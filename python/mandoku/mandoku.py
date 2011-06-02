@@ -79,10 +79,8 @@ class MandokuText(object):
         #additional items might be placed in the tuple, so the implementation should *not* rely on there being only two items
         #the position at which the character is to be found in the seq tuple
         self.cpos = 0
-        #the position at which metadata (u'\b6',etc) is to be found
+        #the position at which metadata (u'\b6', <pb etc) is to be found
         self.mpos = 1
-        #the position at which <pb, <md and \n are found
-        self.ppos = 1
         self.seq = [('', '')]
         self.ext = ext
         self.textpath = textpath
@@ -129,21 +127,18 @@ class MandokuText(object):
     def punc_reorder(self):
         """Expand the tuple in seq to at least three items,
         punctuation before the char, the char and punctuation after
-        the char, additional stuff like pagebreaks goes at the
-        beginning of the first in the next item."""
+        the char, additional stuff like pagebreaks goes into the fourth item."""
         #we do this only if it has not been done before...
         if self.cpos > 0:
             return
         for i in range(len(self.seq)-1, -1, -1):
             ##move opening punctuation to the next chartuple; move metadata other than punctuation to a new item in this tuple
-            p = np = m = pg = ''
+            p = np = m = ''
             s=self.seq[i][self.cpos+1]
             ex=meta_re.split(s)
             for e in ex:
                 if len(e) > 0:
-                    if e[0] in (u'<', u'\n'):
-                        pg += e
-                    elif e[0] == u'¶':
+                    if e[0] in (u'<', u'¶', u'\n'):
                         m += e
                     else:
                         for j in range(0, len(e)):
@@ -153,10 +148,10 @@ class MandokuText(object):
                             else:
                                 np += e[j]
 #                                print "np", i, np
-            self.seq[i] = ('', '', self.seq[i][self.cpos], np, m)
+            self.seq[i] = ('', self.seq[i][self.cpos], np, m)
             if len(p) > 0:
                 try:
-                    self.seq[i+1] = (pg + self.seq[i+1][0], p + self.seq[i+1][1], ) + self.seq[i+1][1:]
+                    self.seq[i+1] = (p + self.seq[i+1][0], ) + self.seq[i+1][1:]
                 except:
                     print i, p, self.seq[i]
             if self.seq[i][1].startswith('{'):
@@ -165,25 +160,24 @@ class MandokuText(object):
                 rep = ts[ts.find(':')+1:-1]
                 if len(k) > 0:
                     try:
-                        self.seq[i] = ('', '{', k[0], ':' + rep[0] + '}', ) + self.seq[i][2:]
+                        self.seq[i] = ('{', k[0], ':' + rep[0] + '}', ) + self.seq[i][2:]
                     except:
-                        self.seq[i] = ('', '{', k[0], ':}', ) + self.seq[i][2:]
+                        self.seq[i] = ('{', k[0], ':}', ) + self.seq[i][2:]
                     if len(k) > 1:
                         ##this should be the only case where we extend the seq
                         for x in range(1, len(k)):
                             try:
-                                self.seq.insert(i+x, ('', '{', k[x], ':' + rep[x] + '}', '',))
+                                self.seq.insert(i+x, ('{', k[x], ':' + rep[x] + '}', '',))
                             except:
-                                self.seq.insert(i+x, ('', '{', k[x], ':}', '',))
+                                self.seq.insert(i+x, ('{', k[x], ':}', '',))
                         if len(rep) > x:
                             self.seq[i+x] = ('{', self.seq[i+x][1], ':' + rep[x:] + '}', '')
                 elif len(rep) > 0:
-                    self.seq[i] = ('', '{', '', ':' + rep + '}', ) + self.seq[i][2:]
+                    self.seq[i] = ('{', '', ':' + rep + '}', ) + self.seq[i][2:]
                     
                 
         self.cpos = 1
         self.mpos = 3
-        self.ppos = 0
     def add_metadata(self):
         l=0
         for i in range(0, len(self.seq)):
