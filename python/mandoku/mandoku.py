@@ -79,8 +79,10 @@ class MandokuText(object):
         #additional items might be placed in the tuple, so the implementation should *not* rely on there being only two items
         #the position at which the character is to be found in the seq tuple
         self.cpos = 0
-        #the position at which metadata (u'\b6', <pb etc) is to be found
+        #the position at which metadata (u'\b6',etc) is to be found
         self.mpos = 1
+        #the position at which <pb, <md and \n are found
+        self.ppos = 1
         self.seq = [('', '')]
         self.ext = ext
         self.textpath = textpath
@@ -127,18 +129,21 @@ class MandokuText(object):
     def punc_reorder(self):
         """Expand the tuple in seq to at least three items,
         punctuation before the char, the char and punctuation after
-        the char, additional stuff like pagebreaks goes into the fourth item."""
+        the char, additional stuff like pagebreaks goes at the
+        beginning of the first in the next item."""
         #we do this only if it has not been done before...
         if self.cpos > 0:
             return
         for i in range(len(self.seq)-1, -1, -1):
             ##move opening punctuation to the next chartuple; move metadata other than punctuation to a new item in this tuple
-            p = np = m = ''
+            p = np = m = pg = ''
             s=self.seq[i][self.cpos+1]
             ex=meta_re.split(s)
             for e in ex:
                 if len(e) > 0:
-                    if e[0] in (u'<', u'¶', u'\n'):
+                    if e[0] in (u'<', u'\n'):
+                        pg += e
+                    elif e[0] == u'¶':
                         m += e
                     else:
                         for j in range(0, len(e)):
@@ -148,10 +153,10 @@ class MandokuText(object):
                             else:
                                 np += e[j]
 #                                print "np", i, np
-            self.seq[i] = ('', self.seq[i][self.cpos], np, m)
+            self.seq[i] = ('', '', self.seq[i][self.cpos], np, m)
             if len(p) > 0:
                 try:
-                    self.seq[i+1] = (p + self.seq[i+1][0], ) + self.seq[i+1][1:]
+                    self.seq[i+1] = (pg + self.seq[i+1][0], p + self.seq[i+1][1], ) + self.seq[i+1][1:]
                 except:
                     print i, p, self.seq[i]
             if self.seq[i][1].startswith('{'):
@@ -160,24 +165,25 @@ class MandokuText(object):
                 rep = ts[ts.find(':')+1:-1]
                 if len(k) > 0:
                     try:
-                        self.seq[i] = ('{', k[0], ':' + rep[0] + '}', ) + self.seq[i][2:]
+                        self.seq[i] = ('', '{', k[0], ':' + rep[0] + '}', ) + self.seq[i][2:]
                     except:
-                        self.seq[i] = ('{', k[0], ':}', ) + self.seq[i][2:]
+                        self.seq[i] = ('', '{', k[0], ':}', ) + self.seq[i][2:]
                     if len(k) > 1:
                         ##this should be the only case where we extend the seq
                         for x in range(1, len(k)):
                             try:
-                                self.seq.insert(i+x, ('{', k[x], ':' + rep[x] + '}', '',))
+                                self.seq.insert(i+x, ('', '{', k[x], ':' + rep[x] + '}', '',))
                             except:
-                                self.seq.insert(i+x, ('{', k[x], ':}', '',))
+                                self.seq.insert(i+x, ('', '{', k[x], ':}', '',))
                         if len(rep) > x:
                             self.seq[i+x] = ('{', self.seq[i+x][1], ':' + rep[x:] + '}', '')
                 elif len(rep) > 0:
-                    self.seq[i] = ('{', '', ':' + rep + '}', ) + self.seq[i][2:]
+                    self.seq[i] = ('', '{', '', ':' + rep + '}', ) + self.seq[i][2:]
                     
                 
         self.cpos = 1
         self.mpos = 3
+        self.ppos = 0
     def add_metadata(self):
         l=0
         for i in range(0, len(self.seq)):
@@ -185,7 +191,7 @@ class MandokuText(object):
             if x > 0:
                 l += x
                 self.lines[i] = l
-            m=re.search(ur"(<pb:[^>]*>)", self.seq[i][self.mpos])
+            m=re.search(ur"(<pb:[^>]*>)", self.seq[i][self.ppos])
             if m:
                 self.pages[i] = m.groups()[0]
                 
@@ -282,8 +288,8 @@ class MandokuText(object):
                 tmp = start
                 while tmp > 0:
                     tmp -= 1
-                    if self.seq[tmp][self.mpos].find('<') > 0:
-                        pb=self.seq[tmp][self.mpos]
+                    if self.seq[tmp][self.ppos].find('<') > 0:
+                        pb=self.seq[tmp][self.ppos]
                         outfile.write("#+PROPERTY: LASTPB  %s\n" % (pb[pb.find('<'):pb.find('>')+1]))
                         outfile.write("%s¶\n" % (pb[pb.find('<'):pb.find('>')+1]))
                         break
@@ -573,10 +579,12 @@ class MandokuComp(object):
         for tag, i1, i2, j1, j2 in self.s.get_opcodes():
             if tag == 'replace':
                 print "".join([a[t1.cpos] for a in t1.seq[i1:i2]]), "".join([a[t2.cpos] for a in t2.seq[j1:j2]])
-    def mergelayout(self, i):
-        """update text2 with layout markers from text1"""
+    def mergelayout(self, i, action='punc'):
+        u"""update text2 with layout markers from text1
+        target is 'punc' (move punctuation) or 'layout' (move pb and \xb6). """
         ##TODO: what I really want is a separation of target of the action and the action itself,
         ## then I could define various actions that move some features of t1 to t2 etc.
+        
         t1 = self.maintext
         t2 = self.othertexts[i]
         if t1.cpos == 0:
@@ -593,17 +601,33 @@ class MandokuComp(object):
             #i.e. equal or replace
             if li == lj:
                 for i in range(i1, i2):
-                    t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] + (t1.seq[i][t1.mpos], )
+                    if action == 'punc':
+                        t2.seq[i+dx] = (t2.seq[i+dx][0], t1.seq[i][1], t2.seq[i+dx][2], t1.seq[i][3],) + t2.seq[i+dx][4:]
+                    else:
+                        t2.seq[i+dx] = (t1.seq[i][0],) + t2.seq[i+dx][1:3] + t1.seq[i][4:]
             elif tag == 'replace':
 #                print dx, i1, i2
                 l = min(li, lj)
                 for i in range(i1, i1+l):
-                    t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] + (t1.seq[i][t1.mpos],) 
+                    if action == 'punc':
+                        t2.seq[i+dx] = (t2.seq[i+dx][0], t1.seq[i][1], t2.seq[i+dx][2], t1.seq[i][3],) + t2.seq[i+dx][4:]
+                    else:
+                        t2.seq[i+dx] = (t1.seq[i][0],) + t2.seq[i+dx][1:3] + t1.seq[i][4:]
                 #only if text1 is longer, we add the rest of 1 add the last char
                 if li > lj:
-                    t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] +( t1.seq[i][t1.mpos] + "".join([a[t1.mpos] for  a in t1.seq[i:i2]]), ) + t2.seq[i+dx][t2.mpos+1:]
+                    if action == 'punc':
+                        ##this misses out on the extra stuff in a[1]??
+                        t2.seq[i+dx] = (t2.seq[i+dx][0], t1.seq[i][1], t2.seq[i+dx][2], t1.seq[i][3] + + "".join([a[1]+a[3] for  a in t1.seq[i:i2]]),) + t2.seq[i+dx][4:]
+                    else:
+                        ##TODO
+                        pass
             elif tag == 'delete':
-                t2.seq[j1-1] = t2.seq[j1-1][:t2.mpos] + (t2.seq[j1-1][t2.mpos] + "".join([a[t1.mpos] for  a in t1.seq[i:i2]]), ) + t2.seq[i+dx][t2.mpos+1:]
+                if action == 'punc':
+                    t2.seq[j1-1] = t2.seq[j1-1][:t2.mpos] + (t2.seq[j1-1][t2.mpos] + "".join([a[1]+a[3] for  a in t1.seq[i:i2]]), ) + t2.seq[i+dx][t2.mpos+1:]
+                else:
+                    ##TODO
+                    pass
+                
 
 
     def move_pg_and_xb6tot2(self, i):

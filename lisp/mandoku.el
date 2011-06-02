@@ -2,10 +2,12 @@
 ;; created [2001-03-13T20:32:32+0800]  (as smart.el)
 ;; renamed and refactored [2010-01-08T17:01:43+0900]
 
-(defvar mandoku-dir (expand-file-name  "~/db/text/"))
-(defvar mandoku-image-dir (expand-file-name  "~/db/images/"))
-(defvar mandoku-index-dir (expand-file-name "~/db/index/"))
-(defvar mandoku-meta-dir (expand-file-name "~/db/meta/"))
+(defvar mandoku-base-dir (expand-file-name  "~/db/"))
+
+(defvar mandoku-text-dir (expand-file-name (concat mandoku-base-dir "text/")))
+(defvar mandoku-image-dir (expand-file-name  (concat mandoku-base-dir "images/")))
+(defvar mandoku-index-dir (expand-file-name  (concat mandoku-base-dir "index/")))
+(defvar mandoku-meta-dir (expand-file-name  (concat mandoku-base-dir "meta/")))
 
 (defvar mandoku-file-type ".txt")
 ;;》《
@@ -119,27 +121,36 @@ One character is either a character or one entity expression"
 	       ;; the following are optional:
 	       ;; match-string 5: dummy
 	       ;; match-string 6: addinfo
+	       ;; match-string 1: dummy
+	       ;; match-string 2: collection
+	       ;; match-string 3: match
+	       ;; match-string 4: pre
+	       ;; match-string 5: location
+	       ;; the following are optional:
+	       ;; match-string 6: dummy
+	       ;; match-string 7: addinfo
+
 ;;       "^[^.]*.\\([^.]*\\)?.\\(.*\\).idx[^:]*:\\([^,]*\\),\\([^\t]*\\)\t\\([^\t \n]*\\)\\(\t?\\([^\n\t ]*\\)\\)$"
 
-       "^[^.]*.\\([^.]*\\)?.?\\(.*\\).idx[^:]*:\\([^,]*\\),\\([^\t]*\\)\t\\([^\t \n]*\\)\\(\t[^\n\t ]*\\)?$"
-
+;;       "^[^.]*.\\([^.]*\\)?.?\\(.*\\).idx[^:]*:\\([^,]*\\),\\([^\t]*\\)\t\\([^\t \n]*\\)\\(\t[^\n\t ]*\\)?$"
+	       "^\\([^.]*.\\([^.]*\\)?.?\\(.*\\).idx[^:]*\\)?:?\\([^,]*\\),\\([^\t]*\\)\t\\([^\t \n]*\\)\\(\t[^\n\t ]*\\)?$"
 	) nil t )
 	(let* (
 	       ;;if no subcoll, need to switch the match assignments.
-	      (subcoll (if (equal "" (match-string 2))
-			   (match-string 2)
-			 (match-string 1)))
-	      (coll  (if (equal "" (match-string 2))
-			   (match-string 1)
+	      (subcoll (if (equal "" (match-string 3))
+			   (match-string 3)
 			 (match-string 2)))
-	      (pre (match-string 4))
-	      (post (match-string 3))
-	      (location (funcall (intern (concat "mandoku-" coll "-parse-location")) (match-string 5)))
+	      (coll  (if (equal "" (match-string 3))
+			   (match-string 2)
+			 (match-string 3)))
+	      (pre (match-string 5))
+	      (post (match-string 4))
+	      (location (funcall (intern (concat "mandoku-" coll "-parse-location")) (match-string 6)))
 	      ;(vol (format "%02d" (string-to-number (match-string 7))))
 	      ;(page (match-string 4))
 	      ;(sec (match-string 5))
-	      (line (match-string 6))
-	      (extra (match-string 7))
+	      (line (match-string 7))
+	      (extra (match-string 8))
 ;;	      (markup (match-string 8))
 	      )
 	  (let* ((vol (car location))
@@ -478,9 +489,9 @@ One character is either a character or one entity expression"
   (interactive "P")
   (let* ((pb (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))
          (this (split-string pb "_")))
-	  (if (file-exists-p (concat mandoku-dir "dzjy/" (elt this 1) "/" (elt this 1 ) ".txt"))
-	      (find-file-other-window (concat mandoku-dir "dzjy/" (elt this 1) "/" (elt this 1 ) ".txt"))
-	    (find-file-other-window (concat mandoku-dir "dzjy-can/" (elt this 1) "/" (elt this 1 ) ".txt")))
+	  (if (file-exists-p (concat mandoku-text-dir "dzjy/" (elt this 1) "/" (elt this 1 ) ".txt"))
+	      (find-file-other-window (concat mandoku-text-dir "dzjy/" (elt this 1) "/" (elt this 1 ) ".txt"))
+	    (find-file-other-window (concat mandoku-text-dir "dzjy-can/" (elt this 1) "/" (elt this 1 ) ".txt")))
 	  (goto-char (point-min))
 	  (message pb)
 	  (search-forward (concat "<pb:" pb))))

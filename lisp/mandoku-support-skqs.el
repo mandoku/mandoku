@@ -53,7 +53,7 @@ For compatibility with the other collections, we move the text number to the bac
 )
 
 
-(setq mandoku-skqs-titletable (expand-file-name "~/db/text/skqs/skqs-titles.txt"))
+(setq mandoku-skqs-titletable (expand-file-name (concat mandoku-dir "meta/skqs-titles.txt"))
 (defun mandoku-skqs-read-titletable () 
 "read the titles table"
   (when (file-exists-p mandoku-skqs-titletable)
