@@ -1,0 +1,39 @@
+#+TITLE: Mandoku project
+
+
+* About mandoku
+
+  Mandoku is a framework for supporting research on premodern Chinese
+  texts. This includes the tasks of 
+
+  * Philologically establishing a text, possibly by referencing and
+    collating multiple versions of a text and digital facsimile(s). 
+  * Reading, annotating, analyzing and translating a text.
+  * Working with repositories of texts, compare, study and analyze
+    differences among these texts.
+  * Establish and maintain metadata about such texts, for example
+    concerning the dates, authors, place of creation etc. of the texts.
+  * Compare notes, share information with other researchers working on
+    these texts.
+
+  Technically speaking this is achieved by
+  * defining a text format.
+  * establishing conventions for collaboration to use texts based on
+    this format.
+  * developing a working environment and tools for handling these
+    texts.
+
+
+** The mandoku text format
+
+   The format used by mandoku is derived from the file format used in
+   Emacs' org-mode (see [[http://orgmode.org/][Org-Mode: Your Life in Plain Text]]) with some
+   extensions and additional conventions.  For more information, see
+   [[mandoku-format.org]].
+
+** 
+
+
+
+
+

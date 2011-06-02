@@ -1,0 +1,34 @@
+#+TITLE: Conventions for the layout of Mandoku repositories
+#+OPTIONS: ^:{}
+
+* Rationale
+  In order to make working with a large number of texts easier, both
+  for the programmer and the user, some conventions has been
+  established.  You might of course lay out your repository the way
+  you like, but don't expect things to work if you deviate from the
+  one and true way.
+
+* Folder structure
+
+  Under an aribitrarily root folder (which defaults to ~/db) the
+  following sub folders are expected
+
+** text 
+   This is where the texts are stored. In most cases, it is convenient
+   to store the texts in =collections=, which are simple sub-folders
+   to hold the actual texts.  While the depth is arbitrary, at least
+   one level of sub-folders is expected, so there are no text files
+   lying around in this folder.
+*** collections
+    Collections are just sub-folders that group together texts in some
+    arbitrary way.  The =cbeta= collection for example, holds the
+    texts provided by cbeta.
+*** text files
+##store as file or in a directory
+    In many cases
+
+*** texts
+
+    
+    * meta 
+      This is where metadata for texts are stored, usually in 

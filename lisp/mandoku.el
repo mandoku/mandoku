@@ -1,0 +1,500 @@
+;; mandoku.el   -*- coding: utf-8 -*-
+;; created [2001-03-13T20:32:32+0800]  (as smart.el)
+;; renamed and refactored [2010-01-08T17:01:43+0900]
+
+(defvar mandoku-dir (expand-file-name  "~/db/text/"))
+(defvar mandoku-image-dir (expand-file-name  "~/db/images/"))
+(defvar mandoku-index-dir (expand-file-name "~/db/index/"))
+(defvar mandoku-meta-dir (expand-file-name "~/db/meta/"))
+
+(defvar mandoku-file-type ".txt")
+;;》《
+(defvar mandoku-punct-regex-post "\\([^
+]\\)\\([　-〇〉」』】-㄀︀-￯)]+\\)")
+(defvar mandoku-punct-regex-pre "\\([^
+]\\)\\([(〈「『【]+\\)")
+
+(defvar mandoku-kanji-regex "\\([㐀-鿿𠀀-𪛟]+\\)")
+
+(defvar mandoku-regex "<[^>]*>\\|[　-㄀＀-￯\n¶]+\\|\t[^\n]+\n")
+
+(defun char-to-ucs (char)
+  char
+)
+(defun mandoku-char-to-ucs (char)
+  (format "%04x" (char-to-ucs char))
+)
+
+(defun mandoku-what (char)
+  (interactive (list (char-after)))
+	(message (mandoku-char-to-ucs char))
+)
+
+(defun mandoku-next-three-chars ()
+	(save-excursion
+	 (list
+	 (char-after)
+	 (progn (mandoku-forward-one-char) (char-after))
+	 (progn (mandoku-forward-one-char) (char-after))
+	 (progn (mandoku-forward-one-char) (char-after))
+	 (progn (mandoku-forward-one-char) (char-after))
+	))
+)
+
+(defun mandoku-forward-one-char ()
+	"this function moves forward one character, ignoring punctuation and markup
+One character is either a character or one entity expression"
+	(interactive)
+	(save-match-data
+	(if (looking-at "&[^;]*;")
+	    (forward-char (- (match-end 0) (match-beginning 0)))
+	  (forward-char 1)
+	)
+	;; this skips over newlines, punctuation and markup.
+	;; Need to expand punctuation regex [2001-03-15T12:30:09+0800]
+	;; this should now skip over most ideogrph punct
+	(while (looking-at mandoku-regex)
+		(forward-char (- (match-end 0) (match-beginning 0)))))
+)
+
+(defun mandoku-forward-n-characters (num)
+	(while (> num 0)
+		(setq num (- num 1))
+		(message (number-to-string num))
+		(mandoku-forward-one-char))
+)
+
+
+
+(defun mandoku-grep-internal (search-string)
+  (interactive "s")
+  (let ((coding-system-for-read 'utf-8)
+	(coding-system-for-write 'utf-8)
+	(index-buffer (get-buffer-create "*temp-mandoku*"))
+	(the-buf (current-buffer))
+	(result-buffer (get-buffer-create "*Mandoku Index*"))
+	(search-char (string-to-char search-string))
+	(org-startup-folded t)
+	(mandoku-count 0))
+    (progn
+      (set-buffer index-buffer)
+      (erase-buffer)
+;; find /tmp/index/SDZ0001.txt -name "97.idx.*" | xargs zgrep "^靈寳"
+      (shell-command
+		    (concat "bzgrep " "^"
+		     (substring search-string 1 )
+		     " "
+		     mandoku-index-dir
+		     (substring (format "%04x" search-char) 0 2)
+		     "/"
+		     (format "%04x" search-char)
+		     "*.idx*")
+		    index-buffer nil
+		    )
+      ;; setup the buffer for the index results
+      (set-buffer result-buffer)
+      (setq buffer-read-only nil)
+      (erase-buffer)
+      ;; switch to index-buffer and get the results
+      (mandoku-read-index-buffer index-buffer result-buffer search-string)
+      )))
+
+(defun mandoku-read-index-buffer (index-buffer result-buffer search-string)
+  (let (
+	(mandoku-count 0)
+      	(search-char (string-to-char search-string)))
+
+      (switch-to-buffer-other-window index-buffer t)
+;;xx      (set-buffer index-buffer)
+;; first: sort the result (after the filename)
+      (sort-regexp-fields nil "^[^:]*:\\(.*\\)$" "\\1" (point-min) (point-max))
+
+      (goto-char (point-min))
+      (while (re-search-forward
+	      (concat
+	       ;; match-string 1: collection
+	       ;; match-string 2: match
+	       ;; match-string 3: pre
+	       ;; match-string 4: location
+	       ;; the following are optional:
+	       ;; match-string 5: dummy
+	       ;; match-string 6: addinfo
+;;       "^[^.]*.\\([^.]*\\)?.\\(.*\\).idx[^:]*:\\([^,]*\\),\\([^\t]*\\)\t\\([^\t \n]*\\)\\(\t?\\([^\n\t ]*\\)\\)$"
+
+       "^[^.]*.\\([^.]*\\)?.?\\(.*\\).idx[^:]*:\\([^,]*\\),\\([^\t]*\\)\t\\([^\t \n]*\\)\\(\t[^\n\t ]*\\)?$"
+
+	) nil t )
+	(let* (
+	       ;;if no subcoll, need to switch the match assignments.
+	      (subcoll (if (equal "" (match-string 2))
+			   (match-string 2)
+			 (match-string 1)))
+	      (coll  (if (equal "" (match-string 2))
+			   (match-string 1)
+			 (match-string 2)))
+	      (pre (match-string 4))
+	      (post (match-string 3))
+	      (location (funcall (intern (concat "mandoku-" coll "-parse-location")) (match-string 5)))
+	      ;(vol (format "%02d" (string-to-number (match-string 7))))
+	      ;(page (match-string 4))
+	      ;(sec (match-string 5))
+	      (line (match-string 6))
+	      (extra (match-string 7))
+;;	      (markup (match-string 8))
+	      )
+	  (let* ((vol (car location))
+		 (pag (car (cdr location)))
+		 (line (car (cdr (cdr location))))
+		 (page (concat
+			(format "%4.4d" (string-to-number (substring pag 0 (- (length pag) 1))))
+			(mandoku-num-to-section (substring pag (- (length pag) 1)))
+			line))
+		 (tx (if (string-match "_"  (car (cdr location)))
+			 ;; if the length is five, we have a location with the textnum at the end, otherwise it starts with a vol and we have to get the textid from there
+		       (funcall (intern (concat "mandoku-" coll "-textid-to-title"))
+			(if subcoll
+			    (concat (upcase subcoll) (car location))
+			  vol)
+		       (concat page ""))
+
+;;
+		       (funcall (intern (concat "mandoku-" coll "-textid-to-title"))
+			(if subcoll
+			    (concat subcoll vol )
+			  vol)
+		       (concat page ""))))
+		 ;; (text (funcall (intern (concat "mandoku-" coll "-vol-page-to-file"))
+		 ;;       subcoll
+		 ;;       (string-to-number vol)
+		 ;;       (string-to-number pag)))
+		 )
+	    (set-buffer result-buffer)
+	    (insert "** [[mandoku:" coll ":" subcoll
+		    vol
+		    ":"
+		    page
+		    "::"
+		    search-string
+		    "][Vol. "
+		    (upcase subcoll)
+		    vol
+		    ", p."
+		    page
+		    "]]"
+		    "\t"
+		    pre
+;		    "\t"
+		    search-char
+		    post
+		    "  [[mandoku:meta:"
+		    coll
+		    ":"
+		    (car tx)
+		    "][《"
+		   (format "%s" (car (cdr tx)))
+		    "》]]\n"
+		    )
+;; additional properties
+	    (insert ":PROPERTIES:\n:COLL: "
+		    coll
+		    "\n:ID: " (car tx)
+		    "\n:PRE: "  (concat (nreverse (string-to-list pre)))
+		    "\n:POST: "
+		    search-char
+		    post
+		    "\n:END:\n"
+		    )
+	    (set-buffer index-buffer)
+	    (setq mandoku-count (+ mandoku-count 1))
+	    )))
+      (switch-to-buffer-other-window result-buffer t)
+      (goto-char (point-min))
+      (insert (format "There were %d matches for your search of %s:\nLocation                Matches          Source\n"
+       mandoku-count search-string))
+      (org-mode)
+      (org-overview)
+      (kill-buffer index-buffer)
+))
+
+(defun mandoku-grep (beg end)
+  (interactive "r")
+  (mandoku-grep-internal (buffer-substring-no-properties beg end)))
+
+;;;###autoload
+(defun mandoku-grep-n3 (search-for)
+  (interactive
+  (let ((search-for (mapconcat 'char-to-string (mandoku-next-three-chars) "")))
+    (list (read-string "Search for: " search-for))))
+    (mandoku-grep-internal search-for)
+)
+
+
+(defun mandoku-num-to-section (num)
+  "Converts the number codes used in the index to the conventionally used values abc"
+  (format "%c" (+ (string-to-number num) 96)))
+
+(defun mandoku-section-to-num (sec)
+  "Converts the number codes used in the index to the conventionally used values abc"
+  (- (string-to-char sec) 96))
+
+
+(defun mandoku-parse-pno (s)
+" parse a pagenumber s format is pagenumber:line or maybe 462a12"
+    (let
+	((page (if (posix-string-match ":" s)
+		   (car (split-string s ":"))
+		 (if (posix-string-match "[a-z]" s)
+		     (substring s 0 (+ 1 (length (car (split-string s "[a-z]")))))
+		   s)))
+	 (line (if (posix-string-match "[a-z:]" s)
+		   (string-to-int (car (cdr  (split-string s "[a-z:]"))))
+		 0)))
+     (string-to-int (format "%s%s%2.2d" (substring page 0 (- (length page) 1) ) (mandoku-section-to-num (substring page (- (length page) 1) ))  line))
+      ))
+
+(defun mandoku-execute-file-search (s)
+"Go to the line indicated by s format is pagenumber:line or maybe 462a12"
+  (when (eq major-mode 'mandoku-view-mode)
+    (let* (
+	   (page
+	    (if (posix-string-match "[a-h]" s)
+		     (substring s 0 (+ 1 (length (car (split-string s "[a-z]")))))
+	      (if (posix-string-match "l" s)
+		   (car (split-string s "l"))
+		s)))
+	   (line (if (posix-string-match "[a-z]" s)
+		     (string-to-int (car (cdr  (split-string s "[a-z]"))))
+		 0))
+	   (search (if (posix-string-match "::" s)
+		       (car (cdr (split-string s "::")))
+		     nil)))
+    (goto-char (point-min))
+    (re-search-forward page nil t)
+    (while (< -1 line)
+      (re-search-forward "¶" nil t)
+      (+ (point) 1)
+      (setq line (- line 1)))
+    (beginning-of-line-text)
+    (if search
+	(progn
+	  (hi-lock-mode t)
+	  ;; FIXME: need to construct a true regex here!
+	  (highlight-regexp
+	   (mapconcat 'char-to-string
+		      (string-to-list search) (concat "\\(" mandoku-regex "\\)?")))
+	  ;; (message 	   (mapconcat 'char-to-string
+	  ;; 	      (string-to-list search) (concat "\\(" mandoku-regex "\\)?")))
+	  )
+    ))
+  ;; return t to indicate that the search is done.
+    t))
+
+(defun mandoku-position-at-point ()
+  (interactive)
+  (save-excursion
+    (let ((p (point)))
+      (re-search-backward "<pb:" nil t)
+      (re-search-forward "\\([^_]*\\)_\\([^_]*\\)>" nil t)
+      (setq textid (match-string 1))
+      (setq page (match-string 2))
+      (setq line 0)
+      (while (and
+	      (< (point) p )
+	      (re-search-forward "¶" (point-max) t))
+	(setq line (+ line 1)))
+      (message (format "%s:%s%2.2d" textid page line)))))
+
+(defun mandoku-open-image-at-page ()
+  (interactive)
+  (let* (
+	 (coll (mandoku-get-coll buffer-file-name))
+	 (path (concat mandoku-image-dir coll "/"
+	   (funcall (intern
+		     (concat "mandoku-" coll "-page-to-image"))
+		    (mandoku-position-at-point-internal)   ))))
+  (find-file-other-window path )))
+
+
+(defun mandoku-position-at-point-internal ()
+  (interactive)
+  (save-excursion
+    (let ((p (point)))
+      (re-search-backward "<pb:" nil t)
+      (re-search-forward "\\([^_]*\\)_\\([^_]*\\)>" nil t)
+      (setq textid (match-string 1))
+      (setq page (match-string 2))
+      (setq line 0)
+      (while (and
+	      (< (point) p )
+	      (re-search-forward "¶" (point-max) t))
+	(setq line (+ line 1)))
+      (concat textid ":" page (int-to-string line)))))
+
+(defun mandoku-get-coll (filename)
+"find the collection of the file"
+(car (cdr (cdr (cdr (cdr (cdr (split-string filename "/")))))))
+)
+
+(defun mandoku-cit-format (location)
+;; FIXME imlement citation formats for mandoku
+  (format "%s %s" (mandoku-get-title)  location)
+)
+
+
+(defun mandoku-textid-to-filename (coll textid page)
+"given a textid, a collection id and a page, return the file that contains this page"
+(funcall (intern (concat "mandoku-" coll "-textid-to-file")) textid page))
+
+
+
+
+;; mandoku-view-mode
+
+(defvar mandoku-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "e" 'view-mode)
+    (define-key map "a" 'redict-get-line)
+         map)
+  "Keymap for mandoku-view mode"
+)
+(define-derived-mode mandoku-view-mode org-mode "mandoku-view"
+  "a mode to view mandoku files
+  \\{mandoku-mode-map}"
+  (setq case-fold-search nil)
+  (set (make-local-variable 'org-startup-folded) 'showeverything)
+;  (view-mode)
+)
+
+(define-key mandoku-mode-map
+             "C-ce" 'view-mode)
+
+
+
+
+(add-hook 'org-execute-file-search-functions 'mandoku-execute-file-search)
+
+;; formatting
+
+;; (defun mandoku-format-file (file)
+;; (interactive)
+;; (with-current-buffer
+;; (goto-char (point-min))
+;; (while (re-search-forward "。\\([^¶\n\t]\\)" nil t)
+;;   (replace-match "。
+;; " (match-data))
+;; ))
+
+(defun mandoku-index-sort-pre ()
+"sort the result index by the preceding string, this has been saved in the property PRE"
+(interactive)
+(save-excursion
+  (mark-whole-buffer)
+  (org-sort-entries-or-items t ?r nil nil "PRE")
+  (org-overview)
+)
+)
+
+
+(defun mandoku-closest-elm-in-seq (n seq)
+  "returns the closest element which is larger or equal to n in sequence seq "
+   (let ((pair (loop with elm = n with last-elm
+                  for i in seq
+                  if (eq i elm) return (list i)
+                  else if (and last-elm (< last-elm elm) (> i elm)) return (list last-elm i)
+                  do (setq last-elm i))))
+     (if (> (length pair) 1)
+         (if (< (- n (car pair)) (- (cadr pair) n))
+             (car pair) (cadr pair))
+         (car pair))))
+
+
+(defun mandoku-format-on-punc ()
+  "Formats the text from point to the end, splitting at punctuation and other splitting points."
+  (interactive)
+  (save-match-data
+    (while (re-search-forward mandoku-punct-regex-post nil t)
+      (if (looking-at "¶?[
+]")
+	  nil
+	(replace-match (concat (match-string 1)  (match-string 2) "
+")))
+      (if (looking-at "¶?[	]")
+	  (forward-line 1)
+	(forward-char 1))
+      )))
+
+(defun mandoku-pre-format-on-punc ()
+  "hallo"
+  (interactive)
+  (save-match-data
+    (while (re-search-forward mandoku-punct-regex-pre nil t)
+      (replace-match (concat (match-string 1) "
+" (match-string 2)))
+      (forward-char 1)
+      )))
+
+(defun mandoku-format ()
+  "Formats the whole file"
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (looking-at "#")
+      (forward-line 1))
+    (mandoku-format-on-punc)
+    (goto-char (point-min))
+    (while (looking-at "#")
+      (forward-line 1))
+    (mandoku-pre-format-on-punc)
+))
+
+(defun mandoku-annotate (beg end)
+  (interactive "r")
+;  (save-excursion
+  (let ((term (replace-regexp-in-string "\\(?:<[^>]*>\\)?¶?" ""
+					(buffer-substring-no-properties beg end) )))
+    (next-line)
+    (beginning-of-line)
+
+    (if (looking-at ":zhu:")
+	(progn
+	  (re-search-forward ":end:")
+	  (beginning-of-line)
+	  (insert term " [" (chw-text-get-pinyin term) "] \n" )
+	  (previous-line))
+      (progn
+	(insert ":zhu:\n \n:end:\n")
+	(previous-line 2)
+	(beginning-of-line)
+	(insert term " [" (chw-text-get-pinyin term) "]" )))
+
+    (beginning-of-line)
+    (deactivate-mark)
+;    (lookup-word)
+))
+
+
+(defun mandoku-img-to-text (arg)
+  "when looking at an image, try to find the corresponding text location"
+  (interactive "P")
+  (let* ((pb (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))
+         (this (split-string pb "_")))
+	  (if (file-exists-p (concat mandoku-dir "dzjy/" (elt this 1) "/" (elt this 1 ) ".txt"))
+	      (find-file-other-window (concat mandoku-dir "dzjy/" (elt this 1) "/" (elt this 1 ) ".txt"))
+	    (find-file-other-window (concat mandoku-dir "dzjy-can/" (elt this 1) "/" (elt this 1 ) ".txt")))
+	  (goto-char (point-min))
+	  (message pb)
+	  (search-forward (concat "<pb:" pb))))
+
+
+
+(defun mandoku-get-title ()
+(interactive)
+    (save-excursion
+      (goto-char (point-min))
+      (when (re-search-forward "^#\\+TITLE: \\(.*\\)" (point-max) t)
+	(message (org-babel-clean-text-properties  (match-string 1))))))
+      
+
+(provide 'mandoku)
+
+;; end of file mandoku.el

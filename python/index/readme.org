@@ -1,0 +1,13 @@
+#+TITLE: Index
+
+* Generation of index files
+
+  The files in this directory are for generating a ngram index for
+  mandoku texts.  They have been developed and used in early 2010 for
+  some collections, some of them are thus very specific.
+
+* plans
+
+  A new index using redis is under development, the files here are
+  only made available as a stopgap measure until this new index gets
+  available.
