@@ -202,7 +202,7 @@ One character is either a character or one entity expression"
 		    ":"
 		    (car tx)
 		    "][《"
-		   (format "%s" (car (cdr tx)))
+		    (format "%s" (car (cdr tx)))
 		    "》]]\n"
 		    )
 ;; additional properties
