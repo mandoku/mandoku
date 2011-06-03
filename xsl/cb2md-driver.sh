@@ -1,5 +1,5 @@
-#for dir in A C F G K L M P S U 
-for dir in J
+wd=`dirname $0`
+for dir in A C F G K L M P S U H I J T X
 do
     cd $dir
     for d2 in *
@@ -8,7 +8,7 @@ do
 	for file in *.xml
 	do
 	    echo $file
-	    sh ~/work/xsl/cb2md.sh `pwd`/$file
+	    sh $wd/cb2md.sh `pwd`/$file
 	done
 	cd ..
     done
