@@ -2,12 +2,15 @@
 ;; created [2001-03-13T20:32:32+0800]  (as smart.el)
 ;; renamed and refactored [2010-01-08T17:01:43+0900]
 
-(defvar mandoku-base-dir (expand-file-name  "~/db/"))
+(defvar mandoku-base-dir (expand-file-name  "/Users/Shared/md/"))
 
 (defvar mandoku-text-dir (expand-file-name (concat mandoku-base-dir "text/")))
 (defvar mandoku-image-dir (expand-file-name  (concat mandoku-base-dir "images/")))
 (defvar mandoku-index-dir (expand-file-name  (concat mandoku-base-dir "index/")))
 (defvar mandoku-meta-dir (expand-file-name  (concat mandoku-base-dir "meta/")))
+
+(defvar mandoku-textfilter (make-hash-table :test 'equal))
+
 
 (defvar mandoku-file-type ".txt")
 ;;》《
@@ -104,6 +107,7 @@ One character is either a character or one entity expression"
 (defun mandoku-read-index-buffer (index-buffer result-buffer search-string)
   (let (
 	(mandoku-count 0)
+	(mandoku-filtered-count 0)
       	(search-char (string-to-char search-string)))
 
       (switch-to-buffer-other-window index-buffer t)
@@ -180,6 +184,8 @@ One character is either a character or one entity expression"
 		 ;;       (string-to-number pag)))
 		 )
 	    (set-buffer result-buffer)
+	    (unless (mandoku-apply-filter (car tx))
+	    (setq mandoku-filtered-count (+ mandoku-filtered-count 1))
 	    (insert "** [[mandoku:" coll ":" subcoll
 		    vol
 		    ":"
@@ -214,18 +220,30 @@ One character is either a character or one entity expression"
 		    search-char
 		    post
 		    "\n:END:\n"
-		    )
+		    ))
 	    (set-buffer index-buffer)
 	    (setq mandoku-count (+ mandoku-count 1))
 	    )))
       (switch-to-buffer-other-window result-buffer t)
       (goto-char (point-min))
-      (insert (format "There were %d matches for your search of %s:\nLocation                Matches          Source\n"
-       mandoku-count search-string))
+;      (insert (format "There were %d matches for your search of %s:\n"
+;       mandoku-count search-string))
+      (if (> (hash-table-count mandoku-textfilter) 0)
+	  (insert (format "Active Filter: [[%s][%s]], Matches: %d\n" (get 'mandoku-textfilter :filename) (get 'mandoku-textfilter :name) mandoku-filtered-count))
+	)
+      (insert (format "* %s (%d/%d)\nLocation                Matches          Source\n"  search-string mandoku-filtered-count mandoku-count))
       (org-mode)
-      (org-overview)
+ ;     (org-overview)
+      (hide-sublevels 2)
       (kill-buffer index-buffer)
 ))
+
+(defun mandoku-apply-filter (textid)
+  "Apply a filter to the search results."
+  (if (> (hash-table-count mandoku-textfilter) 0)
+      (if (gethash textid mandoku-textfilter)
+	  nil
+	t)))
 
 (defun mandoku-grep (beg end)
   (interactive "r")
@@ -505,6 +523,21 @@ One character is either a character or one entity expression"
       (when (re-search-forward "^#\\+TITLE: \\(.*\\)" (point-max) t)
 	(message (org-babel-clean-text-properties  (match-string 1))))))
       
+
+(defun mandoku-read-titletable (filename tablename) 
+  "reads a titles table"
+  (when (file-exists-p filename)
+    (if (> (hash-table-count tablename) 0)
+      (setq tablename (make-hash-table :test 'equal))
+      (put 'tablename :filename filename)
+      (with-temp-buffer
+        (let ((coding-system-for-read 'utf-8)
+              textid)
+          (insert-file-contents filename)
+          (goto-char (point-min))
+          (while (re-search-forward "^\\([a-z0-9]+\\)\s+\\([^\s\n]+\\)" nil t)
+	    (puthash (match-string 1) (match-string 2) tablename)))))))
+
 
 (provide 'mandoku)
 

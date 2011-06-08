@@ -1,6 +1,7 @@
 ;;support file for the SKQS texts.
 ;; currently there are four subsections s1 s2 s3 s4, they are accessed through different functions
 (setq mandoku-skqs-titles nil)
+(setq mandoku-skqs-titletable (expand-file-name (concat mandoku-meta-dir "skqs-titles.txt")))
 
 (defun mandoku-skqs-page-to-image (locid)
 "given a location id, returns the path of the image"
@@ -53,7 +54,6 @@ For compatibility with the other collections, we move the text number to the bac
 )
 
 
-(setq mandoku-skqs-titletable (expand-file-name (concat mandoku-base-dir "meta/skqs-titles.txt")))
 (defun mandoku-skqs-read-titletable () 
 "read the titles table"
   (when (file-exists-p mandoku-skqs-titletable)
