@@ -1,5 +1,5 @@
 wd=`dirname $0`
-for dir in A C F G K L M P S U H I J T X
+for dir in A C F G K L M P S U H I J T W X
 do
     cd $dir
     for d2 in *

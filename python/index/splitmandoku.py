@@ -25,7 +25,8 @@ inf=codecs.open(fname, 'r', 'utf-8')
 print "#%s"%(fileid)
 header=''
 headerflag=0
-jcnt = -1
+#for cbeta: 0, for dz: -1 [2011-06-10T19:41:09+0900]
+jcnt = 0
 baseed= ''
 lastpb=''
 title=''
