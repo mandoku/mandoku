@@ -6,13 +6,13 @@
 ;; pron-x = pronounciation keys
 ;; all keys will be sorted lexically
 (require 'redis)
-
+(require 'org)
 ;; this is the same as mandoku-regex, for the moment copying it to avoid dependencies.
 (defvar redict-regex "<[^>]*>\\|[　-㄀＀-￯\n¶]+\\|\t[^\n]+\n")
 
 (defvar redict-pron "pron-pinyin-01")
 (defvar redict-prefdic "def-abc-01-01")
-(defvar redict-dict-img-dir "~/db/images/dic/")
+(defvar redict-dict-img-dir "/Users/Shared/md/images/dic/")
 
 ;;(let (( redis-buffer "*redis-dict-buffer*"))
 (setq redis (redis-open-connection redis-buffer))
@@ -180,6 +180,12 @@ the form V07-p08115-129"
 		      (string-to-int (car (split-string loc "/")))
 		      dict
 		      loc)
+	  (if (equal dict "ina")
+	      (format "[[%sina/ina-p%4.4d.djvu][%s : %s]]"
+		      redict-dict-img-dir
+		      (string-to-int (car (split-string loc "/")))
+		      dict
+		      loc)
 	  (if (equal dict "mz")
 	      (let ((vol (string-to-int (substring (car (split-string loc "p")) 1)))
 		    (page (string-to-int (substring (car (split-string loc ",")) 3 -1) )))
@@ -190,7 +196,7 @@ the form V07-p08115-129"
 		      page
 		      dict
 		      loc))
-	    (format "%s : %s" dict loc))))))))))
+	    (format "%s : %s" dict loc)))))))))))
   )
 
 (defun redict-get-next-line ()
@@ -249,3 +255,25 @@ the form V07-p08115-129"
 
 (define-key redict-mode-map
              "n" 'redict-get-next-line)
+(defun redict-highlight (state)
+  (interactive)
+  (cond 
+   ((and (eq major-mode 'redict-mode)
+	     (memq state '(children subtree)))
+    (save-excursion
+    (let ((hw (progn 
+		(while (> (org-current-level) 2)
+		  (outline-previous-heading))
+		(car (split-string  (org-get-heading))))))
+      (hi-lock-mode t)
+      (highlight-regexp hw))))
+   ((and (eq major-mode 'redict-mode)
+	     (memq state '(overview folded)))
+      (hi-lock-mode nil))))
+
+(add-hook 'org-cycle-hook 'redict-highlight) 
+	 
+(provide 'redis-dict)
+
+
+;;; redis-dict.el ends here
