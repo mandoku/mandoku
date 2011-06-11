@@ -7,7 +7,11 @@
 ;; all keys will be sorted lexically
 (require 'redis)
 (require 'org)
+(require 'cl)
+(require 'assoc)
 ;; this is the same as mandoku-regex, for the moment copying it to avoid dependencies.
+;;(setq res (redis-cmd-hgetall "本文"))
+
 (defvar redict-regex "<[^>]*>\\|[　-㄀＀-￯\n¶]+\\|\t[^\n]+\n")
 
 (defvar redict-pron "pron-pinyin-01")
@@ -145,17 +149,17 @@ the form V07-p08115-129"
       (if (equal dict "koga")
 	  ;;koga-p0001.djvu
 	  (format "[[%skoga/koga-p%4.4d.djvu][%s : %s]]"
-		redict-dict-img-dir
+		  redict-dict-img-dir
 		(string-to-int loc)
 		dict
 		loc)
 	(if (equal dict "naka")
 	    ;; naka-p1241.djvu
 	    (format "[[%snaka/naka-p%4.4d.djvu][%s : %s]]"
-		redict-dict-img-dir
-		(string-to-int (substring loc 0 (- (length loc) 1 )))
-		dict
-		loc)
+		    redict-dict-img-dir
+		    (string-to-int (substring loc 0 (- (length loc) 1 )))
+		    dict
+		    loc)
 	  (if (equal dict "zgd")
 	      (format "[[%szgd/zgd-p%4.4d.djvu][%s : %s]]"
 		      redict-dict-img-dir
@@ -186,6 +190,17 @@ the form V07-p08115-129"
 		      (string-to-int (car (split-string loc "/")))
 		      dict
 		      loc)
+	  (if (equal dict "bcs")
+	      (format "[[%sbcs/bcs-p%4.4d.djvu][%s : %s]]"
+		      redict-dict-img-dir
+		      (string-to-int (car (split-string loc "/")))
+		      dict
+		      loc)
+	  (if (equal dict "bsk")
+	      (let ((vol  (format "vol%2.2d" (- (string-to-char loc) 9311)))
+		    (page (format "p%4.4d" (string-to-number (substring loc 1 -1)))))
+		(format "[[%sbsk/%s/bsk-%s-%s.djvu][%s : %s]]" redict-dict-img-dir vol vol page dict loc))
+
 	  (if (equal dict "mz")
 	      (let ((vol (string-to-int (substring (car (split-string loc "p")) 1)))
 		    (page (string-to-int (substring (car (split-string loc ",")) 3 -1) )))
@@ -196,8 +211,8 @@ the form V07-p08115-129"
 		      page
 		      dict
 		      loc))
-	    (format "%s : %s" dict loc)))))))))))
-  )
+	    (format "%s : %s" dict loc))))))))))))))
+  
 
 (defun redict-get-next-line ()
   "display the entries for the next line in the Dict Buffer"
@@ -229,8 +244,10 @@ the form V07-p08115-129"
 (defvar redict-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "e" 'view-mode)
+    (define-key map " " 'View-scroll-page-forward)
     (define-key map "r" 'redict-repeat-line)
     (define-key map "n" 'redict-get-next-line)
+    (define-key map "p" 'redict-get-prev-line)
     (define-key map "p" 'redict-get-prev-line)
          map)
   "Keymap for redict-view mode"
@@ -249,9 +266,9 @@ the form V07-p08115-129"
 (global-set-key (kbd "C-c g") 'redict-get-line)
 (global-set-key (kbd "M-a") 'redict-get-line) ; was backward-sentence.
 (global-set-key (kbd "M-s a") 'redict-get-line)
-(global-set-key (kbd "M-s n") 'redict-get-next-line)
-(global-set-key (kbd "M-s p") 'redict-get-prev-line)
-(global-set-key (kbd "M-s r") 'redict-repeat-line)
+;(global-set-key (kbd "M-s n") 'redict-get-next-line)
+;(global-set-key (kbd "M-s p") 'redict-get-prev-line)
+;(global-set-key (kbd "M-s r") 'redict-repeat-line)
 
 (define-key redict-mode-map
              "n" 'redict-get-next-line)
@@ -265,11 +282,11 @@ the form V07-p08115-129"
 		(while (> (org-current-level) 2)
 		  (outline-previous-heading))
 		(car (split-string  (org-get-heading))))))
-      (hi-lock-mode t)
+      (hi-lock-mode 1)
       (highlight-regexp hw))))
    ((and (eq major-mode 'redict-mode)
 	     (memq state '(overview folded)))
-      (hi-lock-mode nil))))
+      (hi-lock-mode 0))))
 
 (add-hook 'org-cycle-hook 'redict-highlight) 
 	 

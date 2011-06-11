@@ -8,9 +8,15 @@
 (defvar mandoku-image-dir (expand-file-name  (concat mandoku-base-dir "images/")))
 (defvar mandoku-index-dir (expand-file-name  (concat mandoku-base-dir "index/")))
 (defvar mandoku-meta-dir (expand-file-name  (concat mandoku-base-dir "meta/")))
-
-(defvar mandoku-textfilter (make-hash-table :test 'equal))
-
+;; we have one default textfilter, which always exists and can be dynamically treated. 
+(defvar mandoku-default-textfilter (make-hash-table :test 'equal) )
+(setplist 'mandoku-default-textfilter '(:name "Default" :active t))
+;; more textfilters can be added to the list
+(defvar mandoku-textfilter-list (list 'mandoku-default-textfilter))
+;; switch the whole filter mechanism on or off.
+(defvar mandoku-use-textfilter nil)
+;; control, which collections are used.
+(defvar mandoku-collfilter-alist '(("cbeta" . t) ("dz" . nil) ("hist" . nil)))
 
 (defvar mandoku-file-type ".txt")
 ;;》《
@@ -228,8 +234,8 @@ One character is either a character or one entity expression"
       (goto-char (point-min))
 ;      (insert (format "There were %d matches for your search of %s:\n"
 ;       mandoku-count search-string))
-      (if (> (hash-table-count mandoku-textfilter) 0)
-	  (insert (format "Active Filter: [[%s][%s]], Matches: %d\n" (get 'mandoku-textfilter :filename) (get 'mandoku-textfilter :name) mandoku-filtered-count))
+      (if (equal mandoku-use-textfilter t)
+	  (insert (format "Active Filter: %s , Matches: %d\n" (mandoku-active-filter) mandoku-filtered-count))
 	)
       (insert (format "* %s (%d/%d)\nLocation                Matches          Source\n"  search-string mandoku-filtered-count mandoku-count))
       (org-mode)
@@ -240,10 +246,50 @@ One character is either a character or one entity expression"
 
 (defun mandoku-apply-filter (textid)
   "Apply a filter to the search results."
-  (if (> (hash-table-count mandoku-textfilter) 0)
-      (if (gethash textid mandoku-textfilter)
-	  nil
-	t)))
+  (let ((test t))
+    (if (equal mandoku-use-textfilter t)
+	(dolist (f mandoku-textfilter-list)
+	  (if (get f :active)
+	      (if (gethash textid (symbol-value f))
+		  (setq test nil)))))
+    test))
+
+(defun mandoku-active-filter (f)
+;; rewrite as mapping function
+    (if (get f :active)
+	(if (get f :filename)
+	    (format "[[file:%s][%s]] " 
+		    (get f :filename) 
+		    (get f :name))
+	  (get f :name)
+	  )
+      nil)
+    ) 
+
+(defun mandoku-read-textfilter (filename )
+  "Reads a new textfilter and adds it to the list of textfilters"
+  (when (file-exists-p filename)
+    (let ((fn (file-name-sans-extension (file-name-nondirectory filename))))
+      (eval (read (concat "(setq tab-" (file-name-sans-extension (file-name-nondirectory filename)) " (make-hash-table :test 'equal))")))
+      (eval (read (concat "(put 'tab-" fn " :name \042" fn "\042)")))
+      (eval (read (concat "(put 'tab-" fn " :filename \042" filename "\042)")))
+      (eval (read (concat "(put 'tab-" fn " :active  t )")))
+      (with-temp-buffer
+        (let ((coding-system-for-read 'utf-8)
+              textid)
+          (insert-file-contents filename)
+          (goto-char (point-min))
+          (while (re-search-forward "^\\([a-z0-9]+\\)\s+\\([^\s\n]+\\)" nil t)
+	    (eval (read (concat "(puthash (match-string 1) (match-string 2) tab-" fn ")"))))))
+      (eval (read (concat "(add-to-list 'mandoku-textfilter-list 'tab-" fn ")"))))))
+      
+
+
+
+
+(defun mandoku-make-textfilter ()
+  "Creates a new textfilter and adds it to the list of textfilters"
+)
 
 (defun mandoku-grep (beg end)
   (interactive "r")
@@ -481,7 +527,7 @@ One character is either a character or one entity expression"
 ;  (save-excursion
   (let ((term (replace-regexp-in-string "\\(?:<[^>]*>\\)?¶?" ""
 					(buffer-substring-no-properties beg end) )))
-    (next-line)
+    (forward-line)
     (beginning-of-line)
 
     (if (looking-at ":zhu:")
