@@ -235,24 +235,44 @@ One character is either a character or one entity expression"
 ;      (insert (format "There were %d matches for your search of %s:\n"
 ;       mandoku-count search-string))
       (if (equal mandoku-use-textfilter t)
-	  (insert (format "Active Filter: %s , Matches: %d\n" (mandoku-active-filter) mandoku-filtered-count))
+	  (insert (format "Active Filter: %s , Matches: %d (Press 't' to temporarily disable the filter)\n" 
+			  (mapconcat 'mandoku-active-filter mandoku-textfilter-list "")
+			  mandoku-filtered-count))
 	)
-      (insert (format "* %s (%d/%d)\nLocation                Matches          Source\n"  search-string mandoku-filtered-count mandoku-count))
-      (org-mode)
+      (insert (format "Location                Matches          Source\n* %s (%d/%d)\n"  search-string mandoku-filtered-count mandoku-count))
+      (mandoku-index-mode)
  ;     (org-overview)
       (hide-sublevels 2)
-      (kill-buffer index-buffer)
+      (replace-buffer-in-windows index-buffer)
+;      (kill-buffer index-buffer)
 ))
+
+(defun manoku-index-no-filter ()
+  "Temporarily displays the search result without applying a filter"
+  (interactive)
+  (save-match-data 
+  (let ((mandoku-use-textfilter nil)
+	(index-buffer (get-buffer "*temp-mandoku*"))
+	(result-buffer (current-buffer))
+	(search-string (progn
+			 (goto-char (point-min))
+			 (re-search-forward "^\* \\([^ ]*\\) (")
+			 (match-string 1))))
+    (set-buffer result-buffer)
+    (setq buffer-read-only nil)
+    (erase-buffer)
+    (mandoku-read-index-buffer index-buffer result-buffer search-string))))
 
 (defun mandoku-apply-filter (textid)
   "Apply a filter to the search results."
-  (let ((test t))
     (if (equal mandoku-use-textfilter t)
+	(let ((test t))
 	(dolist (f mandoku-textfilter-list)
 	  (if (get f :active)
 	      (if (gethash textid (symbol-value f))
-		  (setq test nil)))))
-    test))
+		  (setq test nil))))
+	test)
+    ))
 
 (defun mandoku-active-filter (f)
 ;; rewrite as mapping function
@@ -263,8 +283,7 @@ One character is either a character or one entity expression"
 		    (get f :name))
 	  (get f :name)
 	  )
-      nil)
-    ) 
+      nil))
 
 (defun mandoku-read-textfilter (filename )
   "Reads a new textfilter and adds it to the list of textfilters"
@@ -329,7 +348,7 @@ One character is either a character or one entity expression"
 
 (defun mandoku-execute-file-search (s)
 "Go to the line indicated by s format is pagenumber:line or maybe 462a12"
-  (when (eq major-mode 'mandoku-view-mode)
+  (when (or (eq major-mode 'mandoku-view-mode) (eq major-mode 'org-mode))
     (let* (
 	   (page
 	    (if (posix-string-match "[a-h]" s)
@@ -569,6 +588,26 @@ One character is either a character or one entity expression"
       (when (re-search-forward "^#\\+TITLE: \\(.*\\)" (point-max) t)
 	(message (org-babel-clean-text-properties  (match-string 1))))))
       
+;;the mode for mandoku-index
+(defvar mandoku-index-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "e" 'view-mode)
+    (define-key map " " 'View-scroll-page-forward)
+    (define-key map "t" 'manoku-index-no-filter)
+         map)
+  "Keymap for mandoku-index mode"
+)
+
+(define-derived-mode mandoku-index-mode org-mode "mandoku-index-mode"
+  "a mode to view Mandoku index search results
+  \\{mandoku-index-mode-map}"
+  (setq case-fold-search nil)
+  (set (make-local-variable 'org-startup-folded) 'overview)
+  (toggle-read-only 1)
+;  (view-mode)
+)
+
+
 
 (defun mandoku-read-titletable (filename tablename) 
   "reads a titles table"
