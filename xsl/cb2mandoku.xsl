@@ -34,7 +34,7 @@
     </xd:doc>
     <!--
     <xsl:key name="anc" match="anchor" use="@xml:id"/>-->
-    <xsl:key name="ch" match="char" use="@xml:id"/>
+    <xsl:key name="ch" match="tei:char" use="@xml:id"/>
     <!--<xsl:variable name="wits" select="//tei:listWit/tei:witness"/>-->
     
 <xsl:variable name="fileheader">
@@ -197,10 +197,10 @@
     
  <xsl:template match="tei:g">
      <xsl:variable name="ref" select="substring-after(@ref, '#')"/>
-     <xsl:variable name="map" select="key('ch', $ref)//mapping[@type='normalized']"/>
+     <xsl:variable name="map" select="key('ch', $ref)//tei:mapping[@type='normalized']"/>
      <xsl:variable name="comp"
-         select="key('ch', $ref)//charProp/localName[. =
-         'composition']/following-sibling::value"/>
+         select="key('ch', $ref)//tei:charProp/tei:localName[. =
+         'composition']/following-sibling::tei:value"/>
      <xsl:choose>
          <xsl:when test="$map">
              <xsl:value-of select="$map"/>

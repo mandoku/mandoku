@@ -239,7 +239,7 @@ One character is either a character or one entity expression"
 			  (mapconcat 'mandoku-active-filter mandoku-textfilter-list "")
 			  mandoku-filtered-count))
 	)
-      (insert (format "Location                Matches          Source\n* %s (%d/%d)\n"  search-string mandoku-filtered-count mandoku-count))
+      (insert (format "Location                Match            Source\n* %s (%d/%d)\n"  search-string mandoku-filtered-count mandoku-count))
       (mandoku-index-mode)
  ;     (org-overview)
       (hide-sublevels 2)
@@ -483,6 +483,7 @@ One character is either a character or one entity expression"
 (interactive)
 (save-excursion
   (mark-whole-buffer)
+  (setq buffer-read-only nil)
   (org-sort-entries-or-items t ?r nil nil "PRE")
   (org-overview)
 )
@@ -594,6 +595,7 @@ One character is either a character or one entity expression"
     (define-key map "e" 'view-mode)
     (define-key map " " 'View-scroll-page-forward)
     (define-key map "t" 'manoku-index-no-filter)
+    (define-key map "s" 'mandoku-index-sort-pre)
          map)
   "Keymap for mandoku-index mode"
 )
@@ -603,7 +605,7 @@ One character is either a character or one entity expression"
   \\{mandoku-index-mode-map}"
   (setq case-fold-search nil)
   (set (make-local-variable 'org-startup-folded) 'overview)
-  (toggle-read-only 1)
+;  (toggle-read-only 1)
 ;  (view-mode)
 )
 

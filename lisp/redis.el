@@ -72,11 +72,9 @@
 ;; open the connection
 
 (defun redis-open-connection (buffer &optional host port)
-  (let* ((host (if (not (equal nil host)) (host) redis-host))
-	(port (if (not (equal nil port)) (host) redis-port))
-	(conn (open-network-stream "*redis*" buffer host port)))
-    (set-process-query-on-exit-flag (get-process conn) nil)
-    conn))
+  (let ((host (if (not (equal nil host)) (host) redis-host))
+	(port (if (not (equal nil port)) (host) redis-port)))
+    (open-network-stream "*redis*" buffer host port)))
     
 
 
