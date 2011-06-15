@@ -484,7 +484,7 @@ One character is either a character or one entity expression"
 (save-excursion
   (mark-whole-buffer)
   (setq buffer-read-only nil)
-  (org-sort-entries-or-items t ?r nil nil "PRE")
+  (org-sort-entries t ?r nil nil "PRE")
   (org-overview)
 )
 )
