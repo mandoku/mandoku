@@ -30,5 +30,5 @@
 *** texts
 
     
-    * meta 
-      This is where metadata for texts are stored, usually in 
+** meta 
+   This is where metadata for texts are stored, usually in 

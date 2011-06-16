@@ -485,7 +485,7 @@ One character is either a character or one entity expression"
   (mark-whole-buffer)
   (setq buffer-read-only nil)
   (org-sort-entries t ?r nil nil "PRE")
-  (org-overview)
+  (hide-sublevels 2)
 )
 )
 
