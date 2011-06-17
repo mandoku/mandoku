@@ -49,7 +49,9 @@
     * Task management (org-mode)
     * Dictionary lookup (lookup)
 
-    Mandoku is thus standing on the shoulders of a giant, 
+    Mandoku is thus standing on the shoulders of a giant, but by
+    adding a few little pieces here and there, it becomes even more
+    useful for specific tasks.
     
     
 # *** Web (maybe)
