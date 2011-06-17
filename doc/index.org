@@ -26,7 +26,9 @@
   these categories there are multiple possibilities, but not all of
   them are realized right now.
 
-  The software is pre-alpha quality, not documented and full of quirks. It is made available as open source 
+  The software is pre-alpha quality, not documented and full of
+  quirks. It is made available as open source under a BSD-style
+  license, see https://github.com/cwittern/mandoku.
   
 ** Interface software
 *** Emacs
