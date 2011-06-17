@@ -25,7 +25,6 @@ inf=codecs.open(fname, 'r', 'utf-8')
 print "#%s"%(fileid)
 header=''
 headerflag=0
-#for cbeta: 0, for dz: -1 [2011-06-10T19:41:09+0900]
 jcnt = 0
 baseed= ''
 lastpb=''
@@ -56,7 +55,7 @@ for line in inf:
         if pb[0] == baseed:
             lastpb = pb
             l = 0
-    if line.find('PROPERTY: JUAN') > -1:
+    if line.find('JUAN') > -1:
         if headerflag == 0:
             toc.write(header.replace('mandoku-view', 'org-mode'))
 #            toc.write(':END:\n')
