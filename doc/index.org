@@ -1,5 +1,5 @@
 #+TITLE: The Mandoku project
-#+DATE: 2011-04-28
+#+DATE: 2011-06-17
 
 
 * About Mandoku 
@@ -19,6 +19,13 @@
   To achieve all this, Mandoku defines a file format, directory
   layout, establishes text repositories and develops software to
   operate with these.
+
+* Status
+  
+
+  [2011-06-17] The project has not yet been publically announced,
+  because at the moment, there is not much to be seen here.  Once that
+  changes, I will make an announcement and remove this silly notice.
 
 * Software
   The software for using Mandoku texts falls in two broad categories:
@@ -41,6 +48,8 @@
       PDF, ODT, DocBook [TEI to come])
     * Task management (org-mode)
     * Dictionary lookup (lookup)
+
+    But of course the most relevant 
     
     
 # *** Web (maybe)
