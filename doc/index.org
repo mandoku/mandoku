@@ -1,0 +1,67 @@
+#+TITLE: The Mandoku project
+#+DATE: 2011-04-28
+
+
+* About Mandoku 
+  Mandoku is a framework for supporting research on premodern Chinese
+  texts. This includes the tasks of 
+  * Philologically establishing a text, possibly by referencing and
+    collating multiple versions of a text, a digital facsimile and a
+    text can be displayed side by side
+  * Reading, annotating, analyzing and translating a text
+  * Working with repositories of texts, compare, study and analyze
+    differences among these texts
+  * Establish and maintain metadata about such texts, for example
+    concerning the dates, authors, place of creation etc. of the texts
+  * Compare notes, share information with other researchers working on
+    these texts
+    
+  To achieve all this, Mandoku defines a file format, directory
+  layout, establishes text repositories and develops software to
+  operate with these.
+
+* Description of the file format
+  The file format is based on the format used in Emacs' org-mode [[http://orgmode.org/][Org-Mode: Your Life in Plain Text]]
+  with some extensions/conventions.
+  There are also some files that are used to maintain information related to the texts
+** The file 
+
+* Software
+  The software for using Mandoku texts falls in two broad categories:
+  text processing software and a frontend to the user.  For both of
+  these categories there are multiple possibilities, but not all of
+  them are realized right now.
+  
+** Interface software
+*** Emacs
+    A set of Emacs lisp files, that together form a working
+    environment for comfortable dealing with the texts.  The advantage
+    of using Emacs lies in the fact, that it can make use of the large
+    amount of modules relevant for researchers.  These include for example
+    * Bibliography management (org-bibtex, reftex)
+    * Publication (org-exp, many conversion targets, including HTML,
+      PDF, ODT, DocBook [TEI to come])
+    * Task management (org-mode)
+    * Dictionary lookup (lookup)
+    
+    
+*** Web (maybe)
+    ** to be done **
+*** PyQt based interface (maybe)
+    ** to be done **
+
+
+    
+** Text processing software
+   Many tasks require operating in some way on the texts, for example
+   extracting certain parts, comparing them with other, collate texts
+   etc.  In the context of the Mandoku project, a special processing
+   model has been developed to make these tasks possible.  Several
+   programs and scripts have been developed for such tasks.
+   
+   Another set of scripts works with digital facsimiles, which have to
+   be cleared up, cropped, deskewed, scaled, and cut in such a way
+   that they can be presented alongside a transcribed text. 
+
+   All these programs have been written in Python [[http://www.python.org/][(Python Programming
+   Language - Official Website]]), these are available in the python directories.
