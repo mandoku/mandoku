@@ -3,8 +3,8 @@
 
 
 * About Mandoku 
-  Mandoku is a framework for supporting research on premodern Chinese
-  texts. This includes the tasks of 
+  Mandoku is a framework for supporting collaborative research on
+  premodern Chinese texts. This includes the tasks of
   * Philologically establishing a text, possibly by referencing and
     collating multiple versions of a text, a digital facsimile and a
     text can be displayed side by side
@@ -49,7 +49,7 @@
     * Task management (org-mode)
     * Dictionary lookup (lookup)
 
-    But of course the most relevant 
+    Mandoku is thus standing on the shoulders of a giant, 
     
     
 # *** Web (maybe)
