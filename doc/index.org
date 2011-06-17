@@ -20,17 +20,13 @@
   layout, establishes text repositories and develops software to
   operate with these.
 
-* Description of the file format
-  The file format is based on the format used in Emacs' org-mode [[http://orgmode.org/][Org-Mode: Your Life in Plain Text]]
-  with some extensions/conventions.
-  There are also some files that are used to maintain information related to the texts
-** The file 
-
 * Software
   The software for using Mandoku texts falls in two broad categories:
   text processing software and a frontend to the user.  For both of
   these categories there are multiple possibilities, but not all of
   them are realized right now.
+
+  The software is pre-alpha quality, not documented and full of quirks. It is made available as open source 
   
 ** Interface software
 *** Emacs
@@ -45,10 +41,10 @@
     * Dictionary lookup (lookup)
     
     
-*** Web (maybe)
-    ** to be done **
-*** PyQt based interface (maybe)
-    ** to be done **
+# *** Web (maybe)
+#     ** to be done **
+# *** PyQt based interface (maybe)
+#     ** to be done **
 
 
     
@@ -65,3 +61,6 @@
 
    All these programs have been written in Python [[http://www.python.org/][(Python Programming
    Language - Official Website]]), these are available in the python directories.
+
+
+   
