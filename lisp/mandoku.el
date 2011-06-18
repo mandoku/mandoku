@@ -45,12 +45,13 @@
 	(save-excursion
 	 (list
 	 (char-after)
-	 (progn (mandoku-forward-one-char) (char-after))
-	 (progn (mandoku-forward-one-char) (char-after))
-	 (progn (mandoku-forward-one-char) (char-after))
-	 (progn (mandoku-forward-one-char) (char-after))
-	))
-)
+	 (while (not (eobp))
+	   (progn (mandoku-forward-one-char) (char-after))
+	   (progn (mandoku-forward-one-char) (char-after))
+	   (progn (mandoku-forward-one-char) (char-after))
+	   (progn (mandoku-forward-one-char) (char-after))
+	   ))))
+
 
 (defun mandoku-forward-one-char ()
 	"this function moves forward one character, ignoring punctuation and markup
