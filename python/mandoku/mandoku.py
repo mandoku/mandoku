@@ -185,7 +185,7 @@ class MandokuText(object):
             if x > 0:
                 l += x
                 self.lines[i] = l
-            m=re.search(ur"(<pb:[^>]*>)", self.seq[i][self.ppos])
+            m=re.search(ur"(<pb:[^>]*>)", self.seq[i][self.mpos])
             if m:
                 self.pages[i] = m.groups()[0]
                 
@@ -282,8 +282,8 @@ class MandokuText(object):
                 tmp = start
                 while tmp > 0:
                     tmp -= 1
-                    if self.seq[tmp][self.ppos].find('<') > 0:
-                        pb=self.seq[tmp][self.ppos]
+                    if self.seq[tmp][self.mpos].find('<') > 0:
+                        pb=self.seq[tmp][self.mpos]
                         outfile.write("#+PROPERTY: LASTPB  %s\n" % (pb[pb.find('<'):pb.find('>')+1]))
                         outfile.write("%s¶\n" % (pb[pb.find('<'):pb.find('>')+1]))
                         break
