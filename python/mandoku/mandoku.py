@@ -647,15 +647,15 @@ class MandokuComp(object):
             #i.e. equal or replace
             if li == lj:
                 for i in range(i1, i2):
-                    t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] + (t2.seq[i+dx][t2.mpos]+t1.seq[i+dx][t1.mpos].replace('\n', ''), )+ t2.seq[i+dx][t2.mpos+1:]
+                    t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] + (t2.seq[i+dx][t2.mpos]+t1.seq[i][t1.mpos].replace('\n', ''), )+ t2.seq[i+dx][t2.mpos+1:]
             elif tag == 'replace':
 #                print dx, i1, i2
                 l = min(li, lj)
                 for i in range(i1, i1+l):
-                    t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] + (t2.seq[i+dx][t2.mpos]+t1.seq[i+dx][t1.mpos].replace('\n', ''),) + t2.seq[i+dx][t2.mpos+1:]
+                    t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] + (t2.seq[i+dx][t2.mpos]+t1.seq[i][t1.mpos].replace('\n', ''),) + t2.seq[i+dx][t2.mpos+1:]
                 #only if text1 is longer, we add the rest of 1 add the last char
                 if li > lj:
-                    t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] +(t2.seq[i+dx][t2.mpos] + t1.seq[i+dx][t1.mpos].replace('\n', '') + "".join([a[t1.mpos].replace('\n', '') for  a in t1.seq[i:i2]]), ) + t2.seq[i+dx][t2.mpos+1:]
+                    t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] +(t2.seq[i+dx][t2.mpos] + t1.seq[i][t1.mpos].replace('\n', '') + "".join([a[t1.mpos].replace('\n', '') for  a in t1.seq[i:i2]]), ) + t2.seq[i+dx][t2.mpos+1:]
             elif tag == 'delete':
                 t2.seq[j1-1] = t2.seq[j1-1][:t2.mpos] + (t2.seq[j1-1][t2.mpos] + "".join([a[t1.mpos].replace('\n', '') for  a in t1.seq[i:i2]]), ) + t2.seq[i+dx][t2.mpos+1:]
 
