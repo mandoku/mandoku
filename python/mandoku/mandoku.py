@@ -214,7 +214,7 @@ class MandokuText(object):
                 else:
                     ## '#+' is a singleline prop, '#' and ':' multiline, to next occurence, right?
 #                    self.in_note = not (self.in_note)
-                    rp=line[1:-1].split()
+                    rp=line[1:-1].split(' ', 2)
 ##[2011-03-11T13:44:09+0900] TODO: handle multiline propertiess
                 if rp[0].startswith('PROPERTY'):
                     try:
@@ -312,7 +312,7 @@ class MandokuText(object):
             if dx in ('lastpb', 'date', 'sec', 'juan'):
                 continue
             if not 'mode: ' in self.defs[dx]:
-                out.write("#+PROPERTY: %s %s\n" % (dx, self.defs[dx]))
+                out.write("#+PROPERTY: %s %s\n" % (dx.upper(), self.defs[dx]))
         out.write("#+PROPERTY: JUAN %d\n" % (section))
         
             
