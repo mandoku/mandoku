@@ -147,8 +147,7 @@ class MandokuText(object):
 #                                print "p", i, p
                             else:
                                 np += e[j]
-#                                print "np", i, np
-            self.seq[i] = ('', self.seq[i][self.cpos], np, m)
+            self.seq[i] = ('', self.seq[i][self.cpos], np, m, ) + self.seq[i][self.cpos+2:]
             if len(p) > 0:
                 try:
                     self.seq[i+1] = (p + self.seq[i+1][0], ) + self.seq[i+1][1:]
