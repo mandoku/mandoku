@@ -42,15 +42,15 @@
 )
 
 (defun mandoku-next-three-chars ()
-	(save-excursion
-	 (list
-	 (char-after)
-	 (while (not (eobp))
-	   (progn (mandoku-forward-one-char) (char-after))
-	   (progn (mandoku-forward-one-char) (char-after))
-	   (progn (mandoku-forward-one-char) (char-after))
-	   (progn (mandoku-forward-one-char) (char-after))
-	   ))))
+  (save-excursion
+    (list
+     (char-after)
+     (progn (mandoku-forward-one-char) (char-after))
+     (progn (mandoku-forward-one-char) (char-after))
+     (progn (mandoku-forward-one-char) (char-after))
+     (progn (mandoku-forward-one-char) (char-after))
+     (progn (mandoku-forward-one-char) (char-after))
+)))
 
 
 (defun mandoku-forward-one-char ()
