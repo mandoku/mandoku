@@ -313,7 +313,7 @@ class MandokuText(object):
                 continue
             if not 'mode: ' in self.defs[dx]:
                 out.write("#+PROPERTY: %s %s\n" % (dx.upper(), self.defs[dx]))
-        out.write("#+PROPERTY: JUAN %d\n" % (section))
+        out.write("#+PROPERTY: JUAN %d\n" % (section + 1))
         
             
 class MandokuComp(object):
