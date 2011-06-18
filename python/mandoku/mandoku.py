@@ -210,7 +210,7 @@ class MandokuText(object):
                 if line.startswith('#-'):
                     pass
                 if line.startswith('#+'):
-                    rp=line[2:-1].split()
+                    rp=line[2:-1].split(' ', 2)
                 else:
                     ## '#+' is a singleline prop, '#' and ':' multiline, to next occurence, right?
 #                    self.in_note = not (self.in_note)
@@ -647,17 +647,17 @@ class MandokuComp(object):
             #i.e. equal or replace
             if li == lj:
                 for i in range(i1, i2):
-                    t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] + (t2.seq[i+dx][t2.mpos]+t1.seq[i][t1.mpos].replace('\n', ''), )+ t2.seq[i+dx][t2.mpos+1:]
+                    t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] + (t2.seq[i+dx][t2.mpos]+t1.seq[i][t1.mpos].replace('\n', '').replace('<pb:', '<md:'), )+ t2.seq[i+dx][t2.mpos+1:]
             elif tag == 'replace':
 #                print dx, i1, i2
                 l = min(li, lj)
                 for i in range(i1, i1+l):
-                    t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] + (t2.seq[i+dx][t2.mpos]+t1.seq[i][t1.mpos].replace('\n', ''),) + t2.seq[i+dx][t2.mpos+1:]
+                    t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] + (t2.seq[i+dx][t2.mpos]+t1.seq[i][t1.mpos].replace('\n', '').replace('<pb:', '<md:'), ) + t2.seq[i+dx][t2.mpos+1:]
                 #only if text1 is longer, we add the rest of 1 add the last char
                 if li > lj:
-                    t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] +(t2.seq[i+dx][t2.mpos] + t1.seq[i][t1.mpos].replace('\n', '') + "".join([a[t1.mpos].replace('\n', '') for  a in t1.seq[i:i2]]), ) + t2.seq[i+dx][t2.mpos+1:]
+                    t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] +(t2.seq[i+dx][t2.mpos] + t1.seq[i][t1.mpos].replace('\n', '').replace('<pb:', '<md:') + "".join([a[t1.mpos].replace('\n', '').replace('<pb:', '<md:') for  a in t1.seq[i:i2]]), ) + t2.seq[i+dx][t2.mpos+1:]
             elif tag == 'delete':
-                t2.seq[j1-1] = t2.seq[j1-1][:t2.mpos] + (t2.seq[j1-1][t2.mpos] + "".join([a[t1.mpos].replace('\n', '') for  a in t1.seq[i:i2]]), ) + t2.seq[i+dx][t2.mpos+1:]
+                t2.seq[j1-1] = t2.seq[j1-1][:t2.mpos] + (t2.seq[j1-1][t2.mpos] + "".join([a[t1.mpos].replace('\n', '').replace('<pb:', '<md:') for  a in t1.seq[i:i2]]), ) + t2.seq[i+dx][t2.mpos+1:]
 
             
     def mergepunc(self, i=0):
