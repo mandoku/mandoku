@@ -457,6 +457,8 @@ One character is either a character or one entity expression"
   \\{mandoku-mode-map}"
   (setq case-fold-search nil)
   (set (make-local-variable 'org-startup-folded) 'showeverything)
+  (set (make-local-variable 'tab-with) 30)
+  
 ;  (view-mode)
 )
 
