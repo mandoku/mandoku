@@ -41,8 +41,10 @@ Move punctuation from file 1 to file two.
 
 from mandoku import *
 import sys, codecs
-t1='/Users/chris/db/text/cbeta/T/T51n2076/T51n2076-001.txt'
+t1='/Users/chris/db/work/DZ1039/DZ1039-000.txt'
+#t1='/Users/chris/db/text/cbeta/T/T51n2076/T51n2076-001.txt'
 t2='/Users/chris/sb/txt/T51n2076/T51n2076-001.txt'
+t2='/Users/chris/db/work/DZ1039.txt'
 #t1 = sys.argv[1]
 #t2 = sys.argv[2]
 f1 = MandokuText(t1)
