@@ -555,12 +555,12 @@ One character is either a character or one entity expression"
 
     (if (looking-at ":zhu:")
 	(progn
-	  (re-search-forward ":end:")
+	  (re-search-forward ":END:")
 	  (beginning-of-line)
 	  (insert term " [" (chw-text-get-pinyin term) "] \n" )
 	  (previous-line))
       (progn
-	(insert ":zhu:\n \n:end:\n")
+	(insert ":zhu:\n \n:END:\n")
 	(previous-line 2)
 	(beginning-of-line)
 	(insert term " [" (chw-text-get-pinyin term) "]" )))
