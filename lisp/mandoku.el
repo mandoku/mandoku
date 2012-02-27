@@ -632,6 +632,7 @@ One character is either a character or one entity expression"
 (defun mandoku-get-heading (&optional n)
   (interactive "p")
  (car (split-string (car (org-get-outline-path)) "\t" )))
+
 (defun mandoku-display-heading (&optional n)
   (interactive "p")
 (message (mandoku-get-heading)))
@@ -643,10 +644,27 @@ One character is either a character or one entity expression"
       (when (re-search-forward "^#\\+PROPERTY: JUAN\\(.*\\)" (point-max) t)
 	(org-babel-clean-text-properties  (match-string 1)))))
 
+(defun mandoku-page-at-point ()
+  (interactive)
+  (save-excursion
+    (let ((p (point)))
+      (re-search-backward "<pb:" nil t)
+      (re-search-forward "\\([^_]*\\)_\\([^_]*\\)>" nil t)
+      (setq textid (match-string 1))
+      (setq page (match-string 2))
+      (setq line 0)
+      (while (and
+	      (< (point) p )
+	      (re-search-forward "¶" (point-max) t))
+	(setq line (+ line 1)))
+      (format "%s%2.2d" page line))))
+
+
 (defun mandoku-get-subtree ()
   (interactive)
   (org-copy-subtree) 
-  (kill-append (concat "\n(巻" (mandoku-get-juan) " " (mandoku-get-heading) ")"))) 
+  (kill-append (concat "\n(巻" (mandoku-get-juan) ", " (mandoku-get-heading) ", p" (mandoku-page-at-point) ")") nil ) ) 
+
 
 (provide 'mandoku)
 
