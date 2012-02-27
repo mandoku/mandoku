@@ -628,6 +628,25 @@ One character is either a character or one entity expression"
           (while (re-search-forward "^\\([a-z0-9]+\\)\s+\\([^\s\n]+\\)" nil t)
 	    (puthash (match-string 1) (match-string 2) tablename)))))))
 
+;;[2012-02-28T08:26:29+0900]
+(defun mandoku-get-heading (&optional n)
+  (interactive "p")
+ (car (split-string (car (org-get-outline-path)) "\t" )))
+(defun mandoku-display-heading (&optional n)
+  (interactive "p")
+(message (mandoku-get-heading)))
+
+(defun mandoku-get-juan ()
+(interactive)
+    (save-excursion
+      (goto-char (point-min))
+      (when (re-search-forward "^#\\+PROPERTY: JUAN\\(.*\\)" (point-max) t)
+	(org-babel-clean-text-properties  (match-string 1)))))
+
+(defun mandoku-get-subtree ()
+  (interactive)
+  (org-copy-subtree) 
+  (kill-append (concat "\n(巻" (mandoku-get-juan) " " (mandoku-get-heading) ")"))) 
 
 (provide 'mandoku)
 
