@@ -69,6 +69,10 @@
 ;(setq redis (open-network-stream "*redis*" redis-buffer "localhost" 6379))
 ;(process-status redis)
 
+;; we need utf-8 !!
+
+(add-to-list 'process-coding-system-alist '("redis" . utf-8))
+
 ;; open the connection
 
 (defun redis-open-connection (buffer &optional host port)
