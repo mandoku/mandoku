@@ -20,6 +20,7 @@
 
 ;;(let (( redis-buffer "*redis-dict-buffer*"))
 (setq redis (redis-open-connection redis-buffer))
+(set-process-coding-system redis 'utf-8 'utf-8)
 
 (defun redict-procline (inp)
   "parse the string and repetitevely call the dictionary"

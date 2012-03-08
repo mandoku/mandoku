@@ -71,13 +71,13 @@
 
 ;; we need utf-8 !!
 
-(add-to-list 'process-coding-system-alist '("redis" . utf-8))
+(add-to-list 'process-coding-system-alist '("\\.redis\\." . utf-8))
 
 ;; open the connection
 
 (defun redis-open-connection (buffer &optional host port)
-  (let ((host (if (not (equal nil host)) (host) redis-host))
-	(port (if (not (equal nil port)) (host) redis-port)))
+  (let ((host (if (not (equal nil host)) host redis-host))
+	(port (if (not (equal nil port)) host redis-port)))
     (open-network-stream "*redis*" buffer host port)))
     
 
