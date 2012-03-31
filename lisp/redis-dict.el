@@ -147,6 +147,13 @@ the form V07-p08115-129"
 		(substring (car (cdr (split-string loc "-"))) 1)
 		dict
 		loc)
+    (if (equal dict "hydzd")
+	;; hydzd : // hydzd-p00001 V1-p0031-04
+	(format "[[%shydzd/hydzd-p%s.djvu][%s : %s]]"
+		redict-dict-img-dir
+		(substring (car (cdr (split-string loc "-"))) 1)
+		dict
+		loc)
       (if (equal dict "koga")
 	  ;;koga-p0001.djvu
 	  (format "[[%skoga/koga-p%4.4d.djvu][%s : %s]]"
