@@ -219,7 +219,7 @@ the form V07-p08115-129"
 		      page
 		      dict
 		      loc))
-	    (format "%s : %s" dict loc))))))))))))))
+	    (format "%s : %s" dict loc)))))))))))))))
   
 
 (defun redict-get-next-line ()
