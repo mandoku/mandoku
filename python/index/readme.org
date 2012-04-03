@@ -11,3 +11,15 @@
   A new index using redis is under development, the files here are
   only made available as a stopgap measure until this new index gets
   available.
+
+** update
+   <2012-04-03 Tue> It seems to me now, that rather than using redis,
+   couchdb would be a better choice.  The problems I see with redis are
+   - size of database
+     - at some point, and probably rather soon a db that requires
+       everything to be in memory will be too small
+   - replication: this is one important point were couchdb excells.
+   - speed ? WIll need to check for that, but I hope that it will be
+     in the same ballpark
+   - at some later point, I hope to move the dictionary stuff also
+     into couchdb.
