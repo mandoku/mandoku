@@ -1,0 +1,735 @@
+Help on module couchdb.mapping in couchdb:
+
+NAME
+    couchdb.mapping - Mapping from raw JSON data structures to Python objects and vice versa.
+
+FILE
+    /usr/local/lib/python2.7/site-packages/CouchDB-0.8-py2.7.egg/couchdb/mapping.py
+
+DESCRIPTION
+    >>> from couchdb import Server
+    >>> server = Server()
+    >>> db = server.create('python-tests')
+    
+    To define a document mapping, you declare a Python class inherited from
+    `Document`, and add any number of `Field` attributes:
+    
+    >>> from couchdb.mapping import TextField, IntegerField, DateField
+    >>> class Person(Document):
+    ...     name = TextField()
+    ...     age = IntegerField()
+    ...     added = DateTimeField(default=datetime.now)
+    >>> person = Person(name='John Doe', age=42)
+    >>> person.store(db) #doctest: +ELLIPSIS
+    <Person ...>
+    >>> person.age
+    42
+    
+    You can then load the data from the CouchDB server through your `Document`
+    subclass, and conveniently access all attributes:
+    
+    >>> person = Person.load(db, person.id)
+    >>> old_rev = person.rev
+    >>> person.name
+    u'John Doe'
+    >>> person.age
+    42
+    >>> person.added                #doctest: +ELLIPSIS
+    datetime.datetime(...)
+    
+    To update a document, simply set the attributes, and then call the ``store()``
+    method:
+    
+    >>> person.name = 'John R. Doe'
+    >>> person.store(db)            #doctest: +ELLIPSIS
+    <Person ...>
+    
+    If you retrieve the document from the server again, you should be getting the
+    updated data:
+    
+    >>> person = Person.load(db, person.id)
+    >>> person.name
+    u'John R. Doe'
+    >>> person.rev != old_rev
+    True
+    
+    >>> del server['python-tests']
+
+CLASSES
+    __builtin__.object
+        Field
+            BooleanField
+            DateField
+            DateTimeField
+            DecimalField
+            DictField
+            FloatField
+            IntegerField
+            ListField
+            LongField
+            TextField
+            TimeField
+        Mapping
+            Document
+        ViewField
+    
+    class BooleanField(Field)
+     |  Mapping field for boolean values.
+     |  
+     |  Method resolution order:
+     |      BooleanField
+     |      Field
+     |      __builtin__.object
+     |  
+     |  Methods inherited from Field:
+     |  
+     |  __get__(self, instance, owner)
+     |  
+     |  __init__(self, name=None, default=None)
+     |  
+     |  __set__(self, instance, value)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from Field:
+     |  
+     |  __dict__
+     |      dictionary for instance variables (if defined)
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+    
+    class DateField(Field)
+     |  Mapping field for storing dates.
+     |  
+     |  >>> field = DateField()
+     |  >>> field._to_python('2007-04-01')
+     |  datetime.date(2007, 4, 1)
+     |  >>> field._to_json(date(2007, 4, 1))
+     |  '2007-04-01'
+     |  >>> field._to_json(datetime(2007, 4, 1, 15, 30))
+     |  '2007-04-01'
+     |  
+     |  Method resolution order:
+     |      DateField
+     |      Field
+     |      __builtin__.object
+     |  
+     |  Methods inherited from Field:
+     |  
+     |  __get__(self, instance, owner)
+     |  
+     |  __init__(self, name=None, default=None)
+     |  
+     |  __set__(self, instance, value)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from Field:
+     |  
+     |  __dict__
+     |      dictionary for instance variables (if defined)
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+    
+    class DateTimeField(Field)
+     |  Mapping field for storing date/time values.
+     |  
+     |  >>> field = DateTimeField()
+     |  >>> field._to_python('2007-04-01T15:30:00Z')
+     |  datetime.datetime(2007, 4, 1, 15, 30)
+     |  >>> field._to_json(datetime(2007, 4, 1, 15, 30, 0, 9876))
+     |  '2007-04-01T15:30:00Z'
+     |  >>> field._to_json(date(2007, 4, 1))
+     |  '2007-04-01T00:00:00Z'
+     |  
+     |  Method resolution order:
+     |      DateTimeField
+     |      Field
+     |      __builtin__.object
+     |  
+     |  Methods inherited from Field:
+     |  
+     |  __get__(self, instance, owner)
+     |  
+     |  __init__(self, name=None, default=None)
+     |  
+     |  __set__(self, instance, value)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from Field:
+     |  
+     |  __dict__
+     |      dictionary for instance variables (if defined)
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+    
+    class DecimalField(Field)
+     |  Mapping field for decimal values.
+     |  
+     |  Method resolution order:
+     |      DecimalField
+     |      Field
+     |      __builtin__.object
+     |  
+     |  Methods inherited from Field:
+     |  
+     |  __get__(self, instance, owner)
+     |  
+     |  __init__(self, name=None, default=None)
+     |  
+     |  __set__(self, instance, value)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from Field:
+     |  
+     |  __dict__
+     |      dictionary for instance variables (if defined)
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+    
+    class DictField(Field)
+     |  Field type for nested dictionaries.
+     |  
+     |  >>> from couchdb import Server
+     |  >>> server = Server()
+     |  >>> db = server.create('python-tests')
+     |  
+     |  >>> class Post(Document):
+     |  ...     title = TextField()
+     |  ...     content = TextField()
+     |  ...     author = DictField(Mapping.build(
+     |  ...         name = TextField(),
+     |  ...         email = TextField()
+     |  ...     ))
+     |  ...     extra = DictField()
+     |  
+     |  >>> post = Post(
+     |  ...     title='Foo bar',
+     |  ...     author=dict(name='John Doe',
+     |  ...                 email='john@doe.com'),
+     |  ...     extra=dict(foo='bar'),
+     |  ... )
+     |  >>> post.store(db) #doctest: +ELLIPSIS
+     |  <Post ...>
+     |  >>> post = Post.load(db, post.id)
+     |  >>> post.author.name
+     |  u'John Doe'
+     |  >>> post.author.email
+     |  u'john@doe.com'
+     |  >>> post.extra
+     |  {'foo': 'bar'}
+     |  
+     |  >>> del server['python-tests']
+     |  
+     |  Method resolution order:
+     |      DictField
+     |      Field
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  __init__(self, mapping=None, name=None, default=None)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from Field:
+     |  
+     |  __get__(self, instance, owner)
+     |  
+     |  __set__(self, instance, value)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from Field:
+     |  
+     |  __dict__
+     |      dictionary for instance variables (if defined)
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+    
+    class Document(Mapping)
+     |  Method resolution order:
+     |      Document
+     |      Mapping
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  __init__(self, id=None, **values)
+     |  
+     |  __repr__(self)
+     |  
+     |  _get_id(self)
+     |  
+     |  _set_id(self, value)
+     |  
+     |  items(self)
+     |      Return the fields as a list of ``(name, value)`` tuples.
+     |      
+     |      This method is provided to enable easy conversion to native dictionary
+     |      objects, for example to allow use of `mapping.Document` instances with
+     |      `client.Database.update`.
+     |      
+     |      >>> class Post(Document):
+     |      ...     title = TextField()
+     |      ...     author = TextField()
+     |      >>> post = Post(id='foo-bar', title='Foo bar', author='Joe')
+     |      >>> sorted(post.items())
+     |      [('_id', 'foo-bar'), ('author', u'Joe'), ('title', u'Foo bar')]
+     |      
+     |      :return: a list of ``(name, value)`` tuples
+     |  
+     |  store(self, db)
+     |      Store the document in the given database.
+     |  
+     |  ----------------------------------------------------------------------
+     |  Class methods defined here:
+     |  
+     |  _wrap_row(cls, row) from DocumentMeta
+     |  
+     |  load(cls, db, id) from DocumentMeta
+     |      Load a specific document from the given database.
+     |      
+     |      :param db: the `Database` object to retrieve the document from
+     |      :param id: the document ID
+     |      :return: the `Document` instance, or `None` if no document with the
+     |               given ID was found
+     |  
+     |  query(cls, db, map_fun, reduce_fun, language='javascript', **options) from DocumentMeta
+     |      Execute a CouchDB temporary view and map the result values back to
+     |      objects of this mapping.
+     |      
+     |      Note that by default, any properties of the document that are not
+     |      included in the values of the view will be treated as if they were
+     |      missing from the document. If you want to load the full document for
+     |      every row, set the ``include_docs`` option to ``True``.
+     |  
+     |  view(cls, db, viewname, **options) from DocumentMeta
+     |      Execute a CouchDB named view and map the result values back to
+     |      objects of this mapping.
+     |      
+     |      Note that by default, any properties of the document that are not
+     |      included in the values of the view will be treated as if they were
+     |      missing from the document. If you want to load the full document for
+     |      every row, set the ``include_docs`` option to ``True``.
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  id
+     |      The document ID
+     |  
+     |  rev
+     |      The document revision.
+     |      
+     |      :rtype: basestring
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes defined here:
+     |  
+     |  __metaclass__ = <class 'couchdb.mapping.DocumentMeta'>
+     |  
+     |  
+     |  _fields = {}
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from Mapping:
+     |  
+     |  __delitem__(self, name)
+     |  
+     |  __getitem__(self, name)
+     |  
+     |  __iter__(self)
+     |  
+     |  __len__(self)
+     |  
+     |  __setitem__(self, name, value)
+     |  
+     |  _to_json(self, value)
+     |  
+     |  _to_python(self, value)
+     |  
+     |  get(self, name, default)
+     |  
+     |  setdefault(self, name, default)
+     |  
+     |  unwrap(self)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Class methods inherited from Mapping:
+     |  
+     |  build(cls, **d) from DocumentMeta
+     |  
+     |  wrap(cls, data) from DocumentMeta
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from Mapping:
+     |  
+     |  __dict__
+     |      dictionary for instance variables (if defined)
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+    
+    class Field(__builtin__.object)
+     |  Basic unit for mapping a piece of data between Python and JSON.
+     |  
+     |  Instances of this class can be added to subclasses of `Document` to describe
+     |  the mapping of a document.
+     |  
+     |  Methods defined here:
+     |  
+     |  __get__(self, instance, owner)
+     |  
+     |  __init__(self, name=None, default=None)
+     |  
+     |  __set__(self, instance, value)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  __dict__
+     |      dictionary for instance variables (if defined)
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+    
+    class FloatField(Field)
+     |  Mapping field for float values.
+     |  
+     |  Method resolution order:
+     |      FloatField
+     |      Field
+     |      __builtin__.object
+     |  
+     |  Methods inherited from Field:
+     |  
+     |  __get__(self, instance, owner)
+     |  
+     |  __init__(self, name=None, default=None)
+     |  
+     |  __set__(self, instance, value)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from Field:
+     |  
+     |  __dict__
+     |      dictionary for instance variables (if defined)
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+    
+    class IntegerField(Field)
+     |  Mapping field for integer values.
+     |  
+     |  Method resolution order:
+     |      IntegerField
+     |      Field
+     |      __builtin__.object
+     |  
+     |  Methods inherited from Field:
+     |  
+     |  __get__(self, instance, owner)
+     |  
+     |  __init__(self, name=None, default=None)
+     |  
+     |  __set__(self, instance, value)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from Field:
+     |  
+     |  __dict__
+     |      dictionary for instance variables (if defined)
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+    
+    class ListField(Field)
+     |  Field type for sequences of other fields.
+     |  
+     |  >>> from couchdb import Server
+     |  >>> server = Server()
+     |  >>> db = server.create('python-tests')
+     |  
+     |  >>> class Post(Document):
+     |  ...     title = TextField()
+     |  ...     content = TextField()
+     |  ...     pubdate = DateTimeField(default=datetime.now)
+     |  ...     comments = ListField(DictField(Mapping.build(
+     |  ...         author = TextField(),
+     |  ...         content = TextField(),
+     |  ...         time = DateTimeField()
+     |  ...     )))
+     |  
+     |  >>> post = Post(title='Foo bar')
+     |  >>> post.comments.append(author='myself', content='Bla bla',
+     |  ...                      time=datetime.now())
+     |  >>> len(post.comments)
+     |  1
+     |  >>> post.store(db) #doctest: +ELLIPSIS
+     |  <Post ...>
+     |  >>> post = Post.load(db, post.id)
+     |  >>> comment = post.comments[0]
+     |  >>> comment['author']
+     |  'myself'
+     |  >>> comment['content']
+     |  'Bla bla'
+     |  >>> comment['time'] #doctest: +ELLIPSIS
+     |  '...T...Z'
+     |  
+     |  >>> del server['python-tests']
+     |  
+     |  Method resolution order:
+     |      ListField
+     |      Field
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  __init__(self, field, name=None, default=None)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes defined here:
+     |  
+     |  Proxy = <class 'couchdb.mapping.Proxy'>
+     |  
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from Field:
+     |  
+     |  __get__(self, instance, owner)
+     |  
+     |  __set__(self, instance, value)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from Field:
+     |  
+     |  __dict__
+     |      dictionary for instance variables (if defined)
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+    
+    class LongField(Field)
+     |  Mapping field for long integer values.
+     |  
+     |  Method resolution order:
+     |      LongField
+     |      Field
+     |      __builtin__.object
+     |  
+     |  Methods inherited from Field:
+     |  
+     |  __get__(self, instance, owner)
+     |  
+     |  __init__(self, name=None, default=None)
+     |  
+     |  __set__(self, instance, value)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from Field:
+     |  
+     |  __dict__
+     |      dictionary for instance variables (if defined)
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+    
+    class Mapping(__builtin__.object)
+     |  Methods defined here:
+     |  
+     |  __delitem__(self, name)
+     |  
+     |  __getitem__(self, name)
+     |  
+     |  __init__(self, **values)
+     |  
+     |  __iter__(self)
+     |  
+     |  __len__(self)
+     |  
+     |  __setitem__(self, name, value)
+     |  
+     |  _to_json(self, value)
+     |  
+     |  _to_python(self, value)
+     |  
+     |  get(self, name, default)
+     |  
+     |  setdefault(self, name, default)
+     |  
+     |  unwrap(self)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Class methods defined here:
+     |  
+     |  build(cls, **d) from MappingMeta
+     |  
+     |  wrap(cls, data) from MappingMeta
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  __dict__
+     |      dictionary for instance variables (if defined)
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes defined here:
+     |  
+     |  __metaclass__ = <class 'couchdb.mapping.MappingMeta'>
+     |  
+     |  
+     |  _fields = {}
+    
+    class TextField(Field)
+     |  Mapping field for string values.
+     |  
+     |  Method resolution order:
+     |      TextField
+     |      Field
+     |      __builtin__.object
+     |  
+     |  Methods inherited from Field:
+     |  
+     |  __get__(self, instance, owner)
+     |  
+     |  __init__(self, name=None, default=None)
+     |  
+     |  __set__(self, instance, value)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from Field:
+     |  
+     |  __dict__
+     |      dictionary for instance variables (if defined)
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+    
+    class TimeField(Field)
+     |  Mapping field for storing times.
+     |  
+     |  >>> field = TimeField()
+     |  >>> field._to_python('15:30:00')
+     |  datetime.time(15, 30)
+     |  >>> field._to_json(time(15, 30))
+     |  '15:30:00'
+     |  >>> field._to_json(datetime(2007, 4, 1, 15, 30))
+     |  '15:30:00'
+     |  
+     |  Method resolution order:
+     |      TimeField
+     |      Field
+     |      __builtin__.object
+     |  
+     |  Methods inherited from Field:
+     |  
+     |  __get__(self, instance, owner)
+     |  
+     |  __init__(self, name=None, default=None)
+     |  
+     |  __set__(self, instance, value)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from Field:
+     |  
+     |  __dict__
+     |      dictionary for instance variables (if defined)
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+    
+    class ViewField(__builtin__.object)
+     |  Descriptor that can be used to bind a view definition to a property of
+     |  a `Document` class.
+     |  
+     |  >>> class Person(Document):
+     |  ...     name = TextField()
+     |  ...     age = IntegerField()
+     |  ...     by_name = ViewField('people', '''\
+     |  ...         function(doc) {
+     |  ...             emit(doc.name, doc);
+     |  ...         }''')
+     |  >>> Person.by_name
+     |  <ViewDefinition '_design/people/_view/by_name'>
+     |  
+     |  >>> print Person.by_name.map_fun
+     |  function(doc) {
+     |      emit(doc.name, doc);
+     |  }
+     |  
+     |  That property can be used as a function, which will execute the view.
+     |  
+     |  >>> from couchdb import Database
+     |  >>> db = Database('python-tests')
+     |  
+     |  >>> Person.by_name(db, count=3)
+     |  <ViewResults <PermanentView '_design/people/_view/by_name'> {'count': 3}>
+     |  
+     |  The results produced by the view are automatically wrapped in the
+     |  `Document` subclass the descriptor is bound to. In this example, it would
+     |  return instances of the `Person` class. But please note that this requires
+     |  the values of the view results to be dictionaries that can be mapped to the
+     |  mapping defined by the containing `Document` class. Alternatively, the
+     |  ``include_docs`` query option can be used to inline the actual documents in
+     |  the view results, which will then be used instead of the values.
+     |  
+     |  If you use Python view functions, this class can also be used as a
+     |  decorator:
+     |  
+     |  >>> class Person(Document):
+     |  ...     name = TextField()
+     |  ...     age = IntegerField()
+     |  ...
+     |  ...     @ViewField.define('people')
+     |  ...     def by_name(doc):
+     |  ...         yield doc['name'], doc
+     |  
+     |  >>> Person.by_name
+     |  <ViewDefinition '_design/people/_view/by_name'>
+     |  
+     |  >>> print Person.by_name.map_fun
+     |  def by_name(doc):
+     |      yield doc['name'], doc
+     |  
+     |  Methods defined here:
+     |  
+     |  __get__(self, instance, cls=None)
+     |  
+     |  __init__(self, design, map_fun, reduce_fun=None, name=None, language='javascript', wrapper=<object object>, **defaults)
+     |      Initialize the view descriptor.
+     |      
+     |      :param design: the name of the design document
+     |      :param map_fun: the map function code
+     |      :param reduce_fun: the reduce function code (optional)
+     |      :param name: the actual name of the view in the design document, if
+     |                   it differs from the name the descriptor is assigned to
+     |      :param language: the name of the language used
+     |      :param wrapper: an optional callable that should be used to wrap the
+     |                      result rows
+     |      :param defaults: default query string parameters to apply
+     |  
+     |  ----------------------------------------------------------------------
+     |  Class methods defined here:
+     |  
+     |  define(cls, design, name=None, language='python', wrapper=<object object>, **defaults) from __builtin__.type
+     |      Factory method for use as a decorator (only suitable for Python
+     |      view code).
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  __dict__
+     |      dictionary for instance variables (if defined)
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+
+DATA
+    __all__ = ['Mapping', 'Document', 'Field', 'TextField', 'FloatField', ...
+    __docformat__ = 'restructuredtext en'
+
