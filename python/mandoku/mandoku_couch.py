@@ -42,7 +42,7 @@ class CouchMandoku(MandokuText):
         else:
             super(CouchMandoku, self).__init__(*args, **kwargs)
             self.read()
-#            self.add_metadata()
+            self.add_metadata()
             try:
                 self.txtid = self.defs['id']
             except:
@@ -60,7 +60,8 @@ class CouchMandoku(MandokuText):
             t['sigle-%s' % (sigle)] = self.revision
             t['fac'] = self.fac
             for k in self.pages.keys():
-                t['
+                t[''
+
     def add_metadata(self):
         """for the redis version, we store the 'location' value, that is
         the section * fac +position"""
