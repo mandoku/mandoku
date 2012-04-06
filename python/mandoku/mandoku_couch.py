@@ -47,6 +47,7 @@ class CouchMandoku(MandokuText):
                 self.txtid = textpath.split('/')[-1].split('.')[0]
                 
     def connectText(self):
+        t = self.db[self.txtid]
         pass
 
     def add_metadata(self):
