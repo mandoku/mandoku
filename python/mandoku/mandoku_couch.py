@@ -137,6 +137,7 @@ class CouchMandoku(MandokuText):
 
 
     def pos2seg(self, pos):
+        #give the section of a given pos
         s=[a[0] for a in self.sections]
 #        s.reverse()
         cnt=len(s)
