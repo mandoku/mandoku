@@ -59,9 +59,16 @@ class CouchMandoku(MandokuText):
             t['textpath'] = self.textpath
             t['sigle-%s' % (sigle)] = self.revision
             t['fac'] = self.fac
+            t['pages'] = {}
             for k in self.pages.keys():
-                t[''
-
+                t['pages'][k] = self.pages[k]
+            for i in range(1, len(self.sections)+1):
+                s, f = self.sections[i-1]
+                try:
+                    cnt = self.sections[i][0] - s
+                except(IndexError):
+                    cnt = len(self.seq) - s
+                
     def add_metadata(self):
         """for the redis version, we store the 'location' value, that is
         the section * fac +position"""
