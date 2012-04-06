@@ -12,11 +12,13 @@ from couchdb import Document
 
 from difflib import *
 
-def getsigle(branch, r=redis_config.CLIENT):
+def getsigle(branch, db):
+    "the sigle is a general, not text dependend mapping from a shorthand version to the identifier used in git"
     s = r.hget('branch', branch)
     if s:
         return s
     else:
+        #this means, the branch we are seeing is new, register it
         t = branch.replace(u'【', '')
         i = 1
         s1 = t[0:i]
@@ -48,7 +50,11 @@ class CouchMandoku(MandokuText):
                 
     def connectText(self):
         t = self.db[self.txtid]
-        pass
+        if len(t) < 1:
+            ##new text
+            self.defs['date']= datetime.datetime.now()
+            sigle = getsigle(self.version, self.db)
+
 
     def add_metadata(self):
         """for the redis version, we store the 'location' value, that is
