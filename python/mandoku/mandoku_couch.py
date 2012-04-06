@@ -47,65 +47,7 @@ class CouchMandoku(MandokuText):
                 self.txtid = textpath.split('/')[-1].split('.')[0]
                 
     def connectText(self):
-        t=self.r.hgetall(self.txtid)
-        if len(t) < 1:
-            ##we are connecting a new text, set the metadata etc.
-            self.defs['date']= datetime.datetime.now()
-            ## it looks like we will have to set the first added version as baseversion, version == branch
-            sigle = getsigle(self.version, self.r)
-            self.r.hset('%s' % (self.txtid), 'baseversion', self.version)
-            self.r.hset('%s' % (self.txtid), 'title', self.defs['title'])
-            self.r.hset('%s' % (self.txtid), 'textpath', self.textpath)
-            self.r.hset('%s' % (self.txtid), 'sigle-%s' % (sigle), self.revision)
-            self.r.hset('%s' % (self.txtid), 'fac' , self.fac)
-            #r.zadd('%s:%s-pages' % (defs['id'], defs['sec']),  rp[-1] , defs['char'])
-            p=self.r.pipeline()
-            for k in self.pages.keys():
-                p.zadd('%s-pages' % (self.txtid), self.pages[k], k)
-            for i in range(1, len(self.sections)+1):
-                s, f = self.sections[i-1]
-                try:
-                    cnt = self.sections[i][0] - s
-                except(IndexError):
-                    cnt = len(self.seq) - s
-                self.r.hset('%s:%s-ver' % (self.txtid, i), self.version, self.revision)
-                self.r.hset('%s:%s' % (self.txtid, i), 'charcount', cnt)
-                self.r.hset('%s-sec' % (self.txtid), i, f)
-                target="%s:%s:%s" % (self.txtid, sigle, i)
-                for a in self.seq[s:s+cnt]:
-                    p.rpush(target, "".join(a))
-                p.execute()
-                ## add the zset txtid:sec-pages
-                ## add hash txtid:sec:pageno == mapping of lines to charpos::
-                ##r.hset("%s:%s:%s"%(defs['id'], defs['sec'], defs['page']), "%2.2d"%(defs['line']), defs['char'])
-    def addNgram(self, action='add', n=3):
-        #                    AddToRedis("".join([a[0] for a in chars[0:n]]), chars[0][1], defs['id'])
-        p=self.r.pipeline()
-        for i in range(1, len(self.sections)+1):
-            s, f = self.sections[i-1]
-            try:
-                cnt = self.sections[i][0]
-            except(IndexError):
-                cnt = len(self.seq)
-            for j in range(s, cnt):
-                sx="".join([a[0] for a in self.seq[j:j+n]])
-                if j % 100 == 0:
-                    p.execute()
-                ##ngram:txt, position
-                p.rpush("%s:%s"%(sx, self.txtid), i* self.fac + j)
-                if len(sx) == n:
-                    ##ngram, occurrences in txt
-                    p.zincrby(sx, self.txtid)
-                    try:
-                        p.zincrby(sx[0:2], sx[2])
-                    except:
-                        pass
-                    try:
-                        p.zincrby("%s-next" % (sx[0]), sx[1])
-                        p.zincrby("%s-prev" % (sx[1]), sx[2])
-                    except:
-                        pass
-            p.execute()
+        pass
 
     def add_metadata(self):
         """for the redis version, we store the 'location' value, that is
