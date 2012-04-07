@@ -32,6 +32,7 @@ def getsigle(branch, db):
 
 
 class CouchMandoku(MandokuText):
+    id = TextField()
     def __init__(self, db, txtid=None, fac=100000, *args, **kwargs):
         self.db=db
         self.fac = fac
