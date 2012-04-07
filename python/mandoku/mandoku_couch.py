@@ -72,7 +72,7 @@ class CouchMandoku(MandokuText):
                 except(IndexError):
                     cnt = len(self.seq) - s
                 t['sec'][i] = { 'version' : self.version, 'rev' : self.revision}
-                t
+
     def add_metadata(self):
         """for the redis version, we store the 'location' value, that is
         the section * fac +position"""
