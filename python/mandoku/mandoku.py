@@ -152,6 +152,7 @@ class MandokuText(object):
                 try:
                     self.seq[i+1] = (p + self.seq[i+1][0], ) + self.seq[i+1][1:]
                 except:
+                    pass
                     print i, p, self.seq[i]
             if self.seq[i][1].startswith('{'):
                 ts = self.seq[i][1]
