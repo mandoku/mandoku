@@ -283,8 +283,8 @@ class MandokuText(object):
                     tmp -= 1
                     if self.seq[tmp][self.mpos].find('<') > 0:
                         pb=self.seq[tmp][self.mpos]
-                        outfile.write("#+PROPERTY: LASTPB  %s\n" % (pb[pb.find('<'):pb.find('>')+1]))
-                        outfile.write("%s¶\n" % (pb[pb.find('<'):pb.find('>')+1]))
+                        outfile.write(u"#+PROPERTY: LASTPB  %s\n" % (pb[pb.find('<'):pb.find('>')+1]))
+                        outfile.write(u"%s¶\n" % (pb[pb.find('<'):pb.find('>')+1]))
                         break
             if header and alignpb:
                 ##for the first section, we keep the position at 1
