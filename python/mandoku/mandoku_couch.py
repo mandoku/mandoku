@@ -24,9 +24,9 @@ def getsigle(branch, db):
         i = 1
         s1 = t[0:i]
         sdoc = db['sigle']
-        while sdoc.has_key(s1):
-            s1 = t[0:i]
+        while sdoc.has_key(s1) and i < len(t):
             i += 1
+            s1 = t[0:i]
         sdoc[s1] = branch
         db.save(sdoc)
         bdoc[branch]=s1
@@ -92,6 +92,7 @@ class CouchMandoku(MandokuText):
     def add_metadata(self):
         """for the redis version, we store the 'location' value, that is
         the section * fac +position"""
+        ##this should also be moved to the section, thus not requiring fac
         l=0
         sec=0
         prev = 0
