@@ -14,19 +14,22 @@ from difflib import *
 
 def getsigle(branch, db):
     "the sigle is a general, not text dependend mapping from a shorthand version to the identifier used in git; db is the db where the sigles document is stored"
-    m = db['branch']
-    if m.has_key(branch):
+    bdoc = db['branch']
+    if bdoc.has_key(branch):
         return s
     else:
         #this means, the branch we are seeing is new, register it
         t = branch.replace(u'【', '')
         i = 1
         s1 = t[0:i]
-        while r.hget('sigle', s1):
+        sdoc = db['sigle']
+        while sdoc.has_key(s1):
             s1 = t[o:i]
             i += 1
-        r.hset('sigle', s1, branch)
-        r.hset('branch', branch, s1)
+        sdoc[s1] = branch
+        sdoc.save()
+        bdoc[branch]=s1
+        bdoc.save()
         return s1
 
 
