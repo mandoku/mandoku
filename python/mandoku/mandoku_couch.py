@@ -130,7 +130,7 @@ class CouchMandoku(MandokuText):
                 b.checkout()
                 self.branches[b.name]={}
                 res = self.branches[b.name]
-                sig = getsigle(b.name, self.r)
+                sig = getsigle(b.name, self.meta)
                 t2 = MandokuText(self.textpath, version=b.name)
                 self.refs.append(t2)
                 t2.read()
@@ -141,6 +141,7 @@ class CouchMandoku(MandokuText):
                 for tag, i1, i2, j1, j2 in s.get_opcodes():
                     ##need to find out which seg we are in
                     dummy, f = self.sections[self.pos2seg(i1) - 1]
+                    target="%s:%s:%d"%(self.txtid, sig, self.pos2seg(i1))
                     if add_var_punctuation and tag == 'equal':
                         dx = j1 - i1
                         for i in range(i1, i2):
@@ -172,8 +173,9 @@ class CouchMandoku(MandokuText):
                     elif tag == 'delete':
                         res[i1+d] = ""
                 try:
-                    t=self.db
-                    self.r.hmset(target, res)
+                    t = self.db.get(self.txtid)
+                    t[target] = res
+                    self.db.save(t)
                 except:
                     pass
 
