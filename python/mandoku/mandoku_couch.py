@@ -84,6 +84,7 @@ class CouchMandoku(MandokuText):
                      'sigle' : sigle, 
                      '_id' : f[0:f.index('.')]}
                 d['seq'] = self.seq[s:s+cnt]
+                db.save(d)
             db.save(t)
 
 
@@ -188,9 +189,9 @@ class CouchMandoku(MandokuText):
                 break
                 print pos, x, s
         return cnt
-    # def pos2facpos(self, pos):
-    #     seg = self.pos2seg(pos) 
-    #     return seg * self.fac + pos - self.sections[seg-1][0]
-    # def facpos2pos(self, facpos):
-    #     seg = facpos / self.fac
-    #     return facpos - seg * self.fac + self.sections[seg-1][0]
+    def pos2facpos(self, pos):
+        seg = self.pos2seg(pos) 
+        return seg * self.fac + pos - self.sections[seg-1][0]
+    def facpos2pos(self, facpos):
+        seg = facpos / self.fac
+        return facpos - seg * self.fac + self.sections[seg-1][0]
