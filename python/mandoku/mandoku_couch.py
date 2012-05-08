@@ -36,11 +36,11 @@ def getsigle(branch, db):
 
 class CouchMandoku(MandokuText):
     id = TextField()
-    def __init__(self, db, meta, txtid=None, *args, **kwargs):
+    def __init__(self, db, meta, txtid=None, fac=100000,  *args, **kwargs):
         """db ist the database for text data on the server, meta the metadata database (for internal stuff)"""
         self.meta=meta
         self.db=db
-#        self.fac = fac
+        self.fac = fac
         self.branches={}
         if txtid:
             ## connect to couchdb, get the required data there...
@@ -188,9 +188,9 @@ class CouchMandoku(MandokuText):
                 break
                 print pos, x, s
         return cnt
-    def pos2facpos(self, pos):
-        seg = self.pos2seg(pos) 
-        return seg * self.fac + pos - self.sections[seg-1][0]
-    def facpos2pos(self, facpos):
-        seg = facpos / self.fac
-        return facpos - seg * self.fac + self.sections[seg-1][0]
+    # def pos2facpos(self, pos):
+    #     seg = self.pos2seg(pos) 
+    #     return seg * self.fac + pos - self.sections[seg-1][0]
+    # def facpos2pos(self, facpos):
+    #     seg = facpos / self.fac
+    #     return facpos - seg * self.fac + self.sections[seg-1][0]
