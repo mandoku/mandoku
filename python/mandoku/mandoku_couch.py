@@ -74,6 +74,7 @@ class CouchMandoku(MandokuText):
                     cnt = len(self.seq) - s
                 t['sec'][i] = { 'version' : self.version, 'rev' : self.revision}
 
+
     def add_metadata(self):
         """for the redis version, we store the 'location' value, that is
         the section * fac +position"""
