@@ -27,9 +27,9 @@ def getsigle(branch, db):
             s1 = t[o:i]
             i += 1
         sdoc[s1] = branch
-        sdoc.save()
+        db.save(sdoc)
         bdoc[branch]=s1
-        bdoc.save()
+        db.save(bdoc)
         return s1
 
 
@@ -56,7 +56,7 @@ class CouchMandoku(MandokuText):
                 
     def connectText(self):
         t = self.db.get(self.txtid)
-        if len(t) < 1:
+        if not(t):
             ##new text, so we need to save this to db
             t = {}
             self.defs['date']= datetime.datetime.now()
@@ -84,8 +84,8 @@ class CouchMandoku(MandokuText):
                      'sigle' : sigle, 
                      '_id' : f[0:f.index('.')]}
                 d['seq'] = self.seq[s:s+cnt]
-                db.save(d)
-            db.save(t)
+                self.db.save(d)
+            self.db.save(t)
 
 
     def add_metadata(self):
