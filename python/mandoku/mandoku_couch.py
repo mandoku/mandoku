@@ -62,6 +62,7 @@ class CouchMandoku(MandokuText):
             self.defs['date']= datetime.datetime.now()
             sigle = getsigle(self.version, self.meta)
             t['_id'] = self.txtid
+            t['type'] = 'base'
             t['baseversion'] = self.version
             t['title'] = self.defs['title']
             t['textpath'] = self.textpath
@@ -69,17 +70,21 @@ class CouchMandoku(MandokuText):
             t['fac'] = self.fac
             t['pages'] = {}
             t['versions'] = {}
-
-            for k in self.pages.keys():
-                t['pages'][k] = self.pages[k]
-            db.save(t)
+            t['pages'] = self.pages
+            t['sections'] = self.sections
             for i in range(1, len(self.sections)+1):
                 s, f = self.sections[i-1]
                 try:
                     cnt = self.sections[i][0] - s
                 except(IndexError):
                     cnt = len(self.seq) - s
-                t['sec'][i] = { 'version' : self.version, 'rev' : self.revision, 'sigle' : sigle, 'id' : f[0:f.index('.')]}
+                d = {'type' : 'seq',  
+                     'version' : self.version, 
+                     'rev' : self.revision, 
+                     'sigle' : sigle, 
+                     '_id' : f[0:f.index('.')]}
+                d['seq'] = 
+            db.save(t)
 
 
     def add_metadata(self):
