@@ -150,6 +150,7 @@ class CouchMandoku(MandokuText):
                         self.db.save(t)
                         res = self.branches[b.name]
                         oldseg = seg
+                    ##todo: need to update the position, so that it is based on the section, not total charpos
                     if add_var_punctuation and tag == 'equal':
                         dx = j1 - i1
                         for i in range(i1, i2):
