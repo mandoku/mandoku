@@ -24,7 +24,7 @@ def getsigle(branch, db):
         s1 = t[0:i]
         sdoc = db['sigle']
         while sdoc.has_key(s1):
-            s1 = t[o:i]
+            s1 = t[0:i]
             i += 1
         sdoc[s1] = branch
         db.save(sdoc)
@@ -143,11 +143,12 @@ class CouchMandoku(MandokuText):
                     if (seg != oldseg):
                         dummy, f = self.sections[oldseg]
                         t = self.db.get(f[0:f.find('.')])
-                        try:
-                            t['sigs']
+                        if not(t.has_key('variants')):
+                            t['variants'] = {}
+                        t['variants'][sig] = res
                         self.db.save(t)
                         res = self.branches[b.name]
-
+                        oldseg = seg
                     if add_var_punctuation and tag == 'equal':
                         dx = j1 - i1
                         for i in range(i1, i2):
@@ -179,8 +180,11 @@ class CouchMandoku(MandokuText):
                     elif tag == 'delete':
                         res[i1+d] = ""
                 try:
-                    t = self.db.get()
-                    t[target] = res
+                    dummy, f = self.sections[seg]
+                    t = self.db.get(f[0:f.find('.')])
+                    if not(t.has_key('variants')):
+                        t['variants'] = {}
+                    t['variants'][sig] = res
                     self.db.save(t)
                 except:
                     pass
