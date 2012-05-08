@@ -63,6 +63,7 @@ class CouchMandoku(MandokuText):
             t['fac'] = self.fac
             t['pages'] = {}
             t['versions'] = {}
+            
             for k in self.pages.keys():
                 t['pages'][k] = self.pages[k]
             for i in range(1, len(self.sections)+1):
