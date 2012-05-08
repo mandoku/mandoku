@@ -125,6 +125,7 @@ class CouchMandoku(MandokuText):
         s = SequenceMatcher()
         self.s=s
         self.refs=[]
+        #todo: if possible use only one section for comparison, this is much faster!
         s.set_seq1([a[0] for a in self.seq])
         for b in repo.heads:
             if b.name != self.version:
