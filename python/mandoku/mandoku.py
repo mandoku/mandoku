@@ -102,6 +102,8 @@ class MandokuText(object):
         ## we use our own re to make it replaceable
         self.re = kp_re
 
+
+
     def read(self):
         self.seq = [('', '')]
         self.cpos=0

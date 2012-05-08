@@ -43,7 +43,7 @@ class CouchMandoku(MandokuText):
         self.fac = fac
         self.branches={}
         if txtid:
-            ## connect to redis, get the required data there...
+            ## connect to couchdb, get the required data there...
             self.txtid = txtid
         else:
             super(CouchMandoku, self).__init__(*args, **kwargs)
@@ -58,8 +58,10 @@ class CouchMandoku(MandokuText):
         t = self.db.get(self.txtid)
         if len(t) < 1:
             ##new text, so we need to save this to db
+            t = {}
             self.defs['date']= datetime.datetime.now()
             sigle = getsigle(self.version, self.meta)
+            t['_id'] = self.txtid
             t['baseversion'] = self.version
             t['title'] = self.defs['title']
             t['textpath'] = self.textpath
@@ -70,13 +72,14 @@ class CouchMandoku(MandokuText):
 
             for k in self.pages.keys():
                 t['pages'][k] = self.pages[k]
+            db.save(t)
             for i in range(1, len(self.sections)+1):
                 s, f = self.sections[i-1]
                 try:
                     cnt = self.sections[i][0] - s
                 except(IndexError):
                     cnt = len(self.seq) - s
-                t['sec'][i] = { 'version' : self.version, 'rev' : self.revision}
+                t['sec'][i] = { 'version' : self.version, 'rev' : self.revision, 'sigle' : sigle, 'id' : f[0:f.index('.')]}
 
 
     def add_metadata(self):
