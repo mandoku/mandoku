@@ -13,9 +13,9 @@ from couchdb import Document
 from difflib import *
 
 def getsigle(branch, db):
-    "the sigle is a general, not text dependend mapping from a shorthand version to the identifier used in git"
-    s = r.hget('branch', branch)
-    if s:
+    "the sigle is a general, not text dependend mapping from a shorthand version to the identifier used in git; db is the db where the sigles document is stored"
+    m = db['branch']
+    if m.has_key(branch):
         return s
     else:
         #this means, the branch we are seeing is new, register it
