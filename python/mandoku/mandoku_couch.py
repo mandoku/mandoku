@@ -38,7 +38,7 @@ class CouchMandoku(MandokuText):
     id = TextField()
     def __init__(self, db, meta, txtid=None, fac=100000, *args, **kwargs):
         """db ist the database for text data on the server, meta the metadata database (for internal stuff)"""
-        self.meta
+        self.meta=meta
         self.db=db
         self.fac = fac
         self.branches={}
@@ -52,7 +52,7 @@ class CouchMandoku(MandokuText):
             try:
                 self.txtid = self.defs['id']
             except:
-                self.txtid = textpath.split('/')[-1].split('.')[0]
+                self.txtid = self.textpath.split('/')[-1].split('.')[0]
                 
     def connectText(self):
         t = self.db.get(self.txtid)
@@ -83,7 +83,7 @@ class CouchMandoku(MandokuText):
                      'rev' : self.revision, 
                      'sigle' : sigle, 
                      '_id' : f[0:f.index('.')]}
-                d['seq'] = 
+                d['seq'] = self.seq[s:s+cnt]
             db.save(t)
 
 
