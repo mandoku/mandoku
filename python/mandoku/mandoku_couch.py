@@ -51,7 +51,10 @@ class CouchMandoku(MandokuText):
                 self.txtid = textpath.split('/')[-1].split('.')[0]
                 
     def connectText(self):
-        t = self.db[self.txtid]
+        try:
+            t = self.db[self.txtid]
+        except couchdb.http.ResourceNotFound:
+            t = ""
         if len(t) < 1:
             ##new text
             self.defs['date']= datetime.datetime.now()
@@ -63,7 +66,7 @@ class CouchMandoku(MandokuText):
             t['fac'] = self.fac
             t['pages'] = {}
             t['versions'] = {}
-            
+
             for k in self.pages.keys():
                 t['pages'][k] = self.pages[k]
             for i in range(1, len(self.sections)+1):
