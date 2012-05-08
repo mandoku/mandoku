@@ -82,7 +82,7 @@ class CouchMandoku(MandokuText):
                      'version' : self.version, 
                      'rev' : self.revision, 
                      'sigle' : sigle, 
-                     '_id' : f[0:f.index('.')]}
+                     '_id' : f[0:f.find('.')]}
                 d['seq'] = self.seq[s:s+cnt]
                 self.db.save(d)
             self.db.save(t)
@@ -134,14 +134,13 @@ class CouchMandoku(MandokuText):
                 t2 = MandokuText(self.textpath, version=b.name)
                 self.refs.append(t2)
                 t2.read()
-                ##todo: add the necessary metadata to redis
-                
                 s.set_seq2([a[0] for a in t2.seq])
                 d=0
                 for tag, i1, i2, j1, j2 in s.get_opcodes():
                     ##need to find out which seg we are in
-                    dummy, f = self.sections[self.pos2seg(i1) - 1]
-                    target="%s:%s:%d"%(self.txtid, sig, self.pos2seg(i1))
+                    seg = self.pos2seg(i1) - 1
+                    dummy, f = self.sections[seg]
+                    target="%s:%s:%d"%(f[0:f.find('.')], sig, self.pos2seg(i1))
                     if add_var_punctuation and tag == 'equal':
                         dx = j1 - i1
                         for i in range(i1, i2):
@@ -173,7 +172,7 @@ class CouchMandoku(MandokuText):
                     elif tag == 'delete':
                         res[i1+d] = ""
                 try:
-                    t = self.db.get(self.txtid)
+                    d = self.db.get()
                     t[target] = res
                     self.db.save(t)
                 except:
