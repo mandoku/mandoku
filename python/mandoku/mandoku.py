@@ -254,7 +254,7 @@ class MandokuText(object):
                 if extra:
                     self.seq[-1] = (self.seq[-1][:] + ('\t' + extra,))
 
-                
+        #reduce empty         
     def write_org(self, outfile, header=False):
         """write the text out in the supplied file object"""
         outfile.write("".join( ["".join(a) for a in self.seq]))
