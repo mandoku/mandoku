@@ -114,6 +114,7 @@ class CouchMandoku(MandokuText):
             if m:
                 pos = self.pos2facpos(i)
                 self.pages[pos] = m.groups()[0]
+
     def addOtherBranches(self, add_var_punctuation=False):
         """adds the other branches to redis"""
         try:
@@ -134,11 +135,12 @@ class CouchMandoku(MandokuText):
                 self.refs.append(t2)
                 t2.read()
                 ##todo: add the necessary metadata to redis
+                
                 s.set_seq2([a[0] for a in t2.seq])
                 d=0
                 for tag, i1, i2, j1, j2 in s.get_opcodes():
                     ##need to find out which seg we are in
-                    target="%s:%s:%d"%(self.txtid, sig, self.pos2seg(i1))
+                    dummy, f = self.sections[self.pos2seg(i1) - 1]
                     if add_var_punctuation and tag == 'equal':
                         dx = j1 - i1
                         for i in range(i1, i2):
@@ -170,6 +172,7 @@ class CouchMandoku(MandokuText):
                     elif tag == 'delete':
                         res[i1+d] = ""
                 try:
+                    t=self.db
                     self.r.hmset(target, res)
                 except:
                     pass
