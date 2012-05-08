@@ -15,11 +15,12 @@ from difflib import *
 def getsigle(branch, db):
     "the sigle is a general, not text dependend mapping from a shorthand version to the identifier used in git; db is the db where the sigles document is stored"
     bdoc = db['branch']
-    if bdoc.has_key(branch):
-        return bdoc[branch]
+    t = branch.replace(u'【', '')
+    t = t.replace(u'】', '')
+    if bdoc.has_key(t):
+        return bdoc[t]
     else:
         #this means, the branch we are seeing is new, register it
-        t = branch.replace(u'【', '')
         i = 1
         s1 = t[0:i]
         sdoc = db['sigle']
