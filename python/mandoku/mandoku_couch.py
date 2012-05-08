@@ -16,7 +16,7 @@ def getsigle(branch, db):
     "the sigle is a general, not text dependend mapping from a shorthand version to the identifier used in git; db is the db where the sigles document is stored"
     bdoc = db['branch']
     if bdoc.has_key(branch):
-        return s
+        return bdoc[branch]
     else:
         #this means, the branch we are seeing is new, register it
         t = branch.replace(u'【', '')
@@ -36,8 +36,9 @@ def getsigle(branch, db):
 
 class CouchMandoku(MandokuText):
     id = TextField()
-    
-    def __init__(self, db, txtid=None, fac=100000, *args, **kwargs):
+    def __init__(self, db, meta, txtid=None, fac=100000, *args, **kwargs):
+        """db ist the database for text data on the server, meta the metadata database (for internal stuff)"""
+        self.meta
         self.db=db
         self.fac = fac
         self.branches={}
@@ -54,14 +55,11 @@ class CouchMandoku(MandokuText):
                 self.txtid = textpath.split('/')[-1].split('.')[0]
                 
     def connectText(self):
-        try:
-            t = self.db[self.txtid]
-        except couchdb.http.ResourceNotFound:
-            t = ""
+        t = self.db.get(self.txtid)
         if len(t) < 1:
-            ##new text
+            ##new text, so we need to save this to db
             self.defs['date']= datetime.datetime.now()
-            sigle = getsigle(self.version, self.db)
+            sigle = getsigle(self.version, self.meta)
             t['baseversion'] = self.version
             t['title'] = self.defs['title']
             t['textpath'] = self.textpath
