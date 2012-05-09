@@ -143,20 +143,21 @@ class CouchMandoku(MandokuText):
                         s1start, f =self.sections[i]
                         try:
                             s1end = self.sections[i+1][0]
-                        except KeyError:
+                        except IndexError:
                             s1end = len(self.seq) - s1start
                         s2start=t2.sections[i][0]
                         try:
                             s2end = t2.sections[i+1][0]
-                        except KeyError:
+                        except IndexError:
                             s2end = len(t2.seq) - s2start
+                        s = SequenceMatcher()
                         s.set_seq1([a[0] for a in self.seq[s1start:s1end]])
                         s.set_seq2([a[0] for a in t2.seq[s2start:s2end]])
                         res = self.procdiffs(t2, s, add_var_punctuation)
                         t = self.db.get(f[0:f.find('.')])
                         if not(t.has_key('variants')):
                             t['variants'] = {}
-                        t['variants'][sig] = self.branches[b.name]
+                        t['variants'][sig] = res
                         self.db.save(t)
                 else:
                     s.set_seq2([a[0] for a in t2.seq])
@@ -170,6 +171,7 @@ class CouchMandoku(MandokuText):
                         self.db.save(t)
                     except:
                         pass
+
     def procdiffs (self, t2, s, add_var_punctuation):
         unevensec = len(self.sections) != len(t2.sections)
         d=0
