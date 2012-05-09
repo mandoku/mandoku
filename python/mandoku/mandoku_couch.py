@@ -150,7 +150,7 @@ class CouchMandoku(MandokuText):
                     self.db.save(t)
                 except:
                     pass
-    def procdiffs (t2, s):
+    def procdiffs (self, t2, s):
         res = {}
         for tag, i1, i2, j1, j2 in s.get_opcodes():
             ##need to find out which seg we are in
