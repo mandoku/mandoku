@@ -76,15 +76,15 @@ class CouchMandoku(MandokuText):
             for i in range(1, len(self.sections)+1):
                 s, f = self.sections[i-1]
                 try:
-                    cnt = self.sections[i][0] - s
+                    cnt = self.sections[i][0] 
                 except(IndexError):
-                    cnt = len(self.seq) - s
+                    cnt = len(self.seq) 
                 d = {'type' : 'seq',  
                      'version' : self.version, 
                      'rev' : self.revision, 
                      'sigle' : sigle, 
                      '_id' : f[0:f.find('.')]}
-                d['seq'] = self.seq[s:s+cnt]
+                d['seq'] = self.seq[s:cnt]
                 self.db.save(d)
             self.db.save(t)
 
@@ -145,12 +145,12 @@ class CouchMandoku(MandokuText):
                         try:
                             s1end = self.sections[i+1][0]
                         except IndexError:
-                            s1end = len(self.seq) - s1start
+                            s1end = len(self.seq)
                         s2start=t2.sections[i][0]
                         try:
                             s2end = t2.sections[i+1][0]
                         except IndexError:
-                            s2end = len(t2.seq) - s2start
+                            s2end = len(t2.seq)
                         s = SequenceMatcher()
                         s.set_seq1([a[0] for a in self.seq[s1start:s1end]])
                         s.set_seq2([a[0] for a in t2.seq[s2start:s2end]])
