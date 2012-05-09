@@ -137,10 +137,21 @@ class CouchMandoku(MandokuText):
                 t2 = MandokuText(self.textpath, version=b.name)
                 self.refs.append(t2)
                 t2.read()
-                s.set_seq2([a[0] for a in t2.seq])
-                d=0
-                oldseg = 0
-                self.branches[b.name] = self.procdiffs(t2, s)
+                if len(t2.sections) == len(self.sections):
+                    for i in range(0, len(self.sections)):
+                        s1start=self.sections[i][0]
+                        try:
+                            s1end = self.sections[i+1][0]
+                        except KeyError:
+                            s1end = len(self.seq) - s1start
+                        s2start=t2.sections[i][0]
+                        try:
+                            s2end = t2.sections[i+1][0]
+                        except KeyError:
+                            s2end = len(t2.seq) - s2start
+                        s.set_seq1([a[0] for a in self.seq[s1start:s1end]])
+                        s.set_seq2([a[0] for a in t2.seq[s2start:s2end]])
+                self.branches[b.name] = self.procdiffs(t2, s, add_var_punctuation)
                 try:
                     dummy, f = self.sections[seg]
                     t = self.db.get(f[0:f.find('.')])
@@ -150,7 +161,9 @@ class CouchMandoku(MandokuText):
                     self.db.save(t)
                 except:
                     pass
-    def procdiffs (self, t2, s):
+    def procdiffs (self, t2, s, add_var_punctuation):
+        d=0
+        oldseg = 0
         res = {}
         for tag, i1, i2, j1, j2 in s.get_opcodes():
             ##need to find out which seg we are in
