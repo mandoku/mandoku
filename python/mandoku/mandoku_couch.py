@@ -201,7 +201,7 @@ class CouchMandoku(MandokuText):
                         res[i+d] = ':' + t2.seq[s2start+i+dx][1]
             if tag == 'replace':
                 a1=self.seq[s1start+i1:s1start+i2]
-                a=t2.seq[s2start+j1:s2start+j2]
+                a=[x[0] for x in t2.seq[s2start+j1:s2start+j2]]
                 if add_var_punctuation:
                     b1=[x[1] for x in t2.seq[s2start+j1:s2start+j2]]
                     a1=map(lambda xx : xx[0] + ':' + xx[1], zip(a,b1))
