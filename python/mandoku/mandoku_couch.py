@@ -126,7 +126,6 @@ class CouchMandoku(MandokuText):
         s = SequenceMatcher()
         self.s=s
         self.refs=[]
-        #todo: if possible use only one section for comparison, this is much faster!
         s.set_seq1([a[0] for a in self.seq])
         for b in repo.heads:
             if b.name != self.version:
@@ -174,6 +173,9 @@ class CouchMandoku(MandokuText):
                         self.db.save(t)
                     except:
                         pass
+        for b in repo.heads:
+            if b.name == self.version:
+                b.checkout()
 
     def procdiffs (self, s, t2, s1start, s2start, add_var_punctuation):
         unevensec = len(self.sections) != len(t2.sections)
@@ -220,9 +222,9 @@ class CouchMandoku(MandokuText):
                 k = i1-1+d
                 if add_var_punctuation:
                     #here we just grap the original e, munge it together and slab it onto the rest
-                    res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[s1start+i1-1:s1start+i1][0]), "".join("".join(["".join(a) for a in t2.seq[s2start+j1:s2start+j2]])))
+                    res[k] =  "%s%s%s" % (res.get(k, ''), "".join([x[0] for x in self.seq[s1start+i1-1:s1start+i1]]), "".join("".join(["".join(x[0]) for x in t2.seq[s2start+j1:s2start+j2]])))
                 else:
-                    res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[s1start+i1-1:s1start+i1][0]), "".join("".join(["".join(a) for a in t2.seq[s2start+j1:s2start+j2]])))
+                    res[k] =  "%s%s%s" % (res.get(k, ''), "".join([x[0] for x in self.seq[s1start+i1-1:s1start+i1]]), "".join("".join(["".join(x[0]) for x in t2.seq[s2start+j1:s2start+j2]])))
             elif tag == 'delete':
                 res[i1+d] = ""
         return res
