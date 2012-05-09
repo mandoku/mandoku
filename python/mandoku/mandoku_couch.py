@@ -140,60 +140,62 @@ class CouchMandoku(MandokuText):
                 s.set_seq2([a[0] for a in t2.seq])
                 d=0
                 oldseg = 0
+                self.branches[b.name] = self.procdiffs(t2, s)
                 try:
                     dummy, f = self.sections[seg]
                     t = self.db.get(f[0:f.find('.')])
                     if not(t.has_key('variants')):
                         t['variants'] = {}
-                    t['variants'][sig] = res
+                    t['variants'][sig] = self.branches[b.name]
                     self.db.save(t)
                 except:
                     pass
-    def procdiffs (s):
-                for tag, i1, i2, j1, j2 in s.get_opcodes():
-                    ##need to find out which seg we are in
-                    seg = self.pos2seg(i1) - 1
-                    # if (seg != oldseg):
-                    #     dummy, f = self.sections[oldseg]
-                    #     t = self.db.get(f[0:f.find('.')])
-                    #     if not(t.has_key('variants')):
-                    #         t['variants'] = {}
-                    #     t['variants'][sig] = res
-                    #     self.db.save(t)
-                    #     res = self.branches[b.name]
-                    #     oldseg = seg
-                    ##todo: need to update the position, so that it is based on the section, not total charpos
-                    if add_var_punctuation and tag == 'equal':
-                        dx = j1 - i1
-                        for i in range(i1, i2):
-                            if t2.seq[i+dx][1] != '':
-                                res[i+d] = ':' + t2.seq[i+dx][1]
-                    if tag == 'replace':
-                        a=self.seq[j1:j2]
-                        if add_var_punctuation:
-                            b1=[x[1] for x in t2.seq[j1:j2]]
-                            a=map(lambda xx : xx[0] + ':' + xx[1], zip(a,b1))
-                        a.reverse()
-                        for i in range(i1, i2):
-                            try:
-                                res[i+d] = a.pop()
-                            except:
-                                #b is shorter than a
-                                res[i+d] = ''
-                        if len(a) > 0:
-                            #b is longer than a
-                            a.reverse()
-                            res[i+d] = "%s%s" % (res[i], "".join(["".join(tmp) for tmp in a]))
-                    elif tag == 'insert':
-                        k = i1-1+d
-                        if add_var_punctuation:
-                            #here we just grap the original e, munge it together and slab it onto the rest
-                            res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[i1-1:i1][0]), "".join("".join(["".join(a) for a in t2.seq[j1:j2]])))
-                        else:
-                            res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[i1-1:i1][0]), "".join("".join(["".join(a) for a in t2.seq[j1:j2]])))
-                    elif tag == 'delete':
-                        res[i1+d] = ""
-
+    def procdiffs (t2, s):
+        res = {}
+        for tag, i1, i2, j1, j2 in s.get_opcodes():
+            ##need to find out which seg we are in
+            seg = self.pos2seg(i1) - 1
+            # if (seg != oldseg):
+            #     dummy, f = self.sections[oldseg]
+            #     t = self.db.get(f[0:f.find('.')])
+            #     if not(t.has_key('variants')):
+            #         t['variants'] = {}
+            #     t['variants'][sig] = res
+            #     self.db.save(t)
+            #     res = self.branches[b.name]
+            #     oldseg = seg
+            ##todo: need to update the position, so that it is based on the section, not total charpos
+            if add_var_punctuation and tag == 'equal':
+                dx = j1 - i1
+                for i in range(i1, i2):
+                    if t2.seq[i+dx][1] != '':
+                        res[i+d] = ':' + t2.seq[i+dx][1]
+            if tag == 'replace':
+                a=self.seq[j1:j2]
+                if add_var_punctuation:
+                    b1=[x[1] for x in t2.seq[j1:j2]]
+                    a=map(lambda xx : xx[0] + ':' + xx[1], zip(a,b1))
+                a.reverse()
+                for i in range(i1, i2):
+                    try:
+                        res[i+d] = a.pop()
+                    except:
+                        #b is shorter than a
+                        res[i+d] = ''
+                if len(a) > 0:
+                    #b is longer than a
+                    a.reverse()
+                    res[i+d] = "%s%s" % (res[i], "".join(["".join(tmp) for tmp in a]))
+            elif tag == 'insert':
+                k = i1-1+d
+                if add_var_punctuation:
+                    #here we just grap the original e, munge it together and slab it onto the rest
+                    res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[i1-1:i1][0]), "".join("".join(["".join(a) for a in t2.seq[j1:j2]])))
+                else:
+                    res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[i1-1:i1][0]), "".join("".join(["".join(a) for a in t2.seq[j1:j2]])))
+            elif tag == 'delete':
+                res[i1+d] = ""
+        return res
 
     def pos2seg(self, pos):
         #give the section of a given pos
