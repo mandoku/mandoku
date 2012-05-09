@@ -137,9 +137,10 @@ class CouchMandoku(MandokuText):
                 t2 = MandokuText(self.textpath, version=b.name)
                 self.refs.append(t2)
                 t2.read()
-                if len(t2.sections) == len(self.sections):
+                evensec = len(t2.sections) == len(self.sections)
+                if evensec:
                     for i in range(0, len(self.sections)):
-                        s1start=self.sections[i][0]
+                        s1start, f =self.sections[i]
                         try:
                             s1end = self.sections[i+1][0]
                         except KeyError:
@@ -151,32 +152,42 @@ class CouchMandoku(MandokuText):
                             s2end = len(t2.seq) - s2start
                         s.set_seq1([a[0] for a in self.seq[s1start:s1end]])
                         s.set_seq2([a[0] for a in t2.seq[s2start:s2end]])
-                self.branches[b.name] = self.procdiffs(t2, s, add_var_punctuation)
-                try:
-                    dummy, f = self.sections[seg]
-                    t = self.db.get(f[0:f.find('.')])
-                    if not(t.has_key('variants')):
-                        t['variants'] = {}
-                    t['variants'][sig] = self.branches[b.name]
-                    self.db.save(t)
-                except:
-                    pass
+                        res = self.procdiffs(t2, s, add_var_punctuation)
+                        t = self.db.get(f[0:f.find('.')])
+                        if not(t.has_key('variants')):
+                            t['variants'] = {}
+                        t['variants'][sig] = self.branches[b.name]
+                        self.db.save(t)
+                else:
+                    s.set_seq2([a[0] for a in t2.seq])
+                    res = self.procdiffs(t2, s, add_var_punctuation)
+                    try:
+                        dummy, f = self.sections[seg]
+                        t = self.db.get(f[0:f.find('.')])
+                        if not(t.has_key('variants')):
+                            t['variants'] = {}
+                        t['variants'][sig] = self.branches[b.name]
+                        self.db.save(t)
+                    except:
+                        pass
     def procdiffs (self, t2, s, add_var_punctuation):
+        unevensec = len(self.sections) != len(t2.sections)
         d=0
         oldseg = 0
         res = {}
         for tag, i1, i2, j1, j2 in s.get_opcodes():
             ##need to find out which seg we are in
-            seg = self.pos2seg(i1) - 1
-            # if (seg != oldseg):
-            #     dummy, f = self.sections[oldseg]
-            #     t = self.db.get(f[0:f.find('.')])
-            #     if not(t.has_key('variants')):
-            #         t['variants'] = {}
-            #     t['variants'][sig] = res
-            #     self.db.save(t)
-            #     res = self.branches[b.name]
-            #     oldseg = seg
+            if unevensec:
+                seg = self.pos2seg(i1) - 1
+                if (seg != oldseg):
+                     dummy, f = self.sections[oldseg]
+                     t = self.db.get(f[0:f.find('.')])
+                     if not(t.has_key('variants')):
+                         t['variants'] = {}
+                     t['variants'][sig] = res
+                     self.db.save(t)
+                     res = {}
+                     oldseg = seg
             ##todo: need to update the position, so that it is based on the section, not total charpos
             if add_var_punctuation and tag == 'equal':
                 dx = j1 - i1
