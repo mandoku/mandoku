@@ -140,6 +140,7 @@ class CouchMandoku(MandokuText):
                 evensec = len(t2.sections) == len(self.sections)
                 if evensec:
                     for i in range(0, len(self.sections)):
+                        print self.sections[i]
                         s1start, f =self.sections[i]
                         try:
                             s1end = self.sections[i+1][0]
@@ -162,12 +163,13 @@ class CouchMandoku(MandokuText):
                 else:
                     s.set_seq2([a[0] for a in t2.seq])
                     res = self.procdiffs(t2, s, add_var_punctuation)
+                    print "res:", res
                     try:
                         dummy, f = self.sections[seg]
                         t = self.db.get(f[0:f.find('.')])
                         if not(t.has_key('variants')):
                             t['variants'] = {}
-                        t['variants'][sig] = self.branches[b.name]
+                        t['variants'][sig] = res
                         self.db.save(t)
                     except:
                         pass
