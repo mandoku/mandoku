@@ -140,18 +140,28 @@ class CouchMandoku(MandokuText):
                 s.set_seq2([a[0] for a in t2.seq])
                 d=0
                 oldseg = 0
+                try:
+                    dummy, f = self.sections[seg]
+                    t = self.db.get(f[0:f.find('.')])
+                    if not(t.has_key('variants')):
+                        t['variants'] = {}
+                    t['variants'][sig] = res
+                    self.db.save(t)
+                except:
+                    pass
+    def procdiffs (s):
                 for tag, i1, i2, j1, j2 in s.get_opcodes():
                     ##need to find out which seg we are in
                     seg = self.pos2seg(i1) - 1
-                    if (seg != oldseg):
-                        dummy, f = self.sections[oldseg]
-                        t = self.db.get(f[0:f.find('.')])
-                        if not(t.has_key('variants')):
-                            t['variants'] = {}
-                        t['variants'][sig] = res
-                        self.db.save(t)
-                        res = self.branches[b.name]
-                        oldseg = seg
+                    # if (seg != oldseg):
+                    #     dummy, f = self.sections[oldseg]
+                    #     t = self.db.get(f[0:f.find('.')])
+                    #     if not(t.has_key('variants')):
+                    #         t['variants'] = {}
+                    #     t['variants'][sig] = res
+                    #     self.db.save(t)
+                    #     res = self.branches[b.name]
+                    #     oldseg = seg
                     ##todo: need to update the position, so that it is based on the section, not total charpos
                     if add_var_punctuation and tag == 'equal':
                         dx = j1 - i1
@@ -183,15 +193,6 @@ class CouchMandoku(MandokuText):
                             res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[i1-1:i1][0]), "".join("".join(["".join(a) for a in t2.seq[j1:j2]])))
                     elif tag == 'delete':
                         res[i1+d] = ""
-                try:
-                    dummy, f = self.sections[seg]
-                    t = self.db.get(f[0:f.find('.')])
-                    if not(t.has_key('variants')):
-                        t['variants'] = {}
-                    t['variants'][sig] = res
-                    self.db.save(t)
-                except:
-                    pass
 
 
     def pos2seg(self, pos):
