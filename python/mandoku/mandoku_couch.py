@@ -197,13 +197,14 @@ class CouchMandoku(MandokuText):
             if add_var_punctuation and tag == 'equal':
                 dx = j1 - i1
                 for i in range(i1, i2):
-                    if t2.seq[i+dx][1] != '':
-                        res[i+d] = ':' + t2.seq[i+dx][1]
+                    if t2.seq[s2start+i+dx][1] != '':
+                        res[i+d] = ':' + t2.seq[s2start+i+dx][1]
             if tag == 'replace':
-                a=self.seq[j1:j2]
+                a1=self.seq[s1start+i1:s1start+i2]
+                a=t2.seq[s2start+j1:s2start+j2]
                 if add_var_punctuation:
-                    b1=[x[1] for x in t2.seq[j1:j2]]
-                    a=map(lambda xx : xx[0] + ':' + xx[1], zip(a,b1))
+                    b1=[x[1] for x in t2.seq[s2start+j1:s2start+j2]]
+                    a1=map(lambda xx : xx[0] + ':' + xx[1], zip(a,b1))
                 a.reverse()
                 for i in range(i1, i2):
                     try:
@@ -219,9 +220,9 @@ class CouchMandoku(MandokuText):
                 k = i1-1+d
                 if add_var_punctuation:
                     #here we just grap the original e, munge it together and slab it onto the rest
-                    res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[i1-1:i1][0]), "".join("".join(["".join(a) for a in t2.seq[j1:j2]])))
+                    res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[s1start+i1-1:s1start+i1][0]), "".join("".join(["".join(a) for a in t2.seq[s2start+j1:s2start+j2]])))
                 else:
-                    res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[i1-1:i1][0]), "".join("".join(["".join(a) for a in t2.seq[j1:j2]])))
+                    res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[s1start+i1-1:s1start+i1][0]), "".join("".join(["".join(a) for a in t2.seq[s2start+j1:s2start+j2]])))
             elif tag == 'delete':
                 res[i1+d] = ""
         return res
