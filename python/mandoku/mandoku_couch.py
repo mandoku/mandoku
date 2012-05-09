@@ -154,7 +154,7 @@ class CouchMandoku(MandokuText):
                         s = SequenceMatcher()
                         s.set_seq1([a[0] for a in self.seq[s1start:s1end]])
                         s.set_seq2([a[0] for a in t2.seq[s2start:s2end]])
-                        res = self.procdiffs(t2, s, add_var_punctuation)
+                        res = self.procdiffs(s, t2, s1start, s2start, add_var_punctuation)
                         print "res:", res
                         t = self.db.get(f[0:f.find('.')])
                         if not(t.has_key('variants')):
@@ -163,7 +163,7 @@ class CouchMandoku(MandokuText):
                         self.db.save(t)
                 else:
                     s.set_seq2([a[0] for a in t2.seq])
-                    res = self.procdiffs(t2, s, add_var_punctuation)
+                    res = self.procdiffs(s, t2, 1, 1, add_var_punctuation)
                     print "res:", res
                     try:
                         dummy, f = self.sections[seg]
@@ -175,7 +175,7 @@ class CouchMandoku(MandokuText):
                     except:
                         pass
 
-    def procdiffs (self, t2, s, add_var_punctuation):
+    def procdiffs (self, s, t2, s1start, s2start, add_var_punctuation):
         unevensec = len(self.sections) != len(t2.sections)
         d=0
         oldseg = 0
