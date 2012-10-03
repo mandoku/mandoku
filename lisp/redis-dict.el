@@ -40,13 +40,16 @@
 
 (defun redict-get-line ()
   (interactive)
-  (save-excursion
-    (end-of-line)
-    (setq end (point))
-    (beginning-of-line)
-    (redict-display-result
-     (redict-procline (buffer-substring-no-properties (point) end))
-     (redict-position-at-point))))
+  (redict-display-result
+   (redict-procline (mandoku-get-line))
+   (redict-position-at-point)))
+  ;; (save-excursion
+  ;;   (end-of-line)
+  ;;   (setq end (point))
+  ;;   (beginning-of-line)
+  ;;   (redict-display-result
+  ;;    (redict-procline (buffer-substring-no-properties (point) end))
+  ;;    (redict-position-at-point))))
 
 (defun redict-display-result (res pos)
   (let ((result-buffer (get-buffer-create "*Dict Result*"))

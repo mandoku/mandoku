@@ -665,6 +665,11 @@ One character is either a character or one entity expression"
   (org-copy-subtree) 
   (kill-append (concat "\n(巻" (mandoku-get-juan) ", " (mandoku-get-heading) ", p" (mandoku-page-at-point) ")") nil ) ) 
 
+(defun mandoku-get-line (&optional left)
+;  (interactive)
+;  (message 
+   (car (split-string (buffer-substring-no-properties (point-at-bol) (point-at-eol)) "	")))
+
 
 (provide 'mandoku)
 
