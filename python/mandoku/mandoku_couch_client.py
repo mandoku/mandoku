@@ -2,6 +2,7 @@
 import couchdb, re
 from mandoku import mandoku
 from mandoku import mandoku_couch
+n=20
 server = couchdb.Server()
 db = server['md-tests']
 m = server['meta']
@@ -20,6 +21,6 @@ res = db.view('_design/test/_view/ngram3', startkey=sk, endkey=ek)
 for k in res:
     docid, pos =k.value
     doc = db[docid]
-    pre = re.sub(r'\n|\xb6|<[^>]*>', '', "".join(["".join(z) for z in doc['seq'][pos-15:pos-1]]))
-    post = re.sub(r'\n|\xb6|<[^>]*>', '', "".join(["".join(z) for z in doc['seq'][pos:pos+15]]))
-    out = pre[len(pre) - 15:] + " " + post[0:15]
+    pre = re.sub(r'\n|\xb6|<[^>]*>', '', "".join(["".join(z) for z in doc['seq'][pos- n :pos-1]]))
+    post = re.sub(r'\n|\xb6|<[^>]*>', '', "".join(["".join(z) for z in doc['seq'][pos:pos + n]]))
+    out = pre[len(pre) - n:] + "" + post[0:n]
