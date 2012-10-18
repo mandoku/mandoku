@@ -86,8 +86,16 @@ class CouchMandoku(MandokuText):
                      'sigle' : sigle, 
                      '_id' : f[0:f.find('.')]}
                 d['seq'] = self.seq[s:cnt]
+                if self.defs.has_key('juan'):
+                    d['juan'] = self.defs['juan']
+                else:
+                    d['juan'] = ''
                 d['pages'] = {}
                 for i in range(0, len(d['seq'])):
+                    # x = len(re.findall(u"\xb6", d['seq'][i][1]))
+                    # if x > 0:
+                    #     l += x
+                    #     d['lines'][i] = l
                     m=re.search(ur"(<pb:[^>]*>)", d['seq'][i][1])
                     if m:
                         d['pages'][i] = m.groups()[0]
