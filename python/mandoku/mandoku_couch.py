@@ -55,20 +55,6 @@ class CouchMandoku(MandokuText):
             except:
                 self.txtid = self.textpath.split('/')[-1].split('.')[0]
 
-    def add_metadata(self):
-        "this is overriding the metadata generation so that it better fits with the couch model"
-        l=0
-        self.pages={}
-        self.lines={}
-        for i in range(0, len(self.seq)):
-            x = len(re.findall(u"\xb6", self.seq[i][self.mpos]))
-            if x > 0:
-                l += x
-                self.lines[i] = l
-            m=re.search(ur"(<pb:[^>]*>)", self.seq[i][self.mpos])
-            if m:
-                self.pages[i] = m.groups()[0]
-
                 
     def connectText(self):
         t = self.db.get(self.txtid)
@@ -105,8 +91,7 @@ class CouchMandoku(MandokuText):
 
 
     def add_metadata(self):
-        """for the redis version, we store the 'location' value, that is
-        the section * fac +position"""
+        """for the couch version, we store the pages with the sections as 'pure' positions."""
         ##this should also be moved to the section, thus not requiring fac
         l=0
         sec=0
