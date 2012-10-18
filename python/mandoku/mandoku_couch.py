@@ -49,7 +49,7 @@ class CouchMandoku(MandokuText):
         else:
             super(CouchMandoku, self).__init__(*args, **kwargs)
             self.read()
-            self.add_metadata()
+#            self.add_metadata()
             try:
                 self.txtid = self.defs['id']
             except:
@@ -69,10 +69,10 @@ class CouchMandoku(MandokuText):
             t['title'] = self.defs['title'].split()[-1]
             t['textpath'] = self.textpath
             t['sigle-%s' % (sigle)] = self.revision
-            t['fac'] = self.fac
-            t['pages'] = {}
+#            t['fac'] = self.fac
+#            t['pages'] = {}
             t['versions'] = {}
-            t['pages'] = self.pages
+#            t['pages'] = self.pages
             t['sections'] = self.sections
             for i in range(1, len(self.sections)+1):
                 s, f = self.sections[i-1]
@@ -86,36 +86,18 @@ class CouchMandoku(MandokuText):
                      'sigle' : sigle, 
                      '_id' : f[0:f.find('.')]}
                 d['seq'] = self.seq[s:cnt]
+                d['pages'] = {}
+                for i in range(0, len(d['seq'])):
+                    m=re.search(ur"(<pb:[^>]*>)", d['seq'][i][1])
+                    if m:
+                        d['pages'][i] = m.groups()[0]
                 self.db.save(d)
             self.db.save(t)
 
 
     def add_metadata(self):
-        """for the couch version, we store the pages with the sections as 'pure' positions."""
-        ##this should also be moved to the section, thus not requiring fac
-        l=0
-        sec=0
-        prev = 0
-        s=[a[0] for a in self.sections]
-        s.reverse()
-        limit = s.pop()
-        for i in range(0, len(self.seq)):
-            if i == limit:
-                prev = limit
-                try:
-                    limit = s.pop()
-                except:
-                    #for the last one, we dont have a limit...
-                    pass
-                sec +=1
-            x = len(re.findall(u"\xb6", self.seq[i][1]))
-            if x > 0:
-                l += x
-                self.lines[i] = l
-            m=re.search(ur"(<pb:[^>]*>)", self.seq[i][1])
-            if m:
-                pos = self.pos2facpos(i)
-                self.pages[pos] = m.groups()[0]
+        "this has moved to connecText() for every section"
+        pass
 
     def addOtherBranches(self, add_var_punctuation=False):
         """adds the other branches to redis"""
