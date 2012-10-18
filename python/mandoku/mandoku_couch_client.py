@@ -4,7 +4,7 @@ from mandoku import mandoku
 from mandoku import mandoku_couch
 n=20
 server = couchdb.Server()
-db = server['md-tests']
+db = server['cbeta']
 m = server['meta']
 
 sk=u"如是我聞"
@@ -16,7 +16,7 @@ elif len(sk) < 3:
     sk=sk
     ek=sk+U"\u30000"
 
-res = db.view('_design/test/_view/ngram3', startkey=sk, endkey=ek)
+res = db.view('_design/mandoku/_view/ngram', startkey=sk, endkey=ek)
 
 for k in res:
     docid, pos =k.value
