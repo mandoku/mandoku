@@ -8,13 +8,14 @@ db = server['cbeta']
 m = server['meta']
 
 sk=u"如是我聞"
+
 if len(sk) > 3:
     sk=sk[0:3]
     ek=sk[0:3]
     rs=sk[4:]
 elif len(sk) < 3:
     sk=sk
-    ek=sk+U"\u30000"
+    ek=sk+U"\uffff"
 
 res = db.view('_design/mandoku/_view/ngram', startkey=sk, endkey=ek)
 
