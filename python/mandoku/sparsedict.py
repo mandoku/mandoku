@@ -47,10 +47,12 @@ class SparseDict(dict):
     def __getitem__(self, key):
         # optional processing here
         n = key
-        while(not self.has_key(n) and n > 0):
+        s = str(n)
+        while(not self.has_key(s) and n > 0):
             n -=1
-        if self.has_key(n):
-            return super(SparseDict, self).__getitem__(n)
+            s = str(n)
+        if self.has_key(s):
+            return super(SparseDict, self).__getitem__(s)
         else:
             return None
 
