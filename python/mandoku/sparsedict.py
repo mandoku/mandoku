@@ -46,11 +46,16 @@ class SparseDict(dict):
 
     def __getitem__(self, key):
         # optional processing here
-        n = key
+        try:
+            n = int(key)
+        except:
+            TypeError
+            n = key
         s = str(n)
         while(not self.has_key(s) and n > 0):
             n -=1
             s = str(n)
+#            print s
         if self.has_key(s):
             return super(SparseDict, self).__getitem__(s)
         else:
