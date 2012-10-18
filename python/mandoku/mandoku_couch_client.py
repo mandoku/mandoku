@@ -19,5 +19,7 @@ res = db.view('_design/test/_view/ngram3', startkey=sk, endkey=ek)
 
 for k in res:
     docid, pos =k.value
-    doc = db[doc]
-    s = re.sub(r'\n|\xb6', '', "".join(["".join(z) for z in doc['seq'][pos-15:pos+15]]))
+    doc = db[docid]
+    pre = re.sub(r'\n|\xb6|<[^>]*>', '', "".join(["".join(z) for z in doc['seq'][pos-15:pos-1]]))
+    post = re.sub(r'\n|\xb6|<[^>]*>', '', "".join(["".join(z) for z in doc['seq'][pos:pos+15]]))
+    out = pre[len(pre) - 15:] + " " + post[0:15]
