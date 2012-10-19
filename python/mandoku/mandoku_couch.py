@@ -96,17 +96,18 @@ class CouchMandoku(MandokuText):
                 if self.defs.has_key('lastpb'):
                     pg = self.defs['lastpb'][self.defs['lastpb'].find('<'):self.defs['lastpb'].find('>')+1]
                     d['pages'][0] = pg
-                    d['lines'][pg] = []
+                    d['lines'][pg] = {}
                 for i in range(0, len(d['seq'])):
                     x = len(re.findall(u"\xb6", d['seq'][i][1]))
                     if x > 0:
                         l += x
-                        d['lines'][pg].append( l)
+                        d['lines'][pg][i] = l
                     m=re.search(ur"(<pb:[^>]*>)", d['seq'][i][1])
                     if m:
                         pg = m.groups()[0]
                         d['pages'][i] = pg
-                        d['lines'][pg] = []
+                        d['lines'][pg] = {}
+                        l = 0
                 self.db.save(d)
             self.db.save(t)
 
