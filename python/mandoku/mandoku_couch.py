@@ -92,7 +92,7 @@ class CouchMandoku(MandokuText):
                     d['juan'] = ''
                 d['pages'] = {}
                 if self.defs.has_key('lastpb'):
-                    d['pages'][0] = self.defs['lastpb']
+                    d['pages'][0] = self.defs['lastpb'][self.defs['lastpb'].find('<'):self.defs['lastpb'].find('>')+1]
                 for i in range(0, len(d['seq'])):
                     # x = len(re.findall(u"\xb6", d['seq'][i][1]))
                     # if x > 0:
