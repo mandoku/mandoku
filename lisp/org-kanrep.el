@@ -20,7 +20,7 @@
 ;      (page (replace-in-string (car (cdr (cdr (split-string link ":")))) "_" ":" ))
       (src (car (cdr (split-string link "::")))))
   (message (format "%s" page))
-    (org-open-file (concat kanrep-base-dir filename) t nil 
+    (org-open-file (concat kanrep-base-dir filename ".txt") t nil 
    (if src 
        (concat page "::" src)
      page)
