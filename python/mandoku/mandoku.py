@@ -200,6 +200,9 @@ class MandokuText(object):
             if line.startswith('*') and not(self.starlines):
                 ## we add the line always to the last string of the last tuple
                 self.seq[-1] = (self.seq[-1][:-1] + (self.seq[-1][-1] + line,))
+            elif line.startswith(u'<pb:') and len(self.seq) == 1:
+                #this is a pb before the text starts, add to the first element
+                self.seq[-1] = (self.seq[-1][:-1] + (self.seq[-1][-1] + line,))
             elif line.startswith(u'-*-'):
                 continue
             elif line.startswith(u'校勘記¶'):
