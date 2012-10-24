@@ -15,8 +15,8 @@
   "Open the text (and optionally go to indicated  position) in LINK."
 
   ;; need to get the file name and then call mandoku-execute-file-search
-  (let ((filename (car (split-string link ":")))
-      (page (car (cdr (split-string link ":"))))
+  (let ((filename (car (split-string link "%")))
+      (page (car (cdr (split-string link "%"))))
 ;      (page (replace-in-string (car (cdr (cdr (split-string link ":")))) "_" ":" ))
       (src (car (cdr (split-string link "::")))))
   (message (format "%s" page))
