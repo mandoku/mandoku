@@ -203,7 +203,7 @@ class MandokuText(object):
             elif line.startswith(u'<pb:') and len(self.seq) == 1:
                 #this is a pb before the text starts, add to the first element
                 #self.seq[-1] = (self.seq[-1][:-1] + (self.seq[-1][-1] + line,))
-                self.seq.extend(['', line])
+                self.seq.extend([('', line)])
             elif line.startswith(u'-*-'):
                 continue
             elif line.startswith(u'校勘記¶'):
