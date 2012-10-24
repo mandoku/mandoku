@@ -52,7 +52,7 @@ class SparseDict(dict):
             TypeError
             n = key
         s = str(n)
-        while(not self.has_key(s) and n => 0):
+        while(not self.has_key(s) and n >= 0):
             n -=1
             s = str(n)
 #            print s
