@@ -86,14 +86,13 @@ class CouchMandoku(MandokuText):
                      'sigle' : sigle, 
                      '_id' : f[0:f.find('.')]}
                 d['seq'] = self.seq[s:cnt]
-                if self.defs.has_key('juan'):
-                    d['juan'] = self.defs['juan']
-                else:
-                    d['juan'] = ''
+                d['juan'] = num(f[0:f.find('.')].split('-')[-1])
                 d['pages'] = {}
                 d['lines'] = {}
                 l=0
                 if self.defs.has_key('lastpb'):
+                    #this makes no sense, lastpb will be the one of the last file
+                    #TODO: look for the previous pg in seq!?
                     pg = self.defs['lastpb'][self.defs['lastpb'].find('<'):self.defs['lastpb'].find('>')+1]
                     d['pages'][0] = pg
                     d['lines'][pg] = {}
