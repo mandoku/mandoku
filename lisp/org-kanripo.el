@@ -4,6 +4,7 @@
 ;; mandoku:cbeta:T52:0850a3::與道冥
 ;; [2012-10-19T20:11:32+0900]  created for kanripo from mandoku example
 ;; kanripo:filename:0850a3::與道冥
+;; 漢籍リポジトリ
 
 (require 'org)
 (require 'mandoku)
