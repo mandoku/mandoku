@@ -165,15 +165,15 @@ class CouchMandoku(MandokuText):
                     s.set_seq2([a[0] for a in t2.seq])
                     res = self.procdiffs(s, t2, 1, 1, add_var_punctuation)
 #                    print "res:", res
-                    try:
-                        dummy, f = self.sections[seg]
-                        t = self.db.get(f[0:f.find('.')])
-                        if not(t.has_key('variants')):
-                            t['variants'] = {}
-                        t['variants'][sig] = res
-                        self.db.save(t)
-                    except:
-                        pass
+#                    try:
+                    dummy, f = self.sections[seg]
+                    t = self.db.get(f[0:f.find('.')])
+                    if not(t.has_key('variants')):
+                        t['variants'] = {}
+                    t['variants'][sig] = res
+                    self.db.save(t)
+#                    except:
+#                        pass
         for b in repo.heads:
             if b.name == self.version:
                 b.checkout()
