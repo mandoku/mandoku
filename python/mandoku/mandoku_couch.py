@@ -185,17 +185,17 @@ class CouchMandoku(MandokuText):
         res = {}
         for tag, i1, i2, j1, j2 in s.get_opcodes():
             ##need to find out which seg we are in
-            if unevensec:
-                seg = self.pos2seg(i1) - 1
-                if (seg != oldseg):
-                     dummy, f = self.sections[oldseg]
-                     t = self.db.get(f[0:f.find('.')])
-                     if not(t.has_key('variants')):
-                         t['variants'] = {}
-                     t['variants'][sig] = res
-                     self.db.save(t)
-                     res = {}
-                     oldseg = seg
+            # if unevensec:
+            #     seg = self.pos2seg(i1) - 1
+            #     if (seg != oldseg):
+            #          dummy, f = self.sections[oldseg]
+            #          t = self.db.get(f[0:f.find('.')])
+            #          if not(t.has_key('variants')):
+            #              t['variants'] = {}
+            #          t['variants'][sig] = res
+            #          self.db.save(t)
+            #          res = {}
+            #          oldseg = seg
             ##todo: need to update the position, so that it is based on the section, not total charpos
             if add_var_punctuation and tag == 'equal':
                 dx = j1 - i1
