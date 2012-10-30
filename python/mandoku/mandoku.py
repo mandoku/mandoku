@@ -224,7 +224,7 @@ class MandokuText(object):
 ##[2011-03-11T13:44:09+0900] TODO: handle multiline propertiess
                 if rp[0].startswith('PROPERTY'):
                     try:
-                        self.defs[rp[1].lower()] = rp[2]
+                        self.defs[rp[1].lower()] = rp[2].strip()
                         if rp[1].startswith('LASTPB'):
                             pass
 #                            setPage(rp[2])
