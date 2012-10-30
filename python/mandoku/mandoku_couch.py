@@ -157,10 +157,13 @@ class CouchMandoku(MandokuText):
                         res = self.procdiffs(s, t2, s1start, s2start, add_var_punctuation)
 #                        print "res:", res
                         t = self.db.get(f[0:f.find('.')])
-                        if not(t.has_key('variants')):
-                            t['variants'] = {}
-                        t['variants'][sig] = res
-                        self.db.save(t)
+                        if t is NoneType:
+                            print f
+                        else:
+                            if not(t.has_key('variants')):
+                                t['variants'] = {}
+                            t['variants'][sig] = res
+                            self.db.save(t)
                 else:
                     s.set_seq2([a[0] for a in t2.seq])
                     res = self.procdiffs(s, t2, 1, 1, add_var_punctuation)
