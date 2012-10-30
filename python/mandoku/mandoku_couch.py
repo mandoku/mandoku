@@ -157,8 +157,8 @@ class CouchMandoku(MandokuText):
                         res = self.procdiffs(s, t2, s1start, s2start, add_var_punctuation)
 #                        print "res:", res
                         t = self.db.get(f[0:f.find('.')])
-                        if t is NoneType:
-                            print f
+                        if t is None:
+                            print f, b.name
                         else:
                             if not(t.has_key('variants')):
                                 t['variants'] = {}
