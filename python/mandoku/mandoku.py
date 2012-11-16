@@ -217,6 +217,9 @@ class MandokuText(object):
                     pass
                 if line.startswith('#+'):
                     rp=line[2:-1].split(' ', 2)
+                elif line.startswith('#<'):
+                    #this is a commented pb, we treat it as a regular pb
+                    self.seq[-1] = (self.seq[-1][:] + (line,))
                 else:
                     ## '#+' is a singleline prop, '#' and ':' multiline, to next occurence, right?
 #                    self.in_note = not (self.in_note)
