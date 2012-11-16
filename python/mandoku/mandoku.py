@@ -312,9 +312,9 @@ class MandokuText(object):
                     pass
                 outfile.write("".join(["".join(a) for a in self.seq[start:limit - 1]]))
                 try:
-                    outfile.write("".join(self.seq[limit][: self.cpos + 2]))
+                    outfile.write("".join(["".join(a) for a in self.seq[limit - 1 :limit][0][: self.cpos + 2]]))
                 except:
-                    outfile.write("".join(self.seq[limit]))
+                    outfile.write("".join(["".join(a) for a in self.seq[limit - 1 :limit]]))
 
             outfile.close()
 
