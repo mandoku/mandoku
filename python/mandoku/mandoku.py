@@ -283,7 +283,7 @@ class MandokuText(object):
             try:
                 limit = self.sections[i+1][0]
             except:
-                limit = len(self.seq) - 1
+                limit = len(self.seq)
             outfile=codecs.open(of, 'w', self.encoding)
             if header:
                 self.writeheader(outfile, i)
