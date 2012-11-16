@@ -283,7 +283,7 @@ class MandokuText(object):
             try:
                 limit = self.sections[i+1][0]
             except:
-                limit = len(self.seq)
+                limit = len(self.seq) - 1
             outfile=codecs.open(of, 'w', self.encoding)
             if header:
                 self.writeheader(outfile, i)
@@ -302,7 +302,19 @@ class MandokuText(object):
                     tmp += 1
                 outfile.write("".join(["".join(a) for a in self.seq[tmp:limit]]))
             else:
-                outfile.write("".join(["".join(a) for a in self.seq[start:limit]]))
+                #additional stuff after the regular characters in a
+                #seq entry belong before the next character, thus the
+                #next file
+                if len(self.seq[start - 1]) > self.cpos + 2:
+                    outfile.write("".join(self.seq[start - 1][self.cpos + 2 :]))
+                outfile.write("".join(["".join(a) for a in self.seq[start:limit - 1]]))
+                try:
+                    outfile.write("".join(self.seq[limit][: self.cpos + 2]))
+                except:
+                    try:
+                        outfile.write("".join(self.seq[limit]))
+                    except:
+                        pass
             outfile.close()
 
     def write_xml(self, outfile):
