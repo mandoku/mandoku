@@ -491,8 +491,8 @@ class MandokuComp(object):
                 text2.newsections[i] = sec, text2.newsections[i][1]
 
 
-    def patch(self, ignore=False, treshold=25):
-        """adds differences stored in self.x to the maintext.  Ignore ignores chars deleted in the other text(s)"""
+    def patch(self, ignore=False, replace=False, treshold=25):
+        """adds differences stored in self.x to the maintext.  Ignore ignores chars deleted in the other text(s).  If replace is True, instead of putting both, only the characters from the other text are used."""
         t1 = self.maintext
         cpos = t1.cpos
         for k in self.x.keys():
@@ -513,31 +513,11 @@ class MandokuComp(object):
                     pass
             d=":".join(s).replace('-', '')
             if not(ignore and d==''):
-                t1.seq[k] = t1.seq[k][:cpos] + ("{%s:%s}" %(t, d.rstrip(':')),) + t1.seq[k][cpos+1:]
+                if replace:
+                    t1.seq[k] = t1.seq[k][:cpos] + ("%s" %(d.rstrip(':')),) + t1.seq[k][cpos+1:]
+                else:
+                    t1.seq[k] = t1.seq[k][:cpos] + ("{%s:%s}" %(t, d.rstrip(':')),) + t1.seq[k][cpos+1:]
 
-    def patch_replace(self, ignore=False, treshold=25):
-        """adds differences stored in self.x to the maintext by replacing the characters in question.  Ignore ignores chars deleted in the other text(s)"""
-        t1 = self.maintext
-        cpos = t1.cpos
-        for k in self.x.keys():
-            t = t1.seq[k][cpos]
-            s=set(self.x[k].values())
-            r=[]
-            for e in s:
-                if len(e) > treshold:
-                    r.append(e)
-                elif e == t:
-                    r.append(e)
-                elif '&' in e:
-                    r.append(e)
-            for e in r:
-                try:
-                    s.remove(e)
-                except:
-                    pass
-            d=":".join(s).replace('-', '')
-            if not(ignore and d==''):
-                t1.seq[k] = t1.seq[k][:cpos] + ("%s" %(d.rstrip(':')),) + t1.seq[k][cpos+1:]
 
     def unpatch(self):
         t1 = self.maintext
