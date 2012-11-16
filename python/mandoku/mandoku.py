@@ -215,11 +215,11 @@ class MandokuText(object):
 #                self.seq[-1] = (self.seq[-1][0], self.seq[-1][1] + line)
                 if line.startswith('#-'):
                     pass
-                if line.startswith('#+'):
-                    rp=line[2:-1].split(' ', 2)
-                elif line.startswith('#<'):
+                if line.startswith('#<') or line.upper().startswith('#+BEGIN') or line.upper().startswith('#+END'):
                     #this is a commented pb, we treat it as a regular pb
                     self.seq[-1] = (self.seq[-1][:] + (line,))
+                elif line.startswith('#+'):
+                    rp=line[2:-1].split(' ', 2)
                 else:
                     ## '#+' is a singleline prop, '#' and ':' multiline, to next occurence, right?
 #                    self.in_note = not (self.in_note)
@@ -305,16 +305,17 @@ class MandokuText(object):
                 #additional stuff after the regular characters in a
                 #seq entry belong before the next character, thus the
                 #next file
-                if len(self.seq[start - 1]) > self.cpos + 2:
-                    outfile.write("".join(self.seq[start - 1][self.cpos + 2 :]))
+                try:
+                    if len(self.seq[start - 1]) > self.cpos + 2:
+                        outfile.write("".join(self.seq[start - 1][self.cpos + 2 :]))
+                except:
+                    pass
                 outfile.write("".join(["".join(a) for a in self.seq[start:limit - 1]]))
                 try:
                     outfile.write("".join(self.seq[limit][: self.cpos + 2]))
                 except:
-                    try:
-                        outfile.write("".join(self.seq[limit]))
-                    except:
-                        pass
+                    outfile.write("".join(self.seq[limit]))
+
             outfile.close()
 
     def write_xml(self, outfile):
