@@ -5,7 +5,7 @@
 
 import os, sys, codecs, re, datetime, git
 
-from mandoku.mandoku import *
+from mandoku import *
 import redis
 import redis_hash_dict
 import redis_config
@@ -44,7 +44,7 @@ class RedisMandoku(MandokuText):
             try:
                 self.txtid = self.defs['id']
             except:
-                self.txtid = textpath.split('/')[-1].split('.')[0]
+                self.txtid = self.textpath.split('/')[-1].split('.')[0]
                 
     def connectText(self):
         t=self.r.hgetall(self.txtid)
