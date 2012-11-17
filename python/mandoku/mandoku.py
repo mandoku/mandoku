@@ -219,7 +219,7 @@ class MandokuText(object):
                     #this is a commented pb, we treat it as a regular pb
                     self.seq[-1] = (self.seq[-1][:] + (line,))
                 elif line.startswith('#+'):
-                    rp=line[2:-1].split(' ', 2)
+                    rp=line[2:-1].split(':', 2)
                 else:
                     ## '#+' is a singleline prop, '#' and ':' multiline, to next occurence, right?
 #                    self.in_note = not (self.in_note)
@@ -236,6 +236,7 @@ class MandokuText(object):
 ##[2011-03-11T13:44:09+0900] TODO: handle sections
                     if self.defs.has_key('juan') and not self.defs.has_key('sec'):
                         pass
+##[2012-11-17T11:44:52+0900] sorry, my mods yesterday broke this.  Arrgh!
                 elif rp[0].startswith('BEGIN_'):
                     flag = rp[0].split('_')[1].lower()
                     self.flags[flag] = len(self.seq)
@@ -248,7 +249,7 @@ class MandokuText(object):
                     self.markup[flag][self.flags[flag]] = len(self.seq)
                 else:
                     try:
-                        self.defs[rp[0][:-1].lower()]=" ".join(rp[1:])
+                        self.defs[rp[0][:-1].lower().strip()]=" ".join(rp[1:])
                     except:
                         pass
             elif self.in_note:
