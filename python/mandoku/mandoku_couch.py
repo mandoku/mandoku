@@ -86,7 +86,13 @@ class CouchMandoku(MandokuText):
                      'sigle' : sigle, 
                      '_id' : f[0:f.find('.')]}
                 d['seq'] = self.seq[s:cnt]
-                d['juan'] = int(f[0:f.find('.')].split('-')[-1])
+                try:
+                    d['juan'] = int(f[0:f.find('.')].split('-')[-1])
+                except:
+                    try:
+                        d['juan'] = int(f[0:f.find('.')].split('_')[-1])
+                    except:
+                        d['juan'] = 0
                 d['pages'] = {}
                 d['lines'] = {}
                 l=0
