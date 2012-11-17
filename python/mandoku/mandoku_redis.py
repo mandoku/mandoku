@@ -185,7 +185,11 @@ class RedisMandoku(MandokuText):
                             #here we just grap the original e, munge it together and slab it onto the rest
                             res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[i1-1:i1][0]), "".join("".join(["".join(a) for a in t2.seq[j1:j2]])))
                         else:
-                            res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[i1-1:i1][0]), "".join("".join(["".join(a) for a in t2.seq[j1:j2]])))
+                            try:
+                                res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[i1-1:i1][0]), "".join("".join(["".join(a) for a in t2.seq[j1:j2]])))
+                            except(IndexError):
+                                print k, i1, j1, j2
+                                exit
                     elif tag == 'delete':
                         res[i1+d] = ""
                 try:
