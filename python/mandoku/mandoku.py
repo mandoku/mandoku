@@ -249,7 +249,7 @@ class MandokuText(object):
                     self.markup[flag][self.flags[flag]] = len(self.seq)
                 else:
                     try:
-                        self.defs[rp[0][:-1].lower().strip()]=" ".join(rp[1:])
+                        self.defs[rp[0].lower()]=" ".join(rp[1:]).strip()
                     except:
                         pass
             elif self.in_note:
