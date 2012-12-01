@@ -85,11 +85,16 @@ class MandokuText(object):
         self.ext = ext
         self.textpath = textpath
         self.encoding = encoding
+        self.versions = []
         ##version is a string that can be used for a branch in git
         try:
             repo = git.Repo(self.textpath)
-            self.version = repo.active_branch.name
+            self.version = repo.active_branch.name.decode('utf-8')
             self.date = time.strftime("%Y-%m-%d %H:%M +0000", time.gmtime(repo.active_branch.commit.authored_date))
+            ##we want to know what other versions are available
+            for b in repo.heads:
+                ## we want to have unicode strings here!!
+                self.versions.append(b.name.decode('utf-8'))
         except:
             self.version = version
         ## the revision of the text in git
