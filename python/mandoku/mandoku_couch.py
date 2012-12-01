@@ -49,7 +49,7 @@ class CouchMandoku(MandokuText):
         else:
             super(CouchMandoku, self).__init__(*args, **kwargs)
             self.read()
-#            self.add_metadata()
+            self.add_metadata()
             try:
                 self.txtid = self.defs['id']
             except:
@@ -57,6 +57,9 @@ class CouchMandoku(MandokuText):
 
                 
     def connectText(self):
+        """Connect to the DB and get the text, or create a DB document for the text and store it there.
+        We assume that the text has been read already with self.read'() and that we have the metadata.
+        """
         t = self.db.get(self.txtid)
         if not(t):
             ##new text, so we need to save this to db
@@ -74,7 +77,7 @@ class CouchMandoku(MandokuText):
             t['sigle-%s' % (sigle)] = self.revision
 #            t['fac'] = self.fac
 #            t['pages'] = {}
-            t['versions'] = {}
+            t['versions'] =self.versions
 #            t['pages'] = self.pages
             t['sections'] = self.sections
             for i in range(1, len(self.sections)+1):
