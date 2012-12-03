@@ -94,8 +94,8 @@ class RedisMandoku(MandokuText):
                 sx="".join([a[0] for a in self.seq[j:j+n]])
                 if j % 100 == 0:
                     p.execute()
-                ##ngram:txt, position
-                p.rpush("%s:%s"%(sx, f), j - lastpos)
+                ##ngram:txt-sec, position
+                p.rpush("%s:%d"%(sx, f), j - lastpos)
                 if len(sx) == n:
                     ##ngram, occurrences in txt
                     p.zincrby(sx, self.txtid)
