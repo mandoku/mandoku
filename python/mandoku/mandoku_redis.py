@@ -8,7 +8,7 @@ import os, sys, codecs, re, datetime, git
 from mandoku import *
 import redis
 import redis_hash_dict
-import redis_config
+#import redis_config
 
 from difflib import *
 
