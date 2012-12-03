@@ -220,43 +220,44 @@ class MandokuText(object):
 #                self.seq[-1] = (self.seq[-1][0], self.seq[-1][1] + line)
                 if line.startswith('#-'):
                     pass
-                if line.startswith('#<') or line.upper().startswith('#+BEGIN') or line.upper().startswith('#+END'):
+                elif line.startswith('#<') or line.upper().startswith('#+BEGIN') or line.upper().startswith('#+END'):
                     #this is a commented pb, we treat it as a regular pb
                     self.seq[-1] = (self.seq[-1][:] + (line,))
                 elif line.startswith('#+'):
                     rp=line[2:-1].split(':', 2)
+                    print "have a #+#
+                    ##[2011-03-11T13:44:09+0900] TODO: handle multiline propertiess
                 else:
                     ## '#+' is a singleline prop, '#' and ':' multiline, to next occurence, right?
 #                    self.in_note = not (self.in_note)
-                    rp=line[1:-1].split(' ', 2)
-                    ##[2011-03-11T13:44:09+0900] TODO: handle multiline propertiess
-                    if rp[0].startswith('PROPERTY'):
-                        try:
-                            self.defs[rp[1].lower()] = rp[2].strip()
-                            if rp[1].startswith('LASTPB'):
-                                pass
-    #                            setPage(rp[2])
-                        except:
+                   rp=line[1:-1].split(' ', 2)
+                if rp[0].startswith('PROPERTY'):
+                    try:
+                        self.defs[rp[1].lower()] = rp[2].strip()
+                        if rp[1].startswith('LASTPB'):
                             pass
-                    ##[2011-03-11T13:44:09+0900] TODO: handle sections
-                        if self.defs.has_key('juan') and not self.defs.has_key('sec'):
-                            pass
-                    ##[2012-11-17T11:44:52+0900] sorry, my mods yesterday broke this.  Arrgh!
-                    elif rp[0].startswith('BEGIN_'):
-                        flag = rp[0].split('_')[1].lower()
-                        self.flags[flag] = len(self.seq)
-                        #mark the start of the verse
-                        self.markup[flag][self.flags[flag]] = self.flags[flag]
-                    elif rp[0].startswith('END_'):
-                        flag = rp[0].split('_')[1].lower()
-                        flag = flag.replace(u'\xb6', u'')
-                        #and the end
-                        self.markup[flag][self.flags[flag]] = len(self.seq)
-                    else:
-                        try:
-                            self.defs[rp[0].lower()]=" ".join(rp[1:]).strip()
-                        except:
-                            pass
+#                            setPage(rp[2])
+                    except:
+                        pass
+                ##[2011-03-11T13:44:09+0900] TODO: handle sections
+                    if self.defs.has_key('juan') and not self.defs.has_key('sec'):
+                        pass
+                ##[2012-11-17T11:44:52+0900] sorry, my mods yesterday broke this.  Arrgh!
+                elif rp[0].startswith('BEGIN_'):
+                    flag = rp[0].split('_')[1].lower()
+                    self.flags[flag] = len(self.seq)
+                    #mark the start of the verse
+                    self.markup[flag][self.flags[flag]] = self.flags[flag]
+                elif rp[0].startswith('END_'):
+                    flag = rp[0].split('_')[1].lower()
+                    flag = flag.replace(u'\xb6', u'')
+                    #and the end
+                    self.markup[flag][self.flags[flag]] = len(self.seq)
+                else:
+                    try:
+                        self.defs[rp[0].lower()]=" ".join(rp[1:]).strip()
+                    except:
+                        pass
             elif self.in_note:
                 self.seq[-1] = (self.seq[-1][:] + (line,))
             else:
