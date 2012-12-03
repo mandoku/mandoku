@@ -12,7 +12,7 @@ import redis_hash_dict
 
 from difflib import *
 
-def getsigle(branch, r=redis_config.CLIENT):
+def getsigle(branch, r):
     s = r.hget('branch', branch)
     if s:
         return s
@@ -30,8 +30,8 @@ def getsigle(branch, r=redis_config.CLIENT):
 
 
 class RedisMandoku(MandokuText):
-    def __init__(self, redis, txtid=None, fac=100000, *args, **kwargs):
-        self.r=redis
+    def __init__(self, red, txtid=None, fac=100000, *args, **kwargs):
+        self.r=red
         self.fac = fac
         self.branches={}
         if txtid:
