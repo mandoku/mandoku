@@ -78,7 +78,41 @@ class RedisMandoku(MandokuText):
                 ## add the zset txtid:sec-pages
                 ## add hash txtid:sec:pageno == mapping of lines to charpos::
                 ##r.hset("%s:%s:%s"%(defs['id'], defs['sec'], defs['page']), "%2.2d"%(defs['line']), defs['char'])
+
     def addNgram(self, action='add', n=3):
+        #                    AddToRedis("".join([a[0] for a in chars[0:n]]), chars[0][1], defs['id'])
+        p=self.r.pipeline()
+        # the end of the last sections:
+        0 = lastpos
+        for i in range(1, len(self.sections)+1):
+            s, f = self.sections[i-1]
+            try:
+                cnt = self.sections[i][0]
+            except(IndexError):
+                cnt = len(self.seq)
+            for j in range(s, cnt):
+                sx="".join([a[0] for a in self.seq[j:j+n]])
+                if j % 100 == 0:
+                    p.execute()
+                ##ngram:txt, position
+                p.rpush("%s:%s"%(sx, f), j - lastpos)
+                if len(sx) == n:
+                    ##ngram, occurrences in txt
+                    p.zincrby(sx, self.txtid)
+                    try:
+                        p.zincrby(sx[0:2], sx[2])
+                    except:
+                        pass
+                    try:
+                        p.zincrby("%s-next" % (sx[0]), sx[1])
+                        p.zincrby("%s-prev" % (sx[1]), sx[2])
+                    except:
+                        pass
+            lastpos = s
+            p.execute()
+
+
+    def addNgramOld(self, action='add', n=3):
         #                    AddToRedis("".join([a[0] for a in chars[0:n]]), chars[0][1], defs['id'])
         p=self.r.pipeline()
         for i in range(1, len(self.sections)+1):
