@@ -83,7 +83,7 @@ class RedisMandoku(MandokuText):
         #                    AddToRedis("".join([a[0] for a in chars[0:n]]), chars[0][1], defs['id'])
         p=self.r.pipeline()
         # the end of the last sections:
-        0 = lastpos
+        lastpos = 0
         for i in range(1, len(self.sections)+1):
             s, f = self.sections[i-1]
             try:
