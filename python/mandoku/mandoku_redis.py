@@ -40,7 +40,7 @@ class RedisMandoku(MandokuText):
         else:
             super(RedisMandoku, self).__init__(*args, **kwargs)
             self.read()
-#            self.add_metadata()
+            self.add_metadata()
             try:
                 self.txtid = self.defs['id']
             except:
