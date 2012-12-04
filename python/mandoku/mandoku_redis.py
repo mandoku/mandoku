@@ -126,7 +126,7 @@ class RedisMandoku(MandokuText):
                 if j % 100 == 0:
                     p.execute()
                 ##ngram:txt, position
-                p.rpush("%s:%s"%(sx, self.txtid), i* self.fac + j)
+                p.rpush("%s:%s"%(sx, self.txtid), i* self.fac + j - s )
                 if len(sx) == n:
                     ##ngram, occurrences in txt
                     p.zincrby(sx, self.txtid)
