@@ -74,7 +74,7 @@ class RedisMandoku(MandokuText):
                 for a in self.seq[s:s+cnt]:
                     p.rpush(target, "".join(a))
                 for j in range(s, s+cnt+1):
-                    m=re.search(ur"(<pb:[^>]*>)", self.seq[j-s][1])
+                    m=re.search(ur"(<pb:[^>]*>)", self.seq[j][1])
                     if m:
                         pg = m.groups()[0]
                         p.zadd("%s-pages" % (target), pg, j-s)
