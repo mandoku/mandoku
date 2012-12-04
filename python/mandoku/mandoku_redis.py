@@ -56,7 +56,8 @@ class RedisMandoku(MandokuText):
             self.r.hset('%s' % (self.txtid), 'baseversion', self.version)
             self.r.hset('%s' % (self.txtid), 'title', self.defs['title'])
             self.r.hset('%s' % (self.txtid), 'textpath', self.textpath)
-            self.r.hset('%s' % (self.txtid), 'sigle-%s' % (sigle), self.revision)
+            #entbehrlich?
+            self.r.hset('%s' % (self.txtid), 'version-%s' % (self.version), self.revision)
             self.r.hset('%s' % (self.txtid), 'fac' , self.fac)
             #r.zadd('%s:%s-pages' % (defs['id'], defs['sec']),  rp[-1] , defs['char'])
             p=self.r.pipeline()
@@ -69,18 +70,24 @@ class RedisMandoku(MandokuText):
                 except(IndexError):
                     cnt = len(self.seq) - s
                 
-                self.r.hset('%s:%s-ver' % (self.txtid, i), self.version, self.revision)
-                self.r.hset('%s:%s' % (self.txtid, i), 'charcount', cnt)
-                self.r.hset('%s-sec' % (self.txtid), i, f)
-#                target="%s:%s:%s" % (self.txtid, sigle, i)
                 target="%s" % (f[0:f.find('.')])
-
                 for a in self.seq[s:s+cnt]:
                     p.rpush(target, "".join(a))
+                for j in range(s, s+cnt+1):
+                    m=re.search(ur"(<pb:[^>]*>)", self.seq[j-s][1])
+                    if m:
+                        pg = m.groups()[0]
+                        p.zadd("%s-pages" % (target), pg, j-s)
+                    #     d['lines'][pg] = {}
+                    #     l = 0
+                    # x = len(re.findall(u"\xb6", d['seq'][j-s][1]))
+                    # if x > 0:
+                    #     l += x
+                    #     try:
+                    #         d['lines'][pg][j-s] = l
+                    #     except:
+                    #         pass
                 p.execute()
-                ## add the zset txtid:sec-pages
-                ## add hash txtid:sec:pageno == mapping of lines to charpos::
-                ##r.hset("%s:%s:%s"%(defs['id'], defs['sec'], defs['page']), "%2.2d"%(defs['line']), defs['char'])
         else:
             #TODO need to fill in the case when we in fact connect to the db
             pass
@@ -99,10 +106,10 @@ class RedisMandoku(MandokuText):
                 if j % 100 == 0:
                     p.execute()
                 ##ngram:txt, position
-                p.rpush("%s:%s"%(sx, self.txtid), i* self.fac + j - s )
+                p.rpush("%s:%s"%(sx, f[0:f.find('.')]),  j - s )
                 if len(sx) == n:
                     ##ngram, occurrences in txt
-                    p.zincrby(sx, self.txtid)
+                    p.zincrby(sx, f[0:f.find('.')])
                     try:
                         p.zincrby(sx[0:2], sx[2])
                     except:
