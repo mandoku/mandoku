@@ -59,10 +59,7 @@ class RedisMandoku(MandokuText):
             #entbehrlich?
             self.r.hset('%s' % (self.txtid), 'version-%s' % (self.version), self.revision)
             self.r.hset('%s' % (self.txtid), 'fac' , self.fac)
-            #r.zadd('%s:%s-pages' % (defs['id'], defs['sec']),  rp[-1] , defs['char'])
             p=self.r.pipeline()
-            # for k in self.pages.keys():
-            #     p.zadd('%s-pages' % (self.txtid), self.pages[k], k)
             for i in range(1, len(self.sections)+1):
                 s, f = self.sections[i-1]
                 try:
@@ -74,7 +71,7 @@ class RedisMandoku(MandokuText):
                 for a in self.seq[s:s+cnt]:
                     p.rpush(target, "".join(a))
                 p.execute()
-                for j in range(s, s+cnt+1):
+                for j in range(s, s+cnt):
                     m=re.search(ur"(<pb:[^>]*>)", self.seq[j][1])
                     if m:
                         pg = m.groups()[0]
