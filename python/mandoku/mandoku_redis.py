@@ -73,6 +73,7 @@ class RedisMandoku(MandokuText):
                 target="%s" % (f[0:f.find('.')])
                 for a in self.seq[s:s+cnt]:
                     p.rpush(target, "".join(a))
+                p.execute()
                 for j in range(s, s+cnt+1):
                     m=re.search(ur"(<pb:[^>]*>)", self.seq[j][1])
                     if m:
