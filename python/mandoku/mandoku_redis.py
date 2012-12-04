@@ -60,24 +60,30 @@ class RedisMandoku(MandokuText):
             self.r.hset('%s' % (self.txtid), 'fac' , self.fac)
             #r.zadd('%s:%s-pages' % (defs['id'], defs['sec']),  rp[-1] , defs['char'])
             p=self.r.pipeline()
-            for k in self.pages.keys():
-                p.zadd('%s-pages' % (self.txtid), self.pages[k], k)
+            # for k in self.pages.keys():
+            #     p.zadd('%s-pages' % (self.txtid), self.pages[k], k)
             for i in range(1, len(self.sections)+1):
                 s, f = self.sections[i-1]
                 try:
                     cnt = self.sections[i][0] - s
                 except(IndexError):
                     cnt = len(self.seq) - s
+                
                 self.r.hset('%s:%s-ver' % (self.txtid, i), self.version, self.revision)
                 self.r.hset('%s:%s' % (self.txtid, i), 'charcount', cnt)
                 self.r.hset('%s-sec' % (self.txtid), i, f)
-                target="%s:%s:%s" % (self.txtid, sigle, i)
+#                target="%s:%s:%s" % (self.txtid, sigle, i)
+                target="%s" % (f[0:f.find('.')])
+
                 for a in self.seq[s:s+cnt]:
                     p.rpush(target, "".join(a))
                 p.execute()
                 ## add the zset txtid:sec-pages
                 ## add hash txtid:sec:pageno == mapping of lines to charpos::
                 ##r.hset("%s:%s:%s"%(defs['id'], defs['sec'], defs['page']), "%2.2d"%(defs['line']), defs['char'])
+        else:
+            #TODO need to fill in the case when we in fact connect to the db
+            pass
 
     def addNgram(self, action='add', n=3):
         #                    AddToRedis("".join([a[0] for a in chars[0:n]]), chars[0][1], defs['id'])

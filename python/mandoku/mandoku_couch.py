@@ -75,7 +75,7 @@ class CouchMandoku(MandokuText):
                 t['title'] = self.textpath.split('/')[-1]
             t['textpath'] = self.textpath[self.textpath.find('/db/')+4:]
             t['sigle-%s' % (sigle)] = self.revision
-#            t['fac'] = self.fac
+            t['fac'] = self.fac
 #            t['pages'] = {}
             t['versions'] =self.versions
 #            t['pages'] = self.pages
