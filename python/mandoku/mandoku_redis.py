@@ -95,6 +95,7 @@ class RedisMandoku(MandokuText):
         p=self.r.pipeline()
         for i in range(1, len(self.sections)+1):
             s, f = self.sections[i-1]
+            inNote = False
             try:
                 cnt = self.sections[i][0]
             except(IndexError):
@@ -105,6 +106,12 @@ class RedisMandoku(MandokuText):
                     p.execute()
                 ##ngram:txt, position
                 p.rpush("%s:%s"%(sx, f[0:f.find('.')]),  j - s )
+                #now we check if the status of the text changes:
+                m=re.search(ur"[\(\)]", self.seq[j][1])
+                if m and not inNote:
+                    inNote = True
+                else:
+                    inNote = False
                 if len(sx) == n:
                     ##ngram, occurrences in txt
                     p.zincrby(sx, f[0:f.find('.')])
