@@ -344,8 +344,11 @@ class MandokuText(object):
             if not 'mode: ' in self.defs[dx]:
                 out.write("#+PROPERTY: %s %s\n" % (dx.upper(), self.defs[dx]))
         out.write("#+PROPERTY: JUAN %d\n" % (section + 1))
-    def printNgram(self, sx, pos, extra=None):
-        pass
+    def printNgram(self, sx, pos, sec, extra=None):
+        if extra:
+            print sx, sec, pos, extra
+        else:
+            print sx, sec, pos
     def addNgram(self, action='add', n=3):
         notestart = 0
         noteend = 0
@@ -379,21 +382,22 @@ class MandokuText(object):
                     dn = noteend - j + 1
                     s1 = "".join([a[0] for a in seq[j:notestart]])
                     s2 = "".join([a[0] for a in seq[j+dn:j+dn+n-len(s1)]])
-                    print j, s1+s2
+                    self.printNgram(s1+s2, f, j - s)
                 elif notestart+1 > j:
                     s1 = "".join([a[0] for a in seq[j:notestart+1]])
                     s2 = "".join([a[0] for a in seq[j+dn:j+dn+n-len(s1)]])
-                    print j, s1+s2
+                    self.printNgram(s1+s2, f, j - s)
                 elif notestart < j and j < noteend+1:
                     e = min(j+n, noteend+1)
                     sx="".join([a[0] for a in seq[j:e]])
-                    print j, sx, "n"
+                    self.printNgram(sx, f, j - s, "n")
                 else:
                     try:
                         sx="".join([a[0] for a in seq[j:j+n]])
                     except:
                         sx="".join([a[0] for a in seq[j:cnt]])
-                    print j, sx
+                    self.printNgram(sx, f, j - s)
+
         
             
 class MandokuComp(object):
