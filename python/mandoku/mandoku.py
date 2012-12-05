@@ -344,7 +344,8 @@ class MandokuText(object):
             if not 'mode: ' in self.defs[dx]:
                 out.write("#+PROPERTY: %s %s\n" % (dx.upper(), self.defs[dx]))
         out.write("#+PROPERTY: JUAN %d\n" % (section + 1))
-
+    def printNgram(self, sx, pos, extra=None):
+        pass
     def addNgram(self, action='add', n=3):
         notestart = 0
         noteend = 0
@@ -357,30 +358,42 @@ class MandokuText(object):
                 cnt = len(self.seq)
             for j in range(s, cnt):
                 #first we check if the status of the text changes:
-                m=re.search(ur"[\(\)]", self.seq[j+n][1])
-                if m and not inNote:
-                    inNote = True
-                else:
-                    inNote = False
-                sx="".join([a[0] for a in self.seq[j:j+n]])
-                if j % 100 == 0:
-                    p.execute()
-                ##ngram:txt, position
-                p.rpush("%s:%s"%(sx, f[0:f.find('.')]),  j - s )
-                if len(sx) == n:
-                    ##ngram, occurrences in txt
-                    p.zincrby(sx, f[0:f.find('.')])
-                    try:
-                        p.zincrby(sx[0:2], sx[2])
-                    except:
-                        pass
-                    try:
-                        p.zincrby("%s-next" % (sx[0]), sx[1])
-                        p.zincrby("%s-prev" % (sx[1]), sx[2])
-                    except:
-                        pass
-            p.execute()
+                try:
+                    #the note-marker is on the character preceding the start of
+                    #the note!
+                    check=seq[j+n-2][1]
+                except:
+                    check=''
+                if '(' in check:
+                    notestart = j+n-2
+                    noteend = notestart
+                    found = False
+                    while not found and noteend <= cnt:
+                        noteend += 1
+                        try:
+                            check2 = seq[noteend][1]
+                        except:
+                            check2 = ''
+                        found = ')' in check2
 
+                    dn = noteend - j + 1
+                    s1 = "".join([a[0] for a in seq[j:notestart]])
+                    s2 = "".join([a[0] for a in seq[j+dn:j+dn+n-len(s1)]])
+                    print j, s1+s2
+                elif notestart+1 > j:
+                    s1 = "".join([a[0] for a in seq[j:notestart+1]])
+                    s2 = "".join([a[0] for a in seq[j+dn:j+dn+n-len(s1)]])
+                    print j, s1+s2
+                elif notestart < j and j < noteend+1:
+                    e = min(j+n, noteend+1)
+                    sx="".join([a[0] for a in seq[j:e]])
+                    print j, sx, "n"
+                else:
+                    try:
+                        sx="".join([a[0] for a in seq[j:j+n]])
+                    except:
+                        sx="".join([a[0] for a in seq[j:cnt]])
+                    print j, sx
         
             
 class MandokuComp(object):
