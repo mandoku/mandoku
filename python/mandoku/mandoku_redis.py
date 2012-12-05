@@ -89,9 +89,16 @@ class RedisMandoku(MandokuText):
         else:
             #TODO need to fill in the case when we in fact connect to the db
             pass
+    def printNgram(self, sx, pos, sec, extra=None):
+        #this is what we overwrite to get the stuff into redis
+        p=self.r.pipeline()
+        if extra:
+            p.rpush("%s:%s"%(sx, sec), "%d:%s" % (pos, extra) )
+        else:
+            p.rpush("%s:%s"%(sx, sec), pos )
+        p.execute()
 
-    def addNgram(self, action='add', n=3):
-        #                    AddToRedis("".join([a[0] for a in chars[0:n]]), chars[0][1], defs['id'])
+    def addNgramR(self, action='add', n=3):
         p=self.r.pipeline()
         for i in range(1, len(self.sections)+1):
             s, f = self.sections[i-1]

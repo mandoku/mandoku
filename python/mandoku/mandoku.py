@@ -354,6 +354,7 @@ class MandokuText(object):
         noteend = 0
         for i in range(1, len(self.sections)+1):
             s, f = self.sections[i-1]
+            fx = f[0:f.find('.')]
             dn = 0
             try:
                 cnt = self.sections[i][0]
@@ -382,22 +383,21 @@ class MandokuText(object):
                     dn = noteend - j + 1
                     s1 = "".join([a[0] for a in seq[j:notestart]])
                     s2 = "".join([a[0] for a in seq[j+dn:j+dn+n-len(s1)]])
-                    self.printNgram(s1+s2, f, j - s)
+                    self.printNgram(s1+s2, fx, j - s)
                 elif notestart+1 > j:
                     s1 = "".join([a[0] for a in seq[j:notestart+1]])
                     s2 = "".join([a[0] for a in seq[j+dn:j+dn+n-len(s1)]])
-                    self.printNgram(s1+s2, f, j - s)
+                    self.printNgram(s1+s2, fx, j - s)
                 elif notestart < j and j < noteend+1:
                     e = min(j+n, noteend+1)
                     sx="".join([a[0] for a in seq[j:e]])
-                    self.printNgram(sx, f, j - s, "n")
+                    self.printNgram(sx, fx, j - s, "n")
                 else:
                     try:
                         sx="".join([a[0] for a in seq[j:j+n]])
                     except:
                         sx="".join([a[0] for a in seq[j:cnt]])
-                    self.printNgram(sx, f, j - s)
-
+                    self.printNgram(sx, fx, j - s)
         
             
 class MandokuComp(object):
