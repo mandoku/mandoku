@@ -96,6 +96,10 @@ class RedisMandoku(MandokuText):
         for i in range(1, len(self.sections)+1):
             s, f = self.sections[i-1]
             inNote = False
+            #dn is a counter that is used to bridge the gap of text
+            #that is interrupted by notes (or other interrupting
+            #features)
+            dn = 0
             try:
                 cnt = self.sections[i][0]
             except(IndexError):
