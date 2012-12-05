@@ -344,6 +344,43 @@ class MandokuText(object):
             if not 'mode: ' in self.defs[dx]:
                 out.write("#+PROPERTY: %s %s\n" % (dx.upper(), self.defs[dx]))
         out.write("#+PROPERTY: JUAN %d\n" % (section + 1))
+
+    def addNgram(self, action='add', n=3):
+        notestart = 0
+        noteend = 0
+        for i in range(1, len(self.sections)+1):
+            s, f = self.sections[i-1]
+            dn = 0
+            try:
+                cnt = self.sections[i][0]
+            except(IndexError):
+                cnt = len(self.seq)
+            for j in range(s, cnt):
+                #first we check if the status of the text changes:
+                m=re.search(ur"[\(\)]", self.seq[j+n][1])
+                if m and not inNote:
+                    inNote = True
+                else:
+                    inNote = False
+                sx="".join([a[0] for a in self.seq[j:j+n]])
+                if j % 100 == 0:
+                    p.execute()
+                ##ngram:txt, position
+                p.rpush("%s:%s"%(sx, f[0:f.find('.')]),  j - s )
+                if len(sx) == n:
+                    ##ngram, occurrences in txt
+                    p.zincrby(sx, f[0:f.find('.')])
+                    try:
+                        p.zincrby(sx[0:2], sx[2])
+                    except:
+                        pass
+                    try:
+                        p.zincrby("%s-next" % (sx[0]), sx[1])
+                        p.zincrby("%s-prev" % (sx[1]), sx[2])
+                    except:
+                        pass
+            p.execute()
+
         
             
 class MandokuComp(object):
