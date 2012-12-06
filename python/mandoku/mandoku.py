@@ -473,6 +473,10 @@ function with access to a database."""
                                 exit
                     elif tag == 'delete':
                         res[i1+d] = ""
+        for b in repo.heads:
+            if b.name == selx.version:
+                b.checkout()
+                print "reverted to ", b.name
 
     def otherNgram(self, version):
         """Adds Ngrams of the specified version."""
