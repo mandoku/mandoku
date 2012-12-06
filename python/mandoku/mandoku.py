@@ -131,6 +131,13 @@ class MandokuText(object):
             sys.stderr.write("missing:  " + self.textpath + '\n')
             raise "No valid file found"
 
+    def getsigle(branch, db=None):
+        "This is a small helper function to get a convenient handle for a
+branch.  In most cases, this should be overwritten by a inherited
+function with access to a database."
+        return branch
+
+
     def punc_reorder(self):
         """Expand the tuple in seq to at least three items,
         punctuation before the char, the char and punctuation after
@@ -398,6 +405,72 @@ class MandokuText(object):
                     except:
                         sx="".join([a[0] for a in seq[j:cnt]])
                     self.printNgram(sx, fx, j - s)
+
+
+    def addOtherBranches(self, add_var_punctuation=False):
+        """adds the other branches to MandokuText."""
+        #[2012-12-05T21:55:39+0900]
+        # todo: currently, the positions are totals for the whole text, but I need to have them by section
+        # also: look at mandoku_couch and see how to deal with different sections, number of section etc.
+        try:
+            repo = git.Repo(self.textpath)
+        except:
+            return "No git repository found"
+        s = SequenceMatcher()
+        self.s=s
+        self.refs=[]
+        self.branches={}
+        self.txtid = self.textpath.split('/')[-1]
+        s.set_seq1([a[0] for a in self.seq])
+        for b in repo.heads:
+            if b.name != self.version:
+                print b.name
+                b.checkout()
+                self.branches[b.name]={}
+                res = self.branches[b.name]
+                sig = self.getsigle(b.name)
+                t2 = mandoku.MandokuText(self.textpath, version=b.name)
+                self.refs.append(t2)
+                t2.read()
+                ##todo: add the necessary metadata to redis
+                s.set_seq2([a[0] for a in t2.seq])
+                #no idea what d is used for, probably not necessary anymore... (maybe it was for section-dependent code)
+                d=0
+                for tag, i1, i2, j1, j2 in s.get_opcodes():
+                    if add_var_punctuation and tag == 'equal':
+                        dx = j1 - i1
+                        for i in range(i1, i2):
+                            if t2.seq[i+dx][1] != '':
+                                res[i+d] = ':' + t2.seq[i+dx][1]
+                    if tag == 'replace':
+                        a=t2.seq[j1:j2]
+                        if add_var_punctuation:
+                            b1=[x[1] for x in t2.seq[j1:j2]]
+                            a=map(lambda xx : xx[0] + ':' + xx[1], zip(a,b1))
+                        a.reverse()
+                        for i in range(i1, i2):
+                            try:
+                                res[i+d] =  a.pop()
+                            except:
+                                #b is shorter than a
+                                res[i+d] = ''
+                        if len(a) > 0:
+                            #b is longer than a, so we have left overs.
+                            a.reverse()
+                            res[i+d] = "%s%s" % (res[i], "".join(["".join(tmp) for tmp in a])) 
+                    elif tag == 'insert':
+                        k = i1-1+d
+                        if add_var_punctuation:
+                            #here we just grab the original e, munge it together and slab it onto the rest
+                            res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[i1-1:i1][0]), "".join("".join(["".join(a) for a in t2.seq[j1:j2]])))
+                        else:
+                            try:
+                                res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[i1-1:i1][0]), "".join("".join(["".join(a) for a in t2.seq[j1:j2]])))
+                            except(IndexError):
+                                print k, i1, j1, j2
+                                exit
+                    elif tag == 'delete':
+                        res[i1+d] = ""
         
             
 class MandokuComp(object):
