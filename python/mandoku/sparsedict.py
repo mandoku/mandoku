@@ -40,7 +40,7 @@ implements a sparse dictionary, that allows to access to existing keys from non-
 #TODO: might implement error checking, it supports only int keys, but does not check.
 #could try to optimize the search for the 'closest' key, but how?
 
-class SparseDict(dict):
+class SparseDictStr(dict):
 #    def __init__(self, *args, **kwargs):
 #        self.update(*args, **kwargs)
 
@@ -60,6 +60,21 @@ class SparseDict(dict):
             return super(SparseDict, self).__getitem__(s)
         else:
             return None
+
+class SparseDict(dict):
+#    def __init__(self, *args, **kwargs):
+#        self.update(*args, **kwargs)
+
+    def __getitem__(self, key):
+        # optional processing here
+        n=key
+        while(not self.has_key(n) and n >= 0):
+            n -=1
+        if self.has_key(n):
+            return super(SparseDict, self).__getitem__(n)
+        else:
+            return None
+
 
 if __name__ == '__main__':
 
