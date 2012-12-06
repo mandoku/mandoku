@@ -57,7 +57,7 @@ class SparseDictStr(dict):
             s = str(n)
 #            print s
         if self.has_key(s):
-            return super(SparseDict, self).__getitem__(s)
+            return super(SparseDictStr, self).__getitem__(s)
         else:
             return None
 
@@ -86,4 +86,12 @@ if __name__ == '__main__':
     print 5, d[5]
     print 11, d[11]
     print 12, d[12]
+    t = SparseDictStr()
+    t["1"] = 'A'
+    t["10"] = 'B'
+    t["12"] = 'C'
+    print 5, t["5"]
+    print 11, t["11"]
+    print 12, t["12"]
+    # this does not work
     print 'a', d['a']
