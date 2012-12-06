@@ -351,11 +351,13 @@ function with access to a database."
             if not 'mode: ' in self.defs[dx]:
                 out.write("#+PROPERTY: %s %s\n" % (dx.upper(), self.defs[dx]))
         out.write("#+PROPERTY: JUAN %d\n" % (section + 1))
+
     def printNgram(self, sx, pos, sec, extra=None):
         if extra:
             print sx, sec, pos, extra
         else:
             print sx, sec, pos
+
     def addNgram(self, action='add', n=3):
         notestart = 0
         noteend = 0
@@ -424,7 +426,7 @@ function with access to a database."
         s.set_seq1([a[0] for a in self.seq])
         for b in repo.heads:
             if b.name != self.version:
-                print b.name
+                #print b.name
                 b.checkout()
                 self.branches[b.name]={}
                 res = self.branches[b.name]
@@ -471,8 +473,10 @@ function with access to a database."
                                 exit
                     elif tag == 'delete':
                         res[i1+d] = ""
+
+    def otherNgram(self, version):
+        """Adds Ngrams of the specified version."""
         
-            
 class MandokuComp(object):
     #text1 and text2 are MandokuText objects
     def __init__(self, text1):
