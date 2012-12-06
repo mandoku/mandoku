@@ -474,7 +474,7 @@ function with access to a database."""
                     elif tag == 'delete':
                         res[i1+d] = ""
         for b in repo.heads:
-            if b.name == selx.version:
+            if b.name == self.version:
                 b.checkout()
                 print "reverted to ", b.name
 
