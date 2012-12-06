@@ -132,9 +132,9 @@ class MandokuText(object):
             raise "No valid file found"
 
     def getsigle(branch, db=None):
-        "This is a small helper function to get a convenient handle for a
+        """This is a small helper function to get a convenient handle for a
 branch.  In most cases, this should be overwritten by a inherited
-function with access to a database."
+function with access to a database."""
         return branch
 
 
@@ -431,7 +431,7 @@ function with access to a database."
                 self.branches[b.name]={}
                 res = self.branches[b.name]
                 sig = self.getsigle(b.name)
-                t2 = mandoku.MandokuText(self.textpath, version=b.name)
+                t2 = MandokuText(self.textpath, version=b.name)
                 self.refs.append(t2)
                 t2.read()
                 ##todo: add the necessary metadata to redis
