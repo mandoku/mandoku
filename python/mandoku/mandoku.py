@@ -71,7 +71,8 @@ class MandokuText(object):
         #this allows me to lookup by character position
         self.pages = SparseDict()
         #indexes the page number to a list of character positions, every position gives the beginning of a line
-        self.lines = collections.defaultdict(list)
+        #self.lines = collections.defaultdict(list)
+        self.lines = {}
         #Holds various metadata about the text culled from the header
         self.defs = {}
         #holds the text, in this case the first character is in fact position 1
@@ -193,14 +194,19 @@ function with access to a database."""
 
     def add_metadata(self):
         l=0
+        page="first"
+        self.lines[page] = []
         for i in range(0, len(self.seq)):
             x = len(re.findall(u"\xb6", self.seq[i][self.mpos]))
             if x > 0:
                 l += x
-                self.lines[i] = l
+                self.lines[page].append(i)
             m=re.search(ur"(<pb:[^>]*>)", self.seq[i][self.mpos])
             if m:
-                self.pages[i] = m.groups()[0]
+                page = m.groups()[0]
+                self.pages[i] = page
+                self.lines[page] = []
+
                 
     def parse(self, infile):
         for line in infile:
