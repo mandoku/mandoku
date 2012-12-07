@@ -209,6 +209,9 @@ function with access to a database."""
                 self.lines[page] = []
 
     def getpl(self, pos):
+        "This is based on absolute positions"
+        if len(self.pages) > 0:
+            self.add_metadata()
         pg = self.pages[pos]
         for i in range(1, len(self.lines[pg])+1):
             l=self.lines[pg][i-1]
