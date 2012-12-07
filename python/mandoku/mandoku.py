@@ -200,12 +200,21 @@ function with access to a database."""
             x = len(re.findall(u"\xb6", self.seq[i][self.mpos]))
             if x > 0:
                 l += x
-                self.lines[page].append(i)
+                ##we say +1 because the line starts on the next character 
+                self.lines[page].append(i+1)
             m=re.search(ur"(<pb:[^>]*>)", self.seq[i][self.mpos])
             if m:
                 page = m.groups()[0]
                 self.pages[i] = page
                 self.lines[page] = []
+
+    def getpl(self, pos):
+        pg = self.pages[pos]
+        for i in range(1, len(self.lines[pg])+1):
+            l=self.lines[pg][i-1]
+            if l > pos:
+                return "%s%d" % (pg[1:-1].split('_')[-1], i)
+        return None
 
                 
     def parse(self, infile):
