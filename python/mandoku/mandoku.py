@@ -359,6 +359,7 @@ function with access to a database."""
             print sx, sec, pos
 
     def addNgram(self, action='add', n=3):
+        ##currently no other action is implemented
         notestart = 0
         noteend = 0
         for i in range(1, len(self.sections)+1):
