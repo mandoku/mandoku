@@ -198,7 +198,7 @@ function with access to a database."""
         l=0
         page="first"
         self.lines[page] = []
-        for i in range(0, len(self.sections)):
+        for i in range(0, len(self.seq)):
             s, f = self.sections[i]
             fx = f[0:f.find('.')]
             if per_section:
