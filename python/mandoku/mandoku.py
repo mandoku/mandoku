@@ -70,6 +70,8 @@ class MandokuText(object):
         self.markup = collections.defaultdict(SparseDict)
         #this allows me to lookup by character position
         self.pages = SparseDict()
+        #page per sections
+        self.pps = {}
         #indexes the page number to a list of character positions, every position gives the beginning of a line
         #self.lines = collections.defaultdict(list)
         self.lines = {}
@@ -192,11 +194,15 @@ function with access to a database."""
         self.cpos = 1
         self.mpos = 3
 
-    def add_metadata(self):
+    def add_metadata(self, per_section=False):
         l=0
         page="first"
         self.lines[page] = []
-        for i in range(0, len(self.seq)):
+        for i in range(0, len(self.sections)):
+            s, f = self.sections[i]
+            fx = f[0:f.find('.')]
+            if per_section:
+                self.pps[fx] = SparseDict()
             x = len(re.findall(u"\xb6", self.seq[i][self.mpos]))
             if x > 0:
                 l += x
@@ -205,14 +211,20 @@ function with access to a database."""
             m=re.search(ur"(<pb:[^>]*>)", self.seq[i][self.mpos])
             if m:
                 page = m.groups()[0]
-                self.pages[i] = page
+                if per_section:
+                    self.pps[fx][i - s] = page
+                else:
+                    self.pages[i] = page
                 self.lines[page] = []
 
-    def getpl(self, pos):
-        "This is based on absolute positions"
-        if len(self.pages) > 0:
-            self.add_metadata()
-        pg = self.pages[pos]
+    def getpl(self, pos, fx=False):
+        "if fx (a section name) is passed, pos is relative, otherwise absolute."
+        if len(self.lines) < 1:
+            self.add_metadata(fx)
+        if fx:
+            pg = self.pps[fx][pos]
+        else:
+            pg = self.pages[pos]
         for i in range(1, len(self.lines[pg])+1):
             l=self.lines[pg][i-1]
             if l > pos:
