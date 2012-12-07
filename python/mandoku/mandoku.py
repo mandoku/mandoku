@@ -188,10 +188,9 @@ function with access to a database."""
                             self.seq[i+x] = ('{', self.seq[i+x][1], ':' + rep[x:] + '}', '')
                 elif len(rep) > 0:
                     self.seq[i] = ('{', '', ':' + rep + '}', ) + self.seq[i][2:]
-                    
-                
         self.cpos = 1
         self.mpos = 3
+
     def add_metadata(self):
         l=0
         for i in range(0, len(self.seq)):
@@ -487,7 +486,7 @@ function with access to a database."""
             return "This version does not exist: %s " % (version)
         ks = res.keys()
         ks.sort()
-        sd = sparsedict.SparseDict()
+        sd = SparseDict()
         for i in range(1, len(self.sections)+1):
             s, f = self.sections[i-1]
             sd[s] = [s, f[0:f.find('.')]]
