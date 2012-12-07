@@ -479,8 +479,52 @@ function with access to a database."""
                 b.checkout()
                 print "reverted to ", b.name
 
-    def otherNgram(self, version):
+    def otherNgram(self, version, n=3):
         """Adds Ngrams of the specified version."""
+        try:
+            res = self.branches[version]
+        except:
+            return "This version does not exist: %s " % (version)
+        ks = res.keys()
+        ks.sort()
+        sd = sparsedict.SparseDict()
+        for i in range(1, len(self.sections)+1):
+            s, f = self.sections[i-1]
+            sd[s] = [s, f[0:f.find('.')]]
+        self.sd=sd
+        for i in range(0, len(ks)):
+            #cant' use negative values here
+            lo = max(1, ks[i]-n+1)
+            #put the positions of variants in the range here
+            vals = []
+            #for the result list
+            sxr = []
+            j = i
+            while(ks[j] < ks[i] - n and j > 0):
+                vals.append(ks[j])
+                j -= 1
+            j = i-1
+            while(j <= len(ks) and  ks[j] < ks[i] + n):
+                vals.append(ks[j])
+                j += 1
+                if j >= len(ks):
+                    break
+            for c in range(lo, ks[i]+n):
+                if c in vals:
+                    try:
+                        sxr.append(res[c][self.cpos])
+                    except:
+                        sxr.append(res[c])
+                else:
+                    sxr.append(self.seq[c][self.cpos])
+                #todo: work out what to do with 0.  Also see if we have a 1 off problem
+            ix=0
+            for c in range(lo, ks[i]+1):
+                #the output has to be relative to the sections
+                print c, "".join(sxr)
+                s, fx = self.sd[c]
+                self.printNgram("".join(sxr[ix:ix+n]), fx, c - s, version)
+                ix +=1
         
 class MandokuComp(object):
     #text1 and text2 are MandokuText objects
