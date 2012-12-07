@@ -423,24 +423,23 @@ function with access to a database."""
                         except:
                             check2 = ''
                         found = ')' in check2
-
                     dn = noteend - j + 1
-                    s1 = "".join([a[0] for a in seq[j:notestart]])
-                    s2 = "".join([a[0] for a in seq[j+dn:j+dn+n-len(s1)]])
+                    s1 = "".join([a[self.cpos] for a in seq[j:notestart]])
+                    s2 = "".join([a[self.cpos] for a in seq[j+dn:j+dn+n-len(s1)]])
                     self.printNgram(s1+s2, fx, j - s)
                 elif notestart+1 > j:
-                    s1 = "".join([a[0] for a in seq[j:notestart+1]])
-                    s2 = "".join([a[0] for a in seq[j+dn:j+dn+n-len(s1)]])
+                    s1 = "".join([a[self.cpos] for a in seq[j:notestart+1]])
+                    s2 = "".join([a[self.cpos] for a in seq[j+dn:j+dn+n-len(s1)]])
                     self.printNgram(s1+s2, fx, j - s)
                 elif notestart < j and j < noteend+1:
                     e = min(j+n, noteend+1)
-                    sx="".join([a[0] for a in seq[j:e]])
+                    sx="".join([a[self.cpos] for a in seq[j:e]])
                     self.printNgram(sx, fx, j - s, "n")
                 else:
                     try:
-                        sx="".join([a[0] for a in seq[j:j+n]])
+                        sx="".join([a[self.cpos] for a in seq[j:j+n]])
                     except:
-                        sx="".join([a[0] for a in seq[j:cnt]])
+                        sx="".join([a[self.cpos] for a in seq[j:cnt]])
                     self.printNgram(sx, fx, j - s)
 
 
@@ -458,7 +457,7 @@ function with access to a database."""
         self.refs=[]
         self.branches={}
         self.txtid = self.textpath.split('/')[-1]
-        s.set_seq1([a[0] for a in self.seq])
+        s.set_seq1([a[self.cpos] for a in self.seq])
         for b in repo.heads:
             if b.name != self.version:
                 #print b.name
@@ -470,7 +469,7 @@ function with access to a database."""
                 self.refs.append(t2)
                 t2.read()
                 ##todo: add the necessary metadata to redis
-                s.set_seq2([a[0] for a in t2.seq])
+                s.set_seq2([a[self.cpos] for a in t2.seq])
                 #no idea what d is used for, probably not necessary anymore... (maybe it was for section-dependent code)
                 d=0
                 for tag, i1, i2, j1, j2 in s.get_opcodes():
@@ -483,7 +482,7 @@ function with access to a database."""
                         a=t2.seq[j1:j2]
                         if add_var_punctuation:
                             b1=[x[1] for x in t2.seq[j1:j2]]
-                            a=map(lambda xx : xx[0] + ':' + xx[1], zip(a,b1))
+                            a=map(lambda xx : xx[self.cpos] + ':' + xx[1], zip(a,b1))
                         a.reverse()
                         for i in range(i1, i2):
                             try:
@@ -499,10 +498,10 @@ function with access to a database."""
                         k = i1-1+d
                         if add_var_punctuation:
                             #here we just grab the original e, munge it together and slab it onto the rest
-                            res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[i1-1:i1][0]), "".join("".join(["".join(a) for a in t2.seq[j1:j2]])))
+                            res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[i1-1:i1][self.cpos]), "".join("".join(["".join(a) for a in t2.seq[j1:j2]])))
                         else:
                             try:
-                                res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[i1-1:i1][0]), "".join("".join(["".join(a) for a in t2.seq[j1:j2]])))
+                                res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[i1-1:i1][self.cpos]), "".join("".join(["".join(a) for a in t2.seq[j1:j2]])))
                             except(IndexError):
                                 print k, i1, j1, j2
                                 exit
