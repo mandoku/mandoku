@@ -198,24 +198,29 @@ function with access to a database."""
         l=0
         page="first"
         self.lines[page] = []
-        for i in range(0, len(self.seq)):
-            s, f = self.sections[i]
+        for i in range(1, len(self.sections)+1):
+            s, f = self.sections[i-1]
             fx = f[0:f.find('.')]
             if per_section:
                 self.pps[fx] = SparseDict()
-            x = len(re.findall(u"\xb6", self.seq[i][self.mpos]))
-            if x > 0:
-                l += x
-                ##we say +1 because the line starts on the next character 
-                self.lines[page].append(i+1)
-            m=re.search(ur"(<pb:[^>]*>)", self.seq[i][self.mpos])
-            if m:
-                page = m.groups()[0]
-                if per_section:
-                    self.pps[fx][i - s] = page
-                else:
-                    self.pages[i] = page
-                self.lines[page] = []
+            try:
+                cnt = self.sections[i][0]
+            except(IndexError):
+                cnt = len(self.seq)
+            for j in range(s, cnt):
+                x = len(re.findall(u"\xb6", self.seq[j][self.mpos]))
+                if x > 0:
+                    l += x
+                    ##we say +1 because the line starts on the next character 
+                    self.lines[page].append(j+1)
+                m=re.search(ur"(<pb:[^>]*>)", self.seq[j][self.mpos])
+                if m:
+                    page = m.groups()[0]
+                    if per_section:
+                        self.pps[fx][j - s] = page
+                    else:
+                        self.pages[j] = page
+                    self.lines[page] = []
 
     def getpl(self, pos, fx=False):
         "if fx (a section name) is passed, pos is relative, otherwise absolute."
