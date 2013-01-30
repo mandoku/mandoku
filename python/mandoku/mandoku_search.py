@@ -43,3 +43,5 @@ library routines for searching mandoku orgmode files.
 import os, sys, codecs, re, datetime, git
 from mandoku import *
 
+class MandokuSearch(object):
+    
