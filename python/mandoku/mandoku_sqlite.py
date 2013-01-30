@@ -3,7 +3,7 @@
 
 # adapting this from the mandoku_idx file
 
-import os, sys, codecs, re, datetime, git
+import os, sys, codecs, re, datetime, git, sqlite3
 
 from mandoku import *
 import redis
@@ -30,15 +30,15 @@ def getsigle(branch, r):
 
 
 class SqliteMandoku(MandokuText):
-    def __init__(self, red, txtid=None, fac=100000, *args, **kwargs):
-        self.r=red
+    def __init__(self, db, txtid=None, fac=100000, *args, **kwargs):
+        self.db=db
         self.fac = fac
         self.branches={}
         if txtid:
             ## connect to redis, get the required data there...
             self.txtid = txtid
         else:
-            super(RedisMandoku, self).__init__(*args, **kwargs)
+            super(SqliteMandoku, self).__init__(*args, **kwargs)
             self.read()
             self.add_metadata()
             try:
