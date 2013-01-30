@@ -6,8 +6,7 @@
 import os, sys, codecs, re, datetime, git, sqlite3
 
 from mandoku import *
-import redis
-import redis_hash_dict
+
 #import redis_config
 
 from difflib import *
@@ -90,7 +89,7 @@ class SqliteMandoku(MandokuText):
             #TODO need to fill in the case when we in fact connect to the db
             pass
     def printNgram(self, sx, pos, sec, extra=None):
-        #this is what we overwrite to get the stuff into redis
+        #this is what we overwrite to get the stuff into sqlite
         p=self.r.pipeline()
         if extra:
             p.rpush("%s:%s"%(sx, sec), "%d:%s" % (pos, extra) )
@@ -138,8 +137,7 @@ class SqliteMandoku(MandokuText):
             p.execute()
 
     def add_metadata(self):
-        """for the redis version, we store the 'location' value, that is
-        the section * fac +position"""
+        """sqlite version does not support metadata, stores only ngrams"""
         l=0
         sec=0
         prev = 0
