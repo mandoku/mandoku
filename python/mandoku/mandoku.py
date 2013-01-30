@@ -37,7 +37,7 @@ Mandoku module
 library routines for reading and parsing mandoku orgmode files.
 :author:       Christian Wittern (cwittern[at]gmail.com)
 :organization: Mandoku project (http://www.mandoku.org)
-:license:      BSD License
+:license:      CC 3.0 BY
 """
 
 import sys, codecs, os ,re, operator, collections, git, time, datetime

@@ -36,7 +36,7 @@ Mandoku module
 
 :author:       Christian Wittern (cwittern[at]gmail.com)
 :organization: Mandoku project (http://www.mandoku.org)
-:license:      BSD License
+:license:      CC 3.0 BY
 """
 
 if __name__ == '__main__':

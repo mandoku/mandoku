@@ -1,6 +1,7 @@
-#!/usr/bin/env python    -*- coding: utf-8 -*-
+#! /usr/bin/python
+# -*- coding: utf-8 -*-
 #
-# Copyright (c) 2011 Christian Wittern cwittern at gmail.com 
+# Copyright (c) 2011-2013 Christian Wittern cwittern at gmail.com 
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -32,66 +33,9 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 """\
-implements a sparse dictionary, that allows to access to existing keys from non-existing larger keys
+Mandoku module
+library routines for reading and parsing mandoku orgmode files.
 :author:       Christian Wittern (cwittern[at]gmail.com)
 :organization: Mandoku project (http://www.mandoku.org)
 :license:      CC 3.0 BY
 """
-#TODO: might implement error checking, it supports only int keys, but does not check.
-#could try to optimize the search for the 'closest' key, but how?
-
-class SparseDictStr(dict):
-#    def __init__(self, *args, **kwargs):
-#        self.update(*args, **kwargs)
-
-    def __getitem__(self, key):
-        # optional processing here
-        try:
-            n = int(key)
-        except:
-            TypeError
-            n = key
-        s = str(n)
-        while(not self.has_key(s) and n >= 0):
-            n -=1
-            s = str(n)
-#            print s
-        if self.has_key(s):
-            return super(SparseDictStr, self).__getitem__(s)
-        else:
-            return None
-
-class SparseDict(dict):
-#    def __init__(self, *args, **kwargs):
-#        self.update(*args, **kwargs)
-
-    def __getitem__(self, key):
-        # optional processing here
-        n=key
-        while(not self.has_key(n) and n >= 0):
-            n -=1
-        if self.has_key(n):
-            return super(SparseDict, self).__getitem__(n)
-        else:
-            return None
-
-
-if __name__ == '__main__':
-
-    d = SparseDict()
-    d[1] = 'A'
-    d[10] = 'B'
-    d[12] = 'C'
-
-    print 5, d[5]
-    print 11, d[11]
-    print 12, d[12]
-    t = SparseDictStr()
-    t["1"] = 'A'
-    t["10"] = 'B'
-    t["12"] = 'C'
-    print 5, t["5"]
-    print 11, t["11"]
-    print 12, t["12"]
-    # this does not work
-    print 'a', d['a']
