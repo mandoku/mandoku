@@ -9,6 +9,7 @@ from mandoku import *
 from couchdb import Server
 from couchdb.mapping import TextField, IntegerField, DateField
 from couchdb import Document
+from collections import OrderedDict
 
 from difflib import *
 
