@@ -112,7 +112,10 @@ class CouchMandoku(MandokuText):
                 for j in range(0, len(d['seq'])):
                     m=re.search(ur"(<pb:[^>]*>)", d['seq'][j][1])
                     if m:
-                        d['lines'][pg]['end'] = j 
+                        try:
+                            d['lines'][pg]['end'] = j
+                        except:
+                            pass
                         pg = m.groups()[0]
                         d['pages'][j] = pg
                         d['lines'][pg] = {'start': j}
@@ -124,6 +127,11 @@ class CouchMandoku(MandokuText):
                             d['lines'][pg][j] = l
                         except:
                             pass
+                #this is the last entry
+                try:
+                    d['lines'][pg]['end'] = j
+                except:
+                    pass
                 self.db.save(d)
             self.db.save(t)
 
