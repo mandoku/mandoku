@@ -7,9 +7,9 @@ import os, sys, codecs, re, datetime, git
 
 from mandoku import *
 from couchdb import Server
-from couchdb.mapping import TextField, IntegerField, DateField
-from couchdb import Document
-from collections import OrderedDict
+from couchdb.mapping import TextField
+#from couchdb import Document , IntegerField, DateField
+#from collections import OrderedDict
 
 from difflib import *
 
