@@ -38,10 +38,11 @@ def getsigle(branch, db):
 
 class CouchMandoku(MandokuText):
     id = TextField()
-    def __init__(self, db, meta, txtid=None, fac=100000,  *args, **kwargs):
+    def __init__(self, db, meta, ngram=None, txtid=None, fac=100000,  *args, **kwargs):
         """db ist the database for text data on the server, meta the metadata database (for internal stuff)"""
         self.meta=meta
         self.db=db
+        self.ngram=ngram
         self.fac = fac
         self.branches={}
         if txtid:
