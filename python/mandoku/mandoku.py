@@ -386,7 +386,7 @@ function with access to a database."""
                 out.write("#+PROPERTY: %s %s\n" % (dx.upper(), self.defs[dx]))
         out.write("#+PROPERTY: JUAN %d\n" % (section + 1))
 
-    def printNgram(self, sx, pos, sec, extra=None):
+    def printNgram(self, sx, sec, pos, extra=None):
         if extra:
             print sx, sec, pos, extra
         else:
@@ -409,7 +409,7 @@ function with access to a database."""
                 try:
                     #the note-marker is on the character preceding the start of
                     #the note!
-                    check=seq[j+n-2][1]
+                    check=self.seq[j+n-2][1]
                 except:
                     check=''
                 if '(' in check:
@@ -419,27 +419,27 @@ function with access to a database."""
                     while not found and noteend <= cnt:
                         noteend += 1
                         try:
-                            check2 = seq[noteend][1]
+                            check2 = self.seq[noteend][1]
                         except:
                             check2 = ''
                         found = ')' in check2
                     dn = noteend - j + 1
-                    s1 = "".join([a[self.cpos] for a in seq[j:notestart]])
-                    s2 = "".join([a[self.cpos] for a in seq[j+dn:j+dn+n-len(s1)]])
+                    s1 = "".join([a[self.cpos] for a in self.seq[j:notestart]])
+                    s2 = "".join([a[self.cpos] for a in self.seq[j+dn:j+dn+n-len(s1)]])
                     self.printNgram(s1+s2, fx, j - s)
                 elif notestart+1 > j:
-                    s1 = "".join([a[self.cpos] for a in seq[j:notestart+1]])
-                    s2 = "".join([a[self.cpos] for a in seq[j+dn:j+dn+n-len(s1)]])
+                    s1 = "".join([a[self.cpos] for a in self.seq[j:notestart+1]])
+                    s2 = "".join([a[self.cpos] for a in self.seq[j+dn:j+dn+n-len(s1)]])
                     self.printNgram(s1+s2, fx, j - s)
                 elif notestart < j and j < noteend+1:
                     e = min(j+n, noteend+1)
-                    sx="".join([a[self.cpos] for a in seq[j:e]])
+                    sx="".join([a[self.cpos] for a in self.seq[j:e]])
                     self.printNgram(sx, fx, j - s, "n")
                 else:
                     try:
-                        sx="".join([a[self.cpos] for a in seq[j:j+n]])
+                        sx="".join([a[self.cpos] for a in self.seq[j:j+n]])
                     except:
-                        sx="".join([a[self.cpos] for a in seq[j:cnt]])
+                        sx="".join([a[self.cpos] for a in self.seq[j:cnt]])
                     self.printNgram(sx, fx, j - s)
 
 

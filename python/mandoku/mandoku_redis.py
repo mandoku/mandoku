@@ -89,7 +89,7 @@ class RedisMandoku(MandokuText):
         else:
             #TODO need to fill in the case when we in fact connect to the db
             pass
-    def printNgram(self, sx, pos, sec, extra=None):
+    def printNgram(self, sx, sec, pos, extra=None):
         #this is what we overwrite to get the stuff into redis
         p=self.r.pipeline()
         if extra:
