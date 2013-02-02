@@ -139,13 +139,17 @@ class CouchMandoku(MandokuText):
     def printNgram(self, sx, pos, sec, extra=None):
         #this is what we overwrite to get the stuff into redis
         if self.ngram:
-            d = self.ngram[sx]
-            p=self.r.pipeline()
             if extra:
-                p.rpush("%s:%s"%(sx, sec), "%d:%s" % (pos, extra) )
+                val = (sec, pos, extra)
             else:
-                p.rpush("%s:%s"%(sx, sec), pos )
-            p.execute()
+                val = (sec, pos)
+            if self.ngram.get(sx):
+                ng = self.ngram.get(sx)
+                ng['ngram'].append(val)
+                ng.save()
+            else:
+                self.ngram.save('_id' : sx, 'ngram' : [val])
+
 
 
     def add_metadata(self):
