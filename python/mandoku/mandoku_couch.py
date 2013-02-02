@@ -136,6 +136,17 @@ class CouchMandoku(MandokuText):
                 self.db.save(d)
             self.db.save(t)
 
+    def printNgram(self, sx, pos, sec, extra=None):
+        #this is what we overwrite to get the stuff into redis
+        if self.ngram:
+            d = self.ngram[sx]
+            p=self.r.pipeline()
+            if extra:
+                p.rpush("%s:%s"%(sx, sec), "%d:%s" % (pos, extra) )
+            else:
+                p.rpush("%s:%s"%(sx, sec), pos )
+            p.execute()
+
 
     def add_metadata(self):
         "this has moved to connecText() for every section"
