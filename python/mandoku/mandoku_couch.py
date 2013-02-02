@@ -108,13 +108,14 @@ class CouchMandoku(MandokuText):
                     #TODO: look for the previous pg in seq!?
                     pg = self.defs['lastpb'][self.defs['lastpb'].find('<'):self.defs['lastpb'].find('>')+1]
                     d['pages'][0] = pg
-                    d['lines'][pg] = {}
+                    d['lines'][pg] = {'start' : 0}
                 for j in range(0, len(d['seq'])):
                     m=re.search(ur"(<pb:[^>]*>)", d['seq'][j][1])
                     if m:
+                        d['lines'][pg]['end'] = j 
                         pg = m.groups()[0]
                         d['pages'][j] = pg
-                        d['lines'][pg] = {}
+                        d['lines'][pg] = {'start': j}
                         l = 0
                     x = len(re.findall(u"\xb6", d['seq'][j][1]))
                     if x > 0:
