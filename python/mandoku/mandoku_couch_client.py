@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import division
+from __future__ import absolute_import
 import couchdb, re
 from mandoku import mandoku
 from mandoku import mandoku_couch

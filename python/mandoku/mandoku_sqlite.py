@@ -2,6 +2,8 @@
 # add files in org (mandoku) format to the redis server
 
 # adapting this from the mandoku_idx file
+from __future__ import division
+from __future__ import absolute_import
 
 import os, sys, codecs, re, datetime, git, sqlite3
 

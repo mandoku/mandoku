@@ -39,6 +39,8 @@ library routines for reading and parsing mandoku orgmode files.
 :organization: Mandoku project (http://www.mandoku.org)
 :license:      CC 3.0 BY
 """
+from __future__ import division
+from __future__ import absolute_import
 
 import sys, codecs, os ,re, operator, collections, git, time, datetime
 from difflib import *

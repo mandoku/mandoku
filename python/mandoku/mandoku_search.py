@@ -39,6 +39,8 @@ library routines for searching mandoku orgmode files.
 :organization: Mandoku project (http://www.mandoku.org)
 :license:      CC 3.0 BY
 """
+from __future__ import division
+from __future__ import absolute_import
 
 import os, sys, codecs, re, datetime, git
 from mandoku import *

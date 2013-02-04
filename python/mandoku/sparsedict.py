@@ -40,6 +40,9 @@ implements a sparse dictionary, that allows to access to existing keys from non-
 #TODO: might implement error checking, it supports only int keys, but does not check.
 #could try to optimize the search for the 'closest' key, but how?
 
+from __future__ import division
+from __future__ import absolute_import
+
 class SparseDictStr(dict):
 #    def __init__(self, *args, **kwargs):
 #        self.update(*args, **kwargs)
