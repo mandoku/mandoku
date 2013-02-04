@@ -7,7 +7,7 @@ from __future__ import absolute_import
 
 import os, sys, codecs, re, datetime, git
 
-from mandoku import *
+from mandoku.mandoku import *
 from couchdb import Server
 from couchdb.mapping import TextField
 #from couchdb import Document , IntegerField, DateField

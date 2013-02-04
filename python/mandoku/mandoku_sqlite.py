@@ -7,7 +7,7 @@ from __future__ import absolute_import
 
 import os, sys, codecs, re, datetime, git, sqlite3
 
-from mandoku import *
+from mandoku.mandoku import *
 
 #import redis_config
 

@@ -43,7 +43,7 @@ from __future__ import division
 from __future__ import absolute_import
 
 import os, sys, codecs, re, datetime, git
-from mandoku import *
+from mandoku.mandoku import *
 
 class MandokuSearch(object):
     
