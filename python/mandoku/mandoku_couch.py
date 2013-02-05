@@ -83,13 +83,15 @@ class CouchMandoku(MandokuText):
 #            t['pages'] = {}
             t['versions'] =self.versions
 #            t['pages'] = self.pages
-            t['sections'] = self.sections
+            t['sections'] = []
             for i in range(1, len(self.sections)+1):
                 s, f = self.sections[i-1]
                 try:
                     cnt = self.sections[i][0] 
                 except(IndexError):
-                    cnt = len(self.seq) 
+                    cnt = len(self.seq)
+                #lets put something useful here
+                t['sections'].append([f[0:f.find('.')], cnt])
                 d = {'type' : 'seq',  
                      'version' : self.version, 
                      'rev' : self.revision, 
