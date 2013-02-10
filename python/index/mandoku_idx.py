@@ -78,6 +78,8 @@ def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2
             break
         line = img_re.sub('', line)
         line = re.sub(r'/', '', line)
+        if "\t" in line:
+            line=line.split('\t')[0]
         if line.startswith('#') or line.startswith(':'):
             if line.startswith('#+'):
                 r=line[2:-1].split()

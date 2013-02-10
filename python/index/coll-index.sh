@@ -8,6 +8,6 @@ rm -Rf $idxdir/*/*.$coll.idx
 for file in */*.txt
 do
     echo $file
-    python ~/projects/mandoku/mandoku_idx.py $file $coll $idxdir
+    python /Users/chris/db/mandoku/python/index/mandoku_idx.py $file $coll $idxdir
     sleep 1
 done
