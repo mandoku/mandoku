@@ -197,8 +197,36 @@ function with access to a database."""
         self.mpos = 3
 
     def maketoc(self):
+        prevlev = 0
+        tmp={0:[]}
+        for i, s, f in enumerate(self.sections):
+            secid=f[0:f.find('.')]
+            start = s
+            try:
+                end = self.sections[i + 1]
+            except:
+                end = len(self.seq)
+            toc = makesectoc(start, end)
+            ky = toc.keys()
+            ky.sort()
+            for k in ky:
+                level, heading, parent = toc[k]
+                out = (level, heading, secid, k)
+                if level == prevlev:
+                    tmp[level].append((out))
+                    print "=", level, tmp
+                elif level > prevlev:
+                    tmp[level] = [out]
+                    print ">", level, tmp
+                else:
+                    while (prevlev > level):
+                        tmp[prevlev -1].append(tmp[prevlev])
+                        prevlev -= 1
+                        print "r", prevlev, tmp[1]
+                    tmp[level].append((out))
+                prevlev = level
+        return tmp[1]
 
-        pass
 
     def makesectoc(self, start, end):
         """I'm passing the boundaries of the section here"""
@@ -208,7 +236,7 @@ function with access to a database."""
         level = 0
         t = ''
         cur = {}
-        for i, tmp in enumerate(sec):
+        for i, tmp in enumerate(self.seq[start:end]):
             a = tmp[0]
             b = "".join(tmp[1:])
             if nl and not "\n" in b:
