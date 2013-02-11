@@ -199,14 +199,15 @@ function with access to a database."""
     def maketoc(self):
         prevlev = 0
         tmp={0:[]}
-        for i, s, f in enumerate(self.sections):
+        for i in range(1, len(self.sections)+1):
+            s, f = self.sections[i-1]
             secid=f[0:f.find('.')]
             start = s
             try:
                 end = self.sections[i + 1]
             except:
                 end = len(self.seq)
-            toc = makesectoc(start, end)
+            toc = self.makesectoc(start, end)
             ky = toc.keys()
             ky.sort()
             for k in ky:
