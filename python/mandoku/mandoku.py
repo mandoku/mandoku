@@ -196,6 +196,38 @@ function with access to a database."""
         self.cpos = 1
         self.mpos = 3
 
+    def maketoc(self):
+
+        pass
+
+    def makesectoc(self, start, end):
+        """I'm passing the boundaries of the section here"""
+        toc= SparseDict()
+        nl=None
+        parent = ''
+        level = 0
+        t = ''
+        cur = {}
+        for i, tmp in enumerate(sec):
+            a = tmp[0]
+            b = "".join(tmp[1:])
+            if nl and not "\n" in b:
+                t += a
+            elif nl and "\n" in b:
+                try:
+                    parent = cur[level - 1]
+                except:
+                    parent = ''
+                toc[nl] = (level, t, parent)
+                cur[level] = t
+                nl = None
+            if "*" in b:
+                level = b.find(' ', b.index('*')) - b.index('*')
+                t = ""
+                nl = i
+        return toc
+
+
     def add_metadata(self, per_section=False):
         l=0
         page="first"
