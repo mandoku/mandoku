@@ -74,6 +74,10 @@ class MandokuText(object):
         self.pages = SparseDict()
         #page per sections
         self.pps = {}
+        #tocs per sections
+        self.sectocs = {}
+        #toc
+        self.toc = []
         #indexes the page number to a list of character positions, every position gives the beginning of a line
         #self.lines = collections.defaultdict(list)
         self.lines = {}
@@ -204,10 +208,12 @@ function with access to a database."""
             secid=f[0:f.find('.')]
             start = s
             try:
-                end = self.sections[i + 1]
+                end = self.sections[i][0]
             except:
                 end = len(self.seq)
+            print start, end
             toc = self.makesectoc(start, end)
+            self.sectocs[secid] = toc
             ky = toc.keys()
             ky.sort()
             for k in ky:
@@ -215,18 +221,16 @@ function with access to a database."""
                 out = (level, heading, secid, k)
                 if level == prevlev:
                     tmp[level].append((out))
-                    print "=", level, tmp
                 elif level > prevlev:
                     tmp[level] = [out]
-                    print ">", level, tmp
                 else:
                     while (prevlev > level):
                         tmp[prevlev -1].append(tmp[prevlev])
                         prevlev -= 1
-                        print "r", prevlev, tmp[1]
                     tmp[level].append((out))
                 prevlev = level
-        return tmp[1]
+        self.toc = tmp[1]
+    
 
 
     def makesectoc(self, start, end):
