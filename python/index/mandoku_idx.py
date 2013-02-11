@@ -146,13 +146,16 @@ def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2
                             else:
                                 chars.append((a, "%d:%d:%d:%d"%(int(vol), int(defs['page']), defs['line'], defs['char'])))
                         else:
-                            if defs['page'].find(':') > -1:
+                            try:
+                                chars.append((a, "%s:%d:%d:%d"%(defs['id'], int(defs['page']), defs['line'], defs['char'])))
+                            except:
                                 #we have section:page pattern
                                 #just assume this is skqs
-                                chars.append((a, "%d:%s:%d:%d"%(int(defs['id'][3:]), defs['page'], defs['line'], defs['char'])))
-                            else:
-                                chars.append((a, "%s:%d:%d:%d"%(defs['id'], int(defs['page']), defs['line'], defs['char'])))
-                        
+                                try:
+                                    chars.append((a, "%d:%s:%d:%d"%(int(defs['id'][3:]), defs['page'], defs['line'], defs['char'])))
+                                except:
+                                    chars.append((a, "%s:%s:%d:%d"%(defs['id'], defs['page'], defs['line'], defs['char'])))
+                                                        
             ## need to disentangle the text now, extract notes into a separate stack if there are some
             ## notes start by '(', end by ')' and have a possible linebreak '/' within.
             ## we will collect the notes until we reach a note-end and then spitting them out
