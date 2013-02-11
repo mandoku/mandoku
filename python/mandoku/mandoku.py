@@ -211,7 +211,7 @@ function with access to a database."""
                 end = self.sections[i][0]
             except:
                 end = len(self.seq)
-            print start, end
+            #print start, end
             toc = self.makesectoc(start, end)
             self.sectocs[secid] = toc
             ky = toc.keys()

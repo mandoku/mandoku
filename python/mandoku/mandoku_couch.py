@@ -54,6 +54,7 @@ class CouchMandoku(MandokuText):
             super(CouchMandoku, self).__init__(*args, **kwargs)
             self.read()
             self.add_metadata()
+            self.maketoc()
             try:
                 self.txtid = self.defs['id']
             except:
@@ -80,29 +81,32 @@ class CouchMandoku(MandokuText):
             t['textpath'] = self.textpath[self.textpath.find('/db/')+4:]
             t['sigle-%s' % (sigle)] = self.revision
             t['fac'] = self.fac
+            t['toc'] = self.toc
 #            t['pages'] = {}
             t['versions'] =self.versions
 #            t['pages'] = self.pages
             t['sections'] = []
             for i in range(1, len(self.sections)+1):
                 s, f = self.sections[i-1]
+                secid=f[0:f.find('.')]
                 try:
                     cnt = self.sections[i][0] 
                 except(IndexError):
                     cnt = len(self.seq)
                 #lets put something useful here
-                t['sections'].append([f[0:f.find('.')], cnt])
+                t['sections'].append([secid, cnt])
                 d = {'type' : 'seq',  
                      'version' : self.version, 
                      'rev' : self.revision, 
                      'sigle' : sigle, 
                      '_id' : f[0:f.find('.')]}
+                d['toc'] = self.sectocs[secid]
                 d['seq'] = self.seq[s:cnt]
                 try:
-                    d['juan'] = int(f[0:f.find('.')].split('-')[-1])
+                    d['juan'] = int(secid.split('-')[-1])
                 except:
                     try:
-                        d['juan'] = int(f[0:f.find('.')].split('_')[-1])
+                        d['juan'] = int(secid.split('_')[-1])
                     except:
                         d['juan'] = 0
                 d['pages'] = {}
