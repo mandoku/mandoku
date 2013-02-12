@@ -93,7 +93,7 @@ One character is either a character or one entity expression"
       (erase-buffer)
 ;; find /tmp/index/SDZ0001.txt -name "97.idx.*" | xargs zgrep "^靈寳"
       (shell-command
-		    (concat "bzgrep " "^"
+		    (concat "bzgrep -H " "^"
 		     (substring search-string 1 )
 		     " "
 		     mandoku-index-dir
