@@ -34,7 +34,7 @@
   "Textids of the form QTW and page strings like p0060-142 are used to find the right file"
   (let* ((sp (split-string page ":"))
 	 (sec (substring (car (split-string (car sp) "-")) 1)))
-    (concat mandoku-text-dir "div/" textid "/" (downcase textid) "_" sec ".txt")))
+    (concat textid "/" (downcase textid) "_" sec ".txt")))
 
 
 ;; (defun mandoku-div-vol-page-to-file (subcoll textnum sec)

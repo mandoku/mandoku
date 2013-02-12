@@ -167,10 +167,13 @@ One character is either a character or one entity expression"
 	  (let* ((vol (car location))
 		 (pag (car (cdr location)))
 		 (line (car (cdr (cdr location))))
-		 (page (concat
-			(format "%4.4d" (string-to-number (substring pag 0 (- (length pag) 1))))
-			(mandoku-num-to-section (substring pag (- (length pag) 1)))
-			line))
+		 (page (if (string-equal (substring pag 0 1) "p")
+			   (concat (substring pag 0 (- (length pag) 1))
+				   (mandoku-num-to-section (substring pag (- (length pag) 1))) line)
+			 (concat
+			  (format "%4.4d" (string-to-number (substring pag 0 (- (length pag) 1))))
+			  (mandoku-num-to-section (substring pag (- (length pag) 1)))
+			  line)))
 		 (tx (if (string-match "_"  (car (cdr location)))
 			 ;; if the length is five, we have a location with the textnum at the end, otherwise it starts with a vol and we have to get the textid from there
 		       (funcall (intern (concat "mandoku-" coll "-textid-to-title"))
