@@ -4,12 +4,12 @@
 (setq mandoku-div-titletable (expand-file-name (concat mandoku-meta-dir "div-titles.txt")))
 
 (defun mandoku-div-page-to-image (locid)
-"given a location id, returns the path of the image"
-(let* ((textid (car (split-string locid ":" )))
-       (vol (substring textid 0 3))
-      (page (car (cdr (split-string locid ":" )))))
-(concat (substring vol 0 1) "/" vol "/" (substring page 0 2) "/"
-	vol "-" (substring page 0 4) ".tif")))
+  "given a location id, returns the path of the image"
+  (let* ((textid (car (split-string locid ":" )))
+	 (vol (substring textid 0 3))
+	 (page (car (cdr (split-string locid ":" )))))
+    (concat (substring vol 0 1) "/" vol "/" (substring page 0 2) "/"
+	    vol "-" (substring page 0 4) ".tif")))
 
 
 

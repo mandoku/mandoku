@@ -8,4 +8,4 @@
 
 
 (global-set-key "\M-\_" 'mandoku-annotate)
-;(setq mandoku-index-dir (expand-file-name "~/tmp/index/"))
+;(setq mandoku-index-dir (expand-file-name "~/00scratch/index/"))
