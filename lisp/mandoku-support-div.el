@@ -19,34 +19,33 @@
 (org-mandoku-open (concat "div: " vol ":"  page)))
 
 (defun mandoku-div-parse-location (loc)
-"parses the location in the index file, returns a list starting with vol (=sec) page line.
+  "parses the location in the index file, returns a list starting with vol (=sec) page line.
 For compatibility with the other collections, we move the text number to the back."
-(list (format "n%4.4d" (string-to-number (car (split-string loc "[:_]")))) 
-      (concat (car (cdr (split-string loc "[:_]"))) "_" (nth 2  (split-string loc "[:_]")))
-      (nth 3 (split-string loc "[:_]"))
-      (nth 4 (split-string loc "[:_]"))))
+  (list (format "n%4.4d" (string-to-number (car (split-string loc "[:_]")))) 
+	(concat (car (cdr (split-string loc "[:_]"))) "_" (nth 2  (split-string loc "[:_]")))
+	(nth 3 (split-string loc "[:_]"))
+	(nth 4 (split-string loc "[:_]"))))
 
 
 (defun mandoku-div-textid-to-title (textid page)
-"returns the title of the text"
-;; read the table if necessary
-(mandoku-div-read-titletable)
-(list textid (gethash textid mandoku-div-titles))
-)
+  "returns the title of the text"
+  ;; read the table if necessary
+  (mandoku-div-read-titletable)
+  (list textid (gethash textid mandoku-div-titles))
+  )
 
 (defun mandoku-div-textid-to-file (textid page)
-"Textids of the form T01n0001 and page strings like 439a12 are used to find the right file"
-  (let* ((subcoll (substring textid 0 2))
-	 (textnum (string-to-number (car (cdr (split-string (substring textid 2) "n")))))
-	 ;; the page I get passed in from org-mandoku is separated with :
-	 (sec (string-to-number (car (split-string page ":")))))
-    (mandoku-div-vol-page-to-file subcoll textnum sec)))
+  "Textids of the form QTW and page strings like p0060-142 are used to find the right file"
+  (let* ((sp (split-string page ":"))
+	 (sec (substring (car (split-string (car sp) "-")) 1)))
+    (concat mandoku-text-dir "div/" textid "/" (downcase textid) "_" sec ".txt")))
 
-(defun mandoku-div-vol-page-to-file (subcoll textnum sec)
-"converts the text id and page to a file name.  Page is numeric with the ending abc as 123"
-(let ((txtid (concat (upcase subcoll) "n" (format "%4.4d" textnum)))) 
-(concat (downcase subcoll) "/" txtid "/" txtid "-" (format "%3.3d" sec) ".txt")
-))
+
+;; (defun mandoku-div-vol-page-to-file (subcoll textnum sec)
+;;   "converts the text id and page to a file name.  Page is numeric with the ending abc as 123"
+;;   (let ((txtid (concat (upcase subcoll) "n" (format "%4.4d" textnum)))) 
+;;     (concat (downcase subcoll) "/" txtid "/" txtid "-" (format "%3.3d" sec) ".txt")
+;;     ))
 
 
 (defun mandoku-div-vol-page-to-title  (subcoll vol page)
