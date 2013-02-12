@@ -19,12 +19,8 @@
 (org-mandoku-open (concat "div: " vol ":"  page)))
 
 (defun mandoku-div-parse-location (loc)
-  "parses the location in the index file, returns a list starting with vol (=sec) page line.
-For compatibility with the other collections, we move the text number to the back."
-  (list (format "n%4.4d" (string-to-number (car (split-string loc "[:_]")))) 
-	(concat (car (cdr (split-string loc "[:_]"))) "_" (nth 2  (split-string loc "[:_]")))
-	(nth 3 (split-string loc "[:_]"))
-	(nth 4 (split-string loc "[:_]"))))
+"parse the location"
+(split-string loc "[:_]"))
 
 
 (defun mandoku-div-textid-to-title (textid page)
