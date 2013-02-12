@@ -202,10 +202,10 @@ One character is either a character or one entity expression"
 		    page
 		    "::"
 		    search-string
-		    "][Vol. "
+		    "]["
 		    (upcase subcoll)
 		    vol
-		    ", p."
+		    ", "
 		    page
 		    "]]"
 		    "\t"
@@ -356,7 +356,7 @@ One character is either a character or one entity expression"
     (let* (
 	   (page
 	    (if (posix-string-match "[a-h]" s)
-		     (substring s 0 (+ 1 (length (car (split-string s "[a-z]")))))
+		     (substring s 0 (+ 1 (length (car (split-string s "[a-o]")))))
 	      (if (posix-string-match "l" s)
 		   (car (split-string s "l"))
 		s)))
