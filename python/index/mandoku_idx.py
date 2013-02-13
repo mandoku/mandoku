@@ -44,7 +44,11 @@ def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2
             defs['page']=r[-1]
             if defs['line'] == 0:
                 ##this means we are looking at the first page?!
-                idlog.write("%(id)s\t%(file)s\t%(title)s\t%(ed)s\t%(page)s\t"%(defs))
+                try:
+                    idlog.write("%(id)s\t%(file)s\t%(title)s\t%(ed)s\t%(page)s\t"%(defs))
+                except:
+                    idlog.write("%(id)s\t%(file)s\t%(ed)s\t%(page)s\t"%(defs))
+                    
             defs['line']=0
             try:
                 defs['page'] = defs['page'][:-1] + tab[defs['page'][-1]]
