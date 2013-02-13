@@ -84,6 +84,7 @@ def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2
         line = re.sub(r'/', '', line)
         if "\t" in line:
             line=line.split('\t')[0] + "\n"
+        line = line.replace(' ', '')
         if line.startswith('#') or line.startswith(':'):
             if line.startswith('#+'):
                 r=line[2:-1].split()
@@ -115,6 +116,7 @@ def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2
             ##<pb:SJB_SDZ0001_010002a>
             setPage(line)
             defs['line'] += line.count(u'¶')
+            defs['char'] = 0
         elif defs.has_key('page'):
 #            defs['line'] += line.count(u'¶')
             line = re.sub(u'[+-~\u3000-\u30FF\uFF00-\uFFEF]', '', line)
