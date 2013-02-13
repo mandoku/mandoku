@@ -33,13 +33,13 @@
 (defun mandoku-div-textid-to-file (textid page)
   "Textids of the form QTW and page strings like 0060-142 are used to find the right file"
   (let* ((sp (split-string page ":"))
-	 (sec (if (string-match "-" sp)
+	 (sec (if (string-match "-" (car sp))
 		  (car (split-string (car sp) "-"))
 		"001"))
-	 (subcoll (if (string-match "-" sp)
+	 (subcoll (if (string-match "-" (car sp))
 		      textid
 		    "tls")))
-    (concat textid "/" (downcase textid) "_" sec ".txt")))
+    (concat subcoll "/" (downcase textid) "_" sec ".txt")))
 
 
 ;; (defun mandoku-div-vol-page-to-file (subcoll textnum sec)
