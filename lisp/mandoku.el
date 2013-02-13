@@ -361,7 +361,9 @@ One character is either a character or one entity expression"
 		   (car (split-string s "l"))
 		s)))
 	   (line (if (posix-string-match "[a-o]" s)
-		     (string-to-int (car (cdr  (split-string (car (car (split-string s "::"))) "[a-o]"))))
+		     (if (string-equal "0" (car (cdr  (split-string (car (split-string s "::")) "[a-o]"))))
+			 1
+		       (string-to-int (car (cdr  (split-string (car (split-string s "::")) "[a-o]")))))
 		 0))
 	   (search (if (posix-string-match "::" s)
 		       (car (cdr (split-string s "::")))
