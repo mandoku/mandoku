@@ -11,4 +11,5 @@
 ;(setq mandoku-index-dir (expand-file-name "~/00scratch/index-skqs/"))
 ;(setq mandoku-index-dir (expand-file-name "/tmp/index/"))
 ;(setq mandoku-index-dir (expand-file-name "~/00scratch/index/"))
+;(setq mandoku-index-dir (expand-file-name  (concat mandoku-base-dir "index/")))
 

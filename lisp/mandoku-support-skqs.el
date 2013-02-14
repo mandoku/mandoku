@@ -66,3 +66,9 @@ For compatibility with the other collections, we move the text number to the bac
           (goto-char (point-min))
           (while (re-search-forward "^\\([a-z0-9]+\\)	\\([^	]+\\)" nil t)
 	     (puthash (match-string 1) (match-string 2) mandoku-skqs-titles)))))))
+
+(defun mandoku-search-skqs ()
+  "search in the skqs index"
+  (interactive)
+  (let ((mandoku-index-dir "/Users/chris/00scratch/index-skqs"))
+    (mandoku-grep-n3)))

@@ -167,7 +167,7 @@ One character is either a character or one entity expression"
 	  (let* ((vol (car location))
 		 (pag (car (cdr location)))
 		 (line (car (cdr (cdr location))))
-		 (page (if (string-match "-"  pag)
+		 (page (if (string-match "[-_]"  pag)
 			   (concat (substring pag 0 (- (length pag) 1))
 				   (mandoku-num-to-section (substring pag (- (length pag) 1))) line)
 			 (concat
@@ -243,7 +243,7 @@ One character is either a character or one entity expression"
 			  (mapconcat 'mandoku-active-filter mandoku-textfilter-list "")
 			  mandoku-filtered-count))
 	)
-      (insert (format "Location                Match            Source\n* %s (%d/%d)\n"  search-string mandoku-filtered-count mandoku-count))
+      (insert (format "Location\tMatch               Source\n* %s (%d/%d)\n"  search-string mandoku-filtered-count mandoku-count))
       (mandoku-index-mode)
  ;     (org-overview)
       (hide-sublevels 2)
@@ -610,6 +610,7 @@ One character is either a character or one entity expression"
   "a mode to view Mandoku index search results
   \\{mandoku-index-mode-map}"
   (setq case-fold-search nil)
+  (set (make-local-variable 'tab-with) 24)
   (set (make-local-variable 'org-startup-folded) 'overview)
 ;  (toggle-read-only 1)
 ;  (view-mode)
