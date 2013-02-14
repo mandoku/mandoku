@@ -276,4 +276,5 @@ if __name__ == '__main__':
         use_vol = 1
     else:
         use_vol = 0
-    MandokuIndex(sys.argv[1], idxdir, idlog, 3, 3, 7, collection, use_vol)
+#    MandokuIndex(sys.argv[1], idxdir, idlog, 3, 3, 7, collection, use_vol)
+    MandokuIndex(sys.argv[1], idxdir, idlog, 2, 2, 5, collection, use_vol)
