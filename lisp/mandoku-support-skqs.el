@@ -70,5 +70,7 @@ For compatibility with the other collections, we move the text number to the bac
 (defun mandoku-search-skqs (beg end)
   "search in the skqs index"
   (interactive "r")
-  (let ((mandoku-index-dir "/Users/chris/00scratch/index-skqs/"))
-     (mandoku-grep beg end)))
+  (let ((mandoku-index-dir "/Users/chris/00scratch/index-skqs/")
+	(mandoku-use-textfilter nil))
+      (mandoku-grep-internal (buffer-substring-no-properties beg end))))
+
