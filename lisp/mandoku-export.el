@@ -3,7 +3,9 @@
 (org-export-define-derived-backend mandoku-latex latex
   :filters-alist ((:filter-parse-tree . mandoku-separate-elements))
   :translate-alist ((headline . mandoku-latex-headline-translator)
-                    (template . mandoku-latex-template)))
+                    (template . mandoku-latex-template)
+		    (paragraph . mandoku-latex-paragraph)
+))
 
 
 (org-export-define-derived-backend mandoku-odt odt
