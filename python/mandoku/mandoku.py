@@ -62,7 +62,7 @@ sys.stdout = codecs.getwriter('utf8')(sys.stdout)
 
 
 class MandokuText(object):
-    def __init__(self, textpath, version='master', starlines=True, encoding='utf-8', ext='.txt'):
+    def __init__(self, textpath, version='master', starlines=True, encoding='utf-8', ext='.txt', coll=None):
         """Read and parse the text.  If we get a directory, read all files in lexical order as parts of the text."""
         self.in_note = False
         self.flags = {}
@@ -93,6 +93,10 @@ class MandokuText(object):
         self.seq = [('', '')]
         self.ext = ext
         self.textpath = textpath
+        if coll is None:
+            self.coll = os.path.split(os.path.dirname(textpath))[1]
+        else:
+            self.coll = coll
         self.encoding = encoding
         self.versions = []
         ##version is a string that can be used for a branch in git
