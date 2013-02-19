@@ -93,6 +93,7 @@ class CouchMandoku(MandokuText):
                     cnt = self.sections[i][0] 
                 except(IndexError):
                     cnt = len(self.seq)
+#                self.sectocs[secid] = self.makesectoc(s, cnt)
                 #lets put something useful here
                 t['sections'].append([secid, cnt])
                 d = {'type' : 'seq',  
