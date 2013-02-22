@@ -59,5 +59,62 @@
 
 
      
-** 
+* JSON format 
+  The JSON format splits a text across several separate structures:
+
+** type: base
+#+BEGIN_SRC js
+{
+   "_id": "T08n0250",
+   "_rev": "2-153551fa267751cc55344c8bafd6c2c6",
+   "title": "摩訶般若波羅蜜大明呪經",
+   "textpath": "ers/chris/00scratch/tmp/test/T08n0250",
+   "sections": [
+       [
+           "T08n0250-001",
+           337
+       ]
+   ],
+   "versions": [
+       "local",
+       "master",
+       "【CBETA】",
+       "【unknown】",
+       "【万】",
+       "【中】",
+       "【元】",
+       "【北藏】",
+       "【南】",
+       "【南藏】",
+       "【原】",
+       "【宋】",
+       "【宮】",
+       "【德】",
+       "【明】",
+       "【明異】",
+       "【知】",
+       "【磧砂】",
+       "【聖】",
+       "【醍】",
+       "【麗-CB】",
+       "【麗】"
+   ],
+   "sigle-m": "0bb3b4fdefc4e70e588233640d0a44607b6a8d62",
+   "baseversion": "master",
+   "toc": [
+       [
+           1,
+           "摩訶般若波羅蜜大明呪",
+           "T08n0250-001",
+           4
+       ]
+   ],
+   "fac": 100000,
+   "type": "base",
+   "coll": "CBETA"
+}
+#+END_SRC
+   - 
+** further extensions:
+   
 
