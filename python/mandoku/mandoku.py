@@ -229,6 +229,7 @@ function with access to a database."""
                     tmp[level] = [out]
                 else:
                     while (prevlev > level):
+                        #this might fail if there are glitches in the hierarchy, like missing levels etc.
                         try:
                             tmp[prevlev -1].append(tmp[prevlev])
                         except:
