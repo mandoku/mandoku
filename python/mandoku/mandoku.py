@@ -229,7 +229,10 @@ function with access to a database."""
                     tmp[level] = [out]
                 else:
                     while (prevlev > level):
-                        tmp[prevlev -1].append(tmp[prevlev])
+                        try:
+                            tmp[prevlev -1].append(tmp[prevlev])
+                        except:
+                            pass
                         prevlev -= 1
                     tmp[level].append((out))
                 prevlev = level
