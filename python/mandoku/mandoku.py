@@ -77,180 +77,182 @@ class MandokuText(object):
         #tocs per sections
         self.sectocs = {}
         #toc
-        self.toc = []
-        #indexes the page number to a list of character positions, every position gives the beginning of a line
-        #self.lines = collections.defaultdict(list)
-        self.lines = {}
-        #Holds various metadata about the text culled from the header
-        self.defs = {}
-        #holds the text, in this case the first character is in fact position 1
-        #the first is a dummy, so that we can dump the beginning of the file and the first item of 'ex'
-        #additional items might be placed in the tuple, so the implementation should *not* rely on there being only two items
-        #the position at which the character is to be found in the seq tuple
-        self.cpos = 0
-        #the position at which metadata (u'\b6', <pb etc) is to be found
-        self.mpos = 1
-        self.seq = [('', '')]
-        self.ext = ext
-        self.textpath = textpath
-        if coll is None:
-            self.coll = os.path.split(os.path.dirname(textpath))[1]
-        else:
-            self.coll = coll
-        self.encoding = encoding
-        self.versions = []
-        ##version is a string that can be used for a branch in git
-        try:
-            repo = git.Repo(self.textpath)
-            self.version = repo.active_branch.name.decode('utf-8')
-            self.date = time.strftime("%Y-%m-%d %H:%M +0000", time.gmtime(repo.active_branch.commit.authored_date))
-            ##we want to know what other versions are available
-            for b in repo.heads:
-                ## we want to have unicode strings here!!
-                self.versions.append(b.name.decode('utf-8'))
-        except:
-            self.version = version
-        ## the revision of the text in git
-        try:
-            self.revision = repo.active_branch.commit.hexsha
-        except:
-            self.revision = ''
-        ##lines that begin a star, if False, we ignore them (for CBETA)
-        self.starlines = starlines
-        ## we use our own re to make it replaceable
-        self.re = kp_re
-
-
-
-    def read(self):
-        self.seq = [('', '')]
-        self.cpos=0
-        self.mpos=1
-        if os.path.isdir(self.textpath):
-            files = os.listdir(self.textpath)
-            files.sort()
-            for f in files:
-                if os.path.isfile(self.textpath + '/' +f) and f.endswith(self.ext):
-                    infile = codecs.open(self.textpath + '/' + f, 'r', self.encoding)
-                    self.sections.append((len(self.seq), f))
-                    self.parse(infile)
-                    infile.close()
-        elif os.path.isfile(self.textpath):
-            infile = codecs.open(self.textpath, 'r', self.encoding)
-            self.sections.append((len(self.seq), self.textpath))
-            self.parse(infile)
-            infile.close()
-        else:
-            sys.stderr.write("missing:  " + self.textpath + '\n')
-            raise "No valid file found"
-
-    def getsigle(branch, db=None):
-        """This is a small helper function to get a convenient handle for a
-branch.  In most cases, this should be overwritten by a inherited
-function with access to a database."""
-        return branch
-
-
-    def punc_reorder(self):
-        """Expand the tuple in seq to at least three items,
-        punctuation before the char, the char and punctuation after
-        the char, additional stuff like pagebreaks goes into the fourth item."""
-        #we do this only if it has not been done before...
-        if self.cpos > 0:
-            return
-        for i in range(len(self.seq)-1, -1, -1):
-            ##move opening punctuation to the next chartuple; move metadata other than punctuation to a new item in this tuple
-            p = np = m = ''
-            s=self.seq[i][self.cpos+1]
-            ex=meta_re.split(s)
-            for e in ex:
-                if len(e) > 0:
-                    if e[0] in (u'<', u'¶', u'\n'):
-                        m += e
-                    else:
-                        for j in range(0, len(e)):
-                            if e[j] in (u'〈', u'《', u'「', u'『', u'【', u'〖', u'〘', u'〚', u'\u3000', '(', '*', ' '):
-                                p += e[j]
-#                                print "p", i, p
-                            else:
-                                np += e[j]
-            self.seq[i] = ('', self.seq[i][self.cpos], np, m, ) + self.seq[i][self.cpos+2:]
-            if len(p) > 0:
-                try:
-                    self.seq[i+1] = (p + self.seq[i+1][0], ) + self.seq[i+1][1:]
-                except:
-                    pass
-                    #print i, p, self.seq[i]
-            if self.seq[i][1].startswith('{'):
-                ts = self.seq[i][1]
-                k = ts[1:ts.find(':')]
-                rep = ts[ts.find(':')+1:-1]
-                if len(k) > 0:
-                    try:
-                        self.seq[i] = ('{', k[0], ':' + rep[0] + '}', ) + self.seq[i][2:]
-                    except:
-                        self.seq[i] = ('{', k[0], ':}', ) + self.seq[i][2:]
-                    if len(k) > 1:
-                        ##this should be the only case where we extend the seq
-                        for x in range(1, len(k)):
-                            try:
-                                self.seq.insert(i+x, ('{', k[x], ':' + rep[x] + '}', '',))
-                            except:
-                                self.seq.insert(i+x, ('{', k[x], ':}', '',))
-                        if len(rep) > x:
-                            self.seq[i+x] = ('{', self.seq[i+x][1], ':' + rep[x:] + '}', '')
-                elif len(rep) > 0:
-                    self.seq[i] = ('{', '', ':' + rep + '}', ) + self.seq[i][2:]
-        self.cpos = 1
-        self.mpos = 3
-
-    def maketoc(self):
-        prevlev = 0
-        tmp={0:[]}
-        for i in range(1, len(self.sections)+1):
-            s, f = self.sections[i-1]
-            secid=f[0:f.find('.')]
-            start = s
+            self.toc = []
+            #indexes the page number to a list of character positions, every position gives the beginning of a line
+            #self.lines = collections.defaultdict(list)
+            self.lines = {}
+            #Holds various metadata about the text culled from the header
+            self.defs = {}
+            #holds the text, in this case the first character is in fact position 1
+            #the first is a dummy, so that we can dump the beginning of the file and the first item of 'ex'
+            #additional items might be placed in the tuple, so the implementation should *not* rely on there being only two items
+            #the position at which the character is to be found in the seq tuple
+            self.cpos = 0
+            #the position at which metadata (u'\b6', <pb etc) is to be found
+            self.mpos = 1
+            self.seq = [('', '')]
+            self.ext = ext
+            self.textpath = textpath
+            if coll is None:
+                self.coll = os.path.split(os.path.dirname(textpath))[1]
+            else:
+                self.coll = coll
+            self.encoding = encoding
+            self.versions = []
+            ##version is a string that can be used for a branch in git
             try:
-                end = self.sections[i][0]
+                repo = git.Repo(self.textpath)
+                self.version = repo.active_branch.name.decode('utf-8')
+                self.date = time.strftime("%Y-%m-%d %H:%M +0000", time.gmtime(repo.active_branch.commit.authored_date))
+                ##we want to know what other versions are available
+                for b in repo.heads:
+                    ## we want to have unicode strings here!!
+                    self.versions.append(b.name.decode('utf-8'))
             except:
-                end = len(self.seq)
-            #print start, end
-            toc = self.makesectoc(start, end)
-            self.sectocs[secid] = toc
-            ky = toc.keys()
-            ky.sort()
-            for k in ky:
-                level, heading, parent = toc[k]
-                out = (level, heading, secid, k)
-                if level == prevlev:
-                    tmp[level].append((out))
-                elif level > prevlev:
-                    tmp[level] = [out]
-                else:
-                    while (prevlev > level):
-                        tmp[prevlev -1].append(tmp[prevlev])
-                        prevlev -= 1
-                    tmp[level].append((out))
-                prevlev = level
-        self.toc = tmp[1]
-    
+                self.version = version
+            ## the revision of the text in git
+            try:
+                self.revision = repo.active_branch.commit.hexsha
+            except:
+                self.revision = ''
+            ##lines that begin a star, if False, we ignore them (for CBETA)
+            self.starlines = starlines
+            ## we use our own re to make it replaceable
+            self.re = kp_re
 
 
-    def makesectoc(self, start, end):
-        """I'm passing the boundaries of the section here"""
-        toc= SparseDict()
-        nl=None
-        parent = ''
-        level = 0
-        t = ''
-        cur = {}
-        for i, tmp in enumerate(self.seq[start:end]):
-            a = tmp[0]
-            b = "".join(tmp[1:])
-            if nl and not "\n" in b:
-                t += a
-            elif nl and "\n" in b:
+
+        def read(self):
+            self.seq = [('', '')]
+            self.cpos=0
+            self.mpos=1
+            if os.path.isdir(self.textpath):
+                files = os.listdir(self.textpath)
+                files.sort()
+                for f in files:
+                    if os.path.isfile(self.textpath + '/' +f) and f.endswith(self.ext):
+                        infile = codecs.open(self.textpath + '/' + f, 'r', self.encoding)
+                        self.sections.append((len(self.seq), f))
+                        self.parse(infile)
+                        infile.close()
+            elif os.path.isfile(self.textpath):
+                infile = codecs.open(self.textpath, 'r', self.encoding)
+                self.sections.append((len(self.seq), self.textpath))
+                self.parse(infile)
+                infile.close()
+            else:
+                sys.stderr.write("missing:  " + self.textpath + '\n')
+                raise "No valid file found"
+
+        def getsigle(branch, db=None):
+            """This is a small helper function to get a convenient handle for a
+    branch.  In most cases, this should be overwritten by a inherited
+    function with access to a database."""
+            return branch
+
+
+        def punc_reorder(self):
+            """Expand the tuple in seq to at least three items,
+            punctuation before the char, the char and punctuation after
+            the char, additional stuff like pagebreaks goes into the fourth item."""
+            #we do this only if it has not been done before...
+            if self.cpos > 0:
+                return
+            for i in range(len(self.seq)-1, -1, -1):
+                ##move opening punctuation to the next chartuple; move metadata other than punctuation to a new item in this tuple
+                p = np = m = ''
+                s=self.seq[i][self.cpos+1]
+                ex=meta_re.split(s)
+                for e in ex:
+                    if len(e) > 0:
+                        if e[0] in (u'<', u'¶', u'\n'):
+                            m += e
+                        else:
+                            for j in range(0, len(e)):
+                                if e[j] in (u'〈', u'《', u'「', u'『', u'【', u'〖', u'〘', u'〚', u'\u3000', '(', '*', ' '):
+                                    p += e[j]
+    #                                print "p", i, p
+                                else:
+                                    np += e[j]
+                self.seq[i] = ('', self.seq[i][self.cpos], np, m, ) + self.seq[i][self.cpos+2:]
+                if len(p) > 0:
+                    try:
+                        self.seq[i+1] = (p + self.seq[i+1][0], ) + self.seq[i+1][1:]
+                    except:
+                        pass
+                        #print i, p, self.seq[i]
+                if self.seq[i][1].startswith('{'):
+                    ts = self.seq[i][1]
+                    k = ts[1:ts.find(':')]
+                    rep = ts[ts.find(':')+1:-1]
+                    if len(k) > 0:
+                        try:
+                            self.seq[i] = ('{', k[0], ':' + rep[0] + '}', ) + self.seq[i][2:]
+                        except:
+                            self.seq[i] = ('{', k[0], ':}', ) + self.seq[i][2:]
+                        if len(k) > 1:
+                            ##this should be the only case where we extend the seq
+                            for x in range(1, len(k)):
+                                try:
+                                    self.seq.insert(i+x, ('{', k[x], ':' + rep[x] + '}', '',))
+                                except:
+                                    self.seq.insert(i+x, ('{', k[x], ':}', '',))
+                            if len(rep) > x:
+                                self.seq[i+x] = ('{', self.seq[i+x][1], ':' + rep[x:] + '}', '')
+                    elif len(rep) > 0:
+                        self.seq[i] = ('{', '', ':' + rep + '}', ) + self.seq[i][2:]
+            self.cpos = 1
+            self.mpos = 3
+
+        def maketoc(self):
+            prevlev = 0
+            tmp={0:[]}
+            for i in range(1, len(self.sections)+1):
+                s, f = self.sections[i-1]
+                secid=f[0:f.find('.')]
+                start = s
+                try:
+                    end = self.sections[i][0]
+                except:
+                    end = len(self.seq)
+                #print start, end
+                toc = self.makesectoc(start, end)
+                self.sectocs[secid] = toc
+                ky = toc.keys()
+                ky.sort()
+                for k in ky:
+                    level, heading, parent = toc[k]
+                    out = (level, heading, secid, k)
+                    if level == prevlev:
+                        tmp[level].append((out))
+                    elif level > prevlev:
+                        tmp[level] = [out]
+                    else:
+                        while (prevlev > level):
+                            tmp[prevlev -1].append(tmp[prevlev])
+                            prevlev -= 1
+                        tmp[level].append((out))
+                    prevlev = level
+            try:
+                self.toc = tmp[1]
+            except:
+                pass
+
+
+        def makesectoc(self, start, end):
+            """I'm passing the boundaries of the section here"""
+            toc= SparseDict()
+            nl=None
+            parent = ''
+            level = 0
+            t = ''
+            cur = {}
+            for i, tmp in enumerate(self.seq[start:end]):
+                a = tmp[0]
+                b = "".join(tmp[1:])
+                if nl and not "\n" in b:
+                    t += a
+                elif nl and "\n" in b:
                 #this works only if the parent is accidentally at the same level
                 try:
                     parent = cur[level - 1]
