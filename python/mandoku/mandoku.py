@@ -553,6 +553,8 @@ function with access to a database."""
                 #no idea what d is used for, probably not necessary anymore... (maybe it was for section-dependent code)
                 d=0
                 for tag, i1, i2, j1, j2 in s.get_opcodes():
+                    ##first we look for pagebreaks, we need only those with a different version
+                    ##we want to end up with a list that has text positions and pb per version
                     if add_var_punctuation and tag == 'equal':
                         dx = j1 - i1
                         for i in range(i1, i2):
