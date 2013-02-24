@@ -111,6 +111,10 @@ class MandokuText(object):
         except:
             self.version = version
         ## the revision of the text in git
+        if version in self.versions:
+
+        else:
+            
         try:
             self.revision = repo.active_branch.commit.hexsha
         except:

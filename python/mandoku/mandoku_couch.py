@@ -82,6 +82,7 @@ class CouchMandoku(MandokuText):
             t['sigle-%s' % (sigle)] = self.revision
             t['fac'] = self.fac
             t['toc'] = self.toc
+            t['coll'] = self.coll
 #            t['pages'] = {}
             t['versions'] =self.versions
 #            t['pages'] = self.pages
