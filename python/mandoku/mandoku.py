@@ -238,7 +238,10 @@ function with access to a database."""
                         except:
                             pass
                         prevlev -= 1
-                    tmp[level].append((out))
+                    try:
+                        tmp[level].append((out))
+                    except:
+                        pass
                 prevlev = level
         try:
             self.toc = tmp[1]
