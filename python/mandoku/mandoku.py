@@ -561,7 +561,8 @@ function with access to a database."""
                         dx = j1 - i1
                         for i in range(i1, i2):
                             if '<pb:' in t2.seq[i+dx][self.mpos]:
-                                self.img[b.name][i] = 
+                                pb = t2.seq[i+dx][self.mpos]
+                                self.img[b.name][i] = pb[pb.find('<pb:'):pb.find('>', pb.find('<pb:'))+1]
                             if add_var_punctuation and t2.seq[i+dx][self.mpos] != '':
                                 res[i+d] = ':' + t2.seq[i+dx][self.mpos]
                     if tag == 'replace':
