@@ -536,6 +536,7 @@ function with access to a database."""
         self.s=s
         self.refs=[]
         self.branches={}
+        self.img={}
         self.txtid = self.textpath.split('/')[-1]
         s.set_seq1([a[self.cpos] for a in self.seq])
         for b in repo.heads:
@@ -543,6 +544,7 @@ function with access to a database."""
                 #print b.name
                 b.checkout()
                 self.branches[b.name]={}
+                self.img[b.name]={}
                 res = self.branches[b.name]
                 sig = self.getsigle(b.name)
                 t2 = MandokuText(self.textpath, version=b.name)
@@ -555,11 +557,13 @@ function with access to a database."""
                 for tag, i1, i2, j1, j2 in s.get_opcodes():
                     ##first we look for pagebreaks, we need only those with a different version
                     ##we want to end up with a list that has text positions and pb per version
-                    if add_var_punctuation and tag == 'equal':
+                    if  tag == 'equal':
                         dx = j1 - i1
                         for i in range(i1, i2):
-                            if t2.seq[i+dx][1] != '':
-                                res[i+d] = ':' + t2.seq[i+dx][1]
+                            if '<pb:' in t2.seq[i+dx][self.mpos]:
+                                self.img[b.name][i] = 
+                            if add_var_punctuation and t2.seq[i+dx][self.mpos] != '':
+                                res[i+d] = ':' + t2.seq[i+dx][self.mpos]
                     if tag == 'replace':
                         a=t2.seq[j1:j2]
                         if add_var_punctuation:
