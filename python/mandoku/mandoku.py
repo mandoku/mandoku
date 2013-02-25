@@ -209,7 +209,7 @@ function with access to a database."""
 
     def maketoc(self):
         prevlev = 0
-        tmp={0:[]}
+        tmptoc={0:[]}
         for i in range(1, len(self.sections)+1):
             s, f = self.sections[i-1]
             secid=f[0:f.find('.')]
@@ -228,26 +228,26 @@ function with access to a database."""
                 level, heading, parent = toc[k]
                 out = (level, heading, secid, k)
                 if level == prevlev or level > prevlev:
-                    if not tmp.has_key(level):
-                        tmp[level] = [out]
+                    if not tmptoc.has_key(level):
+                        tmptoc[level] = [out]
                     else:
-                        tmp[level].append((out))
+                        tmptoc[level].append((out))
 #                elif level > prevlev:
 #                    tmp[level] = [out]
                 else:
                     while (prevlev > level):
                         #this might fail if there are glitches in the hierarchy, like missing levels etc. so better escape it
                         try:
-                            tmp[prevlev -1].append(tmp[prevlev])
+                            tmptoc[prevlev -1].append(tmptoc[prevlev])
                         except:
                             pass
                         prevlev -= 1
                     try:
-                        tmp[level].append((out))
+                        tmptoc[level].append((out))
                     except:
                         pass
                 prevlev = level
-        self.toc = tmp[1]
+        self.toc = tmptoc[1]
 
     def makesectoc(self, start, end):
         """I'm passing the boundaries of the section here"""
