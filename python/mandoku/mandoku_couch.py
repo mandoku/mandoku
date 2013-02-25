@@ -54,7 +54,10 @@ class CouchMandoku(MandokuText):
             super(CouchMandoku, self).__init__(*args, **kwargs)
             self.read()
             self.add_metadata()
-            self.maketoc()
+            try:
+                self.maketoc()
+            except:
+                print "maketoc failed."
             try:
                 self.txtid = self.defs['id']
             except:

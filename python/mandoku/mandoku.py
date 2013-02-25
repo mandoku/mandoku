@@ -213,6 +213,7 @@ function with access to a database."""
         for i in range(1, len(self.sections)+1):
             s, f = self.sections[i-1]
             secid=f[0:f.find('.')]
+            print secid
             start = s
             try:
                 end = self.sections[i][0]
