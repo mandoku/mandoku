@@ -227,10 +227,13 @@ function with access to a database."""
             for k in ky:
                 level, heading, parent = toc[k]
                 out = (level, heading, secid, k)
-                if level == prevlev:
-                    tmp[level].append((out))
-                elif level > prevlev:
-                    tmp[level] = [out]
+                if level == prevlev or level > prevlev:
+                    if not tmp.has_key(level):
+                        tmp[level] = [out]
+                    else:
+                        tmp[level].append((out))
+#                elif level > prevlev:
+#                    tmp[level] = [out]
                 else:
                     while (prevlev > level):
                         #this might fail if there are glitches in the hierarchy, like missing levels etc. so better escape it
@@ -244,10 +247,7 @@ function with access to a database."""
                     except:
                         pass
                 prevlev = level
-        try:
-            self.toc = tmp[1]
-        except:
-            pass
+        self.toc = tmp[1]
 
     def makesectoc(self, start, end):
         """I'm passing the boundaries of the section here"""
@@ -263,6 +263,7 @@ function with access to a database."""
             if nl and not "\n" in b:
                 t += a
             elif nl and "\n" in b:
+                t += a
                 #this works only if the parent is accidentally in the same section
                 try:
                     parent = cur[level - 1]
