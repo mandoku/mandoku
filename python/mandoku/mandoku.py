@@ -213,7 +213,7 @@ function with access to a database."""
         for i in range(1, len(self.sections)+1):
             s, f = self.sections[i-1]
             secid=f[0:f.find('.')]
-            print secid
+#            print secid
             start = s
             try:
                 end = self.sections[i][0]
@@ -248,12 +248,15 @@ function with access to a database."""
                         pass
 #                        tmptoc[level]=[out]
                 prevlev = level
-        try:
-            self.toc = tmptoc[1]
-        except:
-            sys.stderr.write("Warning: %s; level 1 missing. \n" % ( self.sections))
-            self.toc = tmptoc[2]
-#            print "maketoc failed!, ", tmptoc
+        if len(tmptoc) > 1:
+            try:
+                self.toc = tmptoc[1]
+            except:
+                sys.stderr.write("Warning: %s; level 1 missing. \n" % ( self.sections))
+                try:
+                    self.toc = tmptoc[2]
+                except:
+                    print "maketoc failed!, ", tmptoc
             
     def makesectoc(self, start, end):
         """I'm passing the boundaries of the section here"""
@@ -277,7 +280,7 @@ function with access to a database."""
                     parent = ''
                 toc[nl] = (level, t, parent)
                 cur[level] = t
-                print nl, t
+#                print nl, t
                 nl = None
             if "*" in b:
                 level = b.find(' ', b.index('*')) - b.index('*')
@@ -548,12 +551,11 @@ function with access to a database."""
         self.s=s
         self.refs=[]
         self.branches={}
-        self.img={}
         self.txtid = self.textpath.split('/')[-1]
         s.set_seq1([a[self.cpos] for a in self.seq])
         for b in repo.heads:
             if b.name != self.version:
-                #print b.name
+                print b.name
                 b.checkout()
                 self.branches[b.name]={}
                 self.img[b.name]={}
