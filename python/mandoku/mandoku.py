@@ -262,7 +262,7 @@ function with access to a database."""
             if nl and not "\n" in b:
                 t += a
             elif nl and "\n" in b:
-                #this works only if the parent is accidentally at the same level
+                #this works only if the parent is accidentally in the same section
                 try:
                     parent = cur[level - 1]
                 except:
