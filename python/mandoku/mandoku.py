@@ -251,7 +251,9 @@ function with access to a database."""
         try:
             self.toc = tmptoc[1]
         except:
-            print "maketoc failed!, ", tmptoc
+            sys.stderr.write("Warning: %s; level 1 missing. \n" % ( self.sections))
+            self.toc = tmptoc[2]
+#            print "maketoc failed!, ", tmptoc
             
     def makesectoc(self, start, end):
         """I'm passing the boundaries of the section here"""
