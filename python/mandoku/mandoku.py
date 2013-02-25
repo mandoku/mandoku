@@ -240,15 +240,19 @@ function with access to a database."""
                         try:
                             tmptoc[prevlev -1].append(tmptoc[prevlev])
                         except:
-                            pass
+                            tmptoc[prevlev -1]=[tmptoc[prevlev]]
                         prevlev -= 1
                     try:
                         tmptoc[level].append((out))
                     except:
                         pass
+#                        tmptoc[level]=[out]
                 prevlev = level
-        self.toc = tmptoc[1]
-
+        try:
+            self.toc = tmptoc[1]
+        except:
+            print "maketoc failed!, ", tmptoc
+            
     def makesectoc(self, start, end):
         """I'm passing the boundaries of the section here"""
         toc= SparseDict()
@@ -260,9 +264,9 @@ function with access to a database."""
         for i, tmp in enumerate(self.seq[start:end]):
             a = tmp[self.cpos]
             b = "".join(tmp[self.cpos+1:])
-            if nl and not "\n" in b:
+            if nl is not None and not "\n" in b:
                 t += a
-            elif nl and "\n" in b:
+            elif nl is not None and "\n" in b:
                 t += a
                 #this works only if the parent is accidentally in the same section
                 try:
