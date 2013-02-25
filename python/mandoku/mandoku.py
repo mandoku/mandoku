@@ -78,6 +78,7 @@ class MandokuText(object):
         self.sectocs = {}
         #toc
         self.toc = []
+        self.img={}
         #indexes the page number to a list of character positions, every position gives the beginning of a line
         #self.lines = collections.defaultdict(list)
         self.lines = {}
