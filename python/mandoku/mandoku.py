@@ -257,8 +257,8 @@ function with access to a database."""
         t = ''
         cur = {}
         for i, tmp in enumerate(self.seq[start:end]):
-            a = tmp[0]
-            b = "".join(tmp[1:])
+            a = tmp[self.cpos]
+            b = "".join(tmp[self.cpos+1:])
             if nl and not "\n" in b:
                 t += a
             elif nl and "\n" in b:
