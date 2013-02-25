@@ -269,6 +269,7 @@ function with access to a database."""
                     parent = ''
                 toc[nl] = (level, t, parent)
                 cur[level] = t
+                print nl, t
                 nl = None
             if "*" in b:
                 level = b.find(' ', b.index('*')) - b.index('*')
