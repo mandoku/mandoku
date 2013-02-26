@@ -45,7 +45,7 @@ from __future__ import absolute_import
 import sys, codecs, os ,re, operator, collections, git, time, datetime
 from difflib import *
 from itertools import *
-from sparsedict import *
+from mandoku.sparsedict import *
 
 kanji=Ur'\u3400-\u4DFF\u4e00-\u9FFF\uF900-\uFAFF\uFE30-\uFE4F\U00020000-\U0002A6DF\U0002A700-\U0002B73F\U0002B740-\U0002B81F\U0002B820-\U0002F7FF'
 pua=Ur'\uE000-\uF8FF\U000F0000-\U000FFFFD\U00100000-\U0010FFFD'
@@ -577,6 +577,7 @@ function with access to a database."""
                         for i in range(i1, i2):
                             if '<pb:' in t2.seq[i+dx][self.mpos]:
                                 pb = t2.seq[i+dx][self.mpos]
+                                print pb
                                 self.img[b.name][i] = pb[pb.find('<pb:'):pb.find('>', pb.find('<pb:'))+1]
                             if add_var_punctuation and t2.seq[i+dx][self.mpos] != '':
                                 res[i+d] = ':' + t2.seq[i+dx][self.mpos]
