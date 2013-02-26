@@ -207,21 +207,10 @@ class CouchMandoku(MandokuText):
                         s = SequenceMatcher()
                         s.set_seq1([a[self.cpos] for a in self.seq[s1start:s1end]])
                         s.set_seq2([a[self.cpos] for a in t2.seq[s2start:s2end]])
-                        res = self.procdiffs(s, t2, s1start, s2start, add_var_punctuation, b, secid)
-#                        print "res:", res
+                        self.procdiffs(s, t2, s1start, s2start, add_var_punctuation, b, secid)
                 else:
                     s.set_seq2([a[self.cpos] for a in t2.seq])
-                    res = self.procdiffs(s, t2, 1, 1, add_var_punctuation)
-#                    print "res:", res
-#                    try:
-                    dummy, f = self.sections[seg]
-                    t = self.db.get(f[0:f.find('.')])
-                    if not(t.has_key('variants')):
-                        t['variants'] = {}
-                    t['variants'][sig] = res
-                    self.db.save(t)
-#                    except:
-#                        pass
+                    self.procdiffs(s, t2, 1, 1, add_var_punctuation)
         for b in repo.heads:
             if b.name == self.version:
                 b.checkout()
