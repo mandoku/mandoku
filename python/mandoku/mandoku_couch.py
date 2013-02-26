@@ -281,6 +281,9 @@ class CouchMandoku(MandokuText):
                     res[k] =  "%s%s%s" % (res.get(k, ''), "".join([x[self.cpos] for x in self.seq[s1start+i1-1:s1start+i1]]), "".join("".join(["".join(x[self.cpos]) for x in t2.seq[s2start+j1:s2start+j2]])))
                 else:
                     res[k] =  "%s%s%s" % (res.get(k, ''), "".join([x[self.cpos] for x in self.seq[s1start+i1-1:s1start+i1]]), "".join("".join(["".join(x[self.cpos]) for x in t2.seq[s2start+j1:s2start+j2]])))
+                if '<pb:' in res[k]:
+                    pb = res[k]
+                    self.img[i+d][sig] = pb[pb.find('<pb:'):pb.find('>', pb.find('<pb:'))+1]
             elif tag == 'delete':
                 res[i1+d] = ""
 
