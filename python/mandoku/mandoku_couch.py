@@ -170,7 +170,7 @@ class CouchMandoku(MandokuText):
         pass
 
     def addOtherBranches(self, add_var_punctuation=False):
-        """adds the other branches to redis"""
+        """adds the other branches to couchdb"""
         try:
             repo = git.Repo(self.textpath)
         except:
@@ -178,13 +178,14 @@ class CouchMandoku(MandokuText):
         s = SequenceMatcher()
         self.s=s
         self.refs=[]
-        s.set_seq1([a[0] for a in self.seq])
+#        s.set_seq1([a[self.cpos] for a in self.seq])
         for b in repo.heads:
             if b.name != self.version:
                 b.checkout()
                 self.branches[b.name]={}
                 res = self.branches[b.name]
                 sig = getsigle(b.name, self.meta)
+                self.img[b.name]={}
                 t2 = MandokuText(self.textpath, version=b.name)
                 self.refs.append(t2)
                 t2.read()
@@ -203,9 +204,9 @@ class CouchMandoku(MandokuText):
                         except IndexError:
                             s2end = len(t2.seq)
                         s = SequenceMatcher()
-                        s.set_seq1([a[0] for a in self.seq[s1start:s1end]])
-                        s.set_seq2([a[0] for a in t2.seq[s2start:s2end]])
-                        res = self.procdiffs(s, t2, s1start, s2start, add_var_punctuation)
+                        s.set_seq1([a[self.cpos] for a in self.seq[s1start:s1end]])
+                        s.set_seq2([a[self.cpos] for a in t2.seq[s2start:s2end]])
+                        res = self.procdiffs(s, t2, s1start, s2start, add_var_punctuation, b)
 #                        print "res:", res
                         t = self.db.get(f[0:f.find('.')])
                         if t is None:
@@ -216,8 +217,8 @@ class CouchMandoku(MandokuText):
                             t['variants'][sig] = res
                             self.db.save(t)
                 else:
-                    s.set_seq2([a[0] for a in t2.seq])
-                    res = self.procdiffs(s, t2, 1, 1, add_var_punctuation)
+                    s.set_seq2([a[self.cpos] for a in t2.seq])
+                    res = self.procdiffs(s, t2, 1, 1, add_var_punctuation, b)
 #                    print "res:", res
 #                    try:
                     dummy, f = self.sections[seg]
@@ -232,7 +233,7 @@ class CouchMandoku(MandokuText):
             if b.name == self.version:
                 b.checkout()
 
-    def procdiffs (self, s, t2, s1start, s2start, add_var_punctuation):
+    def procdiffs (self, s, t2, s1start, s2start, add_var_punctuation, b):
         unevensec = len(self.sections) != len(t2.sections)
         d=0
         oldseg = 0
@@ -251,17 +252,21 @@ class CouchMandoku(MandokuText):
             #          res = {}
             #          oldseg = seg
             ##todo: need to update the position, so that it is based on the section, not total charpos
-            if add_var_punctuation and tag == 'equal':
+            if  tag == 'equal':
                 dx = j1 - i1
                 for i in range(i1, i2):
-                    if t2.seq[s2start+i+dx][1] != '':
-                        res[i+d] = ':' + t2.seq[s2start+i+dx][1]
+                    if '<pb:' in t2.seq[i+dx][self.mpos]:
+                        pb = t2.seq[i+dx][self.mpos]
+                        print pb
+                        self.img[b.name][i] = pb[pb.find('<pb:'):pb.find('>', pb.find('<pb:'))+1]
+                    if add_var_punctuation and t2.seq[s2start+i+dx][self.mpos] != '':
+                        res[i+d] = ':' + t2.seq[s2start+i+dx][self.mpos]
             if tag == 'replace':
                 a1=self.seq[s1start+i1:s1start+i2]
-                a=[x[0] for x in t2.seq[s2start+j1:s2start+j2]]
+                a=[x[self.cpos] for x in t2.seq[s2start+j1:s2start+j2]]
                 if add_var_punctuation:
-                    b1=[x[1] for x in t2.seq[s2start+j1:s2start+j2]]
-                    a1=map(lambda xx : xx[0] + ':' + xx[1], zip(a,b1))
+                    b1=[x[self.mpos] for x in t2.seq[s2start+j1:s2start+j2]]
+                    a1=map(lambda xx : xx[self.cpos] + ':' + xx[self.mpos], zip(a,b1))
                 a.reverse()
                 for i in range(i1, i2):
                     try:
@@ -277,16 +282,16 @@ class CouchMandoku(MandokuText):
                 k = i1-1+d
                 if add_var_punctuation:
                     #here we just grap the original e, munge it together and slab it onto the rest
-                    res[k] =  "%s%s%s" % (res.get(k, ''), "".join([x[0] for x in self.seq[s1start+i1-1:s1start+i1]]), "".join("".join(["".join(x[0]) for x in t2.seq[s2start+j1:s2start+j2]])))
+                    res[k] =  "%s%s%s" % (res.get(k, ''), "".join([x[self.cpos] for x in self.seq[s1start+i1-1:s1start+i1]]), "".join("".join(["".join(x[self.cpos]) for x in t2.seq[s2start+j1:s2start+j2]])))
                 else:
-                    res[k] =  "%s%s%s" % (res.get(k, ''), "".join([x[0] for x in self.seq[s1start+i1-1:s1start+i1]]), "".join("".join(["".join(x[0]) for x in t2.seq[s2start+j1:s2start+j2]])))
+                    res[k] =  "%s%s%s" % (res.get(k, ''), "".join([x[self.cpos] for x in self.seq[s1start+i1-1:s1start+i1]]), "".join("".join(["".join(x[self.cpos]) for x in t2.seq[s2start+j1:s2start+j2]])))
             elif tag == 'delete':
                 res[i1+d] = ""
         return res
 
     def pos2seg(self, pos):
         #give the section of a given pos
-        s=[a[0] for a in self.sections]
+        s=[a[self.cpos] for a in self.sections]
 #        s.reverse()
         cnt=len(s)
         x = s.pop()
