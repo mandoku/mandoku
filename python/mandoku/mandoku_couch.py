@@ -194,6 +194,7 @@ class CouchMandoku(MandokuText):
                     for i in range(0, len(self.sections)):
 #                        print self.sections[i]
                         s1start, f =self.sections[i]
+                        secid = f[0:f.find('.')]
                         try:
                             s1end = self.sections[i+1][0]
                         except IndexError:
@@ -206,19 +207,11 @@ class CouchMandoku(MandokuText):
                         s = SequenceMatcher()
                         s.set_seq1([a[self.cpos] for a in self.seq[s1start:s1end]])
                         s.set_seq2([a[self.cpos] for a in t2.seq[s2start:s2end]])
-                        res = self.procdiffs(s, t2, s1start, s2start, add_var_punctuation, b)
+                        res = self.procdiffs(s, t2, s1start, s2start, add_var_punctuation, b, secid)
 #                        print "res:", res
-                        t = self.db.get(f[0:f.find('.')])
-                        if t is None:
-                            print f, b.name
-                        else:
-                            if not(t.has_key('variants')):
-                                t['variants'] = {}
-                            t['variants'][sig] = res
-                            self.db.save(t)
                 else:
                     s.set_seq2([a[self.cpos] for a in t2.seq])
-                    res = self.procdiffs(s, t2, 1, 1, add_var_punctuation, b)
+                    res = self.procdiffs(s, t2, 1, 1, add_var_punctuation)
 #                    print "res:", res
 #                    try:
                     dummy, f = self.sections[seg]
@@ -287,7 +280,18 @@ class CouchMandoku(MandokuText):
                     res[k] =  "%s%s%s" % (res.get(k, ''), "".join([x[self.cpos] for x in self.seq[s1start+i1-1:s1start+i1]]), "".join("".join(["".join(x[self.cpos]) for x in t2.seq[s2start+j1:s2start+j2]])))
             elif tag == 'delete':
                 res[i1+d] = ""
-        return res
+
+        sig = getsigle(b.name, self.meta)
+        t = self.db.get(secid)
+        if t is None:
+            print secid, b.name
+        else:
+            if not(t.has_key('variants')):
+                t['variants'] = {}
+            t['variants'][sig] = res
+            t['img'] = self.img
+            self.db.save(t)
+
 
     def pos2seg(self, pos):
         #give the section of a given pos
