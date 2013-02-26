@@ -215,7 +215,7 @@ class CouchMandoku(MandokuText):
             if b.name == self.version:
                 b.checkout()
 
-    def procdiffs (self, s, t2, s1start, s2start, add_var_punctuation, b):
+    def procdiffs (self, s, t2, s1start, s2start, add_var_punctuation, b, secid):
         unevensec = len(self.sections) != len(t2.sections)
         d=0
         oldseg = 0
