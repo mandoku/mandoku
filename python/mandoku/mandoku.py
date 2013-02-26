@@ -574,6 +574,7 @@ function with access to a database."""
                     ##we want to end up with a list that has text positions and pb per version
                     if  tag == 'equal':
                         dx = j1 - i1
+                        print "equal"
                         for i in range(i1, i2):
                             if '<pb:' in t2.seq[i+dx][self.mpos]:
                                 pb = t2.seq[i+dx][self.mpos]
