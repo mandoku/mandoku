@@ -40,9 +40,9 @@ def getsigle(branch, db):
 
 class CouchMandoku(MandokuText):
     id = TextField()
-    def __init__(self, db, meta, ngram=None, txtid=None, fac=100000,  *args, **kwargs):
+    def __init__(self, db, ngram=None, txtid=None, fac=100000,  *args, **kwargs):
         """db ist the database for text data on the server, meta the metadata database (for internal stuff)"""
-        self.meta=meta
+        self.meta=db
         self.db=db
         self.ngram=ngram
         self.fac = fac
@@ -185,7 +185,6 @@ class CouchMandoku(MandokuText):
                 self.branches[b.name]={}
                 res = self.branches[b.name]
                 sig = getsigle(b.name, self.meta)
-                self.img[b.name]={}
                 t2 = MandokuText(self.textpath, version=b.name)
                 self.refs.append(t2)
                 t2.read()
@@ -207,15 +206,16 @@ class CouchMandoku(MandokuText):
                         s = SequenceMatcher()
                         s.set_seq1([a[self.cpos] for a in self.seq[s1start:s1end]])
                         s.set_seq2([a[self.cpos] for a in t2.seq[s2start:s2end]])
-                        self.procdiffs(s, t2, s1start, s2start, add_var_punctuation, b, secid)
+                        self.procdiffs(s, t2, s1start, s2start, add_var_punctuation, sig, secid)
                 else:
+                    ##untested!!
                     s.set_seq2([a[self.cpos] for a in t2.seq])
-                    self.procdiffs(s, t2, 1, 1, add_var_punctuation)
+                    self.procdiffs(s, t2, 1, 1, add_var_punctuation, sig, self.txtid)
         for b in repo.heads:
             if b.name == self.version:
                 b.checkout()
 
-    def procdiffs (self, s, t2, s1start, s2start, add_var_punctuation, b, secid):
+    def procdiffs (self, s, t2, s1start, s2start, add_var_punctuation, sig, secid):
         unevensec = len(self.sections) != len(t2.sections)
         d=0
         oldseg = 0
@@ -240,7 +240,11 @@ class CouchMandoku(MandokuText):
                     if '<pb:' in t2.seq[i+dx][self.mpos]:
                         pb = t2.seq[i+dx][self.mpos]
                         print pb
-                        self.img[b.name][i] = pb[pb.find('<pb:'):pb.find('>', pb.find('<pb:'))+1]
+                        if self.img.has_key(i):
+                            self.img[i][sig] = pb[pb.find('<pb:'):pb.find('>', pb.find('<pb:'))+1]
+                        else:
+                            self.img[i] = {}
+                            self.img[i][sig] = pb[pb.find('<pb:'):pb.find('>', pb.find('<pb:'))+1]
                     if add_var_punctuation and t2.seq[s2start+i+dx][self.mpos] != '':
                         res[i+d] = ':' + t2.seq[s2start+i+dx][self.mpos]
             if tag == 'replace':
@@ -270,7 +274,6 @@ class CouchMandoku(MandokuText):
             elif tag == 'delete':
                 res[i1+d] = ""
 
-        sig = getsigle(b.name, self.meta)
         t = self.db.get(secid)
         if t is None:
             print secid, b.name
