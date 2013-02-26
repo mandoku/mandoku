@@ -356,9 +356,9 @@ function with access to a database."""
             elif line.startswith('#') or line.startswith(':'):
 #                self.seq[-1] = (self.seq[-1][0], self.seq[-1][1] + line)
 #                print "have a #+"
-                if line.startswith('#-'):
+                if line.startswith('#<') or line.startswith('#-'):
                     pass
-                elif line.startswith('#<') or line.upper().startswith('#+BEGIN') or line.upper().startswith('#+END'):
+                elif line.upper().startswith('#+BEGIN') or line.upper().startswith('#+END'):
                     #this is a commented pb, we treat it as a regular pb
                     self.seq[-1] = (self.seq[-1][:] + (line,))
                 elif line.startswith('#+'):
