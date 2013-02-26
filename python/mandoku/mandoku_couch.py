@@ -254,14 +254,19 @@ class CouchMandoku(MandokuText):
                         res[i+d] = ':' + t2.seq[s2start+i+dx][self.mpos]
             if tag == 'replace':
                 a1=self.seq[s1start+i1:s1start+i2]
+                b1=[x[self.mpos] for x in t2.seq[s2start+j1:s2start+j2]]
                 a=[x[self.cpos] for x in t2.seq[s2start+j1:s2start+j2]]
                 if add_var_punctuation:
-                    b1=[x[self.mpos] for x in t2.seq[s2start+j1:s2start+j2]]
+                    ##untested!!
                     a1=map(lambda xx : xx[self.cpos] + ':' + xx[self.mpos], zip(a,b1))
                 a.reverse()
+                b1.reverse()
                 for i in range(i1, i2):
                     try:
                         res[i+d] = a.pop()
+                        pb = b.pop()
+                        if '<pb:' in pb:
+                            self.img[i+d][sig] = pb[pb.find('<pb:'):pb.find('>', pb.find('<pb:'))+1]
                     except:
                         #b is shorter than a
                         res[i+d] = ''
