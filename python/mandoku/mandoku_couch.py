@@ -17,7 +17,10 @@ from difflib import *
 
 def getsigle(branch, db):
     "the sigle is a general, not text dependend mapping from a shorthand version to the identifier used in git; db is the db where the sigles document is stored"
-    bdoc = db['branch']
+    if db.get('branch'):
+        bdoc = db['branch']
+    else:
+        bdoc={'_id': 'branch', 'sigle': 'dummy', 'type' : 'meta' }
     t = branch.replace(u'【', '')
     t = t.replace(u'】', '')
     if bdoc.has_key(t):
@@ -26,7 +29,10 @@ def getsigle(branch, db):
         #this means, the branch we are seeing is new, register it
         i = 1
         s1 = t[0:i]
-        sdoc = db['sigle']
+        if db.get('sigle'):
+            sdoc = db['sigle']
+        else:
+            sdoc={'_id': 'sigle', 'branch': 'dummy', 'type' : 'meta' }
         while sdoc.has_key(s1) and i < len(t):
             i += 1
             s1 = t[0:i]
@@ -239,7 +245,6 @@ class CouchMandoku(MandokuText):
                 for i in range(i1, i2):
                     if '<pb:' in t2.seq[i+dx][self.mpos]:
                         pb = t2.seq[i+dx][self.mpos]
-                        print pb
                         if self.img.has_key(i):
                             self.img[i][sig] = pb[pb.find('<pb:'):pb.find('>', pb.find('<pb:'))+1]
                         else:
