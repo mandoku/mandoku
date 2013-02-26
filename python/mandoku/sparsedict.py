@@ -57,7 +57,7 @@ class SparseDictStr(dict):
         while(not self.has_key(s) and n >= 0):
             n -=1
             s = str(n)
-            print s
+#            print s
         if self.has_key(s):
             return super(SparseDictStr, self).__getitem__(s)
         else:
