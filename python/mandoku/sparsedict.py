@@ -49,10 +49,9 @@ class SparseDictStr(dict):
 
     def __getitem__(self, key):
         # optional processing here
-        try:
+        if isinstance(key, str):
             n = int(key)
-        except:
-            TypeError
+        else:
             n = key
         s = str(n)
         while(not self.has_key(s) and n >= 0):
