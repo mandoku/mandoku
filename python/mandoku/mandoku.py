@@ -45,7 +45,7 @@ from __future__ import absolute_import
 import sys, codecs, os ,re, operator, collections, git, time, datetime
 from difflib import *
 from itertools import *
-import sparsedict
+from mandoku import sparsedict
 
 kanji=Ur'\u3400-\u4DFF\u4e00-\u9FFF\uF900-\uFAFF\uFE30-\uFE4F\U00020000-\U0002A6DF\U0002A700-\U0002B73F\U0002B740-\U0002B81F\U0002B820-\U0002F7FF'
 pua=Ur'\uE000-\uF8FF\U000F0000-\U000FFFFD\U00100000-\U0010FFFD'
