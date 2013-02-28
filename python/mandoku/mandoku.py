@@ -64,6 +64,11 @@ sys.stdout = codecs.getwriter('utf8')(sys.stdout)
 class MandokuText(object):
     def __init__(self, textpath, version='master', starlines=True, encoding='utf-8', ext='.txt', coll=None):
         """Read and parse the text.  If we get a directory, read all files in lexical order as parts of the text."""
+        try:
+            v = versions.split(',')
+            version=v[0]
+        except:
+            pass
         self.in_note = False
         self.flags = {}
         self.sections = []
