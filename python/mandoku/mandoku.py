@@ -65,7 +65,7 @@ class MandokuText(object):
     def __init__(self, textpath, version='master', starlines=True, encoding='utf-8', ext='.txt', coll=None):
         """Read and parse the text.  If we get a directory, read all files in lexical order as parts of the text."""
         try:
-            v = versions.split(',')
+            v = version.split(',')
             version=v[0]
         except:
             pass
@@ -109,6 +109,11 @@ class MandokuText(object):
         try:
             repo = git.Repo(self.textpath)
             ##we want to know what other versions are available
+            if not version in repo.heads:
+                try:
+                    version = v[1]
+                except:
+                    pass
             for b in repo.heads:
                 ## we want to have unicode strings here!!
                 self.versions.append(b.name.decode('utf-8'))
