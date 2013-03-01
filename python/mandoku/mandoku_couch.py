@@ -130,15 +130,15 @@ class CouchMandoku(MandokuText):
                     d['pages'][0] = pg
                     d['lines'][pg] = {'start' : 0}
                 for j in range(0, len(d['seq'])):
-                    m=re.search(ur"(<pb:[^>]*>)", d['seq'][j][1])
-                    if m:
+                    m=re.findall(ur"(<pb:[^>]*>)", d['seq'][j][1])
+                    if len(m) > 0:
                         try:
                             d['lines'][pg]['end'] = j
                         except:
                             pass
-                        pg = m.groups()[0]
-                        d['pages'][j] = pg
-                        d['lines'][pg] = {'start': j}
+                        for pg in m:
+                            d['pages'][j] = pg
+                            d['lines'][pg] = {'start': j}
                         l = 0
                     x = len(re.findall(u"\xb6", d['seq'][j][1]))
                     if x > 0:
