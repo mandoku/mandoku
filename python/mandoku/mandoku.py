@@ -96,7 +96,7 @@ class MandokuText(object):
         self.cpos = 0
         #the position at which metadata (u'\b6', <pb etc) is to be found
         self.mpos = 1
-        self.seq = [('', '')]
+        self.seq = []
         self.ext = ext
         self.textpath = textpath
         if coll is None:
@@ -137,7 +137,7 @@ class MandokuText(object):
 
 
     def read(self):
-        self.seq = [('', '')]
+        self.seq = []
         self.cpos=0
         self.mpos=1
         if os.path.isdir(self.textpath):
@@ -344,6 +344,8 @@ function with access to a database."""
 
                 
     def parse(self, infile):
+        ##we add an empty seq at the beginning of each file
+        self.seq.append(('', ''))
         for line in infile:
             try:
                 line, extra = line.split('\t', 1)
