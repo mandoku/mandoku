@@ -543,22 +543,29 @@ function with access to a database."""
                         dxn += 1
                     self.printNgram(outseq, fx, j - s)
                 elif notestart+1 > j:
-                    outseq = self.seq[j:notestart+1][self.cpos]
-                    dxn = 0
+                    dxn = j
+                    ## we need to first build the sequence before the note, then the part after the note
+                    while len(outseq) < and dxn < (notestart + 1) n:
+                        if not self.seq[dxn][self.cpos] == u'\u3000':
+                            outseq = self.seq[dxn][self.cpos]
+                        dxn += 1
                     while len(outseq) < n:
-                        outseq.append(self.seq[j+dn+dxn][self.cpos])
+                        if not self.seq[dn+dxn][self.cpos] == u'\u3000':
+                            outseq.append(self.seq[dn+dxn][self.cpos])
                         dxn += 1
                     self.printNgram(outseq, fx, j - s)
                 elif notestart < j and j < noteend+1:
                     e = min(j+n, noteend+1)
                     dxn = j
                     while len(outseq)  < n or dxn >= e:
-                        outseq.append(self.seq[dxn][self.cpos])
+                        if not self.seq[dxn][self.cpos] == u'\u3000':
+                            outseq.append(self.seq[dxn][self.cpos])
                         dxn += 1
                     self.printNgram(outseq, fx, j - s)
                 else:
                     while len(outseq) < n or n >= cnt:
-                        outseq.append(self.seq[dxn][self.cpos])
+                        if not self.seq[dxn][self.cpos] == u'\u3000':
+                            outseq.append(self.seq[dxn][self.cpos])
                         dxn += 1
                     self.printNgram(outseq, fx, j - s)
 
