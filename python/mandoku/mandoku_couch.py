@@ -140,6 +140,7 @@ class CouchMandoku(MandokuText):
                             d['pages'][j] = pg
                             d['lines'][pg] = {'start': j}
                         l = 0
+                    #this includes the lbs before the new page!
                     x = len(re.findall(u"\xb6", d['seq'][j][self.mpos]))
                     if x > 0:
                         l += x
