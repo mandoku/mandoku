@@ -532,6 +532,8 @@ function with access to a database."""
                             check2 = ''
                         found = ')' in check2
                     dn = noteend - j + 1
+                    ##[2013-03-02T10:40:07+0900]
+                    ## we build the out sequence, but need to skip over u'\3000' characters
                     s1 = "".join([a[self.cpos] for a in self.seq[j:notestart]])
                     s2 = "".join([a[self.cpos] for a in self.seq[j+dn:j+dn+n-len(s1)]])
                     self.printNgram(s1+s2, fx, j - s)
