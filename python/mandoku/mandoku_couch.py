@@ -130,7 +130,8 @@ class CouchMandoku(MandokuText):
                     d['pages'][0] = pg
                     d['lines'][pg] = {'start' : 0}
                 for j in range(0, len(d['seq'])):
-                    m=re.findall(ur"(<pb:[^>]*>)", d['seq'][j][self.mpos])
+                    this = d['seq'][j][self.mpos]
+                    m=re.findall(ur"(<pb:[^>]*>)", this)
                     if len(m) > 0:
                         try:
                             d['lines'][pg]['end'] = j
@@ -140,8 +141,9 @@ class CouchMandoku(MandokuText):
                             d['pages'][j] = pg
                             d['lines'][pg] = {'start': j}
                         l = 0
-                    #this includes the lbs before the new page!
-                    x = len(re.findall(u"\xb6", d['seq'][j][self.mpos]))
+                    #this includes the lbs before the new page!, so get only the part after >
+                    this = this.rsplit('>', 1)[-1]
+                    x = len(re.findall(u"\xb6", this))
                     if x > 0:
                         l += x
                         try:

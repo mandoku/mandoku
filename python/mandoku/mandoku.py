@@ -545,7 +545,7 @@ function with access to a database."""
                 elif notestart+1 > j:
                     dxn = j
                     ## we need to first build the sequence before the note, then the part after the note
-                    while len(outseq) < and dxn < (notestart + 1) n:
+                    while len(outseq) < n and dxn < (notestart + 1):
                         if not self.seq[dxn][self.cpos] == u'\u3000':
                             outseq = self.seq[dxn][self.cpos]
                         dxn += 1
