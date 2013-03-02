@@ -130,7 +130,7 @@ class CouchMandoku(MandokuText):
                     d['pages'][0] = pg
                     d['lines'][pg] = {'start' : 0}
                 for j in range(0, len(d['seq'])):
-                    this = d['seq'][j][self.mpos]
+                    this = "".join(d['seq'][j][self.mpos:])
                     m=re.findall(ur"(<pb:[^>]*>)", this)
                     if len(m) > 0:
                         try:
