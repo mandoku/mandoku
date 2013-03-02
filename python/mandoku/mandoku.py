@@ -538,7 +538,8 @@ function with access to a database."""
                     outseq = self.seq[j:notestart][self.cpos]
                     dxn = 0
                     while len(outseq) < n:
-                        outseq.append(self.seq[j+dn+dxn][self.cpos])
+                        if not self.seq[j+dn+dxn][self.cpos] == u'\u3000':
+                            outseq.append(self.seq[j+dn+dxn][self.cpos])
                         dxn += 1
                     self.printNgram(outseq, fx, j - s)
                 elif notestart+1 > j:
