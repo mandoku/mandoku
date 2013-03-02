@@ -513,6 +513,7 @@ function with access to a database."""
             except(IndexError):
                 cnt = len(self.seq)
             for j in range(s, cnt):
+                outseq = []
                 #first we check if the status of the text changes:
                 try:
                     #the note-marker is on the character preceding the start of
@@ -534,23 +535,31 @@ function with access to a database."""
                     dn = noteend - j + 1
                     ##[2013-03-02T10:40:07+0900]
                     ## we build the out sequence, but need to skip over u'\3000' characters
-                    s1 = "".join([a[self.cpos] for a in self.seq[j:notestart]])
-                    s2 = "".join([a[self.cpos] for a in self.seq[j+dn:j+dn+n-len(s1)]])
-                    self.printNgram(s1+s2, fx, j - s)
+                    outseq = self.seq[j:notestart][self.cpos]
+                    dxn = 0
+                    while len(outseq) < n:
+                        outseq.append(self.seq[j+dn+dxn][self.cpos])
+                        dxn += 1
+                    self.printNgram(outseq, fx, j - s)
                 elif notestart+1 > j:
-                    s1 = "".join([a[self.cpos] for a in self.seq[j:notestart+1]])
-                    s2 = "".join([a[self.cpos] for a in self.seq[j+dn:j+dn+n-len(s1)]])
-                    self.printNgram(s1+s2, fx, j - s)
+                    outseq = self.seq[j:notestart+1][self.cpos]
+                    dxn = 0
+                    while len(outseq) < n:
+                        outseq.append(self.seq[j+dn+dxn][self.cpos])
+                        dxn += 1
+                    self.printNgram(outseq, fx, j - s)
                 elif notestart < j and j < noteend+1:
                     e = min(j+n, noteend+1)
-                    sx="".join([a[self.cpos] for a in self.seq[j:e]])
-                    self.printNgram(sx, fx, j - s, "n")
+                    dxn = j
+                    while len(outseq)  < n or dxn >= e:
+                        outseq.append(self.seq[dxn][self.cpos])
+                        dxn += 1
+                    self.printNgram(outseq, fx, j - s)
                 else:
-                    try:
-                        sx="".join([a[self.cpos] for a in self.seq[j:j+n]])
-                    except:
-                        sx="".join([a[self.cpos] for a in self.seq[j:cnt]])
-                    self.printNgram(sx, fx, j - s)
+                    while len(outseq) < n or n >= cnt:
+                        outseq.append(self.seq[dxn][self.cpos])
+                        dxn += 1
+                    self.printNgram(outseq, fx, j - s)
 
 
     def addOtherBranches(self, add_var_punctuation=False):
