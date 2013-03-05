@@ -158,10 +158,10 @@ class CouchMandoku(MandokuText):
                 self.db.save(d)
             self.db.save(t)
 
-    def printNgram(self, sqx, sec, pos, extra=None):
+    def printNgram(self, sx, sec, pos, extra=None):
         #this is what we overwrite to get the stuff into redis
         if self.ngram:
-            sx = "".join(sqx)
+            sx = "".join(sx)
             print sx, sec, pos
             if extra:
                 val = (sec, pos, extra)

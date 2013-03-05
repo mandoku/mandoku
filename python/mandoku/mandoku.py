@@ -512,7 +512,7 @@ function with access to a database."""
                 cnt = self.sections[i][0]
             except(IndexError):
                 cnt = len(self.seq)
-            print s, cnt
+#            print s, cnt
             for j in range(s, cnt):
 #                print j, "".join(self.seq[j])
                 outseq = []
@@ -541,20 +541,32 @@ function with access to a database."""
                         outseq = [self.seq[notestart][self.cpos]]
                     dxn = 0
                     while len(outseq) < n:
-                        if not self.seq[j+dn+dxn][self.cpos] == u'\u3000':
-                            outseq.append(self.seq[j+dn+dxn][self.cpos])
+                        try:
+                            val = self.seq[j+dn+dxn][self.cpos]
+                        except IndexError:
+                            val = ''
+                        if not val == u'\u3000':
+                            outseq.append(val)
                         dxn += 1
                     self.printNgram(outseq, fx, j - s)
                 elif notestart+1 > j:
                     dxn = j
                     ## we need to first build the sequence before the note, then the part after the note
                     while len(outseq) < n and dxn < (notestart + 1):
-                        if not self.seq[dxn][self.cpos] == u'\u3000':
-                            outseq = [self.seq[dxn][self.cpos]]
+                        try:
+                            val = self.seq[dxn][self.cpos]
+                        except IndexError:
+                            val = ''
+                        if not val == u'\u3000':
+                            outseq.append(val)
                         dxn += 1
                     while len(outseq) < n:
-                        if not self.seq[dn+dxn][self.cpos] == u'\u3000':
-                            outseq.append(self.seq[dn+dxn][self.cpos])
+                        try:
+                            val = self.seq[dn+dxn][self.cpos]
+                        except IndexError:
+                            val = ''
+                        if not val == u'\u3000':
+                            outseq.append(val)
                         dxn += 1
                     self.printNgram(outseq, fx, j - s)
                 elif notestart < j and j < noteend+1:
@@ -562,15 +574,23 @@ function with access to a database."""
                     dxn = j
 #                    print dxn, self.seq[dxn]
                     while len(outseq)  < n or dxn >= e:
-                        if not self.seq[dxn][self.cpos] == u'\u3000':
-                            outseq.append(self.seq[dxn][self.cpos])
+                        try:
+                            val = self.seq[dxn][self.cpos]
+                        except IndexError:
+                            val = ''
+                        if not val == u'\u3000':
+                            outseq.append(val)
                         dxn += 1
                     self.printNgram(outseq, fx, j - s)
                 else:
                     dxn = j
                     while len(outseq) < n or n >= cnt:
-                        if not self.seq[dxn][self.cpos] == u'\u3000':
-                            outseq.append(self.seq[dxn][self.cpos])
+                        try:
+                            val = self.seq[dxn][self.cpos]
+                        except IndexError:
+                            val = ''
+                        if not val == u'\u3000':
+                            outseq.append(val)
                         dxn += 1
                     self.printNgram(outseq, fx, j - s)
 
