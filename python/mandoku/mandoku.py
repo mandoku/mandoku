@@ -557,6 +557,7 @@ function with access to a database."""
                 elif notestart < j and j < noteend+1:
                     e = min(j+n, noteend+1)
                     dxn = j
+                    print dxn, self.seq[dxn]
                     while len(outseq)  < n or dxn >= e:
                         if not self.seq[dxn][self.cpos] == u'\u3000':
                             outseq.append(self.seq[dxn][self.cpos])
