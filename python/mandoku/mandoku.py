@@ -519,7 +519,7 @@ function with access to a database."""
                 try:
                     #the note-marker is on the character preceding the start of
                     #the note!
-                    check=self.seq[j+n-2][1]
+                    check=self.seq[j+n-2][self[self.mpos]]
                 except:
                     check=''
                 if '(' in check:
