@@ -162,17 +162,17 @@ class CouchMandoku(MandokuText):
         #this is what we overwrite to get the stuff into redis
         if self.ngram:
             sx = "".join(sx)
-            print sx, sec, pos
+#            print sx, sec, pos
             if extra:
                 val = (sec, pos, extra)
             else:
                 val = (sec, pos)
             if self.ngram.get(sx):
                 ng = self.ngram.get(sx)
-                ng['ngram'].append(val)
+                ng['value'].append(val)
                 self.ngram.save(ng)
             else:
-                self.ngram.save({'_id' : sx, 'ngram' : [val]})
+                self.ngram.save({'_id' : sx, 'value' : [val]})
 
 
 
