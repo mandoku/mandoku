@@ -161,8 +161,8 @@ class CouchMandoku(MandokuText):
     def printNgram(self, sqx, sec, pos, extra=None):
         #this is what we overwrite to get the stuff into redis
         if self.ngram:
-            print sqx
             sx = "".join(sqx)
+            print sx, sec, pos
             if extra:
                 val = (sec, pos, extra)
             else:

@@ -512,6 +512,7 @@ function with access to a database."""
                 cnt = self.sections[i][0]
             except(IndexError):
                 cnt = len(self.seq)
+            print s, cnt
             for j in range(s, cnt):
                 outseq = []
                 #first we check if the status of the text changes:
