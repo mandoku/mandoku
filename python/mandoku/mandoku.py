@@ -514,6 +514,7 @@ function with access to a database."""
                 cnt = len(self.seq)
             print s, cnt
             for j in range(s, cnt):
+#                print j, "".join(self.seq[j])
                 outseq = []
                 #first we check if the status of the text changes:
                 try:
@@ -559,13 +560,14 @@ function with access to a database."""
                 elif notestart < j and j < noteend+1:
                     e = min(j+n, noteend+1)
                     dxn = j
-                    print dxn, self.seq[dxn]
+#                    print dxn, self.seq[dxn]
                     while len(outseq)  < n or dxn >= e:
                         if not self.seq[dxn][self.cpos] == u'\u3000':
                             outseq.append(self.seq[dxn][self.cpos])
                         dxn += 1
                     self.printNgram(outseq, fx, j - s)
                 else:
+                    dxn = j
                     while len(outseq) < n or n >= cnt:
                         if not self.seq[dxn][self.cpos] == u'\u3000':
                             outseq.append(self.seq[dxn][self.cpos])
