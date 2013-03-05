@@ -535,7 +535,8 @@ function with access to a database."""
                     dn = noteend - j + 1
                     ##[2013-03-02T10:40:07+0900]
                     ## we build the out sequence, but need to skip over u'\3000' characters
-                    outseq = [self.seq[j:notestart][self.cpos]]
+                    if not self.seq[j:notestart][self.cpos] == u'\u3000':
+                        outseq = [self.seq[j:notestart][self.cpos]]
                     dxn = 0
                     while len(outseq) < n:
                         if not self.seq[j+dn+dxn][self.cpos] == u'\u3000':
