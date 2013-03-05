@@ -84,7 +84,7 @@ class CouchMandoku(MandokuText):
             t['type'] = 'base'
             t['baseversion'] = self.version
             try:
-                t['title'] = self.defs['title'].split()[-1]
+                t['title'] = self.defs['title'].split()
             except:
                 t['title'] = self.textpath.split('/')[-1]
             t['textpath'] = self.textpath[self.textpath.find('/db/')+4:]
@@ -109,7 +109,8 @@ class CouchMandoku(MandokuText):
                 d = {'type' : 'seq',  
                      'version' : self.version, 
                      'rev' : self.revision, 
-                     'sigle' : sigle, 
+                     'sigle' : sigle,
+                     'title' : self['defs'].title,
                      '_id' : f[0:f.find('.')]}
                 d['toc'] = self.sectocs[secid]
                 d['seq'] = self.seq[s:cnt]

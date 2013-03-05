@@ -507,6 +507,7 @@ function with access to a database."""
         for i in range(1, len(self.sections)+1):
             s, f = self.sections[i-1]
             fx = f[0:f.find('.')]
+            print fx
             dn = 0
             try:
                 cnt = self.sections[i][0]
