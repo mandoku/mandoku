@@ -110,7 +110,7 @@ class CouchMandoku(MandokuText):
                      'version' : self.version, 
                      'rev' : self.revision, 
                      'sigle' : sigle,
-                     'title' : self['defs'].title,
+                     'title' : self.defs['title'],
                      '_id' : f[0:f.find('.')]}
                 d['toc'] = self.sectocs[secid]
                 d['seq'] = self.seq[s:cnt]
