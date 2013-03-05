@@ -519,25 +519,25 @@ function with access to a database."""
                 try:
                     #the note-marker is on the character preceding the start of
                     #the note!
-                    check=self.seq[j+n-2][self[self.mpos]]
+                    check="".join(self.seq[j+1][self[self.mpos:]])
                 except:
                     check=''
                 if '(' in check:
-                    notestart = j+n-2
+                    notestart = j+1
                     noteend = notestart
                     found = False
                     while not found and noteend <= cnt:
                         noteend += 1
                         try:
-                            check2 = self.seq[noteend][1]
+                            check2 = "".join(self.seq[j+1][self[self.mpos:]])
                         except:
                             check2 = ''
                         found = ')' in check2
                     dn = noteend - j + 1
                     ##[2013-03-02T10:40:07+0900]
                     ## we build the out sequence, but need to skip over u'\3000' characters
-                    if not self.seq[j:notestart][self.cpos] == u'\u3000':
-                        outseq = [self.seq[j:notestart][self.cpos]]
+                    if not self.seq[notestart][self.cpos] == u'\u3000':
+                        outseq = [self.seq[notestart][self.cpos]]
                     dxn = 0
                     while len(outseq) < n:
                         if not self.seq[j+dn+dxn][self.cpos] == u'\u3000':
