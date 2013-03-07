@@ -84,7 +84,7 @@ class CouchMandoku(MandokuText):
             t['type'] = 'base'
             t['baseversion'] = self.version
             try:
-                t['title'] = self.defs['title'].split()
+                t['title'] = self.defs['title']
             except:
                 t['title'] = self.textpath.split('/')[-1]
             t['textpath'] = self.textpath[self.textpath.find('/db/')+4:]
