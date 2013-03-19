@@ -57,7 +57,7 @@ for line in inf:
             l = 0
     if line.find('JUAN') > -1:
         if headerflag == 0:
-            toc.write(header.replace('mandoku-view', 'org-mode'))
+            toc.write(header.replace('mandoku-view', 'org'))
 #            toc.write(':END:\n')
         jcnt += 1
         try:
