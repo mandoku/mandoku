@@ -252,6 +252,8 @@ function with access to a database."""
                             tmptoc[prevlev -1].append(tmptoc[prevlev])
                         except:
                             tmptoc[prevlev -1]=[tmptoc[prevlev]]
+                        #need to delete this level after use!
+                        tmptoc[prevlev] = []
                         prevlev -= 1
                     try:
                         tmptoc[level].append((out))
@@ -259,6 +261,15 @@ function with access to a database."""
                         pass
 #                        tmptoc[level]=[out]
                 prevlev = level
+        #add the last sections, if necessary
+        if prevlev > 1:
+            while (prevlev > 1):
+                try:
+                    tmptoc[prevlev -1].append(tmptoc[prevlev])
+                except:
+                    tmptoc[prevlev -1]=[tmptoc[prevlev]]
+                tmptoc[prevlev] = []
+                prevlev -= 1
         if len(tmptoc) > 1:
             try:
                 self.toc = tmptoc[1]
