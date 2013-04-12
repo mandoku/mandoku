@@ -300,6 +300,7 @@ function with access to a database."""
                     parent = cur[level - 1]
                 except:
                     parent = ''
+                t = t.strip()
                 toc[nl] = (level, t, parent)
                 cur[level] = t
 #                print nl, t
