@@ -31,11 +31,12 @@
   The software for using Mandoku texts falls in two broad categories:
   text processing software and a frontend to the user.  For both of
   these categories there are multiple possibilities, but not all of
-  them are realized right now.
+  them will be realized right now.
 
-  The software is pre-alpha quality, not documented and full of
-  quirks. It is made available as open source under a BSD-style
-  license, see https://github.com/cwittern/mandoku.
+  What is there at the moment is pre-alpha quality, not documented and
+  full of quirks. It is made available as is as open source under a
+  BSD-style license, see https://github.com/cwittern/mandoku.  Use it
+  as you like and drop me a line if you are stuck.
   
 ** Interface software
 *** Emacs
@@ -53,9 +54,12 @@
     adding a few little pieces here and there, it becomes even more
     useful for specific tasks.
     
+*** Web
     
-# *** Web (maybe)
-#     ** to be done **
+    A web interface, mainly geared at casual users without the need to
+    have the files locally, is under development, a first test version
+    is currently in internal testing.
+
 # *** PyQt based interface (maybe)
 #     ** to be done **
 
