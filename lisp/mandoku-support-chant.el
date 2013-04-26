@@ -39,7 +39,7 @@
 	 (subcoll (if (string-match "-" (car sp))
 		      textid
 		    "tls")))
-    (concat subcoll "/" (downcase textid) "_" sec ".txt")))
+    (concat subcoll "/" textid "_" sec ".txt")))
 
 
 ;; (defun mandoku-chant-vol-page-to-file (subcoll textnum sec)
