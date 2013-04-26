@@ -570,9 +570,10 @@ One character is either a character or one entity expression"
 	  (txtid (car (split-string (file-name-nondirectory (buffer-file-name)) "_")))
 	  (be (mandoku-get-baseedition)))
     (goto-char (point-min))
-    (while (forward-paragraph 1)
+    (while (not (eobp))
+      (forward-paragraph 1)
       (setq cnt (+ cnt 1))
-      (insert (concat "<pb:" be "_" txtid "_" cnt "a>
+      (insert (concat "<pb:" be "_" txtid "_"  (int-to-string cnt) "a>
 "))))))
 
 (defun mandoku-annotate (beg end)
