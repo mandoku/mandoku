@@ -509,12 +509,13 @@ One character is either a character or one entity expression"
          (car pair))))
 
 
-(defun mandoku-format-on-punc (rep)
+(defun mandoku-format-on-punc (&optional rep)
   "Formats the text from point to the end, splitting at punctuation and other splitting points."
+  (interactive "s")
   (save-match-data
     (while (re-search-forward mandoku-punct-regex-post nil t)
-      (if (looking-at "¶?[
-]")
+      (if (or (looking-at "¶?[
+]") (org-at-heading-p) (org-at-comment-p))
 	  nil
 	(replace-match (concat (match-string 1)  (match-string 2) rep)))
       (if (looking-at "¶?[	]")
@@ -526,9 +527,11 @@ One character is either a character or one entity expression"
   "hallo"
   (save-match-data
     (while (re-search-forward mandoku-punct-regex-pre nil t)
-      (replace-match (concat (match-string 1) rep (match-string 2)))
-      (forward-char 1)
-      )))
+      (if (or (org-at-heading-p) (org-at-comment-p))
+	  nil
+	(replace-match (concat (match-string 1) rep (match-string 2)))
+	(forward-char 1)
+	))))
 
 (defun mandoku-format-with-p ()
   "Formats the whole file, adding the line marker to the end of the line"
