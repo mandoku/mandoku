@@ -64,5 +64,6 @@
               textid)
           (insert-file-contents mandoku-chant-titletable)
           (goto-char (point-min))
-          (while (re-search-forward "^\\([a-z0-9]+\\)	\\([^	]+\\)" nil t)
+          (while (re-search-forward "^\\([a-z0-9-]+\\)	\\([^	
+]+\\)" nil t)
 	     (puthash (match-string 1) (match-string 2) mandoku-chant-titles)))))))
