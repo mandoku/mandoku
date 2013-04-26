@@ -509,9 +509,8 @@ One character is either a character or one entity expression"
          (car pair))))
 
 
-(defun mandoku-format-on-punc (&optional rep)
+(defun mandoku-format-on-punc (rep)
   "Formats the text from point to the end, splitting at punctuation and other splitting points."
-  (interactive)
   (save-match-data
     (while (re-search-forward mandoku-punct-regex-post nil t)
       (if (looking-at "¶?[
@@ -523,9 +522,8 @@ One character is either a character or one entity expression"
 	(forward-char 1))
       )))
 
-(defun mandoku-pre-format-on-punc (&optional rep)
+(defun mandoku-pre-format-on-punc (rep)
   "hallo"
-  (interactive)
   (save-match-data
     (while (re-search-forward mandoku-punct-regex-pre nil t)
       (replace-match (concat (match-string 1) rep (match-string 2)))
@@ -539,14 +537,13 @@ One character is either a character or one entity expression"
     (goto-char (point-min))
     (while (looking-at "#")
       (forward-line 1))
-    (mandoku-format-on-punc "x
+    (mandoku-format-on-punc "¶
 ")
     (goto-char (point-min))
     (while (looking-at "#")
       (forward-line 1))
-    (mandoku-pre-format-on-punc "y
-")
-))
+    (mandoku-pre-format-on-punc "¶
+")))
 
 (defun mandoku-format ()
   "Formats the whole file"
@@ -555,12 +552,22 @@ One character is either a character or one entity expression"
     (goto-char (point-min))
     (while (looking-at "#")
       (forward-line 1))
-    (mandoku-format-on-punc)
+    (mandoku-format-on-punc "
+")
     (goto-char (point-min))
     (while (looking-at "#")
       (forward-line 1))
-    (mandoku-pre-format-on-punc)
+    (mandoku-pre-format-on-punc "
+")
 ))
+
+(defun mandoku-format-add-p-numbers ()
+  "For texts without page numbers, add paragraph numbers as a substitute"
+  (save-excursion
+    (let ((cnt 0)
+	  (txtid (current-
+    (goto-char (point-min))
+    (forwar
 
 (defun mandoku-annotate (beg end)
   (interactive "r")
