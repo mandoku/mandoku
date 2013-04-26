@@ -9,5 +9,5 @@ for file in */*.txt
 do
     echo $file
     python /Users/chris/db/mandoku/python/index/mandoku_idx.py $file $coll $idxdir
-    sleep 1
+    sleep 0.05
 done
