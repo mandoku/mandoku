@@ -565,7 +565,9 @@ One character is either a character or one entity expression"
   "For texts without page numbers, add paragraph numbers as a substitute"
   (save-excursion
     (let ((cnt 0)
-	  (txtid  (buffer-file-name)
+	  ;; this assumes a naming convention txtid_<nnn>.txt
+	  (txtid (car (split-string (file-name-nondirectory (buffer-file-name)) "_")))
+	  (be (mandoku-get-baseedition)))
     (goto-char (point-min))
     (forwar
 
@@ -606,6 +608,21 @@ One character is either a character or one entity expression"
 	  (goto-char (point-min))
 	  (message pb)
 	  (search-forward (concat "<pb:" pb))))
+
+(defun mandkue-string-remove-all-properties (string)
+  (condition-case ()
+      (let ((s string))
+	(set-text-properties 0 (length string) nil string)
+	s)
+    (error string)))
+
+
+(defun mandoku-get-baseedition ()
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (when (re-search-forward ": BASEEDITION \\(.*\\)" (point-max) t)
+      (message (mandoku-string-remove-all-properties (match-string 1))))))
 
 
 
