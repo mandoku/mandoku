@@ -563,13 +563,17 @@ One character is either a character or one entity expression"
 
 (defun mandoku-format-add-p-numbers ()
   "For texts without page numbers, add paragraph numbers as a substitute"
+  (interactive)
   (save-excursion
     (let ((cnt 0)
 	  ;; this assumes a naming convention txtid_<nnn>.txt
 	  (txtid (car (split-string (file-name-nondirectory (buffer-file-name)) "_")))
 	  (be (mandoku-get-baseedition)))
     (goto-char (point-min))
-    (forwar
+    (while (forward-paragraph 1)
+      (setq cnt (+ cnt 1))
+      (insert (concat "<pb:" be "_" txtid "_" cnt "a>
+"))))))
 
 (defun mandoku-annotate (beg end)
   (interactive "r")
@@ -609,7 +613,7 @@ One character is either a character or one entity expression"
 	  (message pb)
 	  (search-forward (concat "<pb:" pb))))
 
-(defun mandkue-string-remove-all-properties (string)
+(defun mandoku-string-remove-all-properties (string)
   (condition-case ()
       (let ((s string))
 	(set-text-properties 0 (length string) nil string)
@@ -618,11 +622,10 @@ One character is either a character or one entity expression"
 
 
 (defun mandoku-get-baseedition ()
-  (interactive)
   (save-excursion
     (goto-char (point-min))
     (when (re-search-forward ": BASEEDITION \\(.*\\)" (point-max) t)
-      (message (mandoku-string-remove-all-properties (match-string 1))))))
+      (mandoku-string-remove-all-properties (match-string 1)))))
 
 
 
