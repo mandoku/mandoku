@@ -531,7 +531,7 @@ One character is either a character or one entity expression"
       )))
 
 (defun mandoku-format-with-p ()
-  "Formats the whole file"
+  "Formats the whole file, adding the line marker to the end of the line"
   (interactive)
   (save-excursion
     (goto-char (point-min))
@@ -565,7 +565,7 @@ One character is either a character or one entity expression"
   "For texts without page numbers, add paragraph numbers as a substitute"
   (save-excursion
     (let ((cnt 0)
-	  (txtid (current-
+	  (txtid  (buffer-file-name)
     (goto-char (point-min))
     (forwar
 
