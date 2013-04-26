@@ -509,9 +509,9 @@ One character is either a character or one entity expression"
          (car pair))))
 
 
-(defun mandoku-format-on-punc (&optional rep)
+(defun mandoku-format-on-punc ( rep)
   "Formats the text from point to the end, splitting at punctuation and other splitting points."
-  (interactive "s")
+;  (interactive "s")
   (save-match-data
     (while (re-search-forward mandoku-punct-regex-post nil t)
       (if (or (looking-at "¶?[
