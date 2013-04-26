@@ -19,11 +19,11 @@
 (defvar mandoku-collfilter-alist '(("cbeta" . t) ("dz" . nil) ("hist" . nil)))
 
 (defvar mandoku-file-type ".txt")
-;;》《
+;;we skip: 》《 〔〕
 (defvar mandoku-punct-regex-post "\\([^
-]\\)\\([　-〇〉」』】-㄀︀-￯)]+\\)")
+]\\)\\([　-〇〉」』】〗〙〛-㄀︀-￯)]+\\)")
 (defvar mandoku-punct-regex-pre "\\([^
-]\\)\\([(〈「『【]+\\)")
+]\\)\\([(〈「『【〖〘〚]+\\)")
 
 (defvar mandoku-kanji-regex "\\([㐀-鿿𠀀-𪛟]+\\)")
 
