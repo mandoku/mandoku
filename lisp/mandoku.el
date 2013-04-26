@@ -567,14 +567,15 @@ One character is either a character or one entity expression"
   (save-excursion
     (let ((cnt 0)
 	  ;; this assumes a naming convention txtid_<nnn>.txt
-	  (txtid (car (split-string (file-name-nondirectory (buffer-file-name)) "_")))
+	  (txtfn (car (split-string (file-name-nondirectory (buffer-file-name)) "\\.")))
 	  (be (mandoku-get-baseedition)))
     (goto-char (point-min))
+    (forward-paragraph 1)
     (while (not (eobp))
-      (forward-paragraph 1)
       (setq cnt (+ cnt 1))
-      (insert (concat "<pb:" be "_" txtid "_"  (int-to-string cnt) "a>
-"))))))
+      (insert (concat "<pb:" be "_" txtfn "-" (int-to-string cnt) "a>
+"))
+      (forward-paragraph 1)))))
 
 (defun mandoku-annotate (beg end)
   (interactive "r")
