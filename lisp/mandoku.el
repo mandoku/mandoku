@@ -455,13 +455,27 @@ One character is either a character or one entity expression"
          map)
   "Keymap for mandoku-view mode"
 )
+;(setq mandoku-hide-p-re "\\(?:<[^>]*>\\)\\|¶\n\\|¶")
+(setq mandoku-hide-p-re "\\(?:<[^>]*>\\)\\|¶")
+(defun mandoku-hide-p-markers ()
+  "add overlay 'mandoku to hide/show special characters "
+  (save-match-data
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward mandoku-hide-p-re nil t)
+;	(put-text-property (match-beginning 0) (match-end 0) 'mandoku t)
+	(overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'invisible 'mandoku)
+))))
+
+
 (define-derived-mode mandoku-view-mode org-mode "mandoku-view"
   "a mode to view mandoku files
   \\{mandoku-mode-map}"
   (setq case-fold-search nil)
   (set (make-local-variable 'org-startup-folded) 'showeverything)
   (set (make-local-variable 'tab-with) 30)
-  
+  (mandoku-hide-p-markers)
+  (add-to-invisibility-spec 'mandoku)
 ;  (view-mode)
 )
 
