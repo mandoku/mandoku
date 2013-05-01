@@ -472,11 +472,11 @@ One character is either a character or one entity expression"
   "a mode to view mandoku files
   \\{mandoku-mode-map}"
   (setq case-fold-search nil)
-  (set (make-local-variable 'org-startup-folded) 'showeverything)
+  (set (make-local-variable 'org-startup-folded) 'content)
   (set (make-local-variable 'tab-with) 30)
   (mandoku-hide-p-markers)
   (add-to-invisibility-spec 'mandoku)
-;  (view-mode)
+  (view-mode)
 )
 
 (define-key mandoku-mode-map
