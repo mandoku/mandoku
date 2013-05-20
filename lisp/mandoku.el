@@ -386,9 +386,10 @@ One character is either a character or one entity expression"
     ))
   ;; return t to indicate that the search is done.
     t))
-
 (defun mandoku-position-at-point ()
   (interactive)
+  (message mandoku-position-at-point-internal))
+(defun mandoku-position-at-point-internal ()
   (save-excursion
     (let ((p (point)))
       (re-search-backward "<pb:" nil t)
@@ -400,7 +401,7 @@ One character is either a character or one entity expression"
 	      (< (point) p )
 	      (re-search-forward "¶" (point-max) t))
 	(setq line (+ line 1)))
-      (message (format "%s:%s%2.2d" textid page line)))))
+      (format "%s:%s%2.2d" textid page line))))
 
 (defun mandoku-open-image-at-page ()
   (interactive)
