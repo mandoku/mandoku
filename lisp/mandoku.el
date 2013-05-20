@@ -655,7 +655,7 @@ One character is either a character or one entity expression"
   (save-excursion
     (goto-char (point-min))
     (when (re-search-forward "^#\\+TITLE: \\(.*\\)" (point-max) t)
-      (org-babel-clean-text-properties  (match-string 1)))))
+      (mandoku-string-remove-all-properties  (match-string 1)))))
       
 ;;the mode for mandoku-index
 (defvar mandoku-index-mode-map
