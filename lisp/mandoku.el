@@ -652,11 +652,10 @@ One character is either a character or one entity expression"
 
 
 (defun mandoku-get-title ()
-(interactive)
-    (save-excursion
-      (goto-char (point-min))
-      (when (re-search-forward "^#\\+TITLE: \\(.*\\)" (point-max) t)
-	(message (org-babel-clean-text-properties  (match-string 1))))))
+  (save-excursion
+    (goto-char (point-min))
+    (when (re-search-forward "^#\\+TITLE: \\(.*\\)" (point-max) t)
+      (org-babel-clean-text-properties  (match-string 1)))))
       
 ;;the mode for mandoku-index
 (defvar mandoku-index-mode-map
