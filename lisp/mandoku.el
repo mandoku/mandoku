@@ -388,7 +388,7 @@ One character is either a character or one entity expression"
     t))
 (defun mandoku-position-at-point ()
   (interactive)
-  (message mandoku-position-at-point-internal))
+  (message (mandoku-position-at-point-internal)))
 (defun mandoku-position-at-point-internal ()
   (save-excursion
     (let ((p (point)))
