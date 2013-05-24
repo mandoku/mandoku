@@ -2,6 +2,10 @@
 
 
 * Based on org-mode
+: * Introduction
+:  :PROPERTIES:
+:  :CUSTOM_ID: intro
+:  :END:
 
   Emacs org-mode (see [[http://orgmode.org/][Org-Mode: Your Life in Plain Text]]) is basically
   plain text with some outlining, formatting and hyperlinking
