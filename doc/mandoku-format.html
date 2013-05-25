@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>The mandoku text format</title>
+<!-- 2013-05-25 Sat 10:22 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">The mandoku text format</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Based on org-mode</a></li>
+<li><a href="#sec-2">2. Mandoku extensions to org-mode</a>
+<ul>
+<li><a href="#sec-2-1">2.1. page identification</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. JSON format</a>
+<ul>
+<li><a href="#sec-3-1">3.1. type: base</a></li>
+<li><a href="#sec-3-2">3.2. further extensions:</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Based on org-mode</h2>
+<div class="outline-text-2" id="text-1">
+<pre class="example">
+* Introduction
+ :PROPERTIES:
+ :CUSTOM_ID: intro
+ :END:
+</pre>
+
+<p>
+Emacs org-mode (see <a href="http://orgmode.org/">Org-Mode: Your Life in Plain Text</a>) is basically
+plain text with some outlining, formatting and hyperlinking
+conventions.  This makes it a lightweight text format that covers
+some middle ground between absolutely complete plain text (if such a
+thing exists) and complex markup languages like XML.  Since it even
+supports footnotes and is easily converted to HTML, Latex and
+OpenOffice format, it is useable even for research articles.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Mandoku extensions to org-mode</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Based on earlier work on a text model for premodern Chinese texts,
+requirements for representing such texts where established.  While
+most of these requirements concern the processing, it was also
+established that a convenient framework for adressing characters in
+the text is needed.  This is done by using the page as a fundamental
+unit and text lines on that page as secondary unit.  Within lines,
+characters are then simply indexed.  Mandoku thus requires pages and
+lines marked in the text to function properly.
+</p>
+</div>
+
+
+<div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> page identification</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+A page identification is given at the start of a page with the
+following template: 
+</p>
+<pre class="example">
+&lt;pb:[edition identification]_[text identification]_[page identification]&gt;
+</pre>
+<p>
+for example:
+</p>
+<pre class="example">
+&lt;pb:T_T51n2076_0281c&gt;
+</pre>
+<p>
+would be 
+</p>
+<ul class="org-ul">
+<li>edition identifier:  T
+</li>
+<li>text identifier: T51n2076
+</li>
+<li>page identifier: 281c
+</li>
+</ul>
+
+<p>
+These three pieces are then assembled according to the template
+shown above.  All of these can be chosen as needed. The edition
+identifies the printed text, which supposedly is the source of this
+digital edition.  The text identifier should identify the text
+uniquely in a collection, while the page identifier should be
+unique within that text.  For text digitized from woodblock prints,
+it is therefore necessary to work the section, booklet or whatever
+into this identifier to disambiguate the page number.
+</p>
+
+<p>
+   If there are multiple editions of the same text, the &lt;pb: template
+   always has the page identifier for the edition associated with this
+   specific version of the digital text.  In some cases, an additional
+   identifier for a reference edition has to be introduced, in such
+   cases the template would be to simply change 'pb' to 'md' in the
+   page identification template, thus resulting in something like
+   this:
+:&lt;md:T<sub>T51n2076</sub><sub>0281c</sub>&gt;
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> JSON format</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+The JSON format splits a text across several separate structures:
+</p>
+</div>
+
+<div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> type: base</h3>
+<div class="outline-text-3" id="text-3-1">
+<div class="org-src-container">
+
+<pre class="src src-js">{
+   <span style="color: #8b2252;">"_id"</span>: <span style="color: #8b2252;">"T08n0250"</span>,
+   <span style="color: #8b2252;">"_rev"</span>: <span style="color: #8b2252;">"2-153551fa267751cc55344c8bafd6c2c6"</span>,
+   <span style="color: #8b2252;">"title"</span>: <span style="color: #8b2252;">"&#25705;&#35382;&#33324;&#33509;&#27874;&#32645;&#34588;&#22823;&#26126;&#21610;&#32147;"</span>,
+   <span style="color: #8b2252;">"textpath"</span>: <span style="color: #8b2252;">"ers/chris/00scratch/tmp/test/T08n0250"</span>,
+   <span style="color: #8b2252;">"sections"</span>: [
+       [
+           <span style="color: #8b2252;">"T08n0250-001"</span>,
+           337
+       ]
+   ],
+   <span style="color: #8b2252;">"versions"</span>: [
+       <span style="color: #8b2252;">"local"</span>,
+       <span style="color: #8b2252;">"master"</span>,
+       <span style="color: #8b2252;">"&#12304;CBETA&#12305;"</span>,
+       <span style="color: #8b2252;">"&#12304;unknown&#12305;"</span>,
+       <span style="color: #8b2252;">"&#12304;&#19975;&#12305;"</span>,
+       <span style="color: #8b2252;">"&#12304;&#20013;&#12305;"</span>,
+       <span style="color: #8b2252;">"&#12304;&#20803;&#12305;"</span>,
+       <span style="color: #8b2252;">"&#12304;&#21271;&#34255;&#12305;"</span>,
+       <span style="color: #8b2252;">"&#12304;&#21335;&#12305;"</span>,
+       <span style="color: #8b2252;">"&#12304;&#21335;&#34255;&#12305;"</span>,
+       <span style="color: #8b2252;">"&#12304;&#21407;&#12305;"</span>,
+       <span style="color: #8b2252;">"&#12304;&#23435;&#12305;"</span>,
+       <span style="color: #8b2252;">"&#12304;&#23470;&#12305;"</span>,
+       <span style="color: #8b2252;">"&#12304;&#24503;&#12305;"</span>,
+       <span style="color: #8b2252;">"&#12304;&#26126;&#12305;"</span>,
+       <span style="color: #8b2252;">"&#12304;&#26126;&#30064;&#12305;"</span>,
+       <span style="color: #8b2252;">"&#12304;&#30693;&#12305;"</span>,
+       <span style="color: #8b2252;">"&#12304;&#30951;&#30722;&#12305;"</span>,
+       <span style="color: #8b2252;">"&#12304;&#32854;&#12305;"</span>,
+       <span style="color: #8b2252;">"&#12304;&#37261;&#12305;"</span>,
+       <span style="color: #8b2252;">"&#12304;&#40599;-CB&#12305;"</span>,
+       <span style="color: #8b2252;">"&#12304;&#40599;&#12305;"</span>
+   ],
+   <span style="color: #8b2252;">"sigle-m"</span>: <span style="color: #8b2252;">"0bb3b4fdefc4e70e588233640d0a44607b6a8d62"</span>,
+   <span style="color: #8b2252;">"baseversion"</span>: <span style="color: #8b2252;">"master"</span>,
+   <span style="color: #8b2252;">"toc"</span>: [
+       [
+           1,
+           <span style="color: #8b2252;">"&#25705;&#35382;&#33324;&#33509;&#27874;&#32645;&#34588;&#22823;&#26126;&#21610;"</span>,
+           <span style="color: #8b2252;">"T08n0250-001"</span>,
+           4
+       ]
+   ],
+   <span style="color: #8b2252;">"fac"</span>: 100000,
+   <span style="color: #8b2252;">"type"</span>: <span style="color: #8b2252;">"base"</span>,
+   <span style="color: #8b2252;">"coll"</span>: <span style="color: #8b2252;">"CBETA"</span>
+}
+</pre>
+</div>
+<ul class="org-ul">
+<li></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> further extensions:</h3>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Christian Wittern</p>
+<p class="date">Created: 2013-05-25 Sat 10:22</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.3.1 (<a href="http://orgmode.org">Org</a> mode 8.0.2)</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
