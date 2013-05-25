@@ -59,7 +59,7 @@
    cases the template would be to simply change 'pb' to 'md' in the
    page identification template, thus resulting in something like
    this:
-:<md:T_T51n2076_0281c>
+: <md:T_T51n2076_0281c>
 
 
      
