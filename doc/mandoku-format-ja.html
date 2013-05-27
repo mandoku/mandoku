@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title><code>マンドク</code> のテキスト形式</title>
+<!-- 2013-05-28 Tue 07:32 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title"><code>マンドク</code> のテキスト形式</h1>
+<p>
+<code>マンドク</code> に使用されているテキスト形式は三つの部分によって構成されている：
+</p>
+<ul class="org-ul">
+<li>基本はEmacsのorg-modeのファイル形式
+</li>
+<li>テキストをファイルに纏める時の幾つかの慣例
+</li>
+<li>ファイル内の特定な書き方
+</li>
+</ul>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> テキスト形式はEmacsのorg-modeに基づいて実装された</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+テキスト・エディターEmacsには「モード」という概念がある。様ざまなテキ
+ストの種類、例えば各種のプログラミング言語などは「モード」によってそ
+の種類のテキストに特化したテキスト編集を支援するが可能になり、それに
+よってより簡単、早い、効率よい編集作業が出来る。Org-modeは対象とする
+形式はいわゆる「プレーン･テキスト」、つまり普通の文書のテキストをより
+快適に編集出来るようのためのモードだ。
+</p>
+
+<p>
+これを可能にするため、org-modeで扱う「プレーン･テキスト」は以下の様な
+幾つかの特徴がある(ここで紹介するのは一部であり、<a href="http://orgmode.org/ja/features.html">詳細な紹介はこちら</a>)：
+</p>
+
+<ul class="org-ul">
+<li>テキストに「見出し」の概念があり、各レベルの見出しは行の右に"* "を
+入れるで作成する。星の数はレベルを示唆する。星マークは必ず半角モー
+ド(英数)で入力し、最後に(つまり実際の見出しの文字列の前)半角のスペー
+スが必要。
+<pre class="example">
+* Outline level one レベル１の見出し
+** Outline level two レベル２の見出し
+*** Outline level three レベル３の見出し
+</pre>
+</li>
+<li>見出しの次の行に「property drawer」(属性抽斗)というものをつけれる、
+ここにはこの見出しに関連する機会可読な情報を入れる(例えばここへの
+リンクに使う'CUSTOM_ID')：
+<pre class="example">
+* 序論
+ :PROPERTIES:
+ :CUSTOM_ID: intro
+ :END:
+</pre>
+</li>
+
+<li>見出しに「tag」(タグ)も付けれる、それはこの見出しに関連する分類、整
+理のための情報などに使える；タグは右詰めに、前後に半角のコロンで入
+力する。
+<pre class="example">
+* Outline level one レベル１の見出し          :重要:
+</pre>
+</li>
+
+<li>段落は空き行で記述する。
+</li>
+
+<li>テキストに引用文('QUOTE')或は詩の形('VERSE')などがあるとそれは特殊な
+セクションとして記述できる：
+</li>
+</ul>
+<pre class="example">
+即於佛前以偈頌曰。
+#+BEGIN_VERSE
+目淨脩廣如青蓮
+心淨已度諸禪定
+久積淨業稱無量
+導眾以寂故稽首
+#+END_VERSE
+</pre>
+
+<ul class="org-ul">
+<li>'#'半角のハッシュ・マークで始まる行は特別に処理される：
+<ul class="org-ul">
+<li>"#+"はorg-mode様な特別な用語に使う、例えば <code>#+TITLE</code> 'タイトル',
+      <code>#+AUTHOR</code> '著者' or <code>#+DATE</code> '日付'など。
+</li>
+<li>"# "(半角スペース)は一般のコメントを導入する、このコメントはテキ
+ストの本文の内容とは別になる。
+</li>
+</ul>
+</li>
+<li>他ファイルへのリンクは次のように作られる：
+    <code>[[目的.txt][目的.txtへのリンク] ]</code> 
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> <code>マンドク</code> に特有の慣例</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> テキスト、バーション、エディションなど</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+<code>マンドク</code> では各テキストに特有なID番号(例: <code>T14n0475</code>)が設定され、
+それを以ってテキスト・コレクションの中で、ある一つのテキストをはっき
+り特定できる。　このテキストIDは大体テキストが保存されたフォルダー名
+にも使われる、このフォルダーないにはこのテキストに関するすべてのファ
+イルが収集される。多くのテキストは巻毎に分割されて、各ファイルは順序
+に番号がつけられている。 目次用のファイルも作られる。
+</p>
+<pre class="example">
+T14n0475_000.txt
+T14n0475_001.txt
+T14n0475_002.txt
+T14n0475_003.txt
+T14n0475.org
+</pre>
+
+<p>
+各ファイルのソース(原本)はWITNESS('証拠')として、デジタル・テキスト
+全体の定本("BASEEDITION")はそれそれ各ファイルに記録される。ページ番
+号と改行は定本の通りにきろくされて、各バーションの共通指南となる。
+</p>
+
+<p>
+複数なバーションのテキストは記録可能だ、それによってるテキストの必要
+な情報をすべて管理することは可能になる。 <code>マンドク</code> に於いては全ての
+バーション('証拠')は版管理システムの'branch'(枝)として保存される。
+</p>
+
+<p>
+各バーションに横断的に使える位置情報のために定本のページ番号と改行記
+号は各バーションに書き込む。違う版式のバーションはそれに加えてそのバー
+ションの情報も記録するは出来る。
+</p>
+</div>
+</div>
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> <code>マンドク</code> ファイル内の特定な書き方</h3>
+<div class="outline-text-3" id="text-2-2">
+</div><div id="outline-container-sec-2-2-1" class="outline-4">
+<h4 id="sec-2-2-1"><span class="section-number-4">2.2.1</span> 定本と'証拠'本</h4>
+<div class="outline-text-4" id="text-2-2-1">
+<p>
+=マンドク=では、定本と証拠本等についての情報はファイルの冒頭に機械可読な形式で付けれる：
+</p>
+
+<pre class="example">
+#+PROPERTY: BASEEDITION T
+#+PROPERTY: ID T14n0475
+#+PROPERTY: WITNESS 【CBETA】
+#+PROPERTY: JUAN 1
+</pre>
+
+<p>
+この例では定本は'T'として記録されて、証拠本(つまるこのファイルで記
+録されていいるバーション)は'【CBETA】'として挙げられている。それに
+加えて、テクストのIDと巻数も記録されている。
+</p>
+</div>
+</div>
+<div id="outline-container-sec-2-2-2" class="outline-4">
+<h4 id="sec-2-2-2"><span class="section-number-4">2.2.2</span> ページ番号</h4>
+<div class="outline-text-4" id="text-2-2-2">
+<p>
+ページ番号は次の形で記録されている：
+</p>
+<pre class="example">
+&lt;pb:T_T14n0475_0537a&gt;
+</pre>
+
+<p>
+ページ番号記述は'_'で三つの部分に分けて、'&lt;pb: .. &gt;'囲みされている：
+</p>
+<ul class="org-ul">
+<li>'T' : 定本
+</li>
+<li>'T14n0475' : テキストID
+</li>
+<li>'0537a' : ページ番号 （'a'は木版の表、或はパージの上半部分を指し
+ているが、 <code>マンドク</code> に於いては現時点ページ番号の末に半角ローマ
+字文字が必要）。
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-2-2-3" class="outline-4">
+<h4 id="sec-2-2-3"><span class="section-number-4">2.2.3</span> 改行記号</h4>
+<div class="outline-text-4" id="text-2-2-3">
+<p>
+テキストないの位置情報として <code>マンドク</code> は定本に於ける改行位置を記
+録する。ページ番号を合わせて、それで全体のテキスト内の位置を正確に
+分かる。改行記号として'¶'(U+00B6')を使用する：
+</p>
+<pre class="example">
+復有萬梵天王尸棄等，從餘四天下，來詣¶
+佛所，而聽法；復有萬二千天帝，亦從餘四¶
+天下，來在會坐；并餘大威力諸天、龍神、夜¶
+叉、乾闥婆、阿脩羅、迦樓羅、緊那羅、摩睺羅¶
+伽等，悉來會坐。
+</pre>
+
+<p>
+これでテキストを「一行一句」の形式に変えても位置情報が代わらない：
+</p>
+
+<pre class="example">
+復有萬梵天王尸棄等，
+從餘四天下，
+來詣¶佛所，
+而聽法；
+復有萬二千天帝，
+亦從餘四¶天下，
+來在會坐；
+并餘大威力諸天、
+龍神、
+夜¶叉、
+乾闥婆、
+阿脩羅、
+迦樓羅、
+緊那羅、
+摩睺羅¶伽、
+等悉來會坐。
+</pre>
+</div>
+</div>
+<div id="outline-container-sec-2-2-4" class="outline-4">
+<h4 id="sec-2-2-4"><span class="section-number-4">2.2.4</span> 割注</h4>
+<div class="outline-text-4" id="text-2-2-4">
+<p>
+原文にある割注は"("と")"の丸括弧に囲む。
+</p>
+</div>
+</div>
+<div id="outline-container-sec-2-2-5" class="outline-4">
+<h4 id="sec-2-2-5"><span class="section-number-4">2.2.5</span> 注釈、翻訳などの追加情報</h4>
+<div class="outline-text-4" id="text-2-2-5">
+<p>
+慣例によって、 <code>マンドク</code> では行の始めから第一TAB記号(U+0009)まで原
+文のテキストとする。タブ記号の右側にあるテキストは原文として見ださ
+い、位置情報にも影響しない。以下は先の例に英訳を付けている(英訳はジョ
+ン R.マクレーが仏教伝道協会で出版された維摩経訳より)：
+</p>
+
+<pre class="example">
+復有萬梵天王尸棄等。　　　　　　5. There were also ten thousand Brahmā heavenly kings, Śikhin and others, 
+從餘四天下來詣¶佛所而聽法。　　who descended from the other worlds of four continents to proceed to where the Buddha was in order to hear the Dharma. 
+復有萬二千天帝。　　　　　　　　There were also twelve thousand heavenly emperors (i.e., Indras), 
+亦從餘四¶天下來在會坐。　　　　who also came from the other worlds of four continents to sit in this assembly, 
+并餘大威力諸天．　　　　　　　　and the other awesomely powerful gods (devas), 
+龍神．　　　　　　　　　　　　　dragons (nāgas), 
+夜¶叉．　　　　　　　　　　　　yakṣas, 
+乾闥婆．　　　　　　　　　　　　gandharvas, 
+阿脩羅．　　　　　　　　　　　　asuras, 
+:zhu:
+阿脩羅 [a1xiu1luo1] skt Asura, deities of the lowest rank.
+:END:
+迦樓羅．　　　　　　　　　　　　garuḍas, 
+緊那羅．　　　　　　　　　　　　kiṃnaras, 
+摩睺羅¶伽．　　　　　　　　　　and mahoragas, 
+等悉來會坐。　　　　　　　　　who all came to sit in the assembly.
+</pre>
+
+<p>
+さらに注釈の為に <code>マンドク</code> では'zhu'という'抽斗'が定義されている、
+ここでは前の行にある語彙や文字などについての注釈、読書ノートなど書
+き込まれる。この注釈も原文のテキストと見出さない。
+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Christian Wittern</p>
+<p class="date">Created: 2013-05-28 Tue 07:32</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.3.1 (<a href="http://orgmode.org">Org</a> mode 8.0.2)</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
