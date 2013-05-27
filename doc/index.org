@@ -19,6 +19,9 @@
   To achieve all this, Mandoku defines a file format, directory
   layout, establishes text repositories and develops software to
   operate with these.
+  Documentation of the Mandoku text format:
+  - [[http:mandoku-format-ja.html][マンドク のテキスト形式]]
+  - [[http:mandoku-format-en.html][The Mandoku text format]]
 
 * Status
   
