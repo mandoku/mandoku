@@ -179,6 +179,12 @@ Conventions for the text format used by =Mandoku= are made up of three parts:
 等悉來會坐。
 #+END_SRC
 
+*** Inline notes
+
+    Notes that are in the original text marked as notes through
+    half-size characters on smaller lines are placed within
+    parentheses "(" and ")".
+
 *** Additions to the text
     By convention, =Mandoku= considers only the characters from the
     beginning of the line up to the first TAB character (U+0009) as
