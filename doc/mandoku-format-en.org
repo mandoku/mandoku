@@ -1,0 +1,215 @@
+#+TITLE: The =Mandoku= text format
+#+OPTIONS: toc:nil ^:nil
+
+Conventions for the text format used by =Mandoku= are made up of three parts:
+  - Emacs org-mode format
+  - convention about how texts are organized into files
+  - Additional syntactical conventions singular to =Mandoku= within the files
+
+* The text format is based on Emacs org-mode
+
+  The text editor Emacs has the concept of "modes", which allows for
+  specialized modes of editing depending on the type of text to be
+  edited. This works for various programming languages and helps the
+  programmer to avoid mistakes by giving graphical hints through
+  formatting and colors and in general support the task of writing in
+  this language.  
+
+  Emacs org-mode (see [[http://orgmode.org/][Org-Mode: Your Life in Plain Text]][orgmode.org]) builds on
+  this concept, but the target is not a specific programming language
+  but plain text with some outlining, formatting and hyperlinking
+  conventions.  This makes it a lightweight text format that covers
+  some middle ground between absolutely complete plain text (if such a
+  thing exists) and complex markup languages like XML.  Since it even
+  supports footnotes and is easily converted to HTML, Latex and
+  OpenOffice format, it is useable even for research articles.
+
+  To make this possible, org-mode introduces a few special markup
+  constructs. Some of the assumptions of this plain text according to
+  org-mode are as follows:
+
+  - Headings of all kinds are expressed by placing stars "* " in the
+    leftmost column of the text. The number of stars indicates the
+    level of the heading in the overall outline of the document. The
+    stars have to be followed by a space in order to be recognized as
+    a part of the outline. Structurally, a heading defines a
+    subsection.
+: * Outline level one レベル１の見出し
+: ** Outline level two レベル２の見出し
+: *** Outline level three レベル３の見出し
+  - following a heading a socalled "property drawer" may appear; this
+    is a container for additional information associated with the
+    subsection.
+: * Introduction
+:  :PROPERTIES:
+:  :CUSTOM_ID: intro
+:  :END:
+  - Headings can also have "tags" attached to them, which marks them
+    for example for various analytical purposes, they appear on the
+    headline towards the right margin.
+: * Outline level one レベル１の見出し	      :important:
+  - Paragraphs are indicated by at least one empty line.
+  - Distinctive parts of the text, for example quotations or parts in
+    verse can be set apart using a specific section marker:
+: 即於佛前以偈頌曰。
+: #+BEGIN_VERSE
+: 目淨脩廣如青蓮
+: 心淨已度諸禪定
+: 久積淨業稱無量
+: 導眾以寂故稽首
+: #+END_VERSE
+  - Lines beginning with a pound sign '#' are treated specially, not as part of the text:
+    - if followed by a "+" they introduce special keywords or syntax
+      used for org-mode's own purposes, for example =#+TITLE=,
+      =#+AUTHOR= or =#+DATE=. 
+    - the pound sign followed by a space character "# " introduces a
+      comment which is not considered part of the document.
+  - Links to other files target.txt or places within the current file
+    are constructed like this: =[[target.txt][link to target.txt] ]=
+
+
+* Additional conventions for =Mandoku=
+
+
+** About texts, versions and editions
+
+   In =Mandoku= every text has a text identifier, for example
+   =T14n0475=, which uniquely identifies the text within a larger
+   collection and makes it possible to refer to it unambiguoqusly.
+   This identifier is usually also the name of the folder, where all
+   files that make up a text are stored. The text is usually split up
+   so that one file has the content of one scroll, and they are
+   numbered in sequence.  An additional file may give the table of
+   contents with links to the appropriate location in the files.
+
+: T14n0475_000.txt
+: T14n0475_001.txt
+: T14n0475_002.txt
+: T14n0475_003.txt
+: T14n0475.org
+
+
+   The source of the text has to be given (at the beginning of the
+   file, this is recorded with the property keyword "WITNESS") and
+   there might also be a base edition (keyword "BASEEDITION"). The
+   base edition provides the navigation grid for all editions of a
+   text.
+
+   Several editions of a text might be recorded; this allows the
+   documentation of textual witnesses for a text and provides the
+   ground for critical editions of the text. Within =Mandoku=,
+   different editions (witnesses) of a text are stored as "branches"
+   in a version control system.
+
+   In order to provide a common reference system common to all
+   editions of a text, page numbers and locations of the line break of
+   the base edition are recorded in all files. Editions that have a
+   different layout may additionally record the page numbers according
+   to the source edition.
+
+
+** Syntactic conventions
+
+*** Base edition and text witness
+   In =Mandoku= some import information about the source and
+   edition of a text can be given at the beginning of a file in machine
+   readable form, for example:
+
+: #+PROPERTY: BASEEDITION T
+: #+PROPERTY: ID T14n0475
+: #+PROPERTY: WITNESS 【CBETA】
+: #+PROPERTY: JUAN 1
+
+  Here the base edition is identified as "T" and the witness (the
+  edition in this file) is given as "【CBETA】".  In addition, the
+  identification number of the text is recorded and the number of the
+  juan. 
+
+*** Page numbers
+  The page number is given in the following form:
+: <pb:T_T14n0475_0537a>
+  There are three parts to this number, separated by the "_"
+  character, surrounded by the page break indicator "<pb: .. >":
+  - "T" is the identifier of the edition
+  - "T14n0475" is the identification number of the text
+  - "0537a" is the page number ("a" stands for the upper part of the
+    text or the first half of a page in woodblock prints that are
+    separated in two halves) At the moment =Mandoku= requires the page
+    number to end in a letter.
+
+  The page break indicator "<pb:" referes always to the witness
+  documented in the current file, if this differs from the base
+  edition, then the reference to the base edition can be given with
+  "<md:", that is "pb" is replaced by "md".
+
+*** Line break indicators
+    To facilitate navigation in the text, =Mandoku= records the line
+    breaks of the source edition.  Together with the page numnbers,
+    they provide a grid of coordinates that is used to address
+    locations in the text.  To mark the occurrence of a line break, a
+    line break indicator "¶" is simply inserted at the appropriate
+    location in the text:
+#+BEGIN_SRC 
+復有萬梵天王尸棄等，從餘四天下，來詣¶
+佛所，而聽法；復有萬二千天帝，亦從餘四¶
+天下，來在會坐；并餘大威力諸天、龍神、夜¶
+叉、乾闥婆、阿脩羅、迦樓羅、緊那羅、摩睺羅¶
+伽等，悉來會坐。
+#+END_SRC
+
+    This makes it possible to reformat the text in phrases without
+    losing the navigation grid:
+
+#+BEGIN_SRC 
+復有萬梵天王尸棄等，
+從餘四天下，
+來詣¶佛所，
+而聽法；
+復有萬二千天帝，
+亦從餘四¶天下，
+來在會坐；
+并餘大威力諸天、
+龍神、
+夜¶叉、
+乾闥婆、
+阿脩羅、
+迦樓羅、
+緊那羅、
+摩睺羅¶伽、
+等悉來會坐。
+#+END_SRC
+
+*** Additions to the text
+    By convention, =Mandoku= considers only the characters from the
+    beginning of the line up to the first TAB character (U+0009) as
+    part of the source text. Annotations or a translation can be
+    placed to the right of the TAB character without influencing the
+    navivational grid.  Here is an example with a translation added[fn::The translation is by the late John R. McRae, published in the BDK Tripitaka series, Berkeley 2004.]
+#+BEGIN_SRC 
+復有萬梵天王尸棄等。　　　　　　5. There were also ten thousand Brahmā heavenly kings, Śikhin and others, 
+從餘四天下來詣¶佛所而聽法。　　who descended from the other worlds of four continents to proceed to where the Buddha was in order to hear the Dharma. 
+復有萬二千天帝。　　　　　　　　There were also twelve thousand heavenly emperors (i.e., Indras), 
+亦從餘四¶天下來在會坐。　　　　who also came from the other worlds of four continents to sit in this assembly, 
+并餘大威力諸天．　　　　　　　　and the other awesomely powerful gods (devas), 
+龍神．　　　　　　　　　　　　　dragons (nāgas), 
+夜¶叉．　　　　　　　　　　　　yakṣas, 
+乾闥婆．　　　　　　　　　　　　gandharvas, 
+阿脩羅．　　　　　　　　　　　　asuras, 
+:zhu:
+阿脩羅 [a1xiu1luo1] skt Asura, deities of the lowest rank.
+:END:
+迦樓羅．　　　　　　　　　　　　garuḍas, 
+緊那羅．　　　　　　　　　　　　kiṃnaras, 
+摩睺羅¶伽．　　　　　　　　　　and mahoragas, 
+等悉來會坐。　　　　　　　　　who all came to sit in the assembly. 
+#+END_SRC
+
+    Additionally, annotations can be placed in socalled "drawers" (of
+    which the property drawer above is one example) on lines by
+    themselves.  =Mandoku= defines a drawer called "zhu" for
+    annotation, informal notes etc. pertaining to certain characters
+    or expressions, they are understood to refer to the previous line
+    in the file. Drawers are introduced with the convention :<name of
+    drawer>: on a line by themselves and are ended with :END: again on
+    a line by themselves. In interactive use, the content of drawers
+    can be hidden and made to appear only when needed.
