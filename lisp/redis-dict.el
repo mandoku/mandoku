@@ -274,7 +274,7 @@ the form V07-p08115-129"
 )
 
 
-(global-set-key (kbd "C-c g") 'redict-get-line)
+;(global-set-key (kbd "C-c g") 'redict-get-line)
 (global-set-key (kbd "M-a") 'redict-get-line) ; was backward-sentence.
 (global-set-key (kbd "M-s a") 'redict-get-line)
 ;(global-set-key (kbd "M-s n") 'redict-get-next-line)
