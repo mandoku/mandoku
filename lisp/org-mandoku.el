@@ -20,7 +20,7 @@ LINK will consist of a <textid> recognized by mandoku."
   (message (format "%s" page))
   (if (equal coll "meta")
       ;; this does a headline only search in meta; we need to have the ID on the headline for this to work
-      (org-open-file (concat mandoku-meta-dir  textid ".org" ) t nil (concat "#" page)) 
+      (org-open-file (concat mandoku-meta-dir  textid ".org" ) t nil (concat "" page)) 
 ;      (message (format "%s" (concat mandoku-meta-dir  textid ".org" )))
     (org-open-file (concat mandoku-text-dir coll "/" 
     (funcall (intern (concat "mandoku-" coll "-textid-to-file")) textid page)) t nil 
