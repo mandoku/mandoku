@@ -30,6 +30,10 @@
   because at the moment, there is not much to be seen here.  Once that
   changes, I will make an announcement and remove this silly notice.
 
+  [2013-07-09] A built of Emacs 24.3 that allows the display of
+  Unicode Ext. B characters can be found [[file:data/Emacs24.3+2013-07-03.dmg.zip][here]].
+
+
 * Software
   The software for using Mandoku texts falls in two broad categories:
   text processing software and a frontend to the user.  For both of
@@ -57,7 +61,6 @@
     adding a few little pieces here and there, it becomes even more
     useful for specific tasks.
 
-    A built of Emacs 24.3 that allows the display of Unicode Ext. B characters can be found [[file:data/Emacs24.3+2013-07-03.dmg][here]]
     
 *** Web
     
