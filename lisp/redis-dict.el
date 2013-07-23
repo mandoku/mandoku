@@ -71,7 +71,7 @@
 		 (cdr (assoc redict-pron e))
 		 (if (assoc redict-prefdic e)
 		     (concat " / "
-			     (redict-maybe-substring (cdr (assoc redict-prefdic e)) 60)
+			     (redict-maybe-substring (cdr (assoc redict-prefdic e)) 40)
 			     " / "))
 		 "\n" ))
       ;; this displays the entries
