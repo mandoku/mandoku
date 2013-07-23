@@ -13,7 +13,7 @@
 ;;(setq res (redis-cmd-hgetall "本文"))
 
 (defvar redict-regex "<[^>]*>\\|[　-㄀＀-￯\n¶]+\\|\t[^\n]+\n")
-
+;; pron-kanwa-01 for kanwa!
 (defvar redict-pron "pron-pinyin-01")
 (defvar redict-prefdic "def-abc-01-01")
 (defvar redict-dict-img-dir "/Users/Shared/md/images/dic/")
