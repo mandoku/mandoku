@@ -64,7 +64,8 @@
       ;; lets ignore the head for now
       (let ((hd ""))
 	(if (and (assoc "dummy" e) (eq (length e) 2))
-	    (insert "xx")
+	    ""
+;	    (insert "xx" (cdr (cdr e)) "yy")
 	 (insert
 	 (concat "** "
 		 (car e) " ("
@@ -93,9 +94,9 @@
 		(setq src (car (cdr dx)))
 		(if (not (equal loc "loc"))
 		    (if (not (equal loc "dummy"))
-		    (if (equal src "abc")
-			(insert "*** lyt\n" loc)
-		    (insert "*** " hd (if src src "") "\n"))))))
+			(if (equal src "abc")
+			    (insert "*** lyt\n" loc)
+			  (insert "*** " hd (if src src "") "\n"))))))
 	  (insert
 	   (concat
 	    (if (equal src "hydcd1") "**** " "")
@@ -226,6 +227,8 @@ the form V07-p08115-129"
 		      page
 		      dict
 		      loc))
+;	    (if (not (equal loc "dummy"))
+;		""
 	      (format "%s : %s" dict loc)))))))))))))))
   
 
