@@ -142,6 +142,7 @@
 the form V07-p08115-129"
   (let ((dict (car (cdr (split-string (car  f) "-"))))
 	(loc  (cdr f)))
+    (format "%s -- " (car f))
     (if (equal dict "daikanwa")
 	;; p07-08115.djvu
 	(format "[[%sdkw/p%s-%s.djvu][%s : %s]]"
@@ -222,10 +223,10 @@ the form V07-p08115-129"
 		      page
 		      dict
 		      loc))
-;	  (if (equal dict "dummy")
+	    (if (equal dict "dummy")
 	;; dummys, for entries that would otherwise be unrichable
-;	      ""
-	    (format "%s : %s" dict loc)))))))))))))))
+		(format "%s --" dict)
+	      (format "%s : %s" dict loc))))))))))))))))
   
 
 (defun redict-get-next-line ()
