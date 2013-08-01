@@ -63,7 +63,9 @@
 ;;      (let ((hd (concat (car e) " ")))
       ;; lets ignore the head for now
       (let ((hd ""))
-	(insert
+	(if (and (assoc "dummy" e) (eq (length e) 2))
+	    (insert "xx")
+	 (insert
 	 (concat "** "
 		 (car e) " ("
 		 (format "%s" (- (length e) 1))
@@ -74,6 +76,7 @@
 			     (redict-maybe-substring (cdr (assoc redict-prefdic e)) 40)
 			     " / "))
 		 "\n" ))
+	 )
       ;; this displays the entries
 	(setq e (sort (cdr e) (lambda (a b) (string< (car a) (car b)))))
 	(setq src "")
@@ -89,9 +92,10 @@
 	      (progn
 		(setq src (car (cdr dx)))
 		(if (not (equal loc "loc"))
+		    (if (not (equal loc "dummy"))
 		    (if (equal src "abc")
 			(insert "*** lyt\n" loc)
-		    (insert "*** " hd (if src src "") "\n")))))
+		    (insert "*** " hd (if src src "") "\n"))))))
 	  (insert
 	   (concat
 	    (if (equal src "hydcd1") "**** " "")
@@ -142,7 +146,6 @@
 the form V07-p08115-129"
   (let ((dict (car (cdr (split-string (car  f) "-"))))
 	(loc  (cdr f)))
-    (format "%s -- " (car f))
     (if (equal dict "daikanwa")
 	;; p07-08115.djvu
 	(format "[[%sdkw/p%s-%s.djvu][%s : %s]]"
@@ -223,10 +226,7 @@ the form V07-p08115-129"
 		      page
 		      dict
 		      loc))
-	    (if (equal dict "dummy")
-	;; dummys, for entries that would otherwise be unrichable
-		(format "%s --" dict)
-	      (format "%s : %s" dict loc))))))))))))))))
+	      (format "%s : %s" dict loc)))))))))))))))
   
 
 (defun redict-get-next-line ()
