@@ -222,6 +222,9 @@ the form V07-p08115-129"
 		      page
 		      dict
 		      loc))
+;	  (if (equal dict "dummy")
+	;; dummys, for entries that would otherwise be unrichable
+;	      ""
 	    (format "%s : %s" dict loc)))))))))))))))
   
 
