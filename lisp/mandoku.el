@@ -187,7 +187,9 @@ One character is either a character or one entity expression"
 ;;
 		       (funcall (intern (concat "mandoku-" coll "-textid-to-title"))
 			(if subcoll
-			    (concat subcoll vol )
+			    (if (not (equal (substing subcoll 0 2) "ZB"))
+				(concat subcoll vol )
+			      vol)
 			  vol)
 		       (concat page ""))))
 		 ;; (text (funcall (intern (concat "mandoku-" coll "-vol-page-to-file"))
