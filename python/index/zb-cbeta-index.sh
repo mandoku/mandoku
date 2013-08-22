@@ -28,13 +28,11 @@
 mandokudir=`dirname $0`
 idxdir=~/tmp/index
 coll=cbeta
-src=~/tmp/md
+src=/Users/chris/00scratch/md-test
 cd $src
 #for subcoll in H J T W X
-for subcoll in S U P L M K G F C A H J T W X
-#for subcoll in X
+for subcoll in ZB6a ZB6b ZB6c ZB6d ZB6e ZB6f ZB6g ZB6h ZB6i ZB6j ZB6k ZB6l ZB6m ZB6n ZB6o ZB6p ZB6q ZB6r ZB6s ZB6t ZB6u
 do
-#    rm -Rf $idxdir/*/*$subcoll.$coll.idx
     cd $subcoll
     rm index.log
     for file in */*.txt
