@@ -197,16 +197,16 @@ One character is either a character or one entity expression"
 	    (unless (mandoku-apply-filter (car tx))
 	    (setq mandoku-filtered-count (+ mandoku-filtered-count 1))
 	    (insert "** [[mandoku:" coll ":" 
-		    (if (not (equal (substring subcoll 0 2) "ZB"))
-			 subcoll)
+;		    (if (not (equal (substring subcoll 0 2) "ZB"))
+;			 subcoll)
 		    vol
 		    ":"
 		    page
 		    "::"
 		    search-string
 		    "]["
-		    (if (not (equal (substring subcoll 0 2) "ZB"))
-			(upcase subcoll))
+;		    (if (not (equal (substring subcoll 0 2) "ZB"))
+;			(upcase subcoll))
 		    vol
 		    ", "
 		    page

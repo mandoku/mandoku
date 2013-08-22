@@ -36,10 +36,10 @@
 	 (sec (if (string-match "-" (car sp))
 		  (car (split-string (car sp) "-"))
 		"001"))
-	 (subcoll (if (string-match "-" (car sp))
-		      textid
+	 (subcoll (if (string-match "ZB" (car sp))
+		      (substring textid 0 4)
 		    "tls")))
-    (concat subcoll "/" (downcase textid) "_" sec ".txt")))
+    (concat subcoll "/" textid "_" sec ".txt")))
 
 
 ;; (defun mandoku-krp-vol-page-to-file (subcoll textnum sec)
