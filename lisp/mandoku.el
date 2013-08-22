@@ -178,18 +178,14 @@ One character is either a character or one entity expression"
 			 ;; if the length is five, we have a location with the textnum at the end, otherwise it starts with a vol and we have to get the textid from there
 		       (funcall (intern (concat "mandoku-" coll "-textid-to-title"))
 			(if subcoll
-			    (if (not (equal (substing subcoll 0 2) "ZB"))
-				(concat (upcase subcoll) (car location))
-			      vol)
+			    (concat (upcase subcoll) (car location))
 			  vol)
 		       (concat page ""))
 
 ;;
 		       (funcall (intern (concat "mandoku-" coll "-textid-to-title"))
 			(if subcoll
-			    (if (not (equal (substing subcoll 0 2) "ZB"))
-				(concat subcoll vol )
-			      vol)
+			    (concat subcoll vol )
 			  vol)
 		       (concat page ""))))
 		 ;; (text (funcall (intern (concat "mandoku-" coll "-vol-page-to-file"))
@@ -200,14 +196,17 @@ One character is either a character or one entity expression"
 	    (set-buffer result-buffer)
 	    (unless (mandoku-apply-filter (car tx))
 	    (setq mandoku-filtered-count (+ mandoku-filtered-count 1))
-	    (insert "** [[mandoku:" coll ":" subcoll
+	    (insert "** [[mandoku:" coll ":" 
+		    (if (not (equal (substring subcoll 0 2) "ZB"))
+			 subcoll)
 		    vol
 		    ":"
 		    page
 		    "::"
 		    search-string
 		    "]["
-		    (upcase subcoll)
+		    (if (not (equal (substring subcoll 0 2) "ZB"))
+			(upcase subcoll))
 		    vol
 		    ", "
 		    page
