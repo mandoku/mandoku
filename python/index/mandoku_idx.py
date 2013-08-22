@@ -170,7 +170,9 @@ def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2
             ## [2010-01-07T13:14:14+0900]
             ## this needs to be done before the text is output!
             ## [2010-02-06T17:27:20+0900] FIXME : ZHSJ texts (hist) have the notes where the section is 'b'
-            ## [2010-02-18T20:35:34+0900] and now we want to add the same for verse.. 
+            ## [2010-02-18T20:35:34+0900] and now we want to add the same for verse..
+            ## [2013-08-22T18:36:33+0900] a problem with this seems to be that it mangles complex gaiji expressions
+            ## like [邱-丘+(夸-ㄅ+(万-一))] or maybe the code below handles this?
             if (line.find('(') > 0):
                 for i in range(0, len(chars)-1):
                     #look for the note
