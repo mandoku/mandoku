@@ -39,8 +39,9 @@ def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2
     defs = {'line' : 0, 'noteflag': 0, 'versflag': 0, 'file': file, 'char': 0}
     def setPage(lx):
             r=lx[1:lx.find('>')].split('_')
-            defs['ed']=r[0]
-            defs['id']=r[1]
+            ## this changed for krp
+            defs['ed']=r[1]
+            defs['id']=r[0]
             defs['page']=r[-1]
             if defs['line'] == 0:
                 ##this means we are looking at the first page?!
