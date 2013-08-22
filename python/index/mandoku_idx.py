@@ -38,31 +38,32 @@ def PrintToIdxfile(outdir, string, collection):
 def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2, length=3, collection='test', use_vol=0):
     defs = {'line' : 0, 'noteflag': 0, 'versflag': 0, 'file': file, 'char': 0}
     def setPage(lx):
-            r=lx[1:lx.find('>')].split('_')
-            ## this changed for krp
-            defs['ed']=r[1]
-            defs['id']=r[0]
-            defs['page']=r[-1]
-            if defs['line'] == 0:
-                ##this means we are looking at the first page?!
-                try:
-                    idlog.write("%(id)s\t%(file)s\t%(title)s\t%(ed)s\t%(page)s\t"%(defs))
-                except:
-                    idlog.write("%(id)s\t%(file)s\t%(ed)s\t%(page)s\t"%(defs))
-                    
-            defs['line']=0
+        r=lx[lx.find(':')+1:lx.find('>')].split('_')
+        #r=lx[1:lx.find('>')].split('_')
+        ## this changed for krp
+        defs['ed']=r[1]
+        defs['id']=r[0]
+        defs['page']=r[-1]
+        if defs['line'] == 0:
+            ##this means we are looking at the first page?!
             try:
-                defs['page'] = defs['page'][:-1] + tab[defs['page'][-1]]
-            except KeyError:
-                defs['page'] = re.sub(r'-', '', defs['page'])
-                #maybe there is no abcd, so we add a 'a' anyway
-                try:
-                    test=int(defs['page'])
-                    defs['page'] += '1'
-                except ValueError:
-                    print "error, :", file, line
-                    exit
-            # if there is a lb-marker at the end of the pb, we want to take it into account        
+                idlog.write("%(id)s\t%(file)s\t%(title)s\t%(ed)s\t%(page)s\t"%(defs))
+            except:
+                idlog.write("%(id)s\t%(file)s\t%(ed)s\t%(page)s\t"%(defs))
+
+        defs['line']=0
+        try:
+            defs['page'] = defs['page'][:-1] + tab[defs['page'][-1]]
+        except KeyError:
+            defs['page'] = re.sub(r'-', '', defs['page'])
+            #maybe there is no abcd, so we add a 'a' anyway
+            try:
+                test=int(defs['page'])
+                defs['page'] += '1'
+            except ValueError:
+                print "error, :", file, line
+                exit
+        # if there is a lb-marker at the end of the pb, we want to take it into account        
         
     # outdir = idxdir+'/'+file.split('/')[-1]
     # try:
