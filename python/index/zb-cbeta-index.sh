@@ -27,7 +27,7 @@
 
 mandokudir=`dirname $0`
 idxdir=~/tmp/index
-coll=cbeta
+coll=krp
 src=/Users/chris/00scratch/md-test
 cd $src
 #for subcoll in H J T W X
