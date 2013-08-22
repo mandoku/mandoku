@@ -178,7 +178,9 @@ One character is either a character or one entity expression"
 			 ;; if the length is five, we have a location with the textnum at the end, otherwise it starts with a vol and we have to get the textid from there
 		       (funcall (intern (concat "mandoku-" coll "-textid-to-title"))
 			(if subcoll
-			    (concat (upcase subcoll) (car location))
+			    (if (not (equal (substing subcoll 0 2) "ZB"))
+				(concat (upcase subcoll) (car location))
+			      vol)
 			  vol)
 		       (concat page ""))
 
