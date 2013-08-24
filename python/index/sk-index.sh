@@ -4,7 +4,7 @@ mandokudir=`dirname $0`
 idxdir=/tmp/index
 mkdir -p $idxdir
 coll=krp
-src=/tmp/skqs
+src=/Users/chris/00scratch/md-skqs
 cd $src
 for subcoll in ZB*
 do
