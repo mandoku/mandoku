@@ -2,7 +2,7 @@
 # convert txt files to mandoku index format
 
 import os, sys, codecs, re, datetime
-ch_re = re.compile(ur'(\[[^\]]*\]|&[^;]*;|&amp;C[X3-7]-[A-F0-9]+|.)')
+ch_re = re.compile(ur'(\[[^\]]*\]|&[^;]*;|&amp;[CZ][X3-7]-[A-F0-9]+|.)')
 img_re = re.compile(ur'<i[^>]*>')
 sys.stdout = codecs.getwriter('utf8')(sys.stdout)
 outfiles = {}
