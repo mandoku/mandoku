@@ -50,7 +50,7 @@ from mandoku.sparsedict import *
 kanji=Ur'\u3000\u3400-\u4DFF\u4e00-\u9FFF\uF900-\uFAFF\uFE30-\uFE4F\U00020000-\U0002A6DF\U0002A700-\U0002B73F\U0002B740-\U0002B81F\U0002B820-\U0002F7FF'
 pua=Ur'\uE000-\uF8FF\U000F0000-\U000FFFFD\U00100000-\U0010FFFD'
 ##this will recognize image links like [[./img]] as 1 kanji --> clear this out later?!
-ent=r'\[\[.*?\]\]|\[[^\]]*\]|&[^;]*;|&amp;C[X3-7]-[A-F0-9]+'
+ent=r'\[\[.*?\]\]|\[[^\]]*\]|&[^;]*;|&amp;[CZ][X3-7]-[A-F0-9]+'
 #now
 #kp_re = re.compile(u"(%s|[%s%s])" % (ent, kanji, pua))
 kp_re = re.compile(u"(%s|{[%s%s]+:[^}]*}|[%s%s])" % (ent, kanji, pua, kanji, pua))

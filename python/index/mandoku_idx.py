@@ -121,7 +121,7 @@ def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2
             defs['char'] = 0
         elif defs.has_key('page'):
 #            defs['line'] += line.count(u'¶')
-            line = re.sub(u'[+-~#\u00f1-\u2fff\u3000-\u30FF\uFF00-\uFFEF]', '', line)
+            line = re.sub(u'[~#\u00f1-\u2fff\u3000-\u30FF\uFF00-\uFFEF]', '', line)
             ##remove the footnote markers in the hist files
             line = re.sub(u'〔[一二三四五六七八九０]+〕', '', line)
             ## FIXME: maybe remove punctuation as well?!
