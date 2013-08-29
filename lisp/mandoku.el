@@ -459,6 +459,19 @@ One character is either a character or one entity expression"
          map)
   "Keymap for mandoku-view mode"
 )
+
+
+(define-derived-mode mandoku-view-mode org-mode "mandoku-view"
+  "a mode to view mandoku files
+  \\{mandoku-mode-map}"
+  (setq case-fold-search nil)
+  (set (make-local-variable 'org-startup-folded) 'showeverything)
+  (set (make-local-variable 'tab-with) 30)
+  (mandoku-hide-p-markers)
+  (add-to-invisibility-spec 'mandoku)
+;  (view-mode)
+)
+
 ;(setq mandoku-hide-p-re "\\(?:<[^>]*>\\)\\|¶\n\\|¶")
 ;(setq mandoku-hide-p-re "\\(?:<[^>]*>\\)\\|¶")
 (setq mandoku-hide-p-re "\\(<pb\\)\\([^_]+_[^_]+_\\)\\([^>]+>\\)\\|¶")
@@ -474,16 +487,6 @@ One character is either a character or one entity expression"
 ))))
 
 
-(define-derived-mode mandoku-view-mode org-mode "mandoku-view"
-  "a mode to view mandoku files
-  \\{mandoku-mode-map}"
-  (setq case-fold-search nil)
-  (set (make-local-variable 'org-startup-folded) 'showeverything)
-  (set (make-local-variable 'tab-with) 30)
-  (mandoku-hide-p-markers)
-  (add-to-invisibility-spec 'mandoku)
-;  (view-mode)
-)
 
 (define-key mandoku-mode-map
              "C-ce" 'view-mode)
