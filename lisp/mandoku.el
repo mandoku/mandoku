@@ -469,7 +469,7 @@ One character is either a character or one entity expression"
       (goto-char (point-min))
       (while (re-search-forward mandoku-hide-p-re nil t)
 	(if (match-beginning 2)
-	    (overlay-put (make-overlay (match-beginning 2) (match-end 2)) 'invisible 'mandoku)
+	    (overlay-put (make-overlay (- (match-beginning 2) 2) (match-end 2)) 'invisible 'mandoku)
 	(overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'invisible 'mandoku))
 ))))
 
