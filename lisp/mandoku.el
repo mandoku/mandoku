@@ -745,6 +745,22 @@ One character is either a character or one entity expression"
    (car (split-string (buffer-substring-no-properties (point-at-bol) (point-at-eol)) "	")))
 
 
+(easy-menu-define mandoku-md-menu mandoku-mode-map "Mandoku menu"
+  '("Mandoku"
+    ("Browse"
+     ["Show Catalog" mandoku-show-catalog t]
+     )
+    ["Search" mandoku-search t]
+    ("Versions"
+     ["Switch versions" mandoku-switch-version nil]
+     ["Master" mandoku-switch-to-master nil]
+     ["New version" mandoku-new-version nil]
+     )
+    ("Maintenance"
+     ["Update installed texts" mandoku-update nil]
+     
+     
+
 (provide 'mandoku)
 
 ;; end of file mandoku.el
