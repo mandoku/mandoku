@@ -758,8 +758,9 @@ One character is either a character or one entity expression"
      )
     ("Maintenance"
      ["Update installed texts" mandoku-update nil]
-     
-     
+     ["Add repository" mandoku-setting nil]
+     )
+))     
 
 (provide 'mandoku)
 
