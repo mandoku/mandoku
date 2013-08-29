@@ -467,14 +467,14 @@ One character is either a character or one entity expression"
   (setq case-fold-search nil)
   (set (make-local-variable 'org-startup-folded) 'showeverything)
   (set (make-local-variable 'tab-with) 30)
-  (mandoku-hide-p-markers)
+;  (mandoku-hide-p-markers)
   (add-to-invisibility-spec 'mandoku)
 ;  (view-mode)
 )
 
 ;(setq mandoku-hide-p-re "\\(?:<[^>]*>\\)\\|¶\n\\|¶")
 ;(setq mandoku-hide-p-re "\\(?:<[^>]*>\\)\\|¶")
-(setq mandoku-hide-p-re "\\(<pb\\)\\([^_]+_[^_]+_\\)\\([^>]+>\\)\\|¶")
+(setq mandoku-hide-p-re "\\(<pb\\)\\([^_]+_[^_]+_\\)\\([^>]+>\\)\\|¶\\|&\\([^;]+\\);")
 (defun mandoku-hide-p-markers ()
   "add overlay 'mandoku to hide/show special characters "
   (save-match-data
@@ -483,7 +483,9 @@ One character is either a character or one entity expression"
       (while (re-search-forward mandoku-hide-p-re nil t)
 	(if (match-beginning 2)
 	    (overlay-put (make-overlay (- (match-beginning 2) 2) (match-end 2)) 'invisible 'mandoku)
-	(overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'invisible 'mandoku))
+	  (if (match-beginning 1)
+	      (overlay-put (make-overlay (match-beginning 1) (match-end 1)) 'invisible 'mandoku)
+	    (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'invisible 'mandoku)))
 ))))
 
 
