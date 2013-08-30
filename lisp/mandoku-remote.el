@@ -6,11 +6,9 @@
 ;; probably best to make this a list sometime...
 (defvar mandoku-remote-url "http://localhost:5000/search")
 (setq mandoku-remote-url "http://127.0.0.1:5000/search")
-(defun mandoku-do-query (type str)
-      (let ((url-request-method "GET")
-	    ;; dolist or mapconcat...
-            (arg-stuff (concat "?query=" (url-hexify-string str)
-                         "&filter=" (url-hexify-string type))))
-        (url-retrieve (concat mandoku-remote-url)
-                      (lambda (status) (switch-to-buffer (current-buffer))))))
+
+(defun mandoku-search-remote (search-string index-buffer)
+  (with-current-buffer index-buffer 
+    (url-insert-file-contents (concat mandoku-remote-url "?key=" search-string)
+			      (lambda (status) (switch-to-buffer (current-buffer))))))
 
