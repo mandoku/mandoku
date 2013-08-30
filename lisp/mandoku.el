@@ -133,7 +133,6 @@ One character is either a character or one entity expression"
       (switch-to-buffer-other-window index-buffer t)
 ;;xx      (set-buffer index-buffer)
 ;; first: sort the result (after the filename)
-      (sort-regexp-fields nil "^[^:]*:\\(.*\\)$" "\\1" (point-min) (point-max))
       (sort-lines nil (point-min) (point-max))
       (goto-char (point-min))
       (while (re-search-forward
@@ -153,31 +152,16 @@ One character is either a character or one entity expression"
 	       ;; the following are optional:
 	       ;; match-string 6: dummy
 	       ;; match-string 7: addinfo
-
-;;       "^[^.]*.\\([^.]*\\)?.\\(.*\\).idx[^:]*:\\([^,]*\\),\\([^\t]*\\)\t\\([^\t \n]*\\)\\(\t?\\([^\n\t ]*\\)\\)$"
-
-;;       "^[^.]*.\\([^.]*\\)?.?\\(.*\\).idx[^:]*:\\([^,]*\\),\\([^\t]*\\)\t\\([^\t \n]*\\)\\(\t[^\n\t ]*\\)?$"
-	       "^\\([^.]*.\\([^.]*\\)?.?\\(.*\\).idx[^:]*\\)?:?\\([^,]*\\),\\([^\t]*\\)\t\\([^\t \n]*\\)\\(\t[^\n\t ]*\\)?$"
+	       "^\\([^,]*\\),\\([^\t]*\\)\t\\([^\t \n]*\\)\\(\t[^\n\t ]*\\)?$"
 	) nil t )
 	(let* (
 	       ;;if no subcoll, need to switch the match assignments.
-	      (subcoll (if (equal "" (match-string 3))
-			   (match-string 3)
-			 (match-string 2)))
-	      (coll  (if (equal "" (match-string 3))
-			   (match-string 2)
-			 (match-string 3)))
-	      (pre (match-string 5))
-	      (post (match-string 4))
-	      (location (funcall (intern (concat "mandoku-" coll "-parse-location")) (match-string 6)))
-	      ;(vol (format "%02d" (string-to-number (match-string 7))))
-	      ;(page (match-string 4))
-	      ;(sec (match-string 5))
-	      (line (match-string 7))
+	      (pre (match-string 2))
+	      (post (match-string 1))
+	      (location (split-string (match-string 3) ":" ))
 	      (extra (match-string 8))
-;;	      (markup (match-string 8))
 	      )
-	  (let* ((vol (car location))
+	  (let* ((txtid (car location))
 		 (pag (car (cdr location)))
 		 (line (car (cdr (cdr location))))
 		 (page (if (string-match "[-_]"  pag)
