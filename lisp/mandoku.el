@@ -89,8 +89,16 @@ One character is either a character or one entity expression"
 	(org-startup-folded t)
 	(mandoku-count 0))
     (progn
-      (set-buffer index-buffer)
+      (with-current-buffer index-buffer (mandoku-local-search search-string search-char))
+      ;; setup the buffer for the index results
+      (set-buffer result-buffer)
+      (setq buffer-read-only nil)
       (erase-buffer)
+      ;; switch to index-buffer and get the results
+      (mandoku-read-index-buffer index-buffer result-buffer search-string)
+      )))
+
+(defun mandoku-local-search ()
 ;; find /tmp/index/SDZ0001.txt -name "97.idx.*" | xargs zgrep "^靈寳"
       (shell-command
 		    (concat "bzgrep -H " "^"
@@ -103,13 +111,7 @@ One character is either a character or one entity expression"
 		     "*.idx*")
 		    index-buffer nil
 		    )
-      ;; setup the buffer for the index results
-      (set-buffer result-buffer)
-      (setq buffer-read-only nil)
-      (erase-buffer)
-      ;; switch to index-buffer and get the results
-      (mandoku-read-index-buffer index-buffer result-buffer search-string)
-      )))
+)
 
 (defun mandoku-read-index-buffer (index-buffer result-buffer search-string)
   (let (
