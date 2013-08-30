@@ -193,9 +193,7 @@ One character is either a character or one entity expression"
 ;		    "\t"
 		    search-char
 		    post
-		    "  [[mandoku:meta:"
-		    coll
-		    ":"
+		    "  [[mandoku:meta:krp:"
 		    txtid
 		    "][《"
 		    (format "%s" tit)
