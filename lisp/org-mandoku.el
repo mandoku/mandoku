@@ -19,7 +19,7 @@ LINK will consist of a <textid> recognized by mandoku."
       (src (car (cdr (split-string link "::"))))
       (filename (concat  "/" 
 			(if (equal coll "krp")
-	 (concat "/" (substring textid 0 4) "/" textid "/" textid "_" (car (split-string page "-")) ".txt")
+	 (concat (substring textid 0 4) "/" textid "/" textid "_" (car (split-string page "-")) ".txt")
 	 (funcall (intern (concat "mandoku-" coll "-textid-to-file")) textid page))) ))
   (message (format "%s" page))
   (if (equal coll "meta")
