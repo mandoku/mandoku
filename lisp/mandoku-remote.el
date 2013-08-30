@@ -13,13 +13,18 @@
 			      (lambda (status) (switch-to-buffer (current-buffer))))))
 
 
-(defun mandoku-open-remote-file (filename)
+(defun mandoku-open-remote-file (filename src page)
   (let ((buffer (car (last (split-string filename "/")))))
     (with-current-buffer (get-buffer-create buffer)
       (url-insert-file-contents (concat mandoku-remote-url "/getfile?filename=" filename)
 			      (lambda (status) (switch-to-buffer buffer))))
     (switch-to-buffer buffer)
-    (set buffer-file-name filename)
-    (mandoku-view-mode)))
+    (setq buffer-file-name (concat mandoku-text-dir "krp/" filename))
+    (mandoku-view-mode)
+    (mandoku-execute-file-search 
+	 (if src 
+	     (concat page "::" src)
+	   page))
+    ))
 
 
