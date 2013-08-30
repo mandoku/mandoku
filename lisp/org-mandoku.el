@@ -23,7 +23,9 @@ LINK will consist of a <textid> recognized by mandoku."
       (org-open-file (concat mandoku-meta-dir  textid ".org" ) t nil (concat "" page)) 
 ;      (message (format "%s" (concat mandoku-meta-dir  textid ".org" )))
     (org-open-file (concat mandoku-text-dir coll "/" 
-    (funcall (intern (concat "mandoku-" coll "-textid-to-file")) textid page)) t nil 
+     (if (eq coll "krp")
+	 (concat "/" (substring textid 0 4) "/" textid "/" textid "_" (car (splitstring page "-")) ".txt")
+    (funcall (intern (concat "mandoku-" coll "-textid-to-file")) textid page))) t nil 
    (if src 
 	(concat page "::" src)
      page)
