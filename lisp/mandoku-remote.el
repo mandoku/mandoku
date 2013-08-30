@@ -12,3 +12,6 @@
     (url-insert-file-contents (concat mandoku-remote-url "?query=" search-string)
 			      (lambda (status) (switch-to-buffer (current-buffer))))))
 
+
+(defun mandoku-open-remote-file (filename)
+  
