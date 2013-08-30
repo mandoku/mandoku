@@ -9,6 +9,6 @@
 
 (defun mandoku-search-remote (search-string index-buffer)
   (with-current-buffer index-buffer 
-    (url-insert-file-contents (concat mandoku-remote-url "?key=" search-string)
+    (url-insert-file-contents (concat mandoku-remote-url "?query=" search-string)
 			      (lambda (status) (switch-to-buffer (current-buffer))))))
 

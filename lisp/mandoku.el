@@ -134,7 +134,7 @@ One character is either a character or one entity expression"
 ;;xx      (set-buffer index-buffer)
 ;; first: sort the result (after the filename)
       (sort-regexp-fields nil "^[^:]*:\\(.*\\)$" "\\1" (point-min) (point-max))
-
+      (sort-lines nil (point-min) (point-max))
       (goto-char (point-min))
       (while (re-search-forward
 	      (concat
@@ -266,6 +266,150 @@ One character is either a character or one entity expression"
       (replace-buffer-in-windows index-buffer)
 ;      (kill-buffer index-buffer)
 ))
+
+;; (defun mandoku-read-index-buffer (index-buffer result-buffer search-string)
+;;   (let (
+;; 	(mandoku-count 0)
+;; 	(mandoku-filtered-count 0)
+;;       	(search-char (string-to-char search-string)))
+
+;;       (switch-to-buffer-other-window index-buffer t)
+;; ;;xx      (set-buffer index-buffer)
+;; ;; first: sort the result (after the filename)
+;;       (sort-regexp-fields nil "^[^:]*:\\(.*\\)$" "\\1" (point-min) (point-max))
+
+;;       (goto-char (point-min))
+;;       (while (re-search-forward
+;; 	      (concat
+;; 	       ;; match-string 1: collection
+;; 	       ;; match-string 2: match
+;; 	       ;; match-string 3: pre
+;; 	       ;; match-string 4: location
+;; 	       ;; the following are optional:
+;; 	       ;; match-string 5: dummy
+;; 	       ;; match-string 6: addinfo
+;; 	       ;; match-string 1: dummy
+;; 	       ;; match-string 2: collection
+;; 	       ;; match-string 3: match
+;; 	       ;; match-string 4: pre
+;; 	       ;; match-string 5: location
+;; 	       ;; the following are optional:
+;; 	       ;; match-string 6: dummy
+;; 	       ;; match-string 7: addinfo
+
+;; ;;       "^[^.]*.\\([^.]*\\)?.\\(.*\\).idx[^:]*:\\([^,]*\\),\\([^\t]*\\)\t\\([^\t \n]*\\)\\(\t?\\([^\n\t ]*\\)\\)$"
+
+;; ;;       "^[^.]*.\\([^.]*\\)?.?\\(.*\\).idx[^:]*:\\([^,]*\\),\\([^\t]*\\)\t\\([^\t \n]*\\)\\(\t[^\n\t ]*\\)?$"
+;; 	       "^\\([^.]*.\\([^.]*\\)?.?\\(.*\\).idx[^:]*\\)?:?\\([^,]*\\),\\([^\t]*\\)\t\\([^\t \n]*\\)\\(\t[^\n\t ]*\\)?$"
+;; 	) nil t )
+;; 	(let* (
+;; 	       ;;if no subcoll, need to switch the match assignments.
+;; 	      (subcoll (if (equal "" (match-string 3))
+;; 			   (match-string 3)
+;; 			 (match-string 2)))
+;; 	      (coll  (if (equal "" (match-string 3))
+;; 			   (match-string 2)
+;; 			 (match-string 3)))
+;; 	      (pre (match-string 5))
+;; 	      (post (match-string 4))
+;; 	      (location (funcall (intern (concat "mandoku-" coll "-parse-location")) (match-string 6)))
+;; 	      ;(vol (format "%02d" (string-to-number (match-string 7))))
+;; 	      ;(page (match-string 4))
+;; 	      ;(sec (match-string 5))
+;; 	      (line (match-string 7))
+;; 	      (extra (match-string 8))
+;; ;;	      (markup (match-string 8))
+;; 	      )
+;; 	  (let* ((vol (car location))
+;; 		 (pag (car (cdr location)))
+;; 		 (line (car (cdr (cdr location))))
+;; 		 (page (if (string-match "[-_]"  pag)
+;; 			   (concat (substring pag 0 (- (length pag) 1))
+;; 				   (mandoku-num-to-section (substring pag (- (length pag) 1))) line)
+;; 			 (concat
+;; 			  (format "%4.4d" (string-to-number (substring pag 0 (- (length pag) 1))))
+;; 			  (mandoku-num-to-section (substring pag (- (length pag) 1)))
+;; 			  line)))
+;; 		 (tx (if (string-match "_"  (car (cdr location)))
+;; 			 ;; if the length is five, we have a location with the textnum at the end, otherwise it starts with a vol and we have to get the textid from there
+;; 		       (funcall (intern (concat "mandoku-" coll "-textid-to-title"))
+;; 			(if subcoll
+;; 			    (concat (upcase subcoll) (car location))
+;; 			  vol)
+;; 		       (concat page ""))
+
+;; ;;
+;; 		       (funcall (intern (concat "mandoku-" coll "-textid-to-title"))
+;; 			(if subcoll
+;; 			    (concat subcoll vol )
+;; 			  vol)
+;; 		       (concat page ""))))
+;; 		 ;; (text (funcall (intern (concat "mandoku-" coll "-vol-page-to-file"))
+;; 		 ;;       subcoll
+;; 		 ;;       (string-to-number vol)
+;; 		 ;;       (string-to-number pag)))
+;; 		 )
+;; 	    (set-buffer result-buffer)
+;; 	    (unless (mandoku-apply-filter (car tx))
+;; 	    (setq mandoku-filtered-count (+ mandoku-filtered-count 1))
+;; 	    (insert "** [[mandoku:" coll ":" 
+;; ;		    (if (not (equal (substring subcoll 0 2) "ZB"))
+;; ;			 subcoll)
+;; 		    vol
+;; 		    ":"
+;; 		    page
+;; 		    "::"
+;; 		    search-string
+;; 		    "]["
+;; ;		    (if (not (equal (substring subcoll 0 2) "ZB"))
+;; ;			(upcase subcoll))
+;; 		    vol
+;; 		    ", "
+;; 		    page
+;; 		    "]]"
+;; 		    "\t"
+;; 		    pre
+;; ;		    "\t"
+;; 		    search-char
+;; 		    post
+;; 		    "  [[mandoku:meta:"
+;; 		    coll
+;; 		    ":"
+;; 		    (car tx)
+;; 		    "][《"
+;; 		    (format "%s" (car (cdr tx)))
+;; 		    "》]]\n"
+;; 		    )
+;; ;; additional properties
+;; 	    (insert ":PROPERTIES:\n:COLL: "
+;; 		    coll
+;; 		    "\n:ID: " (car tx)
+;; 		    "\n:PRE: "  (concat (nreverse (string-to-list pre)))
+;; 		    "\n:POST: "
+;; 		    search-char
+;; 		    post
+;; 		    "\n:END:\n"
+;; 		    ))
+;; 	    (set-buffer index-buffer)
+;; 	    (setq mandoku-count (+ mandoku-count 1))
+;; 	    )))
+;;       (switch-to-buffer-other-window result-buffer t)
+;;       (goto-char (point-min))
+;; ;      (insert (format "There were %d matches for your search of %s:\n"
+;; ;       mandoku-count search-string))
+;;       (if (equal mandoku-use-textfilter t)
+;; 	  (insert (format "Active Filter: %s , Matches: %d (Press 't' to temporarily disable the filter)\n" 
+;; 			  (mapconcat 'mandoku-active-filter mandoku-textfilter-list "")
+;; 			  mandoku-filtered-count))
+;; 	)
+;;       (insert (format "Location\tMatch               Source\n* %s (%d/%d)\n"  search-string mandoku-filtered-count mandoku-count))
+;;       (mandoku-index-mode)
+;;  ;     (org-overview)
+;;       (hide-sublevels 2)
+;;       (replace-buffer-in-windows index-buffer)
+;; ;      (kill-buffer index-buffer)
+;; ))
+
 
 (defun manoku-index-no-filter ()
   "Temporarily displays the search result without applying a filter"
