@@ -171,41 +171,21 @@ One character is either a character or one entity expression"
 			  (format "%4.4d" (string-to-number (substring pag 0 (- (length pag) 1))))
 			  (mandoku-num-to-section (substring pag (- (length pag) 1)))
 			  line)))
-		 (tx (if (string-match "_"  (car (cdr location)))
-			 ;; if the length is five, we have a location with the textnum at the end, otherwise it starts with a vol and we have to get the textid from there
-		       (funcall (intern (concat "mandoku-" coll "-textid-to-title"))
-			(if subcoll
-			    (concat (upcase subcoll) (car location))
-			  vol)
-		       (concat page ""))
-
-;;
-		       (funcall (intern (concat "mandoku-" coll "-textid-to-title"))
-			(if subcoll
-			    (concat subcoll vol )
-			  vol)
-		       (concat page ""))))
-		 ;; (text (funcall (intern (concat "mandoku-" coll "-vol-page-to-file"))
-		 ;;       subcoll
-		 ;;       (string-to-number vol)
-		 ;;       (string-to-number pag)))
-		 )
+		 (vol (mandoku-textid-to-vol txtid))
+		 (tit (mandoku-textid-to-title txtid)))
 	    (set-buffer result-buffer)
-	    (unless (mandoku-apply-filter (car tx))
+	    (unless (mandoku-apply-filter txtid)
 	    (setq mandoku-filtered-count (+ mandoku-filtered-count 1))
-	    (insert "** [[mandoku:" coll ":" 
-;		    (if (not (equal (substring subcoll 0 2) "ZB"))
-;			 subcoll)
-		    vol
+	    (insert "** [[mandoku:krp:" 
+		    txtid
 		    ":"
 		    page
 		    "::"
 		    search-string
 		    "]["
-;		    (if (not (equal (substring subcoll 0 2) "ZB"))
-;			(upcase subcoll))
-		    vol
-		    ", "
+		    (if vol
+			(concat vol ", ")
+		      "")
 		    page
 		    "]]"
 		    "\t"
@@ -216,15 +196,14 @@ One character is either a character or one entity expression"
 		    "  [[mandoku:meta:"
 		    coll
 		    ":"
-		    (car tx)
+		    txtid
 		    "][《"
-		    (format "%s" (car (cdr tx)))
+		    (format "%s" tit)
 		    "》]]\n"
 		    )
 ;; additional properties
-	    (insert ":PROPERTIES:\n:COLL: "
-		    coll
-		    "\n:ID: " (car tx)
+	    (insert ":PROPERTIES:\n:COLL: krp"
+		    "\n:ID: " txtid
 		    "\n:PRE: "  (concat (nreverse (string-to-list pre)))
 		    "\n:POST: "
 		    search-char
@@ -250,6 +229,9 @@ One character is either a character or one entity expression"
       (replace-buffer-in-windows index-buffer)
 ;      (kill-buffer index-buffer)
 ))
+
+(defun mandoku-textid-to-vol (txtid) "dummy")
+(defun mandoku-textid-to-title (txtid) "dummy")
 
 ;; (defun mandoku-read-index-buffer (index-buffer result-buffer search-string)
 ;;   (let (
