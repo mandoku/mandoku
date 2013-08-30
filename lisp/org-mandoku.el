@@ -13,23 +13,27 @@
   "Open the text (and optionally go to indicated  position) in LINK.
 LINK will consist of a <textid> recognized by mandoku."
   ;; need to get the file name and then call mandoku-execute-file-search
-  (let ((coll (car (split-string link ":")))
+  (let* ((coll (car (split-string link ":")))
       (textid (car (cdr (split-string link ":"))))
       (page (replace-in-string (car (cdr (cdr (split-string link ":")))) "_" ":" ))
-      (src (car (cdr (split-string link "::")))))
+      (src (car (cdr (split-string link "::"))))
+      (filename (concat mandoku-text-dir coll "/" 
+			(if (equal coll "krp")
+	 (concat "/" (substring textid 0 4) "/" textid "/" textid "_" (car (split-string page "-")) ".txt")
+	 (funcall (intern (concat "mandoku-" coll "-textid-to-file")) textid page))) ))
   (message (format "%s" page))
   (if (equal coll "meta")
       ;; this does a headline only search in meta; we need to have the ID on the headline for this to work
       (org-open-file (concat mandoku-meta-dir  textid ".org" ) t nil (concat "" page)) 
 ;      (message (format "%s" (concat mandoku-meta-dir  textid ".org" )))
-    (org-open-file (concat mandoku-text-dir coll "/" 
-     (if (eq coll "krp")
-	 (concat "/" (substring textid 0 4) "/" textid "/" textid "_" (car (splitstring page "-")) ".txt")
-    (funcall (intern (concat "mandoku-" coll "-textid-to-file")) textid page))) t nil 
-   (if src 
-	(concat page "::" src)
-     page)
-    ))))
+    (if (file-exists-p filename)
+	(org-open-file filename t nil 
+	 (if src 
+	     (concat page "::" src)
+	   page))
+      (mandoku-open-remote-file filename)
+      )
+    )))
 
 
 
