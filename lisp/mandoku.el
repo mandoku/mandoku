@@ -85,11 +85,13 @@ One character is either a character or one entity expression"
 	(index-buffer (get-buffer-create "*temp-mandoku*"))
 	(the-buf (current-buffer))
 	(result-buffer (get-buffer-create "*Mandoku Index*"))
-	(search-char (string-to-char search-string))
 	(org-startup-folded t)
 	(mandoku-count 0))
     (progn
-      (with-current-buffer index-buffer (mandoku-local-search search-string search-char))
+      (set-buffer index-buffer)
+      (setq buffer-read-only nil)
+      (erase-buffer)
+      (mandoku-search-internal search-string index-buffer)
       ;; setup the buffer for the index results
       (set-buffer result-buffer)
       (setq buffer-read-only nil)
@@ -98,8 +100,17 @@ One character is either a character or one entity expression"
       (mandoku-read-index-buffer index-buffer result-buffer search-string)
       )))
 
-(defun mandoku-local-search ()
+(defun mandoku-search-internal (search-string index-buffer)
+  (if mandoku-do-remote 
+      (mandoku-search-remote search-string index-buffer)
+    (mandoku-search-local search-string index-buffer)
+))
+
+(defun mandoku-search-local (search-string index-buffer)
 ;; find /tmp/index/SDZ0001.txt -name "97.idx.*" | xargs zgrep "^靈寳"
+  (let ((coding-system-for-read 'utf-8)
+	(coding-system-for-write 'utf-8)
+	(search-char (string-to-char search-string)))
       (shell-command
 		    (concat "bzgrep -H " "^"
 		     (substring search-string 1 )
@@ -111,7 +122,7 @@ One character is either a character or one entity expression"
 		     "*.idx*")
 		    index-buffer nil
 		    )
-)
+))
 
 (defun mandoku-read-index-buffer (index-buffer result-buffer search-string)
   (let (
