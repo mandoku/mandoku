@@ -31,7 +31,7 @@ LINK will consist of a <textid> recognized by mandoku."
 	 (if src 
 	     (concat page "::" src)
 	   page))
-      (mandoku-open-remote-file filename)
+      (mandoku-open-remote-file filename src page)
       )
     )))
 
