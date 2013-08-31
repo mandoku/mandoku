@@ -293,8 +293,8 @@ One character is either a character or one entity expression"
 
 (defun mandoku-textid-to-vol (txtid) "dummy")
 (defun mandoku-textid-to-title (txtid) 
-  
-  "dummy")
+  (list textid (gethash textid mandoku-titles)))
+
 
 
 ;; (defun mandoku-read-index-buffer (index-buffer result-buffer search-string)
@@ -664,8 +664,11 @@ One character is either a character or one entity expression"
   (let* ((fn (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))))
 	 (textid (car (split-string fn "_"))))
     (list 
-     (concat " " textid " " (mandoku-get-title) ", 巻 " (mandoku-get-juan))
-     '(:eval (mandoku-position-at-point-internal)))
+     (concat " " textid " " (mandoku-get-title) ", 巻 " (mandoku-get-juan) " ")
+     '(:eval (mandoku-get-heading))
+     " "
+     '(:eval (mandoku-position-at-point-internal))
+     )
      ))
 
 
