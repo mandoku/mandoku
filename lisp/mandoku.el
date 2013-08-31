@@ -8,6 +8,7 @@
 (defvar mandoku-image-dir (expand-file-name  (concat mandoku-base-dir "images/")))
 (defvar mandoku-index-dir (expand-file-name  (concat mandoku-base-dir "index/")))
 (defvar mandoku-meta-dir (expand-file-name  (concat mandoku-base-dir "meta/")))
+(defvar mandoku-temp-dir (expand-file-name  (concat mandoku-base-dir "temp/")))
 ;; we have one default textfilter, which always exists and can be dynamically treated. 
 (defvar mandoku-default-textfilter (make-hash-table :test 'equal) )
 (setplist 'mandoku-default-textfilter '(:name "Default" :active t))
