@@ -662,9 +662,8 @@ One character is either a character or one entity expression"
 
 (defun mandoku-header-line ()
   (let* ((fn (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))))
-	 (textid (car (split-string fn "_")))
-	 (juan (car (cdr (split-string fn "_")))))
-    (concat " " textid " " (mandoku-get-title) ", 巻 " juan)))
+	 (textid (car (split-string fn "_"))))
+    (concat " " textid " " (mandoku-get-title) ", 巻 " (mandoku-get-juan))))
 
 
 ;(setq mandoku-hide-p-re "\\(?:<[^>]*>\\)\\|¶\n\\|¶")
@@ -858,7 +857,7 @@ One character is either a character or one entity expression"
   (save-excursion
     (goto-char (point-min))
     (when (re-search-forward "^#\\+TITLE: \\(.*\\)" (point-max) t)
-      (mandoku-string-remove-all-properties  (match-string 1)))))
+      (car (last (split-string (mandoku-string-remove-all-properties  (match-string 1)) " ")))  )))
       
 ;;the mode for mandoku-index
 (defvar mandoku-index-mode-map
@@ -907,11 +906,11 @@ One character is either a character or one entity expression"
 (message (mandoku-get-heading)))
 
 (defun mandoku-get-juan ()
-(interactive)
-    (save-excursion
-      (goto-char (point-min))
-      (when (re-search-forward "^#\\+PROPERTY: JUAN\\(.*\\)" (point-max) t)
-	(org-babel-clean-text-properties  (match-string 1)))))
+  (save-excursion
+    (goto-char (point-min))
+    (when (re-search-forward "^#\\+PROPERTY: JUAN \\(.*\\)" (point-max) t)
+      (mandoku-string-remove-all-properties (match-string 1)))))
+
 
 (defun mandoku-page-at-point ()
   (interactive)
