@@ -36,6 +36,28 @@
 
 (defvar mandoku-regex "<[^>]*>\\|[　-㄀＀-￯\n¶]+\\|\t[^\n]+\n")
 
+
+(defun mandoku-update-title-lists ()
+  (dolist (x mandoku-catalogs-alist)
+    ;; ("ZB6 佛部" . "/Users/chris/projects/meta/zb-cbeta.org")
+    (let ((targetfile (concat mandoku-meta-dir "/" (car (split-string (car x))) ".org"))
+	  (catfile (cdr x))
+	  (tlist 
+	   (with-current-buffer (find-file-noselect catfile)
+	     (org-map-entries 'mandoku-get-header-item "+LEVEL=3"))))
+      (with-current-buffer (find-file-noselect targetfile t)
+	(erase-buffer)
+	
+  (message "%s" (cdr x)))
+)))))
+
+(defun mandoku-get-header-item ()
+  (let ((end (save-excursion(end-of-line) (point)))
+	(begol (save-excursion (beginning-of-line) (+ 4 (point)))))
+    (split-string 
+     (replace-regexp-in-string org-bracket-link-regexp "\\3" 
+			       (buffer-substring-no-properties begol end)))))
+
 (defun char-to-ucs (char)
   char
 )
