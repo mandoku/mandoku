@@ -9,6 +9,7 @@
 (defvar mandoku-index-dir (expand-file-name  (concat mandoku-base-dir "index/")))
 (defvar mandoku-meta-dir (expand-file-name  (concat mandoku-base-dir "meta/")))
 (defvar mandoku-temp-dir (expand-file-name  (concat mandoku-base-dir "temp/")))
+;; ** Textfilters
 ;; we have one default textfilter, which always exists and can be dynamically treated. 
 (defvar mandoku-default-textfilter (make-hash-table :test 'equal) )
 (setplist 'mandoku-default-textfilter '(:name "Default" :active t))
@@ -18,6 +19,11 @@
 (defvar mandoku-use-textfilter nil)
 ;; control, which collections are used.
 (defvar mandoku-collfilter-alist '(("cbeta" . t) ("dz" . nil) ("hist" . nil)))
+;; ** Catalogs
+
+(defvar mandoku-catalogs-alist '(("ZB6 佛部" . "/Users/chris/projects/meta/zb-cbeta.org")))
+
+
 
 (defvar mandoku-file-type ".txt")
 ;;we skip: 》《 
@@ -230,7 +236,10 @@ One character is either a character or one entity expression"
 ))
 
 (defun mandoku-textid-to-vol (txtid) "dummy")
-(defun mandoku-textid-to-title (txtid) "dummy")
+(defun mandoku-textid-to-title (txtid) 
+  
+  "dummy")
+
 
 ;; (defun mandoku-read-index-buffer (index-buffer result-buffer search-string)
 ;;   (let (
