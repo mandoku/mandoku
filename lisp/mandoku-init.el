@@ -8,6 +8,8 @@
 
 (setq mandoku-catalogs-alist '(("ZB6 佛部" . "/Users/chris/projects/meta/zb-cbeta.org")))
 
+
+
 ;(dolist (x mandoku-catalogs-alist)
 ;  (message "%s" (cdr x)))
 
