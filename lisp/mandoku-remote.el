@@ -19,7 +19,7 @@
       (url-insert-file-contents (concat mandoku-remote-url "/getfile?filename=" filename)
 			      (lambda (status) (switch-to-buffer buffer))))
     (switch-to-buffer buffer)
-    (setq buffer-file-name (concat mandoku-text-dir "krp/" filename))
+    (setq buffer-file-name (concat mandoku-temp-dir (buffer-name buffer)))
     (mandoku-view-mode)
     (mandoku-execute-file-search 
 	 (if src 

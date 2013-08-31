@@ -17,9 +17,10 @@ LINK will consist of a <textid> recognized by mandoku."
       (textid (car (cdr (split-string link ":"))))
       (page (replace-in-string (car (cdr (cdr (split-string link ":")))) "_" ":" ))
       (src (car (cdr (split-string link "::"))))
+      (fname (concat textid "_" (car (split-string page "-")) ".txt"))
       (filename (concat  "/" 
 			(if (equal coll "krp")
-	 (concat (substring textid 0 4) "/" textid "/" textid "_" (car (split-string page "-")) ".txt")
+	 (concat (substring textid 0 4) "/" textid "/" fname)
 	 (funcall (intern (concat "mandoku-" coll "-textid-to-file")) textid page))) ))
   (message (format "%s" page))
   (if (equal coll "meta")
@@ -31,9 +32,15 @@ LINK will consist of a <textid> recognized by mandoku."
 	 (if src 
 	     (concat page "::" src)
 	   page))
+      (if (file-exists-p (concat mandoku-temp-dir fname))
+	(org-open-file (concat mandoku-temp-dir fname) t nil 
+	 (if src 
+	     (concat page "::" src)
+	   page))
+	
       (mandoku-open-remote-file filename src page)
       )
-    )))
+    ))))
 
 
 
