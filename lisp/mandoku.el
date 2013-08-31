@@ -664,7 +664,7 @@ One character is either a character or one entity expression"
   (let* ((fn (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))))
 	 (textid (car (split-string fn "_"))))
     (list 
-     (concat " " textid " " (mandoku-get-title) ", 巻 " (mandoku-get-juan) " ")
+     (concat " " textid " " (mandoku-get-title) " -  "); ", 巻 " (mandoku-get-juan) " ")
      '(:eval (mandoku-get-heading))
      " "
      '(:eval (mandoku-position-at-point-internal))
