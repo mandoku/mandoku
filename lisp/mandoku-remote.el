@@ -19,7 +19,8 @@
       (url-insert-file-contents (concat mandoku-remote-url "/getfile?filename=" filename)
 			      (lambda (status) (switch-to-buffer buffer))))
     (switch-to-buffer buffer)
-    (setq buffer-file-name (concat mandoku-temp-dir (buffer-name buffer)))
+    (setq buffer-file-name (concat mandoku-temp-dir buffer))
+    (save-buffer)
     (mandoku-view-mode)
     (mandoku-execute-file-search 
 	 (if src 
