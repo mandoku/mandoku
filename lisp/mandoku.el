@@ -652,12 +652,20 @@ One character is either a character or one entity expression"
   "a mode to view mandoku files
   \\{mandoku-mode-map}"
   (setq case-fold-search nil)
+  (setq header-line-format (mandoku-header-line))
   (set (make-local-variable 'org-startup-folded) 'showeverything)
   (set (make-local-variable 'tab-with) 30)
   (mandoku-hide-p-markers)
   (add-to-invisibility-spec 'mandoku)
 ;  (view-mode)
 )
+
+(defun mandoku-header-line ()
+  (let* ((fn (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))))
+	 (textid (car (split-string fn "_")))
+	 (juan (car (cdr (split-string fn "_")))))
+    (concat " " textid " " (mandoku-get-title) ", 巻 " juan)))
+
 
 ;(setq mandoku-hide-p-re "\\(?:<[^>]*>\\)\\|¶\n\\|¶")
 ;(setq mandoku-hide-p-re "\\(?:<[^>]*>\\)\\|¶")
