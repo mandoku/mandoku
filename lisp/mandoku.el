@@ -53,7 +53,8 @@
 	(insert (format-time-string ";;[%Y-%m-%dT%T%z]\n" (current-time)))
 	(dolist (y tlist)
 	  (insert (concat (car y) "\t" (car (last y)) "\n")))
-	(save-buffer))
+	(save-buffer)
+	(kill-buffer))
       (message (concat "Updating file: " volfile))
       (with-current-buffer (find-file-noselect volfile t)
 	(erase-buffer)
@@ -62,9 +63,11 @@
 	  ;; if there is a CBETA number, it is in the middle: we want the first part before "n"
 	  (if (< 2 (length y))
 	      (insert (concat (car y) "\t"  (car (split-string (car (cdr y)) "n"))  "\n"))))
-	(save-buffer))
+	(save-buffer)
+	(kill-buffer))
       (message "Done!")
-)))
+;;      (kill-buffer catfile)
+  )))
 
 (defun mandoku-get-header-item ()
   (let ((end (save-excursion(end-of-line) (point)))
@@ -72,6 +75,22 @@
     (split-string 
      (replace-regexp-in-string org-bracket-link-regexp "\\3" 
 			       (buffer-substring-no-properties begol end)))))
+
+(defun mandoku-read-titletables () 
+  "read the titles table"
+  (setq mandoku-titles (make-hash-table :test 'equal))
+  (dolist (x mandoku-catalogs-alist)
+    (when (file-exists-p (concat mandoku-meta-dir (car (split-string (car x))) "-titles.txt"))
+      (with-temp-buffer
+        (let ((coding-system-for-read 'utf-8)
+              textid)
+          (insert-file-contents (concat mandoku-meta-dir (car (split-string (car x))) "-titles.txt"))
+          (goto-char (point-min))
+          (while (re-search-forward "^\\([a-z0-9]+\\)	\\([^	
+]+\\)" nil t)
+	     (puthash (match-string 1) (match-string 2) mandoku-titles)))))))
+
+
 
 (defun char-to-ucs (char)
   char
