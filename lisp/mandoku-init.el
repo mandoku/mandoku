@@ -8,6 +8,8 @@
 
 (setq mandoku-catalogs-alist '(("ZB6 佛部" . "/Users/chris/projects/meta/zb-cbeta.org")))
 
+
+
 (global-set-key "\M-\_" 'mandoku-annotate)
 ;(setq mandoku-index-dir (expand-file-name "~/00scratch/index-skqs/"))
 ;(setq mandoku-index-dir (expand-file-name "/tmp/index/"))
