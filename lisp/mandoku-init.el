@@ -6,7 +6,7 @@
   (when (file-directory-p (concat mandoku-text-dir dir))
     (load (concat "mandoku-support-" dir) t )))
 
-(setq mandoku-catalogs-alist '(("ZB6 佛部" . "/Users/chris/projects/meta/zb-cbeta.org")))
+;(setq mandoku-catalogs-alist '(("ZB6 佛部" . "/Users/chris/projects/meta/zb-cbeta.org")))
 
 
 
