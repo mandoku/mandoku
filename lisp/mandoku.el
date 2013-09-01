@@ -295,8 +295,29 @@ One character is either a character or one entity expression"
 
 (defun mandoku-textid-to-vol (txtid) "dummy")
 (defun mandoku-textid-to-title (txtid) 
-  (list txtid (gethash txtid mandoku-titles)))
+;  (list txtid (gethash txtid mandoku-titles)))
+  (gethash txtid mandoku-titles))
 
+(defun mandoku-get-ol ()
+  (save-excursion
+    (let ((olp )
+	  (outline-previous-visible-heading)
+	  (when (looking-at org-complex-heading-regexp)
+	    (push (org-trim
+		   (replace-regexp-in-string
+		    ;; Remove statistical/checkboxes cookies
+		    "\\[[0-9]+%\\]\\|\\[[0-9]+/[0-9]+\\]" ""
+		    (org-match-string-no-properties 4)))
+		  olp))
+	  (while (org-up-heading-safe)
+	    (when (looking-at org-complex-heading-regexp)
+	      (push (org-trim
+		     (replace-regexp-in-string
+		      ;; Remove statistical/checkboxes cookies
+		      "\\[[0-9]+%\\]\\|\\[[0-9]+/[0-9]+\\]" ""
+		      (org-match-string-no-properties 4)))
+		    olp)))
+	  olp))))
 
 
 ;; (defun mandoku-read-index-buffer (index-buffer result-buffer search-string)
