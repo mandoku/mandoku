@@ -295,7 +295,7 @@ One character is either a character or one entity expression"
 
 (defun mandoku-textid-to-vol (txtid) "dummy")
 (defun mandoku-textid-to-title (txtid) 
-  (list textid (gethash textid mandoku-titles)))
+  (list txtid (gethash txtid mandoku-titles)))
 
 
 
