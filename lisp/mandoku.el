@@ -3,6 +3,7 @@
 ;; renamed and refactored [2010-01-08T17:01:43+0900]
 
 (defvar mandoku-base-dir (expand-file-name  "/Users/Shared/md/"))
+(defvar mandoku-do-remote nil)
 
 (defvar mandoku-text-dir (expand-file-name (concat mandoku-base-dir "text/")))
 (defvar mandoku-image-dir (expand-file-name  (concat mandoku-base-dir "images/")))
@@ -183,7 +184,7 @@ One character is either a character or one entity expression"
 		     (substring (format "%04x" search-char) 0 2)
 		     "/"
 		     (format "%04x" search-char)
-		     "*.idx*")
+		     "*.idx* | cut -d : -f 2-")
 		    index-buffer nil
 		    )
 ))
