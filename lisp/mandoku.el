@@ -300,7 +300,7 @@ One character is either a character or one entity expression"
 
 (defun mandoku-get-ol ()
   (save-excursion
-    (let ((olp )
+    (let ((olp ))
 	  (outline-previous-visible-heading)
 	  (when (looking-at org-complex-heading-regexp)
 	    (push (org-trim
@@ -317,8 +317,7 @@ One character is either a character or one entity expression"
 		      "\\[[0-9]+%\\]\\|\\[[0-9]+/[0-9]+\\]" ""
 		      (org-match-string-no-properties 4)))
 		    olp)))
-	  olp))))
-
+	  olp)))
 
 ;; (defun mandoku-read-index-buffer (index-buffer result-buffer search-string)
 ;;   (let (
