@@ -606,7 +606,7 @@ One character is either a character or one entity expression"
   (save-excursion
     (let ((p (point)))
       (re-search-backward "<pb:" nil t)
-      (re-search-forward "\\([^_]*\\)_\\([^_]*\\)>" nil t)
+      (re-search-forward "\\([^_]*\\)_\\([^_>]*\\)>" nil t)
       (setq textid (match-string 1))
       (setq page (match-string 2))
       (setq line 0)
@@ -938,6 +938,12 @@ One character is either a character or one entity expression"
   (save-excursion
     (goto-char (point-min))
     (when (re-search-forward "^#\\+PROPERTY: JUAN \\(.*\\)" (point-max) t)
+      (mandoku-string-remove-all-properties (match-string 1)))))
+
+(defun mandoku-get-vol ()
+  (save-excursion
+    (goto-char (point-min))
+    (when (re-search-forward "^#\\+PROPERTY: VOL \\(.*\\)" (point-max) t)
       (mandoku-string-remove-all-properties (match-string 1)))))
 
 
