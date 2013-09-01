@@ -6,7 +6,7 @@ mkdir -p $idxdir
 coll=krp
 src=/Users/chris/00scratch/md-skqs
 cd $src
-for subcoll in ZB*
+for subcoll in ZB4*
 do
     cd $subcoll
     rm index.log
@@ -14,7 +14,7 @@ do
     do
 	echo $file $subcoll.$coll
 	python $mandokudir/mandoku_idx.py $file $subcoll.$coll $idxdir
-	sleep 1
+#	sleep 1
     done
     cd ..
 done
