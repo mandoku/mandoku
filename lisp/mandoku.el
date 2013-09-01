@@ -298,15 +298,16 @@ One character is either a character or one entity expression"
 ;  (list txtid (gethash txtid mandoku-titles)))
   (gethash txtid mandoku-titles))
 
-(defun mandoku-get-ol ()
+(defun mandoku-get-outline-path ()
+  "this includes the first upward heading"
   (save-excursion
     (let ((olp ))
-	  (outline-previous-visible-heading)
+	  (outline-previous-visible-heading 1)
 	  (when (looking-at org-complex-heading-regexp)
 	    (push (org-trim
 		   (replace-regexp-in-string
 		    ;; Remove statistical/checkboxes cookies
-		    "\\[[0-9]+%\\]\\|\\[[0-9]+/[0-9]+\\]" ""
+		    "\\[[0-9]+%\\]\\|\\[[0-9]+/[0-9]+\\]\\|¶" ""
 		    (org-match-string-no-properties 4)))
 		  olp))
 	  (while (org-up-heading-safe)
@@ -314,7 +315,7 @@ One character is either a character or one entity expression"
 	      (push (org-trim
 		     (replace-regexp-in-string
 		      ;; Remove statistical/checkboxes cookies
-		      "\\[[0-9]+%\\]\\|\\[[0-9]+/[0-9]+\\]" ""
+		      "\\[[0-9]+%\\]\\|\\[[0-9]+/[0-9]+\\]\\|¶" ""
 		      (org-match-string-no-properties 4)))
 		    olp)))
 	  olp)))
@@ -687,7 +688,7 @@ One character is either a character or one entity expression"
 	 (textid (car (split-string fn "_"))))
     (list 
      (concat " " textid " " (mandoku-get-title)  ", 巻" (mandoku-get-juan) " -  ")
-     '(:eval (mandoku-get-heading))
+     '(:eval  (mapconcat 'identity (mandoku-get-outline-path) " / "))
      " "
      '(:eval (mandoku-position-at-point-internal))
      )
