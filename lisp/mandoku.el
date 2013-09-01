@@ -42,8 +42,8 @@
   (dolist (x mandoku-catalogs-alist)
     ;; ("ZB6 佛部" . "/Users/chris/projects/meta/zb-cbeta.org")
     (message (concat  "Reading catalog file for: "  (car x)))
-    (let* ((titlefile (concat mandoku-meta-dir (car (split-string (car x))) "-titles.txt"))
-	   (volfile (concat mandoku-meta-dir (car (split-string (car x))) "-volumes.txt"))
+    (let* ((titlefile (concat mandoku-sys-dir (car (split-string (car x))) "-titles.txt"))
+	   (volfile (concat mandoku-sys-dir (car (split-string (car x))) "-volumes.txt"))
 	  (catfile (cdr x))
 	  (tlist 
 	   (with-current-buffer (find-file-noselect catfile)
@@ -81,11 +81,11 @@
   "read the titles table"
   (setq mandoku-titles (make-hash-table :test 'equal))
   (dolist (x mandoku-catalogs-alist)
-    (when (file-exists-p (concat mandoku-meta-dir (car (split-string (car x))) "-titles.txt"))
+    (when (file-exists-p (concat mandoku-sys-dir (car (split-string (car x))) "-titles.txt"))
       (with-temp-buffer
         (let ((coding-system-for-read 'utf-8)
               textid)
-          (insert-file-contents (concat mandoku-meta-dir (car (split-string (car x))) "-titles.txt"))
+          (insert-file-contents (concat mandoku-sys-dir (car (split-string (car x))) "-titles.txt"))
           (goto-char (point-min))
           (while (re-search-forward "^\\([a-z0-9]+\\)	\\([^	
 ]+\\)" nil t)
