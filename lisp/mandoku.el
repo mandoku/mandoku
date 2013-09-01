@@ -614,7 +614,7 @@ One character is either a character or one entity expression"
 	      (< (point) p )
 	      (re-search-forward "¶" (point-max) t))
 	(setq line (+ line 1)))
-      (format "%s:%s%2.2d" textid page line))))
+      (format "%s:%s%2.2d" (if (mandoku-get-vol) (mandoku-get-vol) "") page line))))
 
 (defun mandoku-open-image-at-page ()
   (interactive)
