@@ -248,6 +248,8 @@ One character is either a character or one entity expression"
 		    "::"
 		    search-string
 		    "]["
+;		    txtid
+;		    " "
 		    (if vol
 			(concat vol ", ")
 		      "")
@@ -260,7 +262,7 @@ One character is either a character or one entity expression"
 		    post
 		    "  [[mandoku:meta:krp:"
 		    txtid
-		    "][《"
+		    "][《" txtid " "
 		    (format "%s" tit)
 		    "》]]\n"
 		    )
@@ -293,7 +295,7 @@ One character is either a character or one entity expression"
 ;      (kill-buffer index-buffer)
 ))
 
-(defun mandoku-textid-to-vol (txtid) "dummy")
+(defun mandoku-textid-to-vol (txtid) nil)
 (defun mandoku-textid-to-title (txtid) 
 ;  (list txtid (gethash txtid mandoku-titles)))
   (gethash txtid mandoku-titles))
@@ -614,7 +616,7 @@ One character is either a character or one entity expression"
 	      (< (point) p )
 	      (re-search-forward "¶" (point-max) t))
 	(setq line (+ line 1)))
-      (format "%s:%s%2.2d" (if (mandoku-get-vol) (mandoku-get-vol) "") page line))))
+      (format "%s%s, p%s%2.2d" textid (if (mandoku-get-vol) (mandoku-get-vol) "") (car (cdr (split-string page "-"))) line))))
 
 (defun mandoku-open-image-at-page ()
   (interactive)
