@@ -4,9 +4,9 @@ mandokudir=`dirname $0`
 idxdir=/tmp/index
 mkdir -p $idxdir
 coll=krp
-src=/Users/chris/00scratch/md-skqs
+src=/Users/chris/db/text/krp
 cd $src
-for subcoll in ZB4*
+for subcoll in ZB3*
 do
     cd $subcoll
     rm index.log
