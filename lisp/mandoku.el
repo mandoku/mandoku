@@ -45,6 +45,7 @@
     (message (concat  "Reading catalog file for: "  (car x)))
     (let* ((titlefile (concat mandoku-sys-dir (car (split-string (car x))) "-titles.txt"))
 	   (volfile (concat mandoku-sys-dir (car (split-string (car x))) "-volumes.txt"))
+	   (lookupfile (concat mandoku-sys-dir (car (split-string (car x))) "-lookup.txt"))
 	  (catfile (cdr x))
 	  (tlist 
 	   (with-current-buffer (find-file-noselect catfile)
@@ -67,6 +68,15 @@
 	      (insert (concat (car y) "\t"  (car (split-string (car (cdr y)) "n"))  "\n"))))
 	(save-buffer)
 	(kill-buffer))
+      (with-current-buffer (find-file-noselect lookupfile t)
+	(erase-buffer)
+	(insert (format-time-string ";;[%Y-%m-%dT%T%z]\n" (current-time)))
+	(dolist (y tlist)
+	  ;; if there is a CBETA number, it is in the middle: we want the first part before "n"
+	  (if (< 2 (length y))
+	      (insert (concat (car (cdr y)) "\t"  (car y)  "\n"))))
+	(save-buffer)
+	(kill-buffer))
       (message "Done!")
 ;;      (kill-buffer catfile)
   )))
@@ -77,6 +87,20 @@
     (split-string 
      (replace-regexp-in-string org-bracket-link-regexp "\\3" 
 			       (buffer-substring-no-properties begol end)))))
+(defun mandoku-read-lookup-list () 
+  "read the titles table"
+  (setq mandoku-lookup (make-hash-table :test 'equal))
+  (dolist (x mandoku-catalogs-alist)
+    (when (file-exists-p (concat mandoku-sys-dir (car (split-string (car x))) "-lookup.txt"))
+      (with-temp-buffer
+        (let ((coding-system-for-read 'utf-8)
+              textid)
+          (insert-file-contents (concat mandoku-sys-dir (car (split-string (car x))) "-lookup.txt"))
+          (goto-char (point-min))
+          (while (re-search-forward "^\\([a-z0-9]+\\)	\\([^	
+]+\\)" nil t)
+	     (puthash (match-string 1) (match-string 2) mandoku-lookup)))))))
+
 
 (defun mandoku-read-titletables () 
   "read the titles table"
