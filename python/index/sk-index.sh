@@ -6,7 +6,7 @@ mkdir -p $idxdir
 coll=krp
 src=/Users/chris/db/text/krp
 cd $src
-for subcoll in ZB3*
+for subcoll in ZB[12]*
 do
     cd $subcoll
     rm index.log
