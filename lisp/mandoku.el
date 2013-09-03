@@ -300,6 +300,7 @@ One character is either a character or one entity expression"
 ;; additional properties
 	    (insert ":PROPERTIES:\n:COLL: krp"
 		    "\n:ID: " txtid
+		    "\n:PAGE: " txtid ":" page
 		    "\n:PRE: "  (concat (nreverse (string-to-list pre)))
 		    "\n:POST: "
 		    search-char
