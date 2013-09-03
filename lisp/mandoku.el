@@ -20,9 +20,9 @@
 ;; switch the whole filter mechanism on or off.
 (defvar mandoku-use-textfilter nil)
 ;; control, which collections are used.
-(defvar mandoku-collfilter-alist '(("cbeta" . t) ("dz" . nil) ("hist" . nil)))
+;; this could be a list? currently only one subcoll allowed
+(defvar mandoku-search-limit-to-coll nil)
 ;; ** Catalogs
-
 (defvar mandoku-catalogs-alist '(("ZB6 佛部" . "/Users/chris/projects/meta/zb-cbeta.org")))
 
 
@@ -208,6 +208,9 @@ One character is either a character or one entity expression"
 		     (substring (format "%04x" search-char) 0 2)
 		     "/"
 		     (format "%04x" search-char)
+		     (if mandoku-search-limit-to-coll
+			 (concat "." mandoku-search-limit-to-coll)
+		       "")
 		     "*.idx* | cut -d : -f 2-")
 		    index-buffer nil
 		    )
