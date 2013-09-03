@@ -635,7 +635,7 @@ One character is either a character or one entity expression"
       (re-search-forward "\\([^_]*\\)_\\([^_>]*\\)>" nil t)
       (setq textid (match-string 1))
       (setq page (match-string 2))
-      (setq line 0)
+      (setq line -1)
       (while (and
 	      (< (point) p )
 	      (re-search-forward "¶" (point-max) t))
