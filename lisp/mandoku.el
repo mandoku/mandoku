@@ -11,6 +11,10 @@
 (defvar mandoku-meta-dir (expand-file-name  (concat mandoku-base-dir "meta/")))
 (defvar mandoku-temp-dir (expand-file-name  (concat mandoku-base-dir "temp/")))
 (defvar mandoku-sys-dir (expand-file-name  (concat mandoku-base-dir "system/")))
+
+(defvar mandoku-string-limit 10)
+
+
 ;; ** Textfilters
 ;; we have one default textfilter, which always exists and can be dynamically treated. 
 (defvar mandoku-default-textfilter (make-hash-table :test 'equal) )
@@ -20,7 +24,7 @@
 ;; switch the whole filter mechanism on or off.
 (defvar mandoku-use-textfilter nil)
 ;; control, which collections are used.
-;; this could be a list? currently only one subcoll allowed
+;; this could be a list? currently only one subcoll allowed, but it could be a regex understood by the shell ZB6[rq]
 (defvar mandoku-search-limit-to-coll nil)
 ;; ** Catalogs
 (defvar mandoku-catalogs-alist '(("ZB6 佛部" . "/Users/chris/projects/meta/zb-cbeta.org")))
@@ -341,13 +345,19 @@ One character is either a character or one entity expression"
 		  olp))
 	  (while (org-up-heading-safe)
 	    (when (looking-at org-complex-heading-regexp)
-	      (push (org-trim
+	      (push (mandoku-cut-string (org-trim
 		     (replace-regexp-in-string
 		      ;; Remove statistical/checkboxes cookies
 		      "\\[[0-9]+%\\]\\|\\[[0-9]+/[0-9]+\\]\\|¶" ""
-		      (org-match-string-no-properties 4)))
+		      (org-match-string-no-properties 4))))
 		    olp)))
 	  olp)))
+
+
+(defun mandoku-cut-string (s)
+  (if (< mandoku-string-limit (length s)  )
+      (substring s 0 mandoku-string-limit)
+    s))
 
 ;; (defun mandoku-read-index-buffer (index-buffer result-buffer search-string)
 ;;   (let (
