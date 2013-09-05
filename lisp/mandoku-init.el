@@ -29,4 +29,4 @@
 ;(setq mandoku-index-dir (expand-file-name  (concat mandoku-base-dir "index/")))
 
 (setq mandoku-index-dir "/Users/Shared/md-remote/index/")
-(setq mandoku-text-dir "/Users/Shared/md/text/")
+(setq mandoku-text-dir "/Users/Shared/md-remote/text/")
