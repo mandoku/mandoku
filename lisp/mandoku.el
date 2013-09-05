@@ -727,7 +727,7 @@ One character is either a character or one entity expression"
   (let* ((fn (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))))
 	 (textid (car (split-string fn "_"))))
     (list 
-     (concat " " textid " " (mandoku-get-title)  ", 巻" (mandoku-get-juan) " -  ")
+     (concat " " textid " " (mandoku-get-title)  ", " (mandoku-get-juan) " -  ")
      '(:eval  (mapconcat 'identity (mandoku-get-outline-path) " / "))
      " "
      '(:eval (mandoku-position-at-point-internal))
@@ -976,8 +976,8 @@ One character is either a character or one entity expression"
 
 (defun mandoku-get-juan ()
   (save-excursion
-    (goto-char (point-min))
-    (when (re-search-forward "^#\\+PROPERTY: JUAN \\(.*\\)" (point-max) t)
+;    (goto-char (point-min))
+    (when (re-search-backward "^#\\+PROPERTY: JUAN \\(.*\\)" (point-max) t)
       (mandoku-string-remove-all-properties (match-string 1)))))
 
 (defun mandoku-get-vol ()
