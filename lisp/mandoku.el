@@ -976,8 +976,8 @@ One character is either a character or one entity expression"
 
 (defun mandoku-get-juan ()
   (save-excursion
-;    (goto-char (point-min))
-    (when (re-search-backward "^#\\+PROPERTY: JUAN \\(.*\\)" (point-max) t)
+    (goto-char (point-min))
+    (when (re-search-forward "^#\\+PROPERTY: JUAN \\(.*\\)" (point-max) t)
       (mandoku-string-remove-all-properties (match-string 1)))))
 
 (defun mandoku-get-vol ()
