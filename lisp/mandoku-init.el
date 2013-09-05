@@ -30,3 +30,4 @@
 
 (setq mandoku-index-dir "/Users/Shared/md-remote/index/")
 (setq mandoku-text-dir "/Users/Shared/md-remote/text/")
+(setq mandoku-sqks-img-root "/Volumes/verbatimssd/db/images/skqs/")
