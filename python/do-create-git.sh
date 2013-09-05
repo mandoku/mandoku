@@ -1,22 +1,17 @@
 #!/bin/sh
-for dir in *
+zb=/Users/Shared/md-remote/text
+for dir in ZB[1-4]*
 do
-    if [ -d $dir ]
+    cd $dir
+    for d2 in ZB*
+    do
+	if [ -d $d2 ]
 	then
-	echo "mkdir $dir"
-	echo "cd $dir"
-	cd $dir
-	for d2 in *
-	do
-	    if [ -d $d2 ]
-		then
-		echo "mkdir $d2.git"
-		echo "cd $d2.git"
-		echo "git init --bare"
-		echo "cd .."
-	    fi
-	done
-	echo "cd .."
-	cd ..
-    fi
+	    echo $d2
+	    cd $d2
+	    echo "git init "
+	    cd ..
+	fi
+    done
+    cd ..
 done
