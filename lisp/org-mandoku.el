@@ -19,16 +19,16 @@ LINK will consist of a <textid> recognized by mandoku."
       (src (car (cdr (split-string link "::"))))
       (fname (concat textid "_" (car (split-string page "-")) ".txt"))
       (filename (concat  "/" 
-			(if (equal coll "krp")
-	 (concat (substring textid 0 4) "/" textid "/" fname)
-	 (funcall (intern (concat "mandoku-" coll "-textid-to-file")) textid page))) ))
-  (message (format "%s" page))
+			 (if (equal coll "krp")
+			     (concat (substring textid 0 4) "/" textid "/" fname)
+			   (funcall (intern (concat "mandoku-" coll "-textid-to-file")) textid page))) ))
+    (message (format "%s" page))
   (if (equal coll "meta")
       ;; this does a headline only search in meta; we need to have the ID on the headline for this to work
       (org-open-file (concat mandoku-meta-dir  textid ".org" ) t nil (concat "" page)) 
 ;      (message (format "%s" (concat mandoku-meta-dir  textid ".org" )))
-    (if (file-exists-p (concat mandoku-text-dir coll "/" filename))
-	(org-open-file (concat mandoku-text-dir coll "/" filename) t nil 
+    (if (file-exists-p (concat mandoku-text-dir "/" filename))
+	(org-open-file (concat mandoku-text-dir "/" filename) t nil 
 	 (if src 
 	     (concat page "::" src)
 	   page))
