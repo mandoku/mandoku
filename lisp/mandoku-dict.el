@@ -10,16 +10,14 @@
 (require 'assoc)
 
 (defvar redict-regex "<[^>]*>\\|[　-㄀＀-￯\n¶]+\\|\t[^\n]+\n")
+(defvar mandoku-dict-url (concat mandoku-remote-url "/dic?query="))
 ;; pron-kanwa-01 for kanwa!
-(defvar redict-pron "pron-pinyin-01")
-(defvar redict-prefdic "def-abc-01-01")
+;(defvar redict-pron "pron-pinyin-01")
+;(defvar redict-prefdic "def-abc-01-01")
 (defvar redict-dict-img-dir "/Users/Shared/md/images/dic/")
 
-;;(let (( redis-buffer "*redis-dict-buffer*"))
-(setq redis (redis-open-connection redis-buffer))
-(set-process-coding-system redis 'utf-8 'utf-8)
 
-(defun redict-procline (inp)
+(defun mandoku-dict-procline (inp)
   "parse the string and repetitevely call the dictionary"
   (let ((v '())
 	(l  (replace-regexp-in-string redict-regex "" inp))
@@ -29,11 +27,16 @@
 	  (while (and res (< j (length l)))
 	    (setq j (+ j 1))
 	    (setq s (substring l i j))
-	    (setq res (redis-cmd-hgetall s))
+	    (setq res (mandoku-dict-get-entry s))
 	    (if res
 		(aput 'v s res)))
 	  (setq res 1))
     v))
+
+(defun mandoku-dict-get-entry (s)
+;; pseudo
+  (buffer-string (url-insert-file-contents (concat mandoku-dict-url s)))
+)
 
 (defun redict-get-line ()
   (interactive)
