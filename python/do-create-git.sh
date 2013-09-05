@@ -1,7 +1,7 @@
 #!/bin/sh
 gitignore=/Users/chris/db/mandoku/python/.gitignore
-#zb=/Users/Shared/md-remote/text
-zb=/tmp/
+zb=/Users/Shared/md-remote/text
+#zb=/tmp/
 cd $zb
 for dir in ZB[1-4]*
 do
@@ -15,7 +15,7 @@ do
 	    git init
 	    cp $gitignore .
 	    git add .
-	    git commit -am "Initial commit"
+	    git commit -am "Initial commit" &> /dev/null
 	    git branch WYG
 	    cd ..
 	fi
