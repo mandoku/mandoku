@@ -1,5 +1,6 @@
 #!/bin/sh
 zb=/Users/Shared/md-remote/text
+cd $zb
 for dir in ZB[1-4]*
 do
     cd $dir
