@@ -38,7 +38,7 @@
   (buffer-string (url-insert-file-contents (concat mandoku-dict-url s)))
 )
 
-(defun redict-get-line ()
+(defun mandoku-dict-get-line ()
   (interactive)
   (redict-display-result
    (redict-procline (mandoku-get-line))
@@ -51,7 +51,7 @@
   ;;    (redict-procline (buffer-substring-no-properties (point) end))
   ;;    (redict-position-at-point))))
 
-(defun redict-display-result (res pos)
+(defun mandoku-dict-display-result (res pos)
   (let ((result-buffer (get-buffer-create "*Dict Result*"))
 		(the-buf (current-buffer)))
     (set-buffer result-buffer)
@@ -116,33 +116,13 @@
 ;    (other-window 1)
     ))
 
-(defun redict-maybe-substring (s len)
+(defun mandoku-dict-maybe-substring (s len)
   (if (> (length s) len)
       (concat (substring s 0 len) " … " )
     s))
 
-(defun redict-position-at-point ()
-  (interactive)
-  (save-excursion
-    (let ((p (point)))
-      (if
-	  (re-search-backward "<pb:" nil t)
-	  (progn
-	    (re-search-forward "\\([^_]*\\)_\\([^_]*\\)>" nil t)
-	    (setq textid (match-string 1))
-	    (setq page (match-string 2))
-	    (setq line 0)
-	    (while (and
-		    (< (point) p )
-		    (re-search-forward "¶" (point-max) t))
-	      (setq line (+ line 1)))
-	    ;; in fact, I might want to get a proper link here...
-	    (format "%s:%s%2.2d" textid page line))
-	;; looks like this is not a mandoku buffer, lets get filename,  line number
-	(format "%s:%s" (buffer-file-name) (line-number-at-pos)))
-      )))
 
-(defun redict-loc-entry (f)
+(defun mandoku-dict-loc-entry (f)
   "f is a two-element list, with the first of the form 'loc-daikanwa-01' and the second of
 the form V07-p08115-129"
   (let ((dict (car (cdr (split-string (car  f) "-"))))
@@ -232,7 +212,7 @@ the form V07-p08115-129"
 	      (format "%s : %s" dict loc)))))))))))))))
   
 
-(defun redict-get-next-line ()
+(defun mandoku-dict-get-next-line ()
   "display the entries for the next line in the Dict Buffer"
   (interactive)
   (if (equal (buffer-name) "*Dict Result*")
@@ -240,7 +220,7 @@ the form V07-p08115-129"
   (forward-line 1)
   (redict-get-line)
 )
-(defun redict-get-prev-line ()
+(defun mandoku-dict-get-prev-line ()
   "display the entries for the next line in the Dict Buffer"
   (interactive)
   (if (equal (buffer-name) "*Dict Result*")
@@ -248,7 +228,7 @@ the form V07-p08115-129"
   (forward-line -1)
   (redict-get-line)
 )
-(defun redict-repeat-line ()
+(defun mandoku-dict-repeat-line ()
   "display the entries for the next line in the Dict Buffer"
   (interactive)
   (if (equal (buffer-name) "*Dict Result*")
@@ -259,7 +239,7 @@ the form V07-p08115-129"
 
 ;; redict-view-mode
 
-(defvar redict-mode-map
+(defvar mandoku-dict-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "e" 'view-mode)
     (define-key map " " 'View-scroll-page-forward)
@@ -268,10 +248,10 @@ the form V07-p08115-129"
     (define-key map "p" 'redict-get-prev-line)
     (define-key map "p" 'redict-get-prev-line)
          map)
-  "Keymap for redict-view mode"
+  "Keymap for mandoku-dict-view mode"
 )
 
-(define-derived-mode redict-mode org-mode "redict-mode"
+(define-derived-mode mandoku-dict-mode org-mode "mandoku-dict-mode"
   "a mode to view dictionary files
   \\{redict-mode-map}"
   (setq case-fold-search nil)
@@ -281,19 +261,19 @@ the form V07-p08115-129"
 )
 
 
-;(global-set-key (kbd "C-c g") 'redict-get-line)
-(global-set-key (kbd "M-a") 'redict-get-line) ; was backward-sentence.
-(global-set-key (kbd "M-s a") 'redict-get-line)
-;(global-set-key (kbd "M-s n") 'redict-get-next-line)
-;(global-set-key (kbd "M-s p") 'redict-get-prev-line)
-;(global-set-key (kbd "M-s r") 'redict-repeat-line)
+;(global-set-key (kbd "C-c g") 'mandoku-dict-get-line)
+(global-set-key (kbd "M-a") 'mandoku-dict-get-line) ; was backward-sentence.
+(global-set-key (kbd "M-s a") 'mandoku-dict-get-line)
+;(global-set-key (kbd "M-s n") 'mandoku-dict-get-next-line)
+;(global-set-key (kbd "M-s p") 'mandoku-dict-get-prev-line)
+;(global-set-key (kbd "M-s r") 'mandoku-dict-repeat-line)
 
-(define-key redict-mode-map
-             "n" 'redict-get-next-line)
-(defun redict-highlight (state)
+(define-key mandoku-dict-mode-map
+             "n" 'mandoku-dict-get-next-line)
+(defun mandoku-dict-highlight (state)
   (interactive)
   (cond 
-   ((and (eq major-mode 'redict-mode)
+   ((and (eq major-mode 'mandoku-dict-mode)
 	     (memq state '(children subtree)))
     (save-excursion
     (let ((hw (progn 
@@ -302,13 +282,13 @@ the form V07-p08115-129"
 		(car (split-string  (org-get-heading))))))
       (hi-lock-mode 1)
       (highlight-regexp hw))))
-   ((and (eq major-mode 'redict-mode)
+   ((and (eq major-mode 'mandoku-dict-mode)
 	     (memq state '(overview folded)))
       (hi-lock-mode 0))))
 
-(add-hook 'org-cycle-hook 'redict-highlight) 
+(add-hook 'org-cycle-hook 'mandoku-dict-highlight) 
 	 
-(provide 'redis-dict)
+(provide 'mandoku-dict)
 
 
-;;; redis-dict.el ends here
+;;; mandoku-dict.el ends here
