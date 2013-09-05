@@ -29,3 +29,6 @@
     ))
 
 
+(provide 'mandoku-remote)
+
+;;; mandoku-remote.el ends here
