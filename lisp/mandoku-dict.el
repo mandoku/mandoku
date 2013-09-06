@@ -23,14 +23,16 @@
 	(the-buf (current-buffer)))
     (set-buffer result-buffer)
     (toggle-read-only 0)
+    (erase-buffer)
     (insert "* " (if pos pos "")  "\n")
-    (url-insert-file-contents (concat mandoku-remote-url "/procline?query=" inp)
+    (with-current-buffer (get-buffer-create result-buffer)
+      (url-insert-file-contents (concat mandoku-remote-url "/procline?query=" inp)
 			      (lambda (status) (switch-to-buffer result-buffer))))
   (switch-to-buffer result-buffer)
   (mandoku-dict-mode)
   (hide-sublevels 2)
   (goto-char (point-min))
-  (switch-to-buffer-other-window result-buffer t))
+  (switch-to-buffer-other-window result-buffer t)))
 
 (defun mandoku-dict-get-entry (s)
 ;; pseudo
