@@ -9,7 +9,7 @@
 (require 'cl)
 (require 'assoc)
 
-(defvar redict-regex "<[^>]*>\\|[　-㄀＀-￯\n¶]+\\|\t[^\n]+\n")
+(defvar mandoku-dict-regex "<[^>]*>\\|[　-㄀＀-￯\n¶]+\\|\t[^\n]+\n")
 (defvar mandoku-dict-url (concat mandoku-remote-url "/dic?query="))
 ;; pron-kanwa-01 for kanwa!
 ;(defvar redict-pron "pron-pinyin-01")
