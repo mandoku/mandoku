@@ -17,10 +17,11 @@
 (defvar redict-dict-img-dir "/Users/Shared/md/images/dic/")
 
 
-(defun mandoku-dict-procline (inp &optional pos)
+(defun mandoku-dict-procline (inp)
   "parse the string and repetitevely call the dictionary"
   (let ((result-buffer (get-buffer-create "*Dict Result*"))
-	(the-buf (current-buffer)))
+	(the-buf (current-buffer))
+	(pos    (mandoku-position-at-point)))
     (set-buffer result-buffer)
     (toggle-read-only 0)
     (erase-buffer)
