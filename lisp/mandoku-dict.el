@@ -22,7 +22,7 @@
   (let ((result-buffer (get-buffer-create "*Dict Result*"))
 	(the-buf (current-buffer)))
     (set-buffer result-buffer)
-    (toggle-read-only 1)
+    (toggle-read-only 0)
     (insert "* " (if pos pos "")  "\n")
     (url-insert-file-contents (concat mandoku-remote-url "/procline?query=" inp)
 			      (lambda (status) (switch-to-buffer result-buffer))))
