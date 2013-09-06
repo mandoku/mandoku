@@ -29,7 +29,7 @@
     (with-current-buffer (get-buffer-create result-buffer)
       (url-insert-file-contents (concat mandoku-remote-url "/procline?query=" inp)
 			      (lambda (status) (switch-to-buffer result-buffer))))
-  (switch-to-buffer result-buffer)
+;  (switch-to-buffer result-buffer)
   (mandoku-dict-mode)
   (hide-sublevels 2)
   (goto-char (point-min))

@@ -672,9 +672,9 @@ One character is either a character or one entity expression"
   (save-excursion
     (let ((p (point)))
       (re-search-backward "<pb:" nil t)
-      (re-search-forward "\\([^_]*\\)_\\([^_]*\\)>" nil t)
+      (re-search-forward "\\([^_:]*\\)_\\([^_]*\\)_\\([^_]*\\)>" nil t)
       (setq textid (match-string 1))
-      (setq page (match-string 2))
+      (setq page (match-string 3))
       (setq line 0)
       (while (and
 	      (< (point) p )
