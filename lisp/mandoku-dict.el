@@ -17,21 +17,20 @@
 (defvar redict-dict-img-dir "/Users/Shared/md/images/dic/")
 
 
-(defun mandoku-dict-procline (inp)
+(defun mandoku-dict-procline (inp &optional pos)
   "parse the string and repetitevely call the dictionary"
-  (let ((v '())
-	(l  (replace-regexp-in-string redict-regex "" inp))
-	(res 1))
-    (loop for i from 0 to  (- (length l) 1) do
-	  (setq j i)
-	  (while (and res (< j (length l)))
-	    (setq j (+ j 1))
-	    (setq s (substring l i j))
-	    (setq res (mandoku-dict-get-entry s))
-	    (if res
-		(aput 'v s res)))
-	  (setq res 1))
-    v))
+  (let ((result-buffer (get-buffer-create "*Dict Result*"))
+	(the-buf (current-buffer)))
+    (set-buffer result-buffer)
+    (toggle-read-only 1)
+    (insert "* " (if pos pos "")  "\n")
+    (url-insert-file-contents (concat mandoku-remote-url "/procline?query=" inp)
+			      (lambda (status) (switch-to-buffer result-buffer))))
+  (switch-to-buffer result-buffer)
+  (mandoku-dict-mode)
+  (hide-sublevels 2)
+  (goto-char (point-min))
+  (switch-to-buffer-other-window result-buffer t))
 
 (defun mandoku-dict-get-entry (s)
 ;; pseudo
