@@ -37,86 +37,10 @@
 
 (defun mandoku-dict-get-entry (s)
 ;; pseudo
-  (buffer-string (url-insert-file-contents (concat mandoku-dict-url s)))
+;  (buffer-string (url-insert-file-contents (concat mandoku-dict-url s)))
 )
 
-(defun mandoku-dict-get-line ()
-  (interactive)
-  (redict-display-result
-   (redict-procline (mandoku-get-line))
-   (redict-position-at-point)))
-  ;; (save-excursion
-  ;;   (end-of-line)
-  ;;   (setq end (point))
-  ;;   (beginning-of-line)
-  ;;   (redict-display-result
-  ;;    (redict-procline (buffer-substring-no-properties (point) end))
-  ;;    (redict-position-at-point))))
 
-(defun mandoku-dict-display-result (res pos)
-  (let ((result-buffer (get-buffer-create "*Dict Result*"))
-		(the-buf (current-buffer)))
-    (set-buffer result-buffer)
-    (toggle-read-only -1)
-    (erase-buffer)
-    (insert "* " (if pos pos "")  "\n")
-    (dolist (e (reverse res))
-      ;; this displays the heading line
-;;      (let ((hd (concat (car e) " ")))
-      ;; lets ignore the head for now
-      (let ((hd ""))
-	(if (and (assoc "dummy" e) (eq (length e) 2))
-	    ""
-;	    (insert "xx" (cdr (cdr e)) "yy")
-	 (insert
-	 (concat "** "
-		 (car e) " ("
-		 (format "%s" (- (length e) 1))
-		 "): "
-		 (cdr (assoc redict-pron e))
-		 (if (assoc redict-prefdic e)
-		     (concat " / "
-			     (redict-maybe-substring (cdr (assoc redict-prefdic e)) 40)
-			     " / "))
-		 "\n" ))
-	 )
-      ;; this displays the entries
-	(setq e (sort (cdr e) (lambda (a b) (string< (car a) (car b)))))
-	(setq src "")
-	(setq loc "")
-	(dolist (f e)
-	  (setq dx (split-string (car f) "-"))
-	  (if (not (equal loc (car dx)))
-	      (progn
-		(setq loc (car dx))
-		(if (equal "loc" loc)
-		    (insert "*** " hd "loc\n"))))
-	  (if (not (equal src (car (cdr dx))))
-	      (progn
-		(setq src (car (cdr dx)))
-		(if (not (equal loc "loc"))
-		    (if (not (equal loc "dummy"))
-			(if (equal src "abc")
-			    (insert "*** lyt\n" loc)
-			  (insert "*** " hd (if src src "") "\n"))))))
-	  (insert
-	   (concat
-	    (if (equal src "hydcd1") "**** " "")
-	    (if (not (equal loc "loc"))
-		(concat
-		 (car (cdr (cdr dx))) (car (cdr (cdr (cdr dx)) )) ": " ))
-	    (if (equal loc "loc")
-		(redict-loc-entry f)
-	      (cdr f)) "\n"))
-;      (fill-paragraph)
-      )))
-    (redict-mode)
-;    (org-overview)
-    (hide-sublevels 2)
-    (goto-char (point-min))
-    (switch-to-buffer-other-window result-buffer t)
-;    (other-window 1)
-    ))
 
 (defun mandoku-dict-maybe-substring (s len)
   (if (> (length s) len)
