@@ -18,7 +18,7 @@
 (defun mandoku-open-remote-file (filename src page)
   (let ((buffer (car (last (split-string filename "/")))))
     (with-current-buffer (get-buffer-create buffer)
-      (url-insert-file-contents (concat mandoku-remote-url "/getfile?filename=" filename "&rep=" (car rep))
+      (url-insert-file-contents (concat mandoku-remote-url "/getfile?filename=" filename )
 			      (lambda (status) (switch-to-buffer buffer))))
     (switch-to-buffer buffer)
     (setq buffer-file-name (concat mandoku-temp-dir buffer))
