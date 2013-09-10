@@ -10,11 +10,11 @@
 (require 'assoc)
 
 (defvar mandoku-dict-regex "<[^>]*>\\|[　-㄀＀-￯\n¶]+\\|\t[^\n]+\n")
-(defvar mandoku-dict-url (concat "http://dic.kanripo.org" "/dic?query="))
+(defvar mandoku-dict-url "http://dic.kanripo.org" )
 ;; pron-kanwa-01 for kanwa!
 ;(defvar mandoku-dict-pron "pron-pinyin-01")
 ;(defvar mandoku-dict-prefdic "def-abc-01-01")
-(defvar mandoku-dict-img-dir nil) "/Users/Shared/md/images/dic/")
+(defvar mandoku-dict-img-dir nil) 
 
 
 (defun mandoku-dict-getline (inp)
@@ -27,7 +27,7 @@
     (erase-buffer)
     (insert "* " (if pos pos "")  "\n")
     (with-current-buffer (get-buffer-create result-buffer)
-      (url-insert-file-contents (concat mandoku-remote-url "/procline?query=" inp)
+      (url-insert-file-contents (concat mandoku-dict-url "/procline?query=" inp)
 			      (lambda (status) (switch-to-buffer result-buffer))))
 ;  (switch-to-buffer result-buffer)
   (mandoku-dict-mode)
@@ -213,6 +213,16 @@ the form V07-p08115-129"
       (hi-lock-mode 0))))
 
 (add-hook 'org-cycle-hook 'mandoku-dict-highlight) 
+
+;; add link type dic
+(org-add-link-type "dic" 'org-dic-open)
+;(add-hook 'org-store-link-functions 'org-dic-store-link)
+
+(defun org-dic-open (link)
+  "Display the dictionary page, either local or remotely"
+  (if mandoku-dict-img-dir
+      (org-open-file (concat mandoku-dict-img-dir  link))
+    (browse-url (concat mandoku-dict-url "/" link))))
 	 
 (provide 'mandoku-dict)
 

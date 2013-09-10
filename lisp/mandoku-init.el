@@ -28,7 +28,7 @@
 (load "mandoku-dict" t)
 (global-set-key [f5] 'mandoku-dict-get-line)
 )
-(setq mandoku-dict-url (concat "http://127.0.0.1:5000" "/dic?query="))
+(setq mandoku-dict-url "http://127.0.0.1:5000")
 
 ;(dolist (x mandoku-catalogs-alist)
 ;  (message "%s" (cdr x)))
