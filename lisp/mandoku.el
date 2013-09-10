@@ -42,7 +42,22 @@
 
 (defvar mandoku-regex "<[^>]*>\\|[　-㄀＀-￯\n¶]+\\|\t[^\n]+\n")
 
+(defun mandoku-update-subcoll-list ()
+  (dolist (x mandoku-repositories-alist)
+    (let ((scfile (concat mandoku-sys-dir "subcolls.txt")))
+      (dolist (y mandoku-catalogs-alist)
+	(let ((tlist 
+	       (with-current-buffer (find-file-noselect (cdr y))
+		 (org-map-entries 'mandoku-get-header-item "+LEVEL=2"))))
+	  (with-current-buffer (find-file-noselect scfile t)
+	    (erase-buffer)
+	    (insert (format-time-string ";;[%Y-%m-%dT%T%z]\n" (current-time)))
+	    (dolist (z tlist)
+	      (insert (concat (car z) "\t" (car (last z)) "\n")))
+	    (save-buffer)
+	    (kill-buffer)))))))
 
+	  
 (defun mandoku-update-title-lists ()
   (dolist (x mandoku-catalogs-alist)
     ;; ("ZB6 佛部" . "/Users/chris/projects/meta/zb-cbeta.org")
@@ -91,6 +106,7 @@
     (split-string 
      (replace-regexp-in-string org-bracket-link-regexp "\\3" 
 			       (buffer-substring-no-properties begol end)))))
+
 (defun mandoku-read-lookup-list () 
   "read the titles table"
   (setq mandoku-lookup (make-hash-table :test 'equal))
