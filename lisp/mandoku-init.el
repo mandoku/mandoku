@@ -17,7 +17,11 @@
 			       ("ZB6 佛部" . "/Users/Shared/md/meta/ZB/ZB6.org")
 ))
 
+(setq mandoku-do-remote t)
 (mandoku-read-titletables)    
+(setq mandoku-base-dir (expand-file-name  "/Users/Shared/md/"))
+(setq mandoku-image-dir (expand-file-name  (concat mandoku-base-dir "images/")))
+(setq mandoku-index-dir (expand-file-name  (concat mandoku-base-dir "index/")))
 
 ;(dolist (x mandoku-catalogs-alist)
 ;  (message "%s" (cdr x)))

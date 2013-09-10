@@ -6,8 +6,8 @@
 (defvar mandoku-do-remote nil)
 
 (defvar mandoku-text-dir (expand-file-name (concat mandoku-base-dir "text/")))
-(defvar mandoku-image-dir (expand-file-name  (concat mandoku-base-dir "images/")))
-(defvar mandoku-index-dir (expand-file-name  (concat mandoku-base-dir "index/")))
+(defvar mandoku-image-dir nil)
+(defvar mandoku-index-dir nil)
 (defvar mandoku-meta-dir (expand-file-name  (concat mandoku-base-dir "meta/")))
 (defvar mandoku-temp-dir (expand-file-name  (concat mandoku-base-dir "temp/")))
 (defvar mandoku-sys-dir (expand-file-name  (concat mandoku-base-dir "system/")))
