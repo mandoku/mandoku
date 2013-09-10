@@ -23,6 +23,14 @@
 (setq mandoku-image-dir (expand-file-name  (concat mandoku-base-dir "images/")))
 (setq mandoku-index-dir (expand-file-name  (concat mandoku-base-dir "index/")))
 
+;; dic
+(setq mandoku-dict-img-dir "/Users/Shared/md/images/dic/")
+(ignore-errors 
+(load "mandoku-dict" t)
+(global-set-key [f5] 'mandoku-dict-get-line)
+)
+(setq mandoku-dict-url (concat "http://127.0.0.1:5000" "/dic?query="))
+
 ;(dolist (x mandoku-catalogs-alist)
 ;  (message "%s" (cdr x)))
 

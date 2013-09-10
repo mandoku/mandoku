@@ -10,14 +10,14 @@
 (require 'assoc)
 
 (defvar mandoku-dict-regex "<[^>]*>\\|[　-㄀＀-￯\n¶]+\\|\t[^\n]+\n")
-(defvar mandoku-dict-url (concat mandoku-remote-url "/dic?query="))
+(defvar mandoku-dict-url (concat "http://dic.kanripo.org" "/dic?query="))
 ;; pron-kanwa-01 for kanwa!
-;(defvar redict-pron "pron-pinyin-01")
-;(defvar redict-prefdic "def-abc-01-01")
-(defvar redict-dict-img-dir "/Users/Shared/md/images/dic/")
+;(defvar mandoku-dict-pron "pron-pinyin-01")
+;(defvar mandoku-dict-prefdic "def-abc-01-01")
+(defvar mandoku-dict-img-dir nil) "/Users/Shared/md/images/dic/")
 
 
-(defun mandoku-dict-procline (inp)
+(defun mandoku-dict-getline (inp)
   "parse the string and repetitevely call the dictionary"
   (let ((result-buffer (get-buffer-create "*Dict Result*"))
 	(the-buf (current-buffer))
@@ -56,7 +56,7 @@ the form V07-p08115-129"
     (if (equal dict "daikanwa")
 	;; p07-08115.djvu
 	(format "[[%sdkw/p%s-%s.djvu][%s : %s]]"
-		redict-dict-img-dir
+		mandoku-dict-img-dir
 		(substring (car (split-string loc "-")) 1 )
 		(substring (car (cdr (split-string loc "-"))) 1)
 		dict
@@ -64,70 +64,70 @@ the form V07-p08115-129"
     (if (equal dict "hydzd")
 	;; hydzd : // hydzd-p00001 V1-p0031-04
 	(format "[[%shydzd/hydzd-p%s.djvu][%s : %s]]"
-		redict-dict-img-dir
+		mandoku-dict-img-dir
 		(substring (car (cdr (split-string loc "-"))) 1)
 		dict
 		loc)
       (if (equal dict "koga")
 	  ;;koga-p0001.djvu
 	  (format "[[%skoga/koga-p%4.4d.djvu][%s : %s]]"
-		  redict-dict-img-dir
+		  mandoku-dict-img-dir
 		(string-to-int loc)
 		dict
 		loc)
 	(if (equal dict "naka")
 	    ;; naka-p1241.djvu
 	    (format "[[%snaka/naka-p%4.4d.djvu][%s : %s]]"
-		    redict-dict-img-dir
+		    mandoku-dict-img-dir
 		    (string-to-int (substring loc 0 (- (length loc) 1 )))
 		    dict
 		    loc)
 	  (if (equal dict "zgd")
 	      (format "[[%szgd/zgd-p%4.4d.djvu][%s : %s]]"
-		      redict-dict-img-dir
+		      mandoku-dict-img-dir
 		      (string-to-int (substring loc 0 (- (length loc) 1 )))
 		      dict
 		      loc)
 	  (if (equal dict "zhongwen")
 	      (format "[[%szhwdcd/%5.5d.djvu][%s : %s]]"
-		      redict-dict-img-dir
+		      mandoku-dict-img-dir
 		      (string-to-int (substring (car (cdr (split-string loc "-"))) 1 ))
 		      dict
 		      loc)
 	  (if (equal dict "je")
 	      (format "[[%sjeb/jeb-p%4.4d.djvu][%s : %s]]"
-		      redict-dict-img-dir
+		      mandoku-dict-img-dir
 		      (string-to-int (car (cdr (split-string loc "/"))))
 		      dict
 		      loc)
 	  (if (equal dict "yo")
 	      (format "[[%syokoi/yokoi-p%4.4d.djvu][%s : %s]]"
-		      redict-dict-img-dir
+		      mandoku-dict-img-dir
 		      (string-to-int (car (split-string loc "/")))
 		      dict
 		      loc)
 	  (if (equal dict "ina")
 	      (format "[[%sina/ina-p%4.4d.djvu][%s : %s]]"
-		      redict-dict-img-dir
+		      mandoku-dict-img-dir
 		      (string-to-int (car (split-string loc "/")))
 		      dict
 		      loc)
 	  (if (equal dict "bcs")
 	      (format "[[%sbcs/bcs-p%4.4d.djvu][%s : %s]]"
-		      redict-dict-img-dir
+		      mandoku-dict-img-dir
 		      (string-to-int (car (split-string loc "/")))
 		      dict
 		      loc)
 	  (if (equal dict "bsk")
 	      (let ((vol  (format "vol%2.2d" (- (string-to-char loc) 9311)))
 		    (page (format "p%4.4d" (string-to-number (substring loc 1 -1)))))
-		(format "[[%sbsk/%s/bsk-%s-%s.djvu][%s : %s]]" redict-dict-img-dir vol vol page dict loc))
+		(format "[[%sbsk/%s/bsk-%s-%s.djvu][%s : %s]]" mandoku-dict-img-dir vol vol page dict loc))
 
 	  (if (equal dict "mz")
 	      (let ((vol (string-to-int (substring (car (split-string loc "p")) 1)))
 		    (page (string-to-int (substring (car (split-string loc ",")) 3 -1) )))
 	      (format "[[%smz/vol%2.2d/mz-v%2.2d-p%4.4d.djvu][%s : %s]]"
-		      redict-dict-img-dir
+		      mandoku-dict-img-dir
 		      vol 
 		      vol
 		      page
@@ -144,7 +144,7 @@ the form V07-p08115-129"
   (if (equal (buffer-name) "*Dict Result*")
       (other-window 1))
   (forward-line 1)
-  (redict-get-line)
+  (mandoku-dict-get-line)
 )
 (defun mandoku-dict-get-prev-line ()
   "display the entries for the next line in the Dict Buffer"
@@ -152,34 +152,33 @@ the form V07-p08115-129"
   (if (equal (buffer-name) "*Dict Result*")
       (other-window 1))
   (forward-line -1)
-  (redict-get-line)
+  (mandoku-dict-get-line)
 )
 (defun mandoku-dict-repeat-line ()
   "display the entries for the next line in the Dict Buffer"
   (interactive)
   (if (equal (buffer-name) "*Dict Result*")
       (other-window 1))
-  (let ((redis-delay 1))
-    (redict-get-line))
-)
+  (mandoku-dict-get-line))
 
-;; redict-view-mode
+
+;; mandoku-dict-view-mode
 
 (defvar mandoku-dict-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "e" 'view-mode)
     (define-key map " " 'View-scroll-page-forward)
-    (define-key map "r" 'redict-repeat-line)
-    (define-key map "n" 'redict-get-next-line)
-    (define-key map "p" 'redict-get-prev-line)
-    (define-key map "p" 'redict-get-prev-line)
+    (define-key map "r" 'mandoku-dict-repeat-line)
+    (define-key map "n" 'mandoku-dict-get-next-line)
+    (define-key map "p" 'mandoku-dict-get-prev-line)
+    (define-key map "p" 'mandoku-dict-get-prev-line)
          map)
   "Keymap for mandoku-dict-view mode"
 )
 
 (define-derived-mode mandoku-dict-mode org-mode "mandoku-dict-mode"
   "a mode to view dictionary files
-  \\{redict-mode-map}"
+  \\{mandoku-dict-mode-map}"
   (setq case-fold-search nil)
   (set (make-local-variable 'org-startup-folded) 'overview)
   (toggle-read-only 1)
