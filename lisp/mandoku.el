@@ -291,7 +291,7 @@ One character is either a character or one entity expression"
 ;		    "\t"
 		    search-char
 		    post
-		    "  [[mandoku:meta:krp:"
+		    "  [[mandoku:meta:"
 		    txtid
 		    "][《" txtid " "
 		    (format "%s" tit)
@@ -332,8 +332,9 @@ One character is either a character or one entity expression"
 ;  (list txtid (gethash txtid mandoku-titles)))
   (gethash txtid mandoku-titles))
 
-(defun mandoku-meta-textid-title (textid page)
-
+(defun mandoku-meta-textid-to-file (txtid)
+  (let ((repid (car (split-string txtid "[0-9]"))))
+    (concat mandoku-meta-dir repid "/" (substring txtid 0 (+ (length repid) 2)) ".org")))
 
 
 (defun mandoku-get-outline-path ()
