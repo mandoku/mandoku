@@ -249,7 +249,7 @@ One character is either a character or one entity expression"
 		    )
 ))
 
-(defun mandoku-tabulate-index-buffer (index-buffer)
+(defun mandoku-tabulate-index-buffer (index-buffer result-buffer)
   (switch-to-buffer-other-window index-buffer t)
   (let ((tabhash (make-hash-table :test 'equal))
 	(m))
@@ -261,9 +261,10 @@ One character is either a character or one entity expression"
 	  (puthash m (+ (gethash m tabhash) 1) tabhash)
 	(puthash m 1 tabhash)))
     (setq myList (mandoku-hash-to-list tabhash))
+    (set-buffer result-buffer)
     (dolist (x   
 	     (sort myList (lambda (a b) (string< (car a) (car b)))))
-      (insert (car x) (gethash (car x) mandoku-subcolls) (cdr (car x))))))
+      (insert (format "* %s\t%s\t%d\n" (car x) (gethash (car x) mandoku-subcolls) (car (cdr x)))))))
 
 (defun mandoku-hash-to-list (hashtable)
   "Return a list that represent the HASHTABLE."
@@ -278,7 +279,7 @@ One character is either a character or one entity expression"
 	(mandoku-count 0)
 	(mandoku-filtered-count 0)
       	(search-char (string-to-char search-string)))
-
+    (mandoku-tabulate-index-buffer index-buffer result-buffer)
       (switch-to-buffer-other-window index-buffer t)
 ;;xx      (set-buffer index-buffer)
 ;; first: sort the result (after the filename)
@@ -372,7 +373,7 @@ One character is either a character or one entity expression"
 			  (mapconcat 'mandoku-active-filter mandoku-textfilter-list "")
 			  mandoku-filtered-count))
 	)
-      (insert (format "Location\tMatch               Source\n* %s (%d/%d)\n"  search-string mandoku-filtered-count mandoku-count))
+      (insert (format "Location\tMatch\tSource\n* %s (%d/%d)\n"  search-string mandoku-filtered-count mandoku-count))
       (mandoku-index-mode)
  ;     (org-overview)
       (hide-sublevels 2)
