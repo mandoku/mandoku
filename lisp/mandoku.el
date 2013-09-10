@@ -332,6 +332,10 @@ One character is either a character or one entity expression"
 ;  (list txtid (gethash txtid mandoku-titles)))
   (gethash txtid mandoku-titles))
 
+(defun mandoku-meta-textid-title (textid page)
+
+
+
 (defun mandoku-get-outline-path ()
   "this includes the first upward heading"
   (save-excursion
