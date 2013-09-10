@@ -334,7 +334,8 @@ One character is either a character or one entity expression"
 
 (defun mandoku-meta-textid-to-file (txtid page)
   (let ((repid (car (split-string txtid "[0-9]"))))
-    (concat mandoku-meta-dir repid "/" (substring txtid 0 (+ (length repid) 2)) ".org")))
+;    (concat mandoku-meta-dir repid "/" (substring txtid 0 (+ (length repid) 2)) ".org")))
+    (concat mandoku-meta-dir repid "/" (substring txtid 0 (+ (length repid) 1)) ".org")))
 
 
 (defun mandoku-get-outline-path ()
