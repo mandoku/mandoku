@@ -249,6 +249,27 @@ One character is either a character or one entity expression"
 		    )
 ))
 
+(defun mandoku-tabulate-index-buffer (index-buffer result-buffer)
+  (switch-to-buffer-other-window index-buffer t)
+  (let ((tabhash (make-hash-table :test 'equal))
+	(m))
+    (goto-char (point-min))
+    (while (re-search-forward "^\\([a-z0-9]+\\)	\\([^	
+]+\\)" nil t)
+      (setq m (substring (match-string 2) 0 4))
+      (if (gethash m)
+	  (puthash m (+ (gethash m) 1))
+	(puthash m 1)))
+    
+
+(defun mandoku-hash-to-list (hashtable)
+  "Return a list that represent the HASHTABLE."
+  (let (myList)
+    (maphash (lambda (kk vv) (setq myList (cons (list kk vv) myList))) hashtable)
+    myList
+  )
+)    
+  
 (defun mandoku-read-index-buffer (index-buffer result-buffer search-string)
   (let (
 	(mandoku-count 0)
