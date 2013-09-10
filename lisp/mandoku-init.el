@@ -2,7 +2,6 @@
 (require 'mandoku)
 (require 'mandoku-remote)
 (require 'org-mandoku)
-
 ;; (dolist (dir (directory-files mandoku-text-dir nil "^[^.,].*"))
 ;;   (when (file-directory-p (concat mandoku-text-dir dir))
 ;;     (load (concat "mandoku-support-" dir) t )))

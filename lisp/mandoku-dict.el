@@ -35,10 +35,11 @@
   (goto-char (point-min))
   (switch-to-buffer-other-window result-buffer t)))
 
-(defun mandoku-dict-get-entry (s)
-;; pseudo
-;  (buffer-string (url-insert-file-contents (concat mandoku-dict-url s)))
-)
+(defun mandoku-dict-get-region (beg end)
+  (interactive "r")
+  (let ((s (buffer-substring-no-properties beg end)))
+    (mandoku-dict-getline s)))
+
 
 
 
