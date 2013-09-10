@@ -43,19 +43,21 @@
 (defvar mandoku-regex "<[^>]*>\\|[　-㄀＀-￯\n¶]+\\|\t[^\n]+\n")
 
 (defun mandoku-update-subcoll-list ()
+  ;; dont really need this outer loop at the moment...
   (dolist (x mandoku-repositories-alist)
     (let ((scfile (concat mandoku-sys-dir "subcolls.txt")))
-      (dolist (y mandoku-catalogs-alist)
-	(let ((tlist 
-	       (with-current-buffer (find-file-noselect (cdr y))
-		 (org-map-entries 'mandoku-get-header-item "+LEVEL=2"))))
-	  (with-current-buffer (find-file-noselect scfile t)
-	    (erase-buffer)
-	    (insert (format-time-string ";;[%Y-%m-%dT%T%z]\n" (current-time)))
-	    (dolist (z tlist)
-	      (insert (concat (car z) "\t" (car (last z)) "\n")))
-	    (save-buffer)
-	    (kill-buffer)))))))
+      (with-current-buffer (find-file-noselect scfile t)
+	(erase-buffer)
+	(insert (format-time-string ";;[%Y-%m-%dT%T%z]\n" (current-time)))
+	(dolist (y mandoku-catalogs-alist)
+	  (let ((tlist 
+		 (with-current-buffer (find-file-noselect (cdr y))
+		   (org-map-entries 'mandoku-get-header-item "+LEVEL=2"))))
+	    (with-current-buffer (file-name-nondirectory scfile)
+	      (dolist (z tlist)
+		(insert (concat (car z) "\t" (car (last z)) "\n")))
+	      (save-buffer))))
+	      (kill-buffer (file-name-nondirectory scfile) )))))
 
 	  
 (defun mandoku-update-title-lists ()
@@ -124,6 +126,17 @@
 
 (defun mandoku-read-titletables () 
   "read the titles table"
+  (setq mandoku-subcolls (make-hash-table :test 'equal))
+  (when (file-exists-p (concat mandoku-sys-dir  "subcolls.txt"))
+    (with-temp-buffer
+      (let ((coding-system-for-read 'utf-8)
+	    textid)
+	(insert-file-contents (concat mandoku-sys-dir "subcolls.txt"))
+	(goto-char (point-min))
+	(while (re-search-forward "^\\([a-z0-9]+\\)	\\([^	
+]+\\)" nil t)
+	  (puthash (match-string 1) (match-string 2) mandoku-subcolls)))))
+
   (setq mandoku-titles (make-hash-table :test 'equal))
   (dolist (x mandoku-catalogs-alist)
     (when (file-exists-p (concat mandoku-sys-dir (car (split-string (car x))) "-titles.txt"))
@@ -973,19 +986,19 @@ One character is either a character or one entity expression"
 
 
 
-(defun mandoku-read-titletable (filename tablename) 
-  "reads a titles table"
-  (when (file-exists-p filename)
-    (if (> (hash-table-count tablename) 0)
-      (setq tablename (make-hash-table :test 'equal))
-      (put 'tablename :filename filename)
-      (with-temp-buffer
-        (let ((coding-system-for-read 'utf-8)
-              textid)
-          (insert-file-contents filename)
-          (goto-char (point-min))
-          (while (re-search-forward "^\\([a-z0-9]+\\)\s+\\([^\s\n]+\\)" nil t)
-	    (puthash (match-string 1) (match-string 2) tablename)))))))
+;; (defun mandoku-read-titletable (filename tablename) 
+;;   "reads a titles table"
+;;   (when (file-exists-p filename)
+;;     (if (> (hash-table-count tablename) 0)
+;;       (setq tablename (make-hash-table :test 'equal))
+;;       (put 'tablename :filename filename)
+;;       (with-temp-buffer
+;;         (let ((coding-system-for-read 'utf-8)
+;;               textid)
+;;           (insert-file-contents filename)
+;;           (goto-char (point-min))
+;;           (while (re-search-forward "^\\([a-z0-9]+\\)\s+\\([^\s\n]+\\)" nil t)
+;; 	    (puthash (match-string 1) (match-string 2) tablename)))))))
 
 ;;[2012-02-28T08:26:29+0900]
 (defun mandoku-get-heading (&optional n)
