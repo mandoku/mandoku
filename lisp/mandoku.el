@@ -249,18 +249,20 @@ One character is either a character or one entity expression"
 		    )
 ))
 
-(defun mandoku-tabulate-index-buffer (index-buffer result-buffer)
+(defun mandoku-tabulate-index-buffer (index-buffer)
   (switch-to-buffer-other-window index-buffer t)
   (let ((tabhash (make-hash-table :test 'equal))
 	(m))
     (goto-char (point-min))
-    (while (re-search-forward "^\\([a-z0-9]+\\)	\\([^	
+    (while (re-search-forward "^\\([^	]+\\)	\\([^	
 ]+\\)" nil t)
       (setq m (substring (match-string 2) 0 4))
-      (if (gethash m)
-	  (puthash m (+ (gethash m) 1))
-	(puthash m 1)))
-    
+      (if (gethash m tabhash)
+	  (puthash m (+ (gethash m tabhash) 1) tabhash)
+	(puthash m 1 tabhash)))
+    (setq myList (mandoku-hash-to-list tabhash))
+    (dolist (x myList)
+      (insert x))))
 
 (defun mandoku-hash-to-list (hashtable)
   "Return a list that represent the HASHTABLE."
