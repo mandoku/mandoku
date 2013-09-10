@@ -261,8 +261,9 @@ One character is either a character or one entity expression"
 	  (puthash m (+ (gethash m tabhash) 1) tabhash)
 	(puthash m 1 tabhash)))
     (setq myList (mandoku-hash-to-list tabhash))
-    (dolist (x myList)
-      (insert x))))
+    (dolist (x   
+	     (sort myList (lambda (a b) (string< (car a) (car b)))))
+      (insert (car x) (gethash (car x) mandoku-subcolls) (cdr (car x))))))
 
 (defun mandoku-hash-to-list (hashtable)
   "Return a list that represent the HASHTABLE."
