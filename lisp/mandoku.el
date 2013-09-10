@@ -102,7 +102,7 @@
 
 (defun mandoku-get-header-item ()
   (let ((end (save-excursion(end-of-line) (point)))
-	(begol (save-excursion (beginning-of-line) (+ 4 (point)))))
+	(begol (save-excursion (beginning-of-line) (search-forward " ") )))
     (split-string 
      (replace-regexp-in-string org-bracket-link-regexp "\\3" 
 			       (buffer-substring-no-properties begol end)))))
