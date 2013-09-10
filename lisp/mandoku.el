@@ -283,6 +283,7 @@ One character is either a character or one entity expression"
       (switch-to-buffer-other-window index-buffer t)
 ;;xx      (set-buffer index-buffer)
 ;; first: sort the result (after the filename)
+      (setq buffer-file-name nil)
       (sort-lines nil (point-min) (point-max))
       (goto-char (point-min))
       (while (re-search-forward
