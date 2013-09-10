@@ -15,7 +15,7 @@ LINK will consist of a <textid> recognized by mandoku."
   ;; need to get the file name and then call mandoku-execute-file-search
   (let* ((coll (car (split-string link ":")))
       (textid (car (cdr (split-string link ":"))))
-      (page (if (equal coll "meta") nil (replace-in-string (car (cdr (cdr (split-string link ":")))) "_" ":" )))
+      (page (replace-in-string (car (cdr (cdr (split-string link ":")))) "_" ":" ))
       (src (car (cdr (split-string link "::"))))
       (fname (concat textid "_" (car (split-string page "-")) ".txt"))
       (filename (concat  "/" 

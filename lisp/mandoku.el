@@ -293,7 +293,7 @@ One character is either a character or one entity expression"
 		    post
 		    "  [[mandoku:meta:"
 		    txtid
-		    "][《" txtid " "
+		    ":10][《" txtid " "
 		    (format "%s" tit)
 		    "》]]\n"
 		    )
@@ -332,7 +332,7 @@ One character is either a character or one entity expression"
 ;  (list txtid (gethash txtid mandoku-titles)))
   (gethash txtid mandoku-titles))
 
-(defun mandoku-meta-textid-to-file (txtid)
+(defun mandoku-meta-textid-to-file (txtid page)
   (let ((repid (car (split-string txtid "[0-9]"))))
     (concat mandoku-meta-dir repid "/" (substring txtid 0 (+ (length repid) 2)) ".org")))
 
