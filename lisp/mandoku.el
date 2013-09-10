@@ -27,7 +27,7 @@
 ;; this could be a list? currently only one subcoll allowed, but it could be a regex understood by the shell ZB6[rq]
 (defvar mandoku-search-limit-to-coll nil)
 ;; ** Catalogs
-(defvar mandoku-catalogs-alist '(("ZB6 佛部" . "/Users/chris/projects/meta/zb-cbeta.org")))
+(defvar mandoku-catalogs-alist nil)
 
 
 

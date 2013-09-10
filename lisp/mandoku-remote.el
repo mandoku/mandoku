@@ -4,19 +4,21 @@
 
 (require 'url-http)
 ;; probably best to make this a list sometime...
+(defvar mandoku-repositories-alist nil)
 (defvar mandoku-remote-url "http://localhost:5000/search")
 (setq mandoku-remote-url "http://127.0.0.1:5000")
 
 (defun mandoku-search-remote (search-string index-buffer)
   (with-current-buffer index-buffer 
-    (url-insert-file-contents (concat mandoku-remote-url "/search?query=" search-string)
-			      (lambda (status) (switch-to-buffer (current-buffer))))))
+    (dolist (rep mandoku-repositories-alist)
+      (url-insert-file-contents (concat (cdr rep) "/search?query=" search-string)
+			      (lambda (status) (switch-to-buffer (current-buffer)))))))
 
 
 (defun mandoku-open-remote-file (filename src page)
   (let ((buffer (car (last (split-string filename "/")))))
     (with-current-buffer (get-buffer-create buffer)
-      (url-insert-file-contents (concat mandoku-remote-url "/getfile?filename=" filename)
+      (url-insert-file-contents (concat mandoku-remote-url "/getfile?filename=" filename "&rep=" (car rep))
 			      (lambda (status) (switch-to-buffer buffer))))
     (switch-to-buffer buffer)
     (setq buffer-file-name (concat mandoku-temp-dir buffer))
