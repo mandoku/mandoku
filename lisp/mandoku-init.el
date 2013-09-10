@@ -24,6 +24,7 @@
 
 ;; dic
 (setq mandoku-dict-img-dir "/Users/Shared/md/images/dic/")
+(setq mandoku-dict-img-dir nil)
 (ignore-errors 
 (load "mandoku-dict" t)
 (global-set-key [f5] 'mandoku-dict-get-line)
