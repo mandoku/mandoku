@@ -23,6 +23,7 @@
 	(the-buf (current-buffer))
 	(pos    (mandoku-position-at-point)))
     (set-buffer result-buffer)
+    (setq buffer-file-name nil)
     (toggle-read-only 0)
     (erase-buffer)
     (insert "* " (if pos pos "")  "\n")
