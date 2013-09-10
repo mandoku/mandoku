@@ -222,7 +222,7 @@ the form V07-p08115-129"
   "Display the dictionary page, either local or remotely"
   (if mandoku-dict-img-dir
       (org-open-file (concat mandoku-dict-img-dir  link))
-    (browse-url (concat mandoku-dict-url "/" link))))
+    (browse-url (concat mandoku-dict-url "/dic/" link))))
 	 
 (provide 'mandoku-dict)
 
