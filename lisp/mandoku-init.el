@@ -6,7 +6,7 @@
 ;;   (when (file-directory-p (concat mandoku-text-dir dir))
 ;;     (load (concat "mandoku-support-" dir) t )))
 
-(setq mandoku-repositories-alist '(("ZB" . "http://127.0.0.1:5000")))
+(setq mandoku-repositories-alist '(("ZB" . "http://www.kanripo.org/zb")))
 
 (setq mandoku-catalogs-alist '(
 			       ("ZB1 經部" . "/Users/Shared/md/meta/ZB/ZB1.org")
@@ -29,7 +29,7 @@
 (load "mandoku-dict" t)
 (global-set-key [f5] 'mandoku-dict-get-line)
 )
-(setq mandoku-dict-url "http://127.0.0.1:5000")
+(setq mandoku-dict-url "http://www.kanripo.org/zb")
 
 ;(dolist (x mandoku-catalogs-alist)
 ;  (message "%s" (cdr x)))
