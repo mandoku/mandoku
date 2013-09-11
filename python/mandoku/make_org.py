@@ -11,13 +11,13 @@ def proctxt(arg, dirname, names):
         for f in names:
             if f.endswith('txt'):
                 cnt += 1
-                inf = codecs.open("%s.%s" % (dirname, f), 'r', 'utf-8')
+                inf = codecs.open("%s/%s" % (dirname, f), 'r', 'utf-8')
                 for line in inf:
                     if line.startswith('#+TITLE:') and cnt == 1:
                         of.write(line)
                     elif "JUAN" in line:
                         j = line[line.index('JUAN')+5:-1]
-                        of.write("[[%s][%s]]\n" % (f, j))
+                        of.write("[[file:%s][%s]]\n" % (f, j))
                         break
 
         nrep.index.add([fn +'.org'])
