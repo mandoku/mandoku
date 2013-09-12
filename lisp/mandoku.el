@@ -1130,7 +1130,7 @@ One character is either a character or one entity expression"
 	 (rtn (replace-regexp-in-string org-bracket-link-regexp "\\3" 
 					(buffer-substring-no-properties begol end))))
     (if (string-match s rtn)
-	rtn
+	(list rtn (org-entry-get begol "RESP" ) (org-entry-get begol "DYNASTY" ) )
       )))
 
 ;; this works
