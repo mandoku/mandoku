@@ -1119,16 +1119,16 @@ One character is either a character or one entity expression"
 (defun mandoku-search-titles(s)
   (let* ((files (mapcar 'cdr mandoku-catalogs-alist ))
 	 results rtn)
-    (setq rtn (org-map-entries 'mandoku-get-catalog-entry "+LEVEL=3" files))
-    (setq results (append results (mandoku-remove-nil-recursively rtn)))
+    (setq rtn (mandoku-remove-nil-recursively (org-map-entries 'mandoku-get-catalog-entry "+LEVEL=3" files)))
+    (setq results (append results rtn))
     results))
 
 (defun mandoku-get-catalog-entry ()
   "let bind the search-string as var s"
   (let* ((end (save-excursion(end-of-line) (point)))
-	(begol (save-excursion (beginning-of-line) (search-forward " ") ))
-	(rtn (replace-regexp-in-string org-bracket-link-regexp "\\3" 
-				       (buffer-substring-no-properties begol end))))
+	 (begol (save-excursion (beginning-of-line) (search-forward " ") ))
+	 (rtn (replace-regexp-in-string org-bracket-link-regexp "\\3" 
+					(buffer-substring-no-properties begol end))))
     (if (string-match s rtn)
 	rtn
       )))
