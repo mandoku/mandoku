@@ -1110,28 +1110,32 @@ One character is either a character or one entity expression"
 	(setq mandoku-cat-buffer (or mandoku-cat-buffer buffer)))
 )))
 
-(defun mandoku-search-titles(search)
+(defun mandoku-remove-nil-recursively (x)
+  (if (listp x)
+    (mapcar #'mandoku-remove-nil-recursively
+            (remove nil x))
+    x))
+
+(defun mandoku-search-titles(s)
   (let* ((files (mapcar 'cdr mandoku-catalogs-alist ))
 	 results rtn)
-    (dolist (f mandoku-catalogs-alist)
-      (let ((buffer (if (file-exists-p (cdr f))
-		     (org-get-agenda-file-buffer (cdr f))
-		   (error "No such file %s" (cdr f))))
-	    )
-	(with-current-buffer buffer
-	  (setq rtn (org-map-entries 'mandoku-get-header-item "+LEVEL=3")))
-	(setq results (append results rtn))
-	results))))
+    (setq rtn (org-map-entries 'mandoku-get-catalog-entry "+LEVEL=3" files))
+    (setq results (append results (mandoku-remove-nil-recursively rtn)))
+    results))
 
 (defun mandoku-get-catalog-entry ()
-  (let ((end (save-excursion(end-of-line) (point)))
+  "let bind the search-string as var s"
+  (let* ((end (save-excursion(end-of-line) (point)))
 	(begol (save-excursion (beginning-of-line) (search-forward " ") ))
-	(rtn (split-string 
-	      (replace-regexp-in-string org-bracket-link-regexp "\\3" 
-					(buffer-substring-no-properties begol end)))))
+	(rtn (replace-regexp-in-string org-bracket-link-regexp "\\3" 
+				       (buffer-substring-no-properties begol end))))
     (if (string-match s rtn)
 	rtn
-      nil)))
+      )))
+
+;; this works
+;; (setq r (mandoku-remove-nil-recursively (let ((s "周易"))
+;;   (org-map-entries 'mandoku-get-catalog-entry "+DYNASTY=\"宋\"" files))))
 
 
 (provide 'mandoku)
