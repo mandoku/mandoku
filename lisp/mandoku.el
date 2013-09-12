@@ -1092,6 +1092,20 @@ One character is either a character or one entity expression"
      )
 ))     
 
+(defun mandoku-get-catalog-entries(file search &rest type)
+;; have not yet defined search types, this will be parallel to org-agenda-entry-types
+;;  (setq type (or type mandoku-search-types))
+  (let* ((org-startup-folded nil)
+	 (org-startup-align-all-tables nil)
+	 (buffer (if (file-exists-p file)
+		     (org-get-agenda-file-buffer file)
+		   (error "No such file %s" file)))
+	 arg results rtn deadline-results)
+    (if (not buffer)
+	;; If file does not exist, make sure an error message ends up in diary
+	(list (format "Mandoku search error: No such catalog-file %s" file))
+    
+
 (provide 'mandoku)
 
 ;; end of file mandoku.el
