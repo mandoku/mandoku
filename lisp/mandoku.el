@@ -1117,6 +1117,7 @@ One character is either a character or one entity expression"
     x))
 
 (defun mandoku-search-titles(s)
+  (interactive (ido-completing-read "What" '("A" "B" "C"))) 
   (let* ((files (mapcar 'cdr mandoku-catalogs-alist ))
 	 (type "title")
 	 results rtn)
