@@ -1117,7 +1117,7 @@ One character is either a character or one entity expression"
     x))
 
 (defun mandoku-search-titles(s)
-  (interactive (ido-completing-read "What" '("A" "B" "C"))) 
+  (interactive "sEnter search string: ")
   (let* ((files (mapcar 'cdr mandoku-catalogs-alist ))
 	 (type "title")
 	 results rtn)
@@ -1140,7 +1140,7 @@ One character is either a character or one entity expression"
 					(buffer-substring-no-properties begol end))))
     (if (equal type "title")
 	(if (string-match s rtn)
-	    (list rtn (org-entry-get begol "RESP" ) (org-entry-get begol "DYNASTY" ) ))
+	    (vector rtn (org-entry-get begol "RESP" ) (org-entry-get begol "DYNASTY" ) ))
       (if (equal type "resp")
 	  (if (string-match s (org-entry-get begol "RESP" ))
 	    (list rtn (org-entry-get begol "RESP" ) (org-entry-get begol "DYNASTY" ) ))
