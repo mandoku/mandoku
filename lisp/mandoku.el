@@ -1104,7 +1104,28 @@ One character is either a character or one entity expression"
     (if (not buffer)
 	;; If file does not exist, make sure an error message ends up in diary
 	(list (format "Mandoku search error: No such catalog-file %s" file))
-    
+      (with-current-buffer buffer
+	(unless (derived-mode-p 'org-mode)
+	  (error "Catalog file %s is not in `org-mode'" file))
+	(setq mandoku-cat-buffer (or mandoku-cat-buffer buffer)))
+)))
+
+(defun mandoku-search-titles(search)
+  (let* (	 
+	 results rtn)
+    (dolist (f mandoku-catalogs-alist)
+      (let ((buffer (if (file-exists-p (cdr f))
+		     (org-get-agenda-file-buffer (cdr f))
+		   (error "No such file %s" (cdr f))))
+	    )
+	(with-current-buffer buffer
+	  (setq rtn (org-map-entries 'mandoku-get-header-item "+LEVEL=3")))
+	(setq results (append results rtn))
+	results))))
+
+(defun mandoku-item-filter ()
+  
+  )
 
 (provide 'mandoku)
 
