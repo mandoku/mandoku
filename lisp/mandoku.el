@@ -1115,6 +1115,7 @@ One character is either a character or one entity expression"
     (mapcar #'mandoku-remove-nil-recursively
             (remove nil x))
     x))
+;; catalog etc
 
 (defun mandoku-search-titles(s)
   (interactive "sEnter search string: ")
@@ -1153,6 +1154,27 @@ One character is either a character or one entity expression"
 ;; (setq r (mandoku-remove-nil-recursively (let ((s "周易"))
 ;;   (org-map-entries 'mandoku-get-catalog-entry "+DYNASTY=\"宋\"" files))))
 
+(define-derived-mode mandoku-title-list-mode tabulated-list-mode "Title List"
+  "Major mode for browsing a list of titles.
+Letters do not insert themselves; instead, they are commands.
+\\<mandoku-title-list-mode-map>
+\\{mandoku-title-list-mode-map}"
+  (setq tabulated-list-format [("Number" 12 t)
+			       ("Title" 30 t)
+			       ("Dynasty"  10 mandoku-title-menu--dyn-predicate)
+			       ("Author" 0 t)])
+  (setq tabulated-list-padding 2)
+  (setq tabulated-list-sort-key (cons "Title" nil))
+  (tabulated-list-init-header))
+
+(defvar mandoku-title-list-mode-map
+  (let ((map (make-sparse-keymap))
+	(menu-map (make-sparse-keymap "TL")))
+    (set-keymap-parent map tabulated-list-mode-map)
+;    (define-key map "i" 'package-menu-mark-install)
+    (define-key map "[RET]" 'mandoku-open-text)
+    map)
+  "Local keymap for `mandoku-title-list-mode' buffers.")
 
 (provide 'mandoku)
 
