@@ -1111,7 +1111,7 @@ One character is either a character or one entity expression"
 )))
 
 (defun mandoku-search-titles(search)
-  (let* (	 
+  (let* ((files (mapcar 'cdr mandoku-catalogs-alist ))
 	 results rtn)
     (dolist (f mandoku-catalogs-alist)
       (let ((buffer (if (file-exists-p (cdr f))
@@ -1123,9 +1123,16 @@ One character is either a character or one entity expression"
 	(setq results (append results rtn))
 	results))))
 
-(defun mandoku-item-filter ()
-  
-  )
+(defun mandoku-get-catalog-entry ()
+  (let ((end (save-excursion(end-of-line) (point)))
+	(begol (save-excursion (beginning-of-line) (search-forward " ") ))
+	(rtn (split-string 
+	      (replace-regexp-in-string org-bracket-link-regexp "\\3" 
+					(buffer-substring-no-properties begol end)))))
+    (if (string-match s rtn)
+	rtn
+      nil)))
+
 
 (provide 'mandoku)
 
