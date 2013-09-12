@@ -1137,10 +1137,11 @@ One character is either a character or one entity expression"
   "let bind the search-string as var s"
   (let* ((end (save-excursion(end-of-line) (point)))
 	 (begol (save-excursion (beginning-of-line) (search-forward " ") ))
-	 (rtn (replace-regexp-in-string org-bracket-link-regexp "\\3" 
-					(buffer-substring-no-properties begol end))))
+	 (rtn (split-string 
+		(replace-regexp-in-string org-bracket-link-regexp "\\3" 
+					  (buffer-substring-no-properties begol end)))))
     (if (equal type "title")
-	(if (string-match s rtn)
+	(if (string-match s (car (cdr rtn)))
 	    (vector rtn (org-entry-get begol "RESP" ) (org-entry-get begol "DYNASTY" ) ))
       (if (equal type "resp")
 	  (if (string-match s (org-entry-get begol "RESP" ))
