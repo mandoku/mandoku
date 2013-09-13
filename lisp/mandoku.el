@@ -1135,8 +1135,11 @@ One character is either a character or one entity expression"
 	 (type "title")
 	 rtn)
     (setq rtn (mandoku-remove-nil-recursively (org-map-entries 'mandoku-get-catalog-entry "+LEVEL=3" files)))
-    (setq tabulated-list-entries (mapcar 'mandoku-title-entry rtn))
-    (switch-to-buffer-other-window buf)
+    (with-current-buffer buf
+      (mandoku-title-list-mode)
+      (setq tabulated-list-entries (mapcar 'mandoku-title-entry rtn))
+      (tabulated-list-print) 
+      (switch-to-buffer-other-window buf))
 ;    (setq results (append results rtn))
 ;    results))
     ))
@@ -1171,8 +1174,8 @@ ent has the form ((serial-number title) author dynasty (sn-parent parent) )"
 	(if (string-match s (car (cdr rtn)))
 	    (list 
 	     rtn 
-	     (org-entry-get begol "RESP" ) 
-	     (org-entry-get begol "DYNASTY" )   
+	     (or (org-entry-get begol "RESP" ) "")
+	     (or (org-entry-get begol "DYNASTY" )   "")
 	     (save-excursion (org-up-heading-safe) (mandoku-get-header-item ))
 	     ))
       (if (equal type "resp")
