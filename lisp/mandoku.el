@@ -835,11 +835,12 @@ One character is either a character or one entity expression"
 	  (search-forward (concat "<pb:" pb))))
 
 (defun mandoku-string-remove-all-properties (string)
+;  (set-text-properties 0 (length string) nil string))
   (condition-case ()
       (let ((s string))
 	(set-text-properties 0 (length string) nil string)
-	s)
-    (error string)))
+	s))
+    (error string))
 
 
 (defun mandoku-get-baseedition ()
