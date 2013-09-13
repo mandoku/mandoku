@@ -397,7 +397,9 @@ One character is either a character or one entity expression"
 
 (defun mandoku-get-outline-path ()
   "this includes the first upward heading"
-  (save-excursion
+  (if (org-before-first-heading-p)
+      (list "")
+    (save-excursion
     (let ((olp ))
 	  (outline-previous-visible-heading 1)
 	  (when (looking-at org-complex-heading-regexp)
@@ -415,7 +417,7 @@ One character is either a character or one entity expression"
 		      "\\[[0-9]+%\\]\\|\\[[0-9]+/[0-9]+\\]\\|¶" ""
 		      (org-match-string-no-properties 4))))
 		    olp)))
-	  olp)))
+	  olp))))
 
 
 (defun mandoku-cut-string (s)
@@ -941,7 +943,11 @@ One character is either a character or one entity expression"
 ;  (message 
    (car (split-string (buffer-substring-no-properties (point-at-bol) (point-at-eol)) "	")))
 
-
+(easy-menu-define mandoku-md-menu mandoku-mode-map "Mandoku menu"
+  '("BK-MDA"
+    ["Test" (lambda () (interactive) (insert "test!")) t]
+    ))
+  
 (easy-menu-define mandoku-md-menu mandoku-mode-map "Mandoku menu"
   '("Mandoku"
     ("Browse"
