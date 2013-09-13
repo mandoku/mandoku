@@ -1131,8 +1131,9 @@ One character is either a character or one entity expression"
     ))
 (defun mandoku-title-entry (ent)
   "Fromat the entry for  `tabulated-list-entries'.
-ent has the form ((serial-number title) author dynasty )"
+ent has the form ((serial-number title) author dynasty (sn-parent parent) )"
 )  
+
 (defun mandoku-search-resp(s)
   (let* ((files (mapcar 'cdr mandoku-catalogs-alist ))
 	 results rtn)
@@ -1142,8 +1143,8 @@ ent has the form ((serial-number title) author dynasty )"
 
 (defun mandoku-get-catalog-entry ()
   "let bind the search-string as var s"
-  (let* ((end (save-excursion(end-of-line) (point)))
-	 (parent (save-excursion (org-up-heading-safe) (mandoku-get-header-item )))
+  (let* ((begol (save-excursion (beginning-of-line) (search-forward " ") ))
+;	 (parent (save-excursion (org-up-heading-safe) (mandoku-get-header-item )))
 	 (rtn (mandoku-get-header-item)))
 
     (if (equal type "title")
