@@ -574,7 +574,7 @@ One character is either a character or one entity expression"
 	      (< (point) p )
 	      (re-search-forward "¶" (point-max) t))
 	(setq line (+ line 1)))
-      (format "%s%s, p%s%2.2d" textid (or (mandoku-get-vol) "") (car (cdr (split-string page "-"))) line))))
+      (format "%s%s, p%s%2.2d" textid (if (mandoku-get-vol) (mandoku-get-vol) "") (car (cdr (split-string page "-"))) line))))
 
 (defun mandoku-open-image-at-page ()
   (interactive)
@@ -640,7 +640,7 @@ One character is either a character or one entity expression"
   (set (make-local-variable 'tab-with) 30)
   (mandoku-hide-p-markers)
   (add-to-invisibility-spec 'mandoku)
-  (easy-menu-add mandoku-md-menu)
+  (easy-menu-add mandoku-md-menu mandoku-mode-map)
 ;  (view-mode)
 )
 
@@ -838,9 +838,8 @@ One character is either a character or one entity expression"
 ;  (set-text-properties 0 (length string) nil string))
   (condition-case ()
       (let ((s string))
-	(set-text-properties 0 (length string) nil string)
-	s))
-    (error string))
+	(set-text-properties 0 (length s) nil s) s)
+    (error string)))
 
 
 (defun mandoku-get-baseedition ()
