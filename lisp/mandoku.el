@@ -626,7 +626,7 @@ One character is either a character or one entity expression"
 
 ;; mandoku-view-mode
 
-(defvar mandoku-mode-map
+(defvar mandoku-view-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "e" 'view-mode)
     (define-key map "a" 'redict-get-line)
@@ -637,7 +637,7 @@ One character is either a character or one entity expression"
 
 (define-derived-mode mandoku-view-mode org-mode "mandoku-view"
   "a mode to view mandoku files
-  \\{mandoku-mode-map}"
+  \\{mandoku-view-mode-map}"
   (setq case-fold-search nil)
   (setq header-line-format (mandoku-header-line))
   (set (make-local-variable 'org-startup-folded) 'showeverything)
@@ -945,7 +945,7 @@ One character is either a character or one entity expression"
 ;  (message 
    (car (split-string (buffer-substring-no-properties (point-at-bol) (point-at-eol)) "	")))
 
-(easy-menu-define mandoku-md-menu mandoku-mode-map "Mandoku menu"
+(easy-menu-define mandoku-md-menu org-mode-map "Mandoku menu"
   '("BK-MDA"
     ["Test" (lambda () (interactive) (insert "test!")) t]
     ))
