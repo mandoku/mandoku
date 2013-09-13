@@ -14,6 +14,8 @@
 
 (defvar mandoku-string-limit 10)
 
+;; Defined somewhere in this file, but used before definition.
+(defvar mandoku-md-menu)
 
 ;; ** Textfilters
 ;; we have one default textfilter, which always exists and can be dynamically treated. 
@@ -948,22 +950,22 @@ One character is either a character or one entity expression"
     ["Test" (lambda () (interactive) (insert "test!")) t]
     ))
   
-(easy-menu-define mandoku-md-menu mandoku-mode-map "Mandoku menu"
-  '("Mandoku"
-    ("Browse"
-     ["Show Catalog" mandoku-show-catalog t]
-     )
-    ["Search" mandoku-search t]
-    ("Versions"
-     ["Switch versions" mandoku-switch-version nil]
-     ["Master" mandoku-switch-to-master nil]
-     ["New version" mandoku-new-version nil]
-     )
-    ("Maintenance"
-     ["Update installed texts" mandoku-update nil]
-     ["Add repository" mandoku-setting nil]
-     )
-))     
+;; (easy-menu-define mandoku-md-menu mandoku-mode-map "Mandoku menu"
+;;   '("Mandoku"
+;;     ("Browse"
+;;      ["Show Catalog" mandoku-show-catalog t]
+;;      )
+;;     ["Search" mandoku-search t]
+;;     ("Versions"
+;;      ["Switch versions" mandoku-switch-version nil]
+;;      ["Master" mandoku-switch-to-master nil]
+;;      ["New version" mandoku-new-version nil]
+;;      )
+;;     ("Maintenance"
+;;      ["Update installed texts" mandoku-update nil]
+;;      ["Add repository" mandoku-setting nil]
+;;      )
+;; ))     
 
 (defun mandoku-get-catalog-entries(file search &rest type)
 ;; have not yet defined search types, this will be parallel to org-agenda-entry-types
