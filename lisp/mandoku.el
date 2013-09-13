@@ -1129,10 +1129,18 @@ One character is either a character or one entity expression"
 ;    (setq results (append results rtn))
 ;    results))
     ))
-(defun mandoku-title-entry (ent)
+(defun mandoku-title-entry (entry)
   "Fromat the entry for  `tabulated-list-entries'.
 ent has the form ((serial-number title) author dynasty (sn-parent parent) )"
-)  
+  (let* (
+	 (sn (caar entry))
+	 (title (car (cdr (car entry))))
+	 (resp (or (nth 1 entry) ""))
+	 (dyn (or (nth 2 entry) ""))
+	 (lei (concat (substring (car (nth 3 entry)) 2) (car (cdr (nth 3 entry))))))
+    (list (cons sn nil)
+	  (vector lei sn title dyn resp ))
+))  
 
 (defun mandoku-search-resp(s)
   (let* ((files (mapcar 'cdr mandoku-catalogs-alist ))
