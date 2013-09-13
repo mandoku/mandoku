@@ -1195,9 +1195,9 @@ ent has the form ((serial-number title) author dynasty (sn-parent parent) )"
 Letters do not insert themselves; instead, they are commands.
 \\<mandoku-title-list-mode-map>
 \\{mandoku-title-list-mode-map}"
-  (setq tabulated-list-format [("Bu" 6 nil)
+  (setq tabulated-list-format [("Bu" 8 nil)
 			       ("Number" 12 t)
-			       ("Title" 30 t)
+			       ("Title" 35 t)
 			       ("Dynasty"  10 mandoku-title-menu--dyn-predicate)
 			       ("Author" 0 t)])
   (setq tabulated-list-padding 2)
@@ -1205,13 +1205,15 @@ Letters do not insert themselves; instead, they are commands.
   (tabulated-list-init-header))
 
 (defun mandoku-title-menu--dyn-predicate (A B)
-  (string< A B))
+  (let ((dA (aref (cadr A) 3))
+	(dB (aref (cadr B) 3)))
+  (string< dA dB)))
 
 (defvar mandoku-title-list-mode-map
   (let ((map (make-sparse-keymap))
 	(menu-map (make-sparse-keymap "TL")))
     (set-keymap-parent map tabulated-list-mode-map)
-;    (define-key map "i" 'package-menu-mark-install)
+    (define-key map "i" 'package-menu-mark-install)
     (define-key map "[RET]" 'mandoku-open-text)
     map)
   "Local keymap for `mandoku-title-list-mode' buffers.")
