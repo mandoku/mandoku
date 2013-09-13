@@ -1117,15 +1117,22 @@ One character is either a character or one entity expression"
     x))
 ;; catalog etc
 
+(defun mandoku-list-titles(filter)
+
 (defun mandoku-search-titles(s)
   (interactive "sEnter search string: ")
   (let* ((files (mapcar 'cdr mandoku-catalogs-alist ))
 	 (type "title")
-	 results rtn)
+	 rtn)
     (setq rtn (mandoku-remove-nil-recursively (org-map-entries 'mandoku-get-catalog-entry "+LEVEL=3" files)))
-    (setq results (append results rtn))
-    results))
-
+    (setq tabulated-list-entries (mapcar 'mandoku-title-entry rtn))
+;    (setq results (append results rtn))
+;    results))
+    ))
+(defun mandoku-title-entry (ent)
+  "Fromat the entry for  `tabulated-list-entries'.
+ent has the form ((serial-number title) author dynasty )"
+)  
 (defun mandoku-search-resp(s)
   (let* ((files (mapcar 'cdr mandoku-catalogs-alist ))
 	 results rtn)
