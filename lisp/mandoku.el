@@ -574,7 +574,7 @@ One character is either a character or one entity expression"
 	      (< (point) p )
 	      (re-search-forward "¶" (point-max) t))
 	(setq line (+ line 1)))
-      (format "%s%s, p%s%2.2d" textid (if (mandoku-get-vol) (mandoku-get-vol) "") (car (cdr (split-string page "-"))) line))))
+      (format "%s%s, p%s%2.2d" textid (or (mandoku-get-vol) "") (car (cdr (split-string page "-"))) line))))
 
 (defun mandoku-open-image-at-page ()
   (interactive)
@@ -587,20 +587,20 @@ One character is either a character or one entity expression"
   (find-file-other-window path )))
 
 
-(defun mandoku-position-at-point-internal ()
-  (interactive)
-  (save-excursion
-    (let ((p (point)))
-      (re-search-backward "<pb:" nil t)
-      (re-search-forward "\\([^_:]*\\)_\\([^_]*\\)_\\([^_]*\\)>" nil t)
-      (setq textid (match-string 1))
-      (setq page (match-string 3))
-      (setq line 0)
-      (while (and
-	      (< (point) p )
-	      (re-search-forward "¶" (point-max) t))
-	(setq line (+ line 1)))
-      (concat textid ":" page (int-to-string line)))))
+;; (defun mandoku-position-at-point-internal ()
+;;   (interactive)
+;;   (save-excursion
+;;     (let ((p (point)))
+;;       (re-search-backward "<pb:" nil t)
+;;       (re-search-forward "\\([^_:]*\\)_\\([^_]*\\)_\\([^_]*\\)>" nil t)
+;;       (setq textid (match-string 1))
+;;       (setq page (match-string 3))
+;;       (setq line 0)
+;;       (while (and
+;; 	      (< (point) p )
+;; 	      (re-search-forward "¶" (point-max) t))
+;; 	(setq line (+ line 1)))
+;;       (concat textid ":" page (int-to-string line)))))
 
 (defun mandoku-get-coll (filename)
 "find the collection of the file"
@@ -640,9 +640,17 @@ One character is either a character or one entity expression"
   (set (make-local-variable 'tab-with) 30)
   (mandoku-hide-p-markers)
   (add-to-invisibility-spec 'mandoku)
+  (easy-menu-add mandoku-md-menu)
 ;  (view-mode)
 )
 
+(defun mandoku-toggle-visibility ()
+  (interactive)
+  (if (member 'mandoku buffer-invisibility-spec)
+      (remove-from-invisibility-spec 'mandoku)
+  (add-to-invisibility-spec 'mandoku)))
+  
+      
 (defun mandoku-header-line ()
   (let* ((fn (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))))
 	 (textid (car (split-string fn "_"))))
