@@ -1118,17 +1118,29 @@ One character is either a character or one entity expression"
 ;; catalog etc
 
 (defun mandoku-list-titles(filter)
+    (let ((buf (get-buffer-create "*Mandoku Titles*")))
+      (with-current-buffer buf
+	(mandoku-title-list-mode)
+	(set (make-local-variable 'package-menu--new-package-list)
+	     new-packages)
+	(package-menu--generate nil t))
+      ;; The package menu buffer has keybindings.  If the user types
+      ;; `M-x list-packages', that suggests it should become current.
+      (switch-to-buffer buf)))
 
 (defun mandoku-search-titles(s)
   (interactive "sEnter search string: ")
   (let* ((files (mapcar 'cdr mandoku-catalogs-alist ))
+	 (buf (get-buffer-create "*Mandoku Titles*"))
 	 (type "title")
 	 rtn)
     (setq rtn (mandoku-remove-nil-recursively (org-map-entries 'mandoku-get-catalog-entry "+LEVEL=3" files)))
     (setq tabulated-list-entries (mapcar 'mandoku-title-entry rtn))
+    (switch-to-buffer-other-window buf)
 ;    (setq results (append results rtn))
 ;    results))
     ))
+
 (defun mandoku-title-entry (entry)
   "Fromat the entry for  `tabulated-list-entries'.
 ent has the form ((serial-number title) author dynasty (sn-parent parent) )"
@@ -1180,13 +1192,17 @@ ent has the form ((serial-number title) author dynasty (sn-parent parent) )"
 Letters do not insert themselves; instead, they are commands.
 \\<mandoku-title-list-mode-map>
 \\{mandoku-title-list-mode-map}"
-  (setq tabulated-list-format [("Number" 12 t)
+  (setq tabulated-list-format [("Bu" 6 nil)
+			       ("Number" 12 t)
 			       ("Title" 30 t)
 			       ("Dynasty"  10 mandoku-title-menu--dyn-predicate)
 			       ("Author" 0 t)])
   (setq tabulated-list-padding 2)
   (setq tabulated-list-sort-key (cons "Title" nil))
   (tabulated-list-init-header))
+
+(defun mandoku-title-menu--dyn-predicate (A B)
+  (string< A B))
 
 (defvar mandoku-title-list-mode-map
   (let ((map (make-sparse-keymap))
