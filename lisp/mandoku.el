@@ -644,6 +644,8 @@ One character is either a character or one entity expression"
   (set (make-local-variable 'tab-with) 30)
   (mandoku-hide-p-markers)
   (add-to-invisibility-spec 'mandoku)
+  (easy-menu-remove org-org-menu)
+  (easy-menu-remove org-tbl-menu)
   (easy-menu-add mandoku-md-menu mandoku-mode-map)
 ;  (view-mode)
 )
@@ -898,13 +900,14 @@ One character is either a character or one entity expression"
 ;; 	    (puthash (match-string 1) (match-string 2) tablename)))))))
 
 ;;[2012-02-28T08:26:29+0900]
-(defun mandoku-get-heading (&optional n)
-  (interactive "p")
- (car (split-string (car (org-get-outline-path)) "\t" )))
 
-(defun mandoku-display-heading (&optional n)
-  (interactive "p")
-(message (mandoku-get-heading)))
+;; (defun mandoku-get-heading (&optional n)
+;;   (interactive "p")
+;;  (car (split-string (car (org-get-outline-path)) "\t" )))
+
+;; (defun mandoku-display-heading (&optional n)
+;;   (interactive "p")
+;; (message (mandoku-get-heading)))
 
 (defun mandoku-get-juan ()
   (save-excursion
@@ -945,27 +948,27 @@ One character is either a character or one entity expression"
 ;  (message 
    (car (split-string (buffer-substring-no-properties (point-at-bol) (point-at-eol)) "	")))
 
-(easy-menu-define mandoku-md-menu org-mode-map "Mandoku menu"
-  '("BK-MDA"
-    ["Test" (lambda () (interactive) (insert "test!")) t]
-    ))
+;; (easy-menu-define mandoku-md-menu org-mode-map "Mandoku menu"
+;;   '("BK-MDA"
+;;     ["Test" (lambda () (interactive) (insert "test!")) t]
+;;     ))
   
-;; (easy-menu-define mandoku-md-menu mandoku-mode-map "Mandoku menu"
-;;   '("Mandoku"
-;;     ("Browse"
-;;      ["Show Catalog" mandoku-show-catalog t]
-;;      )
-;;     ["Search" mandoku-search t]
-;;     ("Versions"
-;;      ["Switch versions" mandoku-switch-version nil]
-;;      ["Master" mandoku-switch-to-master nil]
-;;      ["New version" mandoku-new-version nil]
-;;      )
-;;     ("Maintenance"
-;;      ["Update installed texts" mandoku-update nil]
-;;      ["Add repository" mandoku-setting nil]
-;;      )
-;; ))     
+(easy-menu-define mandoku-md-menu mandoku-view-mode-map "Mandoku menu"
+  '("Mandoku"
+    ("Browse"
+     ["Show Catalog" mandoku-show-catalog t]
+     )
+    ["Search" mandoku-search t]
+    ("Versions"
+     ["Switch versions" mandoku-switch-version nil]
+     ["Master" mandoku-switch-to-master nil]
+     ["New version" mandoku-new-version nil]
+     )
+    ("Maintenance"
+     ["Update installed texts" mandoku-update nil]
+     ["Add repository" mandoku-setting nil]
+     )
+))     
 
 (defun mandoku-get-catalog-entries(file search &rest type)
 ;; have not yet defined search types, this will be parallel to org-agenda-entry-types
