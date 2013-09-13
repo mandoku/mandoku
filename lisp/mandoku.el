@@ -1143,13 +1143,17 @@ ent has the form ((serial-number title) author dynasty )"
 (defun mandoku-get-catalog-entry ()
   "let bind the search-string as var s"
   (let* ((end (save-excursion(end-of-line) (point)))
-	 (begol (save-excursion (beginning-of-line) (search-forward " ") ))
-	 (rtn (split-string 
-		(replace-regexp-in-string org-bracket-link-regexp "\\3" 
-					  (buffer-substring-no-properties begol end)))))
+	 (parent (save-excursion (org-up-heading-safe) (mandoku-get-header-item )))
+	 (rtn (mandoku-get-header-item)))
+
     (if (equal type "title")
 	(if (string-match s (car (cdr rtn)))
-	    (vector rtn (org-entry-get begol "RESP" ) (org-entry-get begol "DYNASTY" ) ))
+	    (list 
+	     rtn 
+	     (org-entry-get begol "RESP" ) 
+	     (org-entry-get begol "DYNASTY" )   
+	     (save-excursion (org-up-heading-safe) (mandoku-get-header-item ))
+	     ))
       (if (equal type "resp")
 	  (if (string-match s (org-entry-get begol "RESP" ))
 	    (list rtn (org-entry-get begol "RESP" ) (org-entry-get begol "DYNASTY" ) ))
