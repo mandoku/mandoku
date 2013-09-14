@@ -172,6 +172,14 @@
   (mandoku-grep-internal (buffer-substring-no-properties beg end)))
 
 ;;;###autoload
+(defun mandoku-show-catalog ()
+  (interactive)
+  (unless mandoku-initialized
+    (load "mandoku-initialize"))
+  (find-file mandoku-catalog)
+)
+
+;;;###autoload
 (defun mandoku-search-text (search-for)
   (interactive "P"	       
 	       (let ((search-for (mapconcat 'char-to-string (mandoku-next-three-chars) "")))
