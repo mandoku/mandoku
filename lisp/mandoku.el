@@ -180,14 +180,15 @@
 
 (defun mandoku-next-three-chars ()
   (save-excursion
-    (list
+    (mandoku-remove-nil-recursively
+     (list
      (char-after)
      (progn (mandoku-forward-one-char) (char-after))
      (progn (mandoku-forward-one-char) (char-after))
      (progn (mandoku-forward-one-char) (char-after))
      (progn (mandoku-forward-one-char) (char-after))
      (progn (mandoku-forward-one-char) (char-after))
-)))
+))))
 
 
 (defun mandoku-forward-one-char ()
@@ -1007,7 +1008,7 @@ One character is either a character or one entity expression"
       ;; The package menu buffer has keybindings.  If the user types
       ;; `M-x list-packages', that suggests it should become current.
       (switch-to-buffer buf)))
-
+;;;###autoload
 (defun mandoku-search-titles(s)
   (interactive "sEnter search string: ")
   (let* ((files (mapcar 'cdr mandoku-catalogs-alist ))
