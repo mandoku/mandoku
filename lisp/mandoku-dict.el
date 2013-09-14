@@ -17,9 +17,8 @@
 (defvar mandoku-dict-img-dir nil) 
 
 
-(defun mandoku-dict-getline (inp)
+(defun mandoku-dict-procline (inp)
   "parse the string and repetitevely call the dictionary"
-  (interactive)
   (let ((result-buffer (get-buffer-create "*Dict Result*"))
 	(the-buf (current-buffer))
 	(pos    (mandoku-position-at-point)))
@@ -37,20 +36,16 @@
   (goto-char (point-min))
   (switch-to-buffer-other-window result-buffer t)))
 
-(defun mandoku-dict-mlookup ()
-
-(defun mandoku-dict-get-region (beg end)
-  (interactive "r")
-  (let ((s (buffer-substring-no-properties beg end)))
-    (mandoku-dict-getline s)))
-
-
-
-
-(defun mandoku-dict-maybe-substring (s len)
-  (if (> (length s) len)
-      (concat (substring s 0 len) " … " )
-    s))
+(defun mandoku-dict-mlookup (arg)
+  (interactive "P")
+  (let* (
+	 (regionp (org-region-active-p))
+	 (beg (if regionp (region-beginning) (point)))
+	 (end (if regionp (region-end))))
+    (if regionp
+	(mandoku-dict-procline (buffer-substring-no-properties beg end))
+      (mandoku-dict-procline (mandoku-get-line))
+)))
 
 
 (defun mandoku-dict-get-next-line ()
@@ -59,22 +54,25 @@
   (if (equal (buffer-name) "*Dict Result*")
       (other-window 1))
   (forward-line 1)
-  (mandoku-dict-get-line)
+  (mandoku-dict-procline (mandoku-get-line))
 )
+
 (defun mandoku-dict-get-prev-line ()
   "display the entries for the next line in the Dict Buffer"
   (interactive)
   (if (equal (buffer-name) "*Dict Result*")
       (other-window 1))
   (forward-line -1)
-  (mandoku-dict-get-line)
+  (mandoku-dict-procline (mandoku-get-line))
 )
+
 (defun mandoku-dict-repeat-line ()
   "display the entries for the next line in the Dict Buffer"
   (interactive)
   (if (equal (buffer-name) "*Dict Result*")
       (other-window 1))
-  (mandoku-dict-get-line))
+  (mandoku-dict-procline (mandoku-get-line)))
+
 
 
 ;; mandoku-dict-view-mode
