@@ -19,6 +19,7 @@
 
 (defun mandoku-dict-getline (inp)
   "parse the string and repetitevely call the dictionary"
+  (interactive)
   (let ((result-buffer (get-buffer-create "*Dict Result*"))
 	(the-buf (current-buffer))
 	(pos    (mandoku-position-at-point)))
@@ -35,6 +36,8 @@
   (hide-sublevels 2)
   (goto-char (point-min))
   (switch-to-buffer-other-window result-buffer t)))
+
+(defun mandoku-dict-mlookup ()
 
 (defun mandoku-dict-get-region (beg end)
   (interactive "r")
