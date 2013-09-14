@@ -165,6 +165,19 @@
 	(message (mandoku-char-to-ucs char))
 )
 
+
+(defun mandoku-grep (beg end)
+  (interactive "r")
+  (mandoku-grep-internal (buffer-substring-no-properties beg end)))
+
+;;;###autoload
+(defun mandoku-search-text (search-for)
+  (interactive "P"
+  (let ((search-for (mapconcat 'char-to-string (mandoku-next-three-chars) "")))
+    (list (read-string "Search for: " search-for))))
+    (mandoku-grep-internal search-for)
+)
+
 (defun mandoku-next-three-chars ()
   (save-excursion
     (list
@@ -180,7 +193,8 @@
 (defun mandoku-forward-one-char ()
 	"this function moves forward one character, ignoring punctuation and markup
 One character is either a character or one entity expression"
-	(interactive)
+;	(interactive)
+	(ignore-errors
 	(save-match-data
 	(if (looking-at "&[^;]*;")
 	    (forward-char (- (match-end 0) (match-beginning 0)))
@@ -190,8 +204,8 @@ One character is either a character or one entity expression"
 	;; Need to expand punctuation regex [2001-03-15T12:30:09+0800]
 	;; this should now skip over most ideogrph punct
 	(while (looking-at mandoku-regex)
-		(forward-char (- (match-end 0) (match-beginning 0)))))
-)
+	  (forward-char (- (match-end 0) (match-beginning 0)))))
+))
 
 (defun mandoku-forward-n-characters (num)
 	(while (> num 0)
@@ -489,18 +503,6 @@ One character is either a character or one entity expression"
 
 (defun mandoku-make-textfilter ()
   "Creates a new textfilter and adds it to the list of textfilters"
-)
-
-(defun mandoku-grep (beg end)
-  (interactive "r")
-  (mandoku-grep-internal (buffer-substring-no-properties beg end)))
-
-;;;###autoload
-(defun mandoku-grep-n3 (search-for)
-  (interactive
-  (let ((search-for (mapconcat 'char-to-string (mandoku-next-three-chars) "")))
-    (list (read-string "Search for: " search-for))))
-    (mandoku-grep-internal search-for)
 )
 
 
