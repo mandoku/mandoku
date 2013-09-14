@@ -5,12 +5,11 @@
 ;; def-x = definition keys
 ;; pron-x = pronounciation keys
 ;; all keys will be sorted lexically
-(require 'org)
-(require 'cl)
-(require 'assoc)
+(require 'mandoku)
 
 (defvar mandoku-dict-regex "<[^>]*>\\|[　-㄀＀-￯\n¶]+\\|\t[^\n]+\n")
 (defvar mandoku-dict-url "http://dic.kanripo.org" )
+
 ;; pron-kanwa-01 for kanwa!
 ;(defvar mandoku-dict-pron "pron-pinyin-01")
 ;(defvar mandoku-dict-prefdic "def-abc-01-01")
@@ -36,6 +35,7 @@
   (goto-char (point-min))
   (switch-to-buffer-other-window result-buffer t)))
 
+;;;###autoload
 (defun mandoku-dict-mlookup (arg)
   (interactive "P")
   (let* (
