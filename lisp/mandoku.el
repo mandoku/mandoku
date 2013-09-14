@@ -644,7 +644,7 @@ One character is either a character or one entity expression"
   (set (make-local-variable 'tab-with) 30)
   (mandoku-hide-p-markers)
   (add-to-invisibility-spec 'mandoku)
-  (easy-menu-remove org-org-menu)
+  (easy-menu-remove-item org-mode-map org-org-menu)
   (easy-menu-remove org-tbl-menu)
   (easy-menu-add mandoku-md-menu mandoku-mode-map)
 ;  (view-mode)
