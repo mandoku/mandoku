@@ -31,6 +31,7 @@
 ;; ** Catalogs
 (defvar mandoku-catalogs-alist nil)
 
+(defvar mandoku-initialized nil)
 
 
 (defvar mandoku-file-type ".txt")
@@ -172,11 +173,13 @@
 
 ;;;###autoload
 (defun mandoku-search-text (search-for)
-  (interactive "P"
-  (let ((search-for (mapconcat 'char-to-string (mandoku-next-three-chars) "")))
-    (list (read-string "Search for: " search-for))))
-    (mandoku-grep-internal search-for)
-)
+  (interactive "P"	       
+	       (let ((search-for (mapconcat 'char-to-string (mandoku-next-three-chars) "")))
+		 (list (read-string "Search for: " search-for))))
+  (unless mandoku-initialized
+    (progn (load "mandoku-init")))
+  (mandoku-grep-internal search-for)
+  )
 
 (defun mandoku-next-three-chars ()
   (save-excursion
