@@ -178,7 +178,7 @@
 		 (list (read-string "Search for: " search-for))))
   (unless mandoku-initialized
     (progn (load "mandoku-init")))
-  (mandoku-grep-internal search-for)
+  (mandoku-grep-internal (mandoku-cut-string search-for))
   )
 
 (defun mandoku-next-three-chars ()
