@@ -175,7 +175,7 @@
 (defun mandoku-show-catalog ()
   (interactive)
   (unless mandoku-initialized
-    (load "mandoku-initialize"))
+    (load "mandoku-init"))
   (find-file mandoku-catalog)
 )
 

@@ -47,5 +47,6 @@
 ;; this part will be generated : s1/64/64268/
 ;; from this filename: 06064268-055.tif
 (setq mandoku-sqks-img-root "/Volumes/verbatimssd/db/images/skqs/")
+(setq mandoku-catalog (concat mandoku-meta-dir "mandoku-catalog.txt"))
 (setq mandoku-initialized t)
 ;; mandoku-init ends here
