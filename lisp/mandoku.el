@@ -660,7 +660,7 @@ One character is either a character or one entity expression"
   (add-to-invisibility-spec 'mandoku)
   (easy-menu-remove-item org-mode-map org-org-menu)
   (easy-menu-remove org-tbl-menu)
-  (easy-menu-add mandoku-md-menu mandoku-mode-map)
+  (easy-menu-add mandoku-md-menu mandoku-view-mode-map)
 ;  (view-mode)
 )
 
@@ -701,7 +701,7 @@ One character is either a character or one entity expression"
 
 
 
-(define-key mandoku-mode-map
+(define-key mandoku-view-mode-map
              "C-ce" 'view-mode)
 
 
