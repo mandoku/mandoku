@@ -2,7 +2,7 @@
 # convert txt files to mandoku index format
 
 import os, sys, codecs, re, datetime
-ch_re = re.compile(ur'(\[[^\]]*\]|&[^;]*;|&amp;C[X3-7]-[A-F0-9]+|.)')
+ch_re = re.compile(ur'(\[[^\]]*\]|&[^;]*;|&amp;[CZ][X3-7]-[A-F0-9]+|.)')
 img_re = re.compile(ur'<i[^>]*>')
 sys.stdout = codecs.getwriter('utf8')(sys.stdout)
 outfiles = {}
@@ -10,7 +10,7 @@ tab={'a':'1', 'b':'2', 'c':'3', 'd': '4', 'e': '5', 'f': '6', 'g':'7', 'h':'8', 
 idx={}
 def PrintToIdxfile(outdir, string, collection):
     try:
-        code = ("%4.4x"%(ord(string[0])))[0:4]
+        code = ("%4.4x"%(ord(string[0])))
     except:
         code = "gj"
     if (not code.startswith('30') and  "()/¶*".find(string[0]) == -1 ):
@@ -38,30 +38,32 @@ def PrintToIdxfile(outdir, string, collection):
 def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2, length=3, collection='test', use_vol=0):
     defs = {'line' : 0, 'noteflag': 0, 'versflag': 0, 'file': file, 'char': 0}
     def setPage(lx):
-            r=lx[1:lx.find('>')].split('_')
-            defs['ed']=r[0]
-            defs['id']=r[1]
-            defs['page']=r[-1]
-            if defs['line'] == 0:
-                ##this means we are looking at the first page?!
-                try:
-                    idlog.write("%(id)s\t%(file)s\t%(title)s\t%(ed)s\t%(page)s\t"%(defs))
-                except:
-                    idlog.write("%(id)s\t%(file)s\t%(ed)s\t%(page)s\t"%(defs))
-                    
-            defs['line']=0
+        r=lx[lx.find(':')+1:lx.find('>')].split('_')
+        #r=lx[1:lx.find('>')].split('_')
+        ## this changed for krp
+        defs['ed']=r[1]
+        defs['id']=r[0]
+        defs['page']=r[-1]
+        if defs['line'] == 0:
+            ##this means we are looking at the first page?!
             try:
-                defs['page'] = defs['page'][:-1] + tab[defs['page'][-1]]
-            except KeyError:
-                defs['page'] = re.sub(r'-', '', defs['page'])
-                #maybe there is no abcd, so we add a 'a' anyway
-                try:
-                    test=int(defs['page'])
-                    defs['page'] += '1'
-                except ValueError:
-                    print "error, :", file, line
-                    exit
-            # if there is a lb-marker at the end of the pb, we want to take it into account        
+                idlog.write("%(id)s\t%(file)s\t%(title)s\t%(ed)s\t%(page)s\t"%(defs))
+            except:
+                idlog.write("%(id)s\t%(file)s\t%(ed)s\t%(page)s\t"%(defs))
+
+        defs['line']=0
+        try:
+            defs['page'] = defs['page'][:-1] + tab[defs['page'][-1]]
+        except KeyError:
+            defs['page'] = re.sub(r'-', '', defs['page'])
+            #maybe there is no abcd, so we add a 'a' anyway
+            try:
+                test=int(defs['page'])
+                defs['page'] += '1'
+            except ValueError:
+                print "error, :", file, line
+                exit
+        # if there is a lb-marker at the end of the pb, we want to take it into account        
         
     # outdir = idxdir+'/'+file.split('/')[-1]
     # try:
@@ -119,7 +121,7 @@ def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2
             defs['char'] = 0
         elif defs.has_key('page'):
 #            defs['line'] += line.count(u'¶')
-            line = re.sub(u'[+-~\u3000-\u30FF\uFF00-\uFFEF]', '', line)
+            line = re.sub(u'[~#\u00f1-\u2fff\u3000-\u30FF\uFF00-\uFFEF]', '', line)
             ##remove the footnote markers in the hist files
             line = re.sub(u'〔[一二三四五六七八九０]+〕', '', line)
             ## FIXME: maybe remove punctuation as well?!
@@ -168,7 +170,9 @@ def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2
             ## [2010-01-07T13:14:14+0900]
             ## this needs to be done before the text is output!
             ## [2010-02-06T17:27:20+0900] FIXME : ZHSJ texts (hist) have the notes where the section is 'b'
-            ## [2010-02-18T20:35:34+0900] and now we want to add the same for verse.. 
+            ## [2010-02-18T20:35:34+0900] and now we want to add the same for verse..
+            ## [2013-08-22T18:36:33+0900] a problem with this seems to be that it mangles complex gaiji expressions
+            ## like [邱-丘+(夸-ㄅ+(万-一))] or maybe the code below handles this?
             if (line.find('(') > 0):
                 for i in range(0, len(chars)-1):
                     #look for the note
@@ -276,5 +280,5 @@ if __name__ == '__main__':
         use_vol = 1
     else:
         use_vol = 0
-#    MandokuIndex(sys.argv[1], idxdir, idlog, 3, 3, 7, collection, use_vol)
-    MandokuIndex(sys.argv[1], idxdir, idlog, 2, 2, 5, collection, use_vol)
+    MandokuIndex(sys.argv[1], idxdir, idlog, 3, 3, 7, collection, use_vol)
+#    MandokuIndex(sys.argv[1], idxdir, idlog, 2, 2, 5, collection, use_vol)

@@ -1,13 +1,23 @@
 ;; mandoku.el   -*- coding: utf-8 -*-
 ;; created [2001-03-13T20:32:32+0800]  (as smart.el)
 ;; renamed and refactored [2010-01-08T17:01:43+0900]
-
+(require 'org)
 (defvar mandoku-base-dir (expand-file-name  "/Users/Shared/md/"))
+(defvar mandoku-do-remote nil)
 
 (defvar mandoku-text-dir (expand-file-name (concat mandoku-base-dir "text/")))
-(defvar mandoku-image-dir (expand-file-name  (concat mandoku-base-dir "images/")))
-(defvar mandoku-index-dir (expand-file-name  (concat mandoku-base-dir "index/")))
+(defvar mandoku-image-dir nil)
+(defvar mandoku-index-dir nil)
 (defvar mandoku-meta-dir (expand-file-name  (concat mandoku-base-dir "meta/")))
+(defvar mandoku-temp-dir (expand-file-name  (concat mandoku-base-dir "temp/")))
+(defvar mandoku-sys-dir (expand-file-name  (concat mandoku-base-dir "system/")))
+
+(defvar mandoku-string-limit 10)
+
+;; Defined somewhere in this file, but used before definition.
+(defvar mandoku-md-menu)
+
+;; ** Textfilters
 ;; we have one default textfilter, which always exists and can be dynamically treated. 
 (defvar mandoku-default-textfilter (make-hash-table :test 'equal) )
 (setplist 'mandoku-default-textfilter '(:name "Default" :active t))
@@ -16,7 +26,13 @@
 ;; switch the whole filter mechanism on or off.
 (defvar mandoku-use-textfilter nil)
 ;; control, which collections are used.
-(defvar mandoku-collfilter-alist '(("cbeta" . t) ("dz" . nil) ("hist" . nil)))
+;; this could be a list? currently only one subcoll allowed, but it could be a regex understood by the shell ZB6[rq]
+(defvar mandoku-search-limit-to-coll nil)
+;; ** Catalogs
+(defvar mandoku-catalogs-alist nil)
+
+(defvar mandoku-initialized nil)
+
 
 (defvar mandoku-file-type ".txt")
 ;;we skip: 》《 
@@ -28,6 +44,115 @@
 (defvar mandoku-kanji-regex "\\([㐀-鿿𠀀-𪛟]+\\)")
 
 (defvar mandoku-regex "<[^>]*>\\|[　-㄀＀-￯\n¶]+\\|\t[^\n]+\n")
+
+(defun mandoku-update-subcoll-list ()
+  ;; dont really need this outer loop at the moment...
+  (dolist (x mandoku-repositories-alist)
+    (let ((scfile (concat mandoku-sys-dir "subcolls.txt")))
+      (with-current-buffer (find-file-noselect scfile t)
+	(erase-buffer)
+	(insert (format-time-string ";;[%Y-%m-%dT%T%z]\n" (current-time)))
+	(dolist (y mandoku-catalogs-alist)
+	  (let ((tlist 
+		 (with-current-buffer (find-file-noselect (cdr y))
+		   (org-map-entries 'mandoku-get-header-item "+LEVEL=2"))))
+	    (with-current-buffer (file-name-nondirectory scfile)
+	      (dolist (z tlist)
+		(insert (concat (car z) "\t" (car (last z)) "\n")))
+	      (save-buffer))))
+	      (kill-buffer (file-name-nondirectory scfile) )))))
+
+	  
+(defun mandoku-update-title-lists ()
+  (dolist (x mandoku-catalogs-alist)
+    ;; ("ZB6 佛部" . "/Users/chris/projects/meta/zb-cbeta.org")
+    (message (concat  "Reading catalog file for: "  (car x)))
+    (let* ((titlefile (concat mandoku-sys-dir (car (split-string (car x))) "-titles.txt"))
+	   (volfile (concat mandoku-sys-dir (car (split-string (car x))) "-volumes.txt"))
+	   (lookupfile (concat mandoku-sys-dir (car (split-string (car x))) "-lookup.txt"))
+	  (catfile (cdr x))
+	  (tlist 
+	   (with-current-buffer (find-file-noselect catfile)
+	     (org-map-entries 'mandoku-get-header-item "+LEVEL=3"))))
+      (message (format "%s" (concat "Updating file: " titlefile)))
+      (with-current-buffer (find-file-noselect titlefile t)
+	(erase-buffer)
+	(insert (format-time-string ";;[%Y-%m-%dT%T%z]\n" (current-time)))
+	(dolist (y tlist)
+	  (insert (concat (car y) "\t" (car (last y)) "\n")))
+	(save-buffer)
+	(kill-buffer))
+      (message (concat "Updating file: " volfile))
+      (with-current-buffer (find-file-noselect volfile t)
+	(erase-buffer)
+	(insert (format-time-string ";;[%Y-%m-%dT%T%z]\n" (current-time)))
+	(dolist (y tlist)
+	  ;; if there is a CBETA number, it is in the middle: we want the first part before "n"
+	  (if (< 2 (length y))
+	      (insert (concat (car y) "\t"  (car (split-string (car (cdr y)) "n"))  "\n"))))
+	(save-buffer)
+	(kill-buffer))
+      (with-current-buffer (find-file-noselect lookupfile t)
+	(erase-buffer)
+	(insert (format-time-string ";;[%Y-%m-%dT%T%z]\n" (current-time)))
+	(dolist (y tlist)
+	  ;; if there is a CBETA number, it is in the middle: we want the first part before "n"
+	  (if (< 2 (length y))
+	      (insert (concat (car (cdr y)) "\t"  (car y)  "\n"))))
+	(save-buffer)
+	(kill-buffer))
+      (message "Done!")
+;;      (kill-buffer catfile)
+  )))
+
+(defun mandoku-get-header-item ()
+  (let ((end (save-excursion(end-of-line) (point)))
+	(begol (save-excursion (beginning-of-line) (search-forward " ") )))
+    (split-string 
+     (replace-regexp-in-string org-bracket-link-regexp "\\3" 
+			       (buffer-substring-no-properties begol end)))))
+
+(defun mandoku-read-lookup-list () 
+  "read the titles table"
+  (setq mandoku-lookup (make-hash-table :test 'equal))
+  (dolist (x mandoku-catalogs-alist)
+    (when (file-exists-p (concat mandoku-sys-dir (car (split-string (car x))) "-lookup.txt"))
+      (with-temp-buffer
+        (let ((coding-system-for-read 'utf-8)
+              textid)
+          (insert-file-contents (concat mandoku-sys-dir (car (split-string (car x))) "-lookup.txt"))
+          (goto-char (point-min))
+          (while (re-search-forward "^\\([a-z0-9]+\\)	\\([^	
+]+\\)" nil t)
+	     (puthash (match-string 1) (match-string 2) mandoku-lookup)))))))
+
+
+(defun mandoku-read-titletables () 
+  "read the titles table"
+  (setq mandoku-subcolls (make-hash-table :test 'equal))
+  (when (file-exists-p (concat mandoku-sys-dir  "subcolls.txt"))
+    (with-temp-buffer
+      (let ((coding-system-for-read 'utf-8)
+	    textid)
+	(insert-file-contents (concat mandoku-sys-dir "subcolls.txt"))
+	(goto-char (point-min))
+	(while (re-search-forward "^\\([a-z0-9]+\\)	\\([^	
+]+\\)" nil t)
+	  (puthash (match-string 1) (match-string 2) mandoku-subcolls)))))
+
+  (setq mandoku-titles (make-hash-table :test 'equal))
+  (dolist (x mandoku-catalogs-alist)
+    (when (file-exists-p (concat mandoku-sys-dir (car (split-string (car x))) "-titles.txt"))
+      (with-temp-buffer
+        (let ((coding-system-for-read 'utf-8)
+              textid)
+          (insert-file-contents (concat mandoku-sys-dir (car (split-string (car x))) "-titles.txt"))
+          (goto-char (point-min))
+          (while (re-search-forward "^\\([a-z0-9]+\\)	\\([^	
+]+\\)" nil t)
+	     (puthash (match-string 1) (match-string 2) mandoku-titles)))))))
+
+
 
 (defun char-to-ucs (char)
   char
@@ -41,22 +166,47 @@
 	(message (mandoku-char-to-ucs char))
 )
 
+
+(defun mandoku-grep (beg end)
+  (interactive "r")
+  (mandoku-grep-internal (buffer-substring-no-properties beg end)))
+
+;;;###autoload
+(defun mandoku-show-catalog ()
+  (interactive)
+  (unless mandoku-initialized
+    (load "mandoku-init"))
+  (find-file mandoku-catalog)
+)
+
+;;;###autoload
+(defun mandoku-search-text (search-for)
+  (interactive 
+   (let ((search-for (mapconcat 'char-to-string (mandoku-next-three-chars) "")))
+     (list (read-string "Search for: " search-for))))
+  (unless mandoku-initialized
+    (progn (load "mandoku-init")))
+  (mandoku-grep-internal (mandoku-cut-string search-for))
+  )
+
 (defun mandoku-next-three-chars ()
   (save-excursion
-    (list
+    (mandoku-remove-nil-recursively
+     (list
      (char-after)
      (progn (mandoku-forward-one-char) (char-after))
      (progn (mandoku-forward-one-char) (char-after))
      (progn (mandoku-forward-one-char) (char-after))
      (progn (mandoku-forward-one-char) (char-after))
      (progn (mandoku-forward-one-char) (char-after))
-)))
+))))
 
 
 (defun mandoku-forward-one-char ()
 	"this function moves forward one character, ignoring punctuation and markup
 One character is either a character or one entity expression"
-	(interactive)
+;	(interactive)
+	(ignore-errors
 	(save-match-data
 	(if (looking-at "&[^;]*;")
 	    (forward-char (- (match-end 0) (match-beginning 0)))
@@ -66,8 +216,8 @@ One character is either a character or one entity expression"
 	;; Need to expand punctuation regex [2001-03-15T12:30:09+0800]
 	;; this should now skip over most ideogrph punct
 	(while (looking-at mandoku-regex)
-		(forward-char (- (match-end 0) (match-beginning 0)))))
-)
+	  (forward-char (- (match-end 0) (match-beginning 0)))))
+))
 
 (defun mandoku-forward-n-characters (num)
 	(while (> num 0)
@@ -85,24 +235,13 @@ One character is either a character or one entity expression"
 	(index-buffer (get-buffer-create "*temp-mandoku*"))
 	(the-buf (current-buffer))
 	(result-buffer (get-buffer-create "*Mandoku Index*"))
-	(search-char (string-to-char search-string))
 	(org-startup-folded t)
 	(mandoku-count 0))
     (progn
       (set-buffer index-buffer)
+      (setq buffer-read-only nil)
       (erase-buffer)
-;; find /tmp/index/SDZ0001.txt -name "97.idx.*" | xargs zgrep "^靈寳"
-      (shell-command
-		    (concat "bzgrep -H " "^"
-		     (substring search-string 1 )
-		     " "
-		     mandoku-index-dir
-		     (substring (format "%04x" search-char) 0 2)
-		     "/"
-		     (format "%04x" search-char)
-		     "*.idx*")
-		    index-buffer nil
-		    )
+      (mandoku-search-internal search-string index-buffer)
       ;; setup the buffer for the index results
       (set-buffer result-buffer)
       (setq buffer-read-only nil)
@@ -111,17 +250,70 @@ One character is either a character or one entity expression"
       (mandoku-read-index-buffer index-buffer result-buffer search-string)
       )))
 
+(defun mandoku-search-internal (search-string index-buffer)
+  (if mandoku-do-remote 
+      (mandoku-search-remote search-string index-buffer)
+    (mandoku-search-local search-string index-buffer)
+))
+
+(defun mandoku-search-local (search-string index-buffer)
+;; find /tmp/index/SDZ0001.txt -name "97.idx.*" | xargs zgrep "^靈寳"
+  (let ((coding-system-for-read 'utf-8)
+	(coding-system-for-write 'utf-8)
+	(search-char (string-to-char search-string)))
+      (shell-command
+		    (concat "bzgrep -H " "^"
+		     (substring search-string 1 )
+		     " "
+		     mandoku-index-dir
+		     (substring (format "%04x" search-char) 0 2)
+		     "/"
+		     (format "%04x" search-char)
+		     (if mandoku-search-limit-to-coll
+			 (concat "." mandoku-search-limit-to-coll)
+		       "")
+		     "*.idx* | cut -d : -f 2-")
+		    index-buffer nil
+		    )
+))
+
+
+(defun mandoku-tabulate-index-buffer (index-buffer result-buffer)
+  (switch-to-buffer-other-window index-buffer t)
+  (let ((tabhash (make-hash-table :test 'equal))
+	(m))
+    (goto-char (point-min))
+    (while (re-search-forward "^\\([^	]+\\)	\\([^	
+]+\\)" nil t)
+      (setq m (substring (match-string 2) 0 4))
+      (if (gethash m tabhash)
+	  (puthash m (+ (gethash m tabhash) 1) tabhash)
+	(puthash m 1 tabhash)))
+    (setq myList (mandoku-hash-to-list tabhash))
+    (set-buffer result-buffer)
+    (dolist (x   
+	     (sort myList (lambda (a b) (string< (car a) (car b)))))
+      (insert (format "* %s\t%s\t%d\n" (car x) (gethash (car x) mandoku-subcolls) (car (cdr x)))))))
+
+(defun mandoku-hash-to-list (hashtable)
+  "Return a list that represent the HASHTABLE."
+  (let (myList)
+    (maphash (lambda (kk vv) (setq myList (cons (list kk vv) myList))) hashtable)
+    myList
+  )
+)    
+  
 (defun mandoku-read-index-buffer (index-buffer result-buffer search-string)
   (let (
 	(mandoku-count 0)
 	(mandoku-filtered-count 0)
       	(search-char (string-to-char search-string)))
-
+;    (mandoku-tabulate-index-buffer index-buffer result-buffer)
       (switch-to-buffer-other-window index-buffer t)
 ;;xx      (set-buffer index-buffer)
 ;; first: sort the result (after the filename)
-      (sort-regexp-fields nil "^[^:]*:\\(.*\\)$" "\\1" (point-min) (point-max))
-
+      (setq buffer-file-name nil)
+      (sort-lines nil (point-min) (point-max))
       (goto-char (point-min))
       (while (re-search-forward
 	      (concat
@@ -140,31 +332,16 @@ One character is either a character or one entity expression"
 	       ;; the following are optional:
 	       ;; match-string 6: dummy
 	       ;; match-string 7: addinfo
-
-;;       "^[^.]*.\\([^.]*\\)?.\\(.*\\).idx[^:]*:\\([^,]*\\),\\([^\t]*\\)\t\\([^\t \n]*\\)\\(\t?\\([^\n\t ]*\\)\\)$"
-
-;;       "^[^.]*.\\([^.]*\\)?.?\\(.*\\).idx[^:]*:\\([^,]*\\),\\([^\t]*\\)\t\\([^\t \n]*\\)\\(\t[^\n\t ]*\\)?$"
-	       "^\\([^.]*.\\([^.]*\\)?.?\\(.*\\).idx[^:]*\\)?:?\\([^,]*\\),\\([^\t]*\\)\t\\([^\t \n]*\\)\\(\t[^\n\t ]*\\)?$"
+	       "^\\([^,]*\\),\\([^\t]*\\)\t\\([^\t \n]*\\)\\(\t[^\n\t ]*\\)?$"
 	) nil t )
 	(let* (
 	       ;;if no subcoll, need to switch the match assignments.
-	      (subcoll (if (equal "" (match-string 3))
-			   (match-string 3)
-			 (match-string 2)))
-	      (coll  (if (equal "" (match-string 3))
-			   (match-string 2)
-			 (match-string 3)))
-	      (pre (match-string 5))
-	      (post (match-string 4))
-	      (location (funcall (intern (concat "mandoku-" coll "-parse-location")) (match-string 6)))
-	      ;(vol (format "%02d" (string-to-number (match-string 7))))
-	      ;(page (match-string 4))
-	      ;(sec (match-string 5))
-	      (line (match-string 7))
+	      (pre (match-string 2))
+	      (post (match-string 1))
+	      (location (split-string (match-string 3) ":" ))
 	      (extra (match-string 8))
-;;	      (markup (match-string 8))
 	      )
-	  (let* ((vol (car location))
+	  (let* ((txtid (car location))
 		 (pag (car (cdr location)))
 		 (line (car (cdr (cdr location))))
 		 (page (if (string-match "[-_]"  pag)
@@ -174,38 +351,23 @@ One character is either a character or one entity expression"
 			  (format "%4.4d" (string-to-number (substring pag 0 (- (length pag) 1))))
 			  (mandoku-num-to-section (substring pag (- (length pag) 1)))
 			  line)))
-		 (tx (if (string-match "_"  (car (cdr location)))
-			 ;; if the length is five, we have a location with the textnum at the end, otherwise it starts with a vol and we have to get the textid from there
-		       (funcall (intern (concat "mandoku-" coll "-textid-to-title"))
-			(if subcoll
-			    (concat (upcase subcoll) (car location))
-			  vol)
-		       (concat page ""))
-
-;;
-		       (funcall (intern (concat "mandoku-" coll "-textid-to-title"))
-			(if subcoll
-			    (concat subcoll vol )
-			  vol)
-		       (concat page ""))))
-		 ;; (text (funcall (intern (concat "mandoku-" coll "-vol-page-to-file"))
-		 ;;       subcoll
-		 ;;       (string-to-number vol)
-		 ;;       (string-to-number pag)))
-		 )
+		 (vol (mandoku-textid-to-vol txtid))
+		 (tit (mandoku-textid-to-title txtid)))
 	    (set-buffer result-buffer)
-	    (unless (mandoku-apply-filter (car tx))
+	    (unless (mandoku-apply-filter txtid)
 	    (setq mandoku-filtered-count (+ mandoku-filtered-count 1))
-	    (insert "** [[mandoku:" coll ":" subcoll
-		    vol
+	    (insert "** [[mandoku:krp:" 
+		    txtid
 		    ":"
 		    page
 		    "::"
 		    search-string
 		    "]["
-		    (upcase subcoll)
-		    vol
-		    ", "
+;		    txtid
+;		    " "
+		    (if vol
+			(concat vol ", ")
+		      "")
 		    page
 		    "]]"
 		    "\t"
@@ -214,17 +376,15 @@ One character is either a character or one entity expression"
 		    search-char
 		    post
 		    "  [[mandoku:meta:"
-		    coll
-		    ":"
-		    (car tx)
-		    "][《"
-		    (format "%s" (car (cdr tx)))
+		    txtid
+		    ":10][《" txtid " "
+		    (format "%s" tit)
 		    "》]]\n"
 		    )
 ;; additional properties
-	    (insert ":PROPERTIES:\n:COLL: "
-		    coll
-		    "\n:ID: " (car tx)
+	    (insert ":PROPERTIES:\n:COLL: krp"
+		    "\n:ID: " txtid
+		    "\n:PAGE: " txtid ":" page
 		    "\n:PRE: "  (concat (nreverse (string-to-list pre)))
 		    "\n:POST: "
 		    search-char
@@ -243,13 +403,59 @@ One character is either a character or one entity expression"
 			  (mapconcat 'mandoku-active-filter mandoku-textfilter-list "")
 			  mandoku-filtered-count))
 	)
-      (insert (format "Location\tMatch               Source\n* %s (%d/%d)\n"  search-string mandoku-filtered-count mandoku-count))
+      (insert (format "Location\tMatch\tSource\n* %s (%d/%d)\n"  search-string mandoku-filtered-count mandoku-count))
       (mandoku-index-mode)
  ;     (org-overview)
       (hide-sublevels 2)
       (replace-buffer-in-windows index-buffer)
 ;      (kill-buffer index-buffer)
 ))
+
+(defun mandoku-textid-to-vol (txtid) nil)
+
+(defun mandoku-textid-to-title (txtid) 
+;  (list txtid (gethash txtid mandoku-titles)))
+  (gethash txtid mandoku-titles))
+
+(defun mandoku-meta-textid-to-file (txtid &optional page)
+  (let ((repid (car (split-string txtid "[0-9]"))))
+;    (concat mandoku-meta-dir repid "/" (substring txtid 0 (+ (length repid) 2)) ".org")))
+    (concat mandoku-meta-dir repid "/" (substring txtid 0 (+ (length repid) 1)) ".org")))
+
+
+(defun mandoku-get-outline-path ()
+  "this includes the first upward heading"
+  (if (org-before-first-heading-p)
+      (list "")
+    (save-excursion
+    (let ((olp ))
+	  (outline-previous-visible-heading 1)
+	  (when (looking-at org-complex-heading-regexp)
+	    (push (org-trim
+		   (replace-regexp-in-string org-bracket-link-regexp "\\3"
+		   (replace-regexp-in-string
+		    ;; Remove statistical/checkboxes cookies
+		    "\\[[0-9]+%\\]\\|\\[[0-9]+/[0-9]+\\]\\|¶" ""
+		    (org-match-string-no-properties 4))))
+		  olp))
+	  (while (org-up-heading-safe)
+	    (when (looking-at org-complex-heading-regexp)
+	      (push (mandoku-cut-string 
+		     (org-trim
+		      (replace-regexp-in-string org-bracket-link-regexp "\\3"
+		     (replace-regexp-in-string
+		      ;; Remove statistical/checkboxes cookies
+		      "\\[[0-9]+%\\]\\|\\[[0-9]+/[0-9]+\\]\\|¶" ""
+		      (org-match-string-no-properties 4)))))
+		    olp)))
+	  olp))))
+
+
+(defun mandoku-cut-string (s)
+  (if (< mandoku-string-limit (length s)  )
+      (substring s 0 mandoku-string-limit)
+    s))
+
 
 (defun manoku-index-no-filter ()
   "Temporarily displays the search result without applying a filter"
@@ -312,18 +518,6 @@ One character is either a character or one entity expression"
 
 (defun mandoku-make-textfilter ()
   "Creates a new textfilter and adds it to the list of textfilters"
-)
-
-(defun mandoku-grep (beg end)
-  (interactive "r")
-  (mandoku-grep-internal (buffer-substring-no-properties beg end)))
-
-;;;###autoload
-(defun mandoku-grep-n3 (search-for)
-  (interactive
-  (let ((search-for (mapconcat 'char-to-string (mandoku-next-three-chars) "")))
-    (list (read-string "Search for: " search-for))))
-    (mandoku-grep-internal search-for)
 )
 
 
@@ -393,15 +587,15 @@ One character is either a character or one entity expression"
   (save-excursion
     (let ((p (point)))
       (re-search-backward "<pb:" nil t)
-      (re-search-forward "\\([^_]*\\)_\\([^_]*\\)>" nil t)
+      (re-search-forward "\\([^_]*\\)_\\([^_>]*\\)>" nil t)
       (setq textid (match-string 1))
       (setq page (match-string 2))
-      (setq line 0)
+      (setq line -1)
       (while (and
 	      (< (point) p )
 	      (re-search-forward "¶" (point-max) t))
 	(setq line (+ line 1)))
-      (format "%s:%s%2.2d" textid page line))))
+      (format "%s%s, p%s%2.2d" textid (if (mandoku-get-vol) (mandoku-get-vol) "") (car (cdr (split-string page "-"))) line))))
 
 (defun mandoku-open-image-at-page ()
   (interactive)
@@ -414,20 +608,20 @@ One character is either a character or one entity expression"
   (find-file-other-window path )))
 
 
-(defun mandoku-position-at-point-internal ()
-  (interactive)
-  (save-excursion
-    (let ((p (point)))
-      (re-search-backward "<pb:" nil t)
-      (re-search-forward "\\([^_]*\\)_\\([^_]*\\)>" nil t)
-      (setq textid (match-string 1))
-      (setq page (match-string 2))
-      (setq line 0)
-      (while (and
-	      (< (point) p )
-	      (re-search-forward "¶" (point-max) t))
-	(setq line (+ line 1)))
-      (concat textid ":" page (int-to-string line)))))
+;; (defun mandoku-position-at-point-internal ()
+;;   (interactive)
+;;   (save-excursion
+;;     (let ((p (point)))
+;;       (re-search-backward "<pb:" nil t)
+;;       (re-search-forward "\\([^_:]*\\)_\\([^_]*\\)_\\([^_]*\\)>" nil t)
+;;       (setq textid (match-string 1))
+;;       (setq page (match-string 3))
+;;       (setq line 0)
+;;       (while (and
+;; 	      (< (point) p )
+;; 	      (re-search-forward "¶" (point-max) t))
+;; 	(setq line (+ line 1)))
+;;       (concat textid ":" page (int-to-string line)))))
 
 (defun mandoku-get-coll (filename)
 "find the collection of the file"
@@ -449,16 +643,52 @@ One character is either a character or one entity expression"
 
 ;; mandoku-view-mode
 
-(defvar mandoku-mode-map
+(defvar mandoku-view-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "e" 'view-mode)
-    (define-key map "a" 'redict-get-line)
+;    (define-key map "e" 'view-mode)
+;    (define-key map "a" 'redict-get-line)
          map)
   "Keymap for mandoku-view mode"
 )
+
+
+(define-derived-mode mandoku-view-mode org-mode "mandoku-view"
+  "a mode to view mandoku files
+  \\{mandoku-view-mode-map}"
+  (setq case-fold-search nil)
+;  (setq header-line-format (mandoku-header-line))
+  (set (make-local-variable 'org-startup-folded) 'showeverything)
+  (set (make-local-variable 'tab-with) 30)
+  (mandoku-hide-p-markers)
+  (add-to-invisibility-spec 'mandoku)
+;  (easy-menu-remove-item org-mode-map (list "Org") org-org-menu)
+;  (easy-menu-remove org-tbl-menu)
+  (easy-menu-add mandoku-md-menu mandoku-view-mode-map)
+;  (view-mode)
+)
+
+(defun mandoku-toggle-visibility ()
+  (interactive)
+  (if (member 'mandoku buffer-invisibility-spec)
+      (remove-from-invisibility-spec 'mandoku)
+  (add-to-invisibility-spec 'mandoku)))
+  
+      
+(defun mandoku-header-line ()
+  (let* ((fn (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))))
+	 (textid (car (split-string fn "_"))))
+    (list 
+     (concat " " textid " " (mandoku-get-title)  ", " (mandoku-get-juan) " -  ")
+     '(:eval  (mapconcat 'identity (mandoku-get-outline-path) " / "))
+     " "
+     '(:eval (mandoku-position-at-point-internal))
+     )
+     ))
+
+
 ;(setq mandoku-hide-p-re "\\(?:<[^>]*>\\)\\|¶\n\\|¶")
 ;(setq mandoku-hide-p-re "\\(?:<[^>]*>\\)\\|¶")
-(setq mandoku-hide-p-re "\\(<\\)\\([^_]+_[^_]+_\\)\\([^>]+>\\)\\|¶")
+(setq mandoku-hide-p-re "\\(<pb\\)\\([^_]+_[^_]+_\\)\\([^>]+>\\)\\|¶\\|&\\([^;]+\\);")
 (defun mandoku-hide-p-markers ()
   "add overlay 'mandoku to hide/show special characters "
   (save-match-data
@@ -466,23 +696,15 @@ One character is either a character or one entity expression"
       (goto-char (point-min))
       (while (re-search-forward mandoku-hide-p-re nil t)
 	(if (match-beginning 2)
-	    (overlay-put (make-overlay (match-beginning 2) (match-end 2)) 'invisible 'mandoku)
-	(overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'invisible 'mandoku))
+	    (overlay-put (make-overlay (- (match-beginning 2) 2) (match-end 2)) 'invisible 'mandoku)
+	  (if (match-beginning 1)
+	      (overlay-put (make-overlay (match-beginning 1) (match-end 1)) 'invisible 'mandoku)
+	    (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'invisible 'mandoku)))
 ))))
 
 
-(define-derived-mode mandoku-view-mode org-mode "mandoku-view"
-  "a mode to view mandoku files
-  \\{mandoku-mode-map}"
-  (setq case-fold-search nil)
-  (set (make-local-variable 'org-startup-folded) 'showeverything)
-  (set (make-local-variable 'tab-with) 30)
-  (mandoku-hide-p-markers)
-  (add-to-invisibility-spec 'mandoku)
-;  (view-mode)
-)
 
-(define-key mandoku-mode-map
+(define-key mandoku-view-mode-map
              "C-ce" 'view-mode)
 
 
@@ -636,10 +858,10 @@ One character is either a character or one entity expression"
 	  (search-forward (concat "<pb:" pb))))
 
 (defun mandoku-string-remove-all-properties (string)
+;  (set-text-properties 0 (length string) nil string))
   (condition-case ()
       (let ((s string))
-	(set-text-properties 0 (length string) nil string)
-	s)
+	(set-text-properties 0 (length s) nil s) s)
     (error string)))
 
 
@@ -655,7 +877,7 @@ One character is either a character or one entity expression"
   (save-excursion
     (goto-char (point-min))
     (when (re-search-forward "^#\\+TITLE: \\(.*\\)" (point-max) t)
-      (mandoku-string-remove-all-properties  (match-string 1)))))
+      (car (last (split-string (mandoku-string-remove-all-properties  (match-string 1)) " ")))  )))
       
 ;;the mode for mandoku-index
 (defvar mandoku-index-mode-map
@@ -680,35 +902,42 @@ One character is either a character or one entity expression"
 
 
 
-(defun mandoku-read-titletable (filename tablename) 
-  "reads a titles table"
-  (when (file-exists-p filename)
-    (if (> (hash-table-count tablename) 0)
-      (setq tablename (make-hash-table :test 'equal))
-      (put 'tablename :filename filename)
-      (with-temp-buffer
-        (let ((coding-system-for-read 'utf-8)
-              textid)
-          (insert-file-contents filename)
-          (goto-char (point-min))
-          (while (re-search-forward "^\\([a-z0-9]+\\)\s+\\([^\s\n]+\\)" nil t)
-	    (puthash (match-string 1) (match-string 2) tablename)))))))
+;; (defun mandoku-read-titletable (filename tablename) 
+;;   "reads a titles table"
+;;   (when (file-exists-p filename)
+;;     (if (> (hash-table-count tablename) 0)
+;;       (setq tablename (make-hash-table :test 'equal))
+;;       (put 'tablename :filename filename)
+;;       (with-temp-buffer
+;;         (let ((coding-system-for-read 'utf-8)
+;;               textid)
+;;           (insert-file-contents filename)
+;;           (goto-char (point-min))
+;;           (while (re-search-forward "^\\([a-z0-9]+\\)\s+\\([^\s\n]+\\)" nil t)
+;; 	    (puthash (match-string 1) (match-string 2) tablename)))))))
 
 ;;[2012-02-28T08:26:29+0900]
-(defun mandoku-get-heading (&optional n)
-  (interactive "p")
- (car (split-string (car (org-get-outline-path)) "\t" )))
 
-(defun mandoku-display-heading (&optional n)
-  (interactive "p")
-(message (mandoku-get-heading)))
+;; (defun mandoku-get-heading (&optional n)
+;;   (interactive "p")
+;;  (car (split-string (car (org-get-outline-path)) "\t" )))
+
+;; (defun mandoku-display-heading (&optional n)
+;;   (interactive "p")
+;; (message (mandoku-get-heading)))
 
 (defun mandoku-get-juan ()
-(interactive)
-    (save-excursion
-      (goto-char (point-min))
-      (when (re-search-forward "^#\\+PROPERTY: JUAN\\(.*\\)" (point-max) t)
-	(org-babel-clean-text-properties  (match-string 1)))))
+  (save-excursion
+    (goto-char (point-min))
+    (when (re-search-forward "^#\\+PROPERTY: JUAN \\(.*\\)" (point-max) t)
+      (mandoku-string-remove-all-properties (match-string 1)))))
+
+(defun mandoku-get-vol ()
+  (save-excursion
+    (goto-char (point-min))
+    (when (re-search-forward "^#\\+PROPERTY: VOL \\(.*\\)" (point-max) t)
+      (mandoku-string-remove-all-properties (match-string 1)))))
+
 
 (defun mandoku-page-at-point ()
   (interactive)
@@ -736,6 +965,153 @@ One character is either a character or one entity expression"
 ;  (message 
    (car (split-string (buffer-substring-no-properties (point-at-bol) (point-at-eol)) "	")))
 
+;; (easy-menu-define mandoku-md-menu org-mode-map "Mandoku menu"
+;;   '("BK-MDA"
+;;     ["Test" (lambda () (interactive) (insert "test!")) t]
+;;     ))
+  
+(easy-menu-define mandoku-md-menu mandoku-view-mode-map "Mandoku menu"
+  '("Mandoku"
+    ("Browse"
+     ["Show Catalog" mandoku-show-catalog t]
+     )
+    ["Search" mandoku-search t]
+    ("Versions"
+     ["Switch versions" mandoku-switch-version nil]
+     ["Master" mandoku-switch-to-master nil]
+     ["New version" mandoku-new-version nil]
+     )
+    ("Maintenance"
+     ["Update installed texts" mandoku-update nil]
+     ["Add repository" mandoku-setting nil]
+     )
+))     
+
+(defun mandoku-get-catalog-entries(file search &rest type)
+;; have not yet defined search types, this will be parallel to org-agenda-entry-types
+;;  (setq type (or type mandoku-search-types))
+  (let* ((org-startup-folded nil)
+	 (org-startup-align-all-tables nil)
+	 (buffer (if (file-exists-p file)
+		     (org-get-agenda-file-buffer file)
+		   (error "No such file %s" file)))
+	 arg results rtn deadline-results)
+    (if (not buffer)
+	;; If file does not exist, make sure an error message ends up in diary
+	(list (format "Mandoku search error: No such catalog-file %s" file))
+      (with-current-buffer buffer
+	(unless (derived-mode-p 'org-mode)
+	  (error "Catalog file %s is not in `org-mode'" file))
+	(setq mandoku-cat-buffer (or mandoku-cat-buffer buffer)))
+)))
+
+(defun mandoku-remove-nil-recursively (x)
+  (if (listp x)
+    (mapcar #'mandoku-remove-nil-recursively
+            (remove nil x))
+    x))
+;; catalog etc
+
+(defun mandoku-list-titles(filter)
+    (let ((buf (get-buffer-create "*Mandoku Titles*")))
+      (with-current-buffer buf
+	(mandoku-title-list-mode)
+	(set (make-local-variable 'package-menu--new-package-list)
+	     new-packages)
+	(package-menu--generate nil t))
+      ;; The package menu buffer has keybindings.  If the user types
+      ;; `M-x list-packages', that suggests it should become current.
+      (switch-to-buffer buf)))
+;;;###autoload
+(defun mandoku-search-titles(s)
+  (interactive "sEnter search string: ")
+  (let* ((files (mapcar 'cdr mandoku-catalogs-alist ))
+	 (buf (get-buffer-create "*Mandoku Titles*"))
+	 (type "title")
+	 rtn)
+    (setq rtn (mandoku-remove-nil-recursively (org-map-entries 'mandoku-get-catalog-entry "+LEVEL=3" files)))
+    (with-current-buffer buf
+      (mandoku-title-list-mode)
+      (setq tabulated-list-entries (mapcar 'mandoku-title-entry rtn))
+      (tabulated-list-print) 
+      (switch-to-buffer-other-window buf))
+;    (setq results (append results rtn))
+;    results))
+    ))
+
+(defun mandoku-title-entry (entry)
+  "Fromat the entry for  `tabulated-list-entries'.
+ent has the form ((serial-number title) author dynasty (sn-parent parent) )"
+  (let* (
+	 (sn (caar entry))
+	 (title (car (cdr (car entry))))
+	 (resp (or (nth 1 entry) ""))
+	 (dyn (or (nth 2 entry) ""))
+	 (lei (concat (substring (car (nth 3 entry)) 2) (car (cdr (nth 3 entry))))))
+    (list (cons sn nil)
+	  (vector lei sn title dyn resp ))
+))  
+
+(defun mandoku-search-resp(s)
+  (let* ((files (mapcar 'cdr mandoku-catalogs-alist ))
+	 results rtn)
+    (setq rtn (mandoku-remove-nil-recursively (org-map-entries 'mandoku-get-catalog-entry "+LEVEL=3" files)))
+    (setq results (append results rtn))
+    results))
+
+(defun mandoku-get-catalog-entry ()
+  "let bind the search-string as var s"
+  (let* ((begol (save-excursion (beginning-of-line) (search-forward " ") ))
+;	 (parent (save-excursion (org-up-heading-safe) (mandoku-get-header-item )))
+	 (rtn (mandoku-get-header-item)))
+
+    (if (equal type "title")
+	(if (string-match s (car (cdr rtn)))
+	    (list 
+	     rtn 
+	     (or (org-entry-get begol "RESP" ) "")
+	     (or (org-entry-get begol "DYNASTY" )   "")
+	     (save-excursion (org-up-heading-safe) (mandoku-get-header-item ))
+	     ))
+      (if (equal type "resp")
+	  (if (string-match s (org-entry-get begol "RESP" ))
+	    (list rtn (org-entry-get begol "RESP" ) (org-entry-get begol "DYNASTY" ) ))
+	(if (equal type "dyn")
+	  (if (string-match s (org-entry-get begol "DYNASTY" ))
+	    (list rtn (org-entry-get begol "RESP" ) (org-entry-get begol "DYNASTY" ) ))
+      )))))
+
+;; this works
+;; (setq r (mandoku-remove-nil-recursively (let ((s "周易"))
+;;   (org-map-entries 'mandoku-get-catalog-entry "+DYNASTY=\"宋\"" files))))
+
+(define-derived-mode mandoku-title-list-mode tabulated-list-mode "Title List"
+  "Major mode for browsing a list of titles.
+Letters do not insert themselves; instead, they are commands.
+\\<mandoku-title-list-mode-map>
+\\{mandoku-title-list-mode-map}"
+  (setq tabulated-list-format [("Bu" 8 nil)
+			       ("Number" 12 t)
+			       ("Title" 35 t)
+			       ("Dynasty"  10 mandoku-title-menu--dyn-predicate)
+			       ("Author" 0 t)])
+  (setq tabulated-list-padding 2)
+  (setq tabulated-list-sort-key (cons "Title" nil))
+  (tabulated-list-init-header))
+
+(defun mandoku-title-menu--dyn-predicate (A B)
+  (let ((dA (aref (cadr A) 3))
+	(dB (aref (cadr B) 3)))
+  (string< dA dB)))
+
+(defvar mandoku-title-list-mode-map
+  (let ((map (make-sparse-keymap))
+	(menu-map (make-sparse-keymap "TL")))
+    (set-keymap-parent map tabulated-list-mode-map)
+    (define-key map "i" 'package-menu-mark-install)
+    (define-key map "[RET]" 'mandoku-open-text)
+    map)
+  "Local keymap for `mandoku-title-list-mode' buffers.")
 
 (provide 'mandoku)
 

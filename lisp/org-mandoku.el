@@ -13,21 +13,40 @@
   "Open the text (and optionally go to indicated  position) in LINK.
 LINK will consist of a <textid> recognized by mandoku."
   ;; need to get the file name and then call mandoku-execute-file-search
-  (let ((coll (car (split-string link ":")))
-      (textid (car (cdr (split-string link ":"))))
-      (page (replace-in-string (car (cdr (cdr (split-string link ":")))) "_" ":" ))
-      (src (car (cdr (split-string link "::")))))
-  (message (format "%s" page))
-  (if (equal coll "meta")
-      ;; this does a headline only search in meta; we need to have the ID on the headline for this to work
-      (org-open-file (concat mandoku-meta-dir  textid ".org" ) t nil (concat "" page)) 
-;      (message (format "%s" (concat mandoku-meta-dir  textid ".org" )))
-    (org-open-file (concat mandoku-text-dir coll "/" 
-    (funcall (intern (concat "mandoku-" coll "-textid-to-file")) textid page)) t nil 
-   (if src 
-	(concat page "::" src)
-     page)
-    ))))
+  (let* ((coll (car (split-string link ":")))
+	 (textid (car (cdr (split-string link ":"))))
+	 (page (concat (if textid 
+			   (replace-in-string (car (cdr (cdr (split-string link ":")))) "_" ":" )
+			 "")))
+	 (src (car (cdr (split-string link "::"))))
+	 (fname (concat (if textid 
+			    (concat textid "_" (car (split-string page "-")) ".txt")
+			  coll)))
+	 (filename (concat  "/" 
+			    (if (equal coll "krp")
+				(concat (substring textid 0 4) "/" textid "/" fname)
+			      (if textid
+				  (funcall (intern (concat "mandoku-" coll "-textid-to-file")) textid page)
+				(concat (substring coll 0 4) "/" (substring coll 0 8) "/" coll)))
+		   )))
+    (message (format "%s" page))
+    (if (equal coll "meta")
+	  ;; this does a headline only search in meta; we need to have the ID on the headline for this to work
+	  (org-open-file filename  t nil (concat "" textid)) 
+					;      (message (format "%s" (concat mandoku-meta-dir  textid ".org" )))
+      (if (file-exists-p (concat mandoku-text-dir "/" filename))
+	  (org-open-file (concat mandoku-text-dir "/" filename) t nil 
+			 (if src 
+			     (concat page "::" src)
+			   page))
+	(if (file-exists-p (concat mandoku-temp-dir fname))
+	    (org-open-file (concat mandoku-temp-dir fname) t nil 
+			   (if src 
+			       (concat page "::" src)
+			     page))
+	  (mandoku-open-remote-file filename src page)
+	  )
+	  ))))
 
 
 
