@@ -19,13 +19,13 @@ LINK will consist of a <textid> recognized by mandoku."
 			   (replace-in-string (car (cdr (cdr (split-string link ":")))) "_" ":" )
 			 "")))
 	 (src (car (cdr (split-string link "::"))))
-	 (fname (concat (if textid 
+	 (fname (concat (if (> (length textid ) 0 )
 			    (concat textid "_" (car (split-string page "-")) ".txt")
 			  coll)))
 	 (filename (concat  "/" 
 			    (if (equal coll "krp")
 				(concat (substring textid 0 4) "/" textid "/" fname)
-			      (if textid
+			      (if (> (length textid ) 0 )
 				  (funcall (intern (concat "mandoku-" coll "-textid-to-file")) textid page)
 				(concat (substring coll 0 4) "/" (substring coll 0 8) "/" coll)))
 		   )))
