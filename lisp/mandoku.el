@@ -432,18 +432,21 @@ One character is either a character or one entity expression"
 	  (outline-previous-visible-heading 1)
 	  (when (looking-at org-complex-heading-regexp)
 	    (push (org-trim
+		   (replace-regexp-in-string org-bracket-link-regexp "\\3"
 		   (replace-regexp-in-string
 		    ;; Remove statistical/checkboxes cookies
 		    "\\[[0-9]+%\\]\\|\\[[0-9]+/[0-9]+\\]\\|¶" ""
-		    (org-match-string-no-properties 4)))
+		    (org-match-string-no-properties 4))))
 		  olp))
 	  (while (org-up-heading-safe)
 	    (when (looking-at org-complex-heading-regexp)
-	      (push (mandoku-cut-string (org-trim
+	      (push (mandoku-cut-string 
+		     (org-trim
+		      (replace-regexp-in-string org-bracket-link-regexp "\\3"
 		     (replace-regexp-in-string
 		      ;; Remove statistical/checkboxes cookies
 		      "\\[[0-9]+%\\]\\|\\[[0-9]+/[0-9]+\\]\\|¶" ""
-		      (org-match-string-no-properties 4))))
+		      (org-match-string-no-properties 4)))))
 		    olp)))
 	  olp))))
 
@@ -658,8 +661,8 @@ One character is either a character or one entity expression"
   (set (make-local-variable 'tab-with) 30)
   (mandoku-hide-p-markers)
   (add-to-invisibility-spec 'mandoku)
-  (easy-menu-remove-item org-mode-map (list "Org") org-org-menu)
-  (easy-menu-remove org-tbl-menu)
+;  (easy-menu-remove-item org-mode-map (list "Org") org-org-menu)
+;  (easy-menu-remove org-tbl-menu)
   (easy-menu-add mandoku-md-menu mandoku-view-mode-map)
 ;  (view-mode)
 )
