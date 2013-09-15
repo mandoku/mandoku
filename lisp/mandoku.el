@@ -181,9 +181,9 @@
 
 ;;;###autoload
 (defun mandoku-search-text (search-for)
-  (interactive "P"	       
-	       (let ((search-for (mapconcat 'char-to-string (mandoku-next-three-chars) "")))
-		 (list (read-string "Search for: " search-for))))
+  (interactive 
+   (let ((search-for (mapconcat 'char-to-string (mandoku-next-three-chars) "")))
+     (list (read-string "Search for: " search-for))))
   (unless mandoku-initialized
     (progn (load "mandoku-init")))
   (mandoku-grep-internal (mandoku-cut-string search-for))
@@ -645,8 +645,8 @@ One character is either a character or one entity expression"
 
 (defvar mandoku-view-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "e" 'view-mode)
-    (define-key map "a" 'redict-get-line)
+;    (define-key map "e" 'view-mode)
+;    (define-key map "a" 'redict-get-line)
          map)
   "Keymap for mandoku-view mode"
 )
@@ -656,7 +656,7 @@ One character is either a character or one entity expression"
   "a mode to view mandoku files
   \\{mandoku-view-mode-map}"
   (setq case-fold-search nil)
-  (setq header-line-format (mandoku-header-line))
+;  (setq header-line-format (mandoku-header-line))
   (set (make-local-variable 'org-startup-folded) 'showeverything)
   (set (make-local-variable 'tab-with) 30)
   (mandoku-hide-p-markers)
