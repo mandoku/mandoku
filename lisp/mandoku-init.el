@@ -42,7 +42,7 @@
 ;(setq mandoku-index-dir (expand-file-name  (concat mandoku-base-dir "index/")))
 
 (setq mandoku-index-dir "/Users/Shared/md-remote/index/")
-(setq mandoku-text-dir "/Users/Shared/md-remote/text/")
+(setq mandoku-text-dir  "/Users/Shared/md-remote/text/")
 ;; /Volumes/verbatimssd/db/images/skqs/s1/64/64268/06064268-055.tif
 ;; this part will be generated : s1/64/64268/
 ;; from this filename: 06064268-055.tif

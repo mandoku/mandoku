@@ -6,14 +6,14 @@ def proctxt(arg, dirname, names):
     if not (".git" in dirname):
         x = "".join(names)
         if "txt" in x:
-            fn = dirname.split('/')[-1]
-            of = codecs.open("%s/%s.org" % (dirname, fn), 'w', 'utf-8')
-            cnt = 0
             nrep = git.Repo.init(dirname)
             for f in names:
-                if f.endswith('txt'):
-                    cnt += 1
-                    inf = codecs.open("%s/%s" % (dirname, f), 'r', 'utf-8')
+                if f.endswith('org'):
+                    ofn = f[:-3] + 'bak'
+                    os.rename(dirname + '/'+ f, dirname + '/' + ofn)
+                    nf = f
+                    of=codecs.open(dirname + '/' + nf, 'w', 'utf-8')
+                    inf = codecs.open("%s/%s" % (dirname, ofn), 'r', 'utf-8')
                     for line in inf:
                         if line.startswith('#+TITLE:'):
                             title = line[line.index('TITLE')+6:-1]
@@ -24,9 +24,8 @@ def proctxt(arg, dirname, names):
                             j = re.sub(ur'[\[\]]', '', j)
                             of.write("[[mandoku:%s][%s %s]]\n" % (f, title.strip(), j))
                             break
-
-            nrep.index.add([fn +'.org'])
-            nrep.index.commit("Added index file %s." % (fn+'.org'))  
+            nrep.index.commit("Changed index file %s." % (fn+'.org'))
+            
 os.path.walk('.', proctxt, "")
                              
 
