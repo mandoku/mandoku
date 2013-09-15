@@ -15,6 +15,7 @@ def proctxt(arg, dirname, names):
                     of=codecs.open(dirname + '/' + nf, 'w', 'utf-8')
                     inf = codecs.open("%s/%s" % (dirname, ofn), 'r', 'utf-8')
                     for line in inf:
+                        line = re.sub("file:", "mandoku:", line)
                         if line.startswith('#+TITLE:'):
                             title = line[line.index('TITLE')+6:-1]
                             if cnt == 1:
