@@ -7,8 +7,9 @@ def proctxt(arg, dirname, names):
         x = "".join(names)
         if "txt" in x:
             nrep = git.Repo.init(dirname)
-            f = dirname.split('/')[-1]
+            f = "%s.org" % (dirname.split('/')[-1])
             ofn = f[:-3] + 'bak'
+            print f, ofn
             os.rename(dirname + '/'+ f, dirname + '/' + ofn)
             nf = f
             of=codecs.open(dirname + '/' + nf, 'w', 'utf-8')
@@ -16,7 +17,7 @@ def proctxt(arg, dirname, names):
             for line in inf:
                 line = re.sub("file:", "mandoku:", line)
                 of.write(line)
-            of.write("\n* 卷\n")
+            of.write(u"\n* 卷\n")
             for f in names:
                 if f.endswith('txt'):
                     inf = codecs.open("%s/%s" % (dirname, f), 'r', 'utf-8')
@@ -26,7 +27,7 @@ def proctxt(arg, dirname, names):
                         elif "JUAN" in line:
                             j = line[line.index('JUAN')+5:-1]
                             j = re.sub(ur'[\[\]]', '', j)
-                            of.write("** [[mandoku:%s][%s %s]]\n" % (f, title.strip(), j))
+                            of.write("** [[mandoku:%s][%s %s]]\n" % (f, title.split()[-1].strip(), j))
                             break
 
             of.close()
