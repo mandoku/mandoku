@@ -15,14 +15,18 @@ LINK will consist of a <textid> recognized by mandoku."
   ;; need to get the file name and then call mandoku-execute-file-search
   (let* ((coll (car (split-string link ":")))
       (textid (car (cdr (split-string link ":"))))
+      (if textid
       (page (replace-in-string (car (cdr (cdr (split-string link ":")))) "_" ":" ))
       (src (car (cdr (split-string link "::"))))
       (fname (concat textid "_" (car (split-string page "-")) ".txt"))
       (filename (concat  "/" 
 			 (if (equal coll "krp")
 			     (concat (substring textid 0 4) "/" textid "/" fname)
-			   (funcall (intern (concat "mandoku-" coll "-textid-to-file")) textid page))) ))
+			   (funcall (intern (concat "mandoku-" coll "-textid-to-file")) textid page))) )))
     (message (format "%s" page))
+    (unless textid
+      
+      )
   (if (equal coll "meta")
       ;; this does a headline only search in meta; we need to have the ID on the headline for this to work
       (org-open-file filename  t nil (concat "" textid)) 
