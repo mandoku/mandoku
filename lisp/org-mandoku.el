@@ -14,37 +14,30 @@
 LINK will consist of a <textid> recognized by mandoku."
   ;; need to get the file name and then call mandoku-execute-file-search
   (let* ((coll (car (split-string link ":")))
-      (textid (car (cdr (split-string link ":"))))
-      (if textid
-      (page (replace-in-string (car (cdr (cdr (split-string link ":")))) "_" ":" ))
-      (src (car (cdr (split-string link "::"))))
-      (fname (concat textid "_" (car (split-string page "-")) ".txt"))
-      (filename (concat  "/" 
-			 (if (equal coll "krp")
-			     (concat (substring textid 0 4) "/" textid "/" fname)
-			   (funcall (intern (concat "mandoku-" coll "-textid-to-file")) textid page))) )))
+	 (textid (car (cdr (split-string link ":"))))
+	 page src fname filename)
     (message (format "%s" page))
     (unless textid
+      ; if textid is nil we have a filename without path, so we just need to provide the path
+      (org-open-file (concat mandoku-text-dir  (substring coll 0 4) "/" coll) t nil )
       
-      )
-  (if (equal coll "meta")
-      ;; this does a headline only search in meta; we need to have the ID on the headline for this to work
-      (org-open-file filename  t nil (concat "" textid)) 
-;      (message (format "%s" (concat mandoku-meta-dir  textid ".org" )))
-    (if (file-exists-p (concat mandoku-text-dir "/" filename))
-	(org-open-file (concat mandoku-text-dir "/" filename) t nil 
-	 (if src 
-	     (concat page "::" src)
-	   page))
-      (if (file-exists-p (concat mandoku-temp-dir fname))
-	(org-open-file (concat mandoku-temp-dir fname) t nil 
-	 (if src 
-	     (concat page "::" src)
-	   page))
-	
-      (mandoku-open-remote-file filename src page)
-      )
-    ))))
+      (if (equal coll "meta")
+	  ;; this does a headline only search in meta; we need to have the ID on the headline for this to work
+	  (org-open-file filename  t nil (concat "" textid)) 
+					;      (message (format "%s" (concat mandoku-meta-dir  textid ".org" )))
+	(if (file-exists-p (concat mandoku-text-dir "/" filename))
+	    (org-open-file (concat mandoku-text-dir "/" filename) t nil 
+			   (if src 
+			       (concat page "::" src)
+			     page))
+	  (if (file-exists-p (concat mandoku-temp-dir fname))
+	      (org-open-file (concat mandoku-temp-dir fname) t nil 
+			     (if src 
+				 (concat page "::" src)
+			       page))
+	    (mandoku-open-remote-file filename src page)
+	    )
+	  )))))
 
 
 
