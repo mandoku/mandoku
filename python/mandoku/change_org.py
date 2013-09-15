@@ -16,17 +16,12 @@ def proctxt(arg, dirname, names):
                     inf = codecs.open("%s/%s" % (dirname, ofn), 'r', 'utf-8')
                     for line in inf:
                         line = re.sub("file:", "mandoku:", line)
-                        if line.startswith('#+TITLE:'):
-                            title = line[line.index('TITLE')+6:-1]
-                            if cnt == 1:
-                                of.write(line)
-                        elif "JUAN" in line:
-                            j = line[line.index('JUAN')+5:-1]
-                            j = re.sub(ur'[\[\]]', '', j)
-                            of.write("[[mandoku:%s][%s %s]]\n" % (f, title.strip(), j))
-                            break
-            nrep.index.commit("Changed index file %s." % (fn+'.org'))
-            
+                        of.write(line)
+                    of.close()
+                    inf.close()
+                    os.remove(dirname + '/' + ofn)
+                    nrep.index.add([nf])
+                    nrep.index.commit("Changed index file %s." % (nf))
 os.path.walk('.', proctxt, "")
                              
 
