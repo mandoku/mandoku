@@ -663,6 +663,8 @@ One character is either a character or one entity expression"
   (add-to-invisibility-spec 'mandoku)
 ;  (easy-menu-remove-item org-mode-map (list "Org") org-org-menu)
 ;  (easy-menu-remove org-tbl-menu)
+  (local-unset-key [menu-bar Org])
+  (local-unset-key [menu-bar Tbl])
   (easy-menu-add mandoku-md-menu mandoku-view-mode-map)
 ;  (view-mode)
 )
@@ -671,7 +673,17 @@ One character is either a character or one entity expression"
   (interactive)
   (if (member 'mandoku buffer-invisibility-spec)
       (remove-from-invisibility-spec 'mandoku)
-  (add-to-invisibility-spec 'mandoku)))
+    (add-to-invisibility-spec 'mandoku))
+  (if (member 'mandoku buffer-invisibility-spec)
+      (easy-menu-change
+	 '("Mandoku") "Markers"
+	 (list  ["Show" mandoku-toggle-visibility t]))
+    (easy-menu-change
+	 '("Mandoku") "Markers"
+	 (list ["Hide" mandoku-toggle-visibility t])))
+  (redraw-display)
+)
+
   
       
 (defun mandoku-header-line ()
@@ -972,10 +984,16 @@ One character is either a character or one entity expression"
   
 (easy-menu-define mandoku-md-menu mandoku-view-mode-map "Mandoku menu"
   '("Mandoku"
+    ("Markers"
+     ["Show" mandoku-toggle-visibility t])
     ("Browse"
      ["Show Catalog" mandoku-show-catalog t]
      )
-    ["Search" mandoku-search t]
+    ("Search"
+     ["Texts" mandoku-search-text t]
+     ["Titles" mandoku-search-titles t]
+     ["Dictionary" mandoku-dict-mlookup t]
+     )
     ("Versions"
      ["Switch versions" mandoku-switch-version nil]
      ["Master" mandoku-switch-to-master nil]
@@ -1108,10 +1126,28 @@ Letters do not insert themselves; instead, they are commands.
   (let ((map (make-sparse-keymap))
 	(menu-map (make-sparse-keymap "TL")))
     (set-keymap-parent map tabulated-list-mode-map)
-    (define-key map "i" 'package-menu-mark-install)
-    (define-key map "[RET]" 'mandoku-open-text)
+    (define-key map "t" 'mandoku-title-list-goto-text)
+    (define-key map "c" 'mandoku-title-list-goto-title)
+    (define-key map "v" 'mandoku-title-list-goto-title)
+    (define-key map "[RET]" 'mandoku-title-list-goto-text)
     map)
   "Local keymap for `mandoku-title-list-mode' buffers.")
+
+(defun mandoku-title-list-goto-text ()
+  (let* ((id (tabulated-list-get-id))
+	 (entry (and id (assq id tabulated-list-entries))))
+    (if entry
+;; this is where I need to implement the jump
+	(aref (cadr entry) 2)
+      "")))
+
+(defun mandoku-title-list-goto-catalog ()
+  (let* ((id (tabulated-list-get-id))
+	 (entry (and id (assq id tabulated-list-entries))))
+    (if entry
+;; this is where I need to implement the jump
+	(aref (cadr entry) 2)
+      "")))
 
 (provide 'mandoku)
 
