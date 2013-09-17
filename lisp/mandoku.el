@@ -1045,7 +1045,7 @@ One character is either a character or one entity expression"
       (switch-to-buffer buf)))
 ;;;###autoload
 (defun mandoku-search-titles(s)
-  (interactive "sEnter search string: ")
+  (interactive "sMandoku | Search for title containing: ")
   (let* ((files (mapcar 'cdr mandoku-catalogs-alist ))
 	 (buf (get-buffer-create "*Mandoku Titles*"))
 	 (type "title")
