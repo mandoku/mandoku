@@ -61,6 +61,14 @@
       (unless (file-directory-p mandoku-temp-dir)
 	(make-directory mandoku-temp-dir t))
 
+
+      (let ((byte-compile-warnings nil)
+	    ;; Byte-compile runs emacs-lisp-mode-hook; disable it
+	    (file pdir)
+	    emacs-lisp-mode-hook)
+	(byte-recompile-directory file 0))
+
+
 ;;
       (let* ((pdir (file-name-as-directory mandoku-meta-dir))
 	    (url       (or (bound-and-true-p mandoku-catalog-clone-url)
@@ -73,6 +81,8 @@
 	     git nil `(,buf t) t "--no-pager" "clone" "-v" url)))
         (unless (zerop status)
 	  (error "Couldn't clone mandoku catalogs from the Git repository: %s" url)))
+      
+
 
       (load "mandoku-init")
 
