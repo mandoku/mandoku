@@ -78,6 +78,7 @@
       (mandoku-update-subcoll-list)
       (mandoku-update-title-lists)
       (mandoku-read-titletables)
+      (mandoku-read-lookup-list)
       (with-current-buffer buf
 	(goto-char (point-max))
 	(insert "\nCongrats, mandoku is installed and ready to serve!")))))
