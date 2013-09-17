@@ -18,7 +18,7 @@
     
     (let* ((package   "mandoku")
 	   (buf       (switch-to-buffer "*mandoku bootstrap*"))
-	   (pdir      (file-name-as-directory (concat mandoku-root package)))
+	   (pdir      (file-name-as-directory (concat mandoku-root package "/lisp")))
 	   (git       (or (executable-find "git")
 			  (error "Unable to find `git'")))
 	   (url       (or (bound-and-true-p mandoku-git-install-url)
@@ -54,29 +54,30 @@
       (add-to-list 'load-path pdir)
       (load package)
 ;;
-      (let ((pdir (file-name-as-directory (concat mandoku-base-dir "/meta" )))
-	    (url       (or (bound-and-true-p mandoku-git-install-url)
-			  "http://github.com/cwittern/mandoku.git"))
+      (let* ((pdir (file-name-as-directory (concat mandoku-base-dir "/meta" )))
+	    (url       (or (bound-and-true-p mandoku-catalog-clone-url)
+			  "http://github.com/cwittern/ZB"))
+	    (default-directory pdir))
+	    
+	   ;; Now clone the catalogs
+	   (status
+	    (call-process
+	     git nil `(,buf t) t "--no-pager" "clone" "-v" url)))
 
-      (let ((mandoku-default-process-sync t) ; force sync operations for installer
-            (mandoku-verbose t))		    ; let's see it all
-        (mandoku-post-install "mandoku"))
-      (unless (boundp 'mandoku-install-skip-emacswiki-recipes)
-        (mandoku-emacswiki-build-local-recipes))
       (with-current-buffer buf
 	(goto-char (point-max))
 	(insert "\nCongrats, mandoku is installed and ready to serve!")))))
 
 
-(defun mandoku-post-install (package)
-  "install the other necessary files, make the system files etc."
-  (let*  (
-	   (buf       (switch-to-buffer "*mandoku bootstrap*"))
-	   (pdir      (file-name-as-directory (concat mandoku-root package)))
-	   (git       (or (executable-find "git")
-			  (error "Unable to find `git'")))
-	   (url       (or (bound-and-true-p mandoku-git-install-url)
-			  "http://github.com/cwittern/mandoku.git"))
-	   (default-directory mandoku-root)
-	   (process-connection-type nil)   ; pipe, no pty (--no-progress)
+;; (defun mandoku-post-install (package)
+;;   "install the other necessary files, make the system files etc."
+;;   (let*  (
+;; 	   (buf       (switch-to-buffer "*mandoku bootstrap*"))
+;; 	   (pdir      (file-name-as-directory (concat mandoku-root package)))
+;; 	   (git       (or (executable-find "git")
+;; 			  (error "Unable to find `git'")))
+;; 	   (url       (or (bound-and-true-p mandoku-git-install-url)
+;; 			  "http://github.com/cwittern/mandoku.git"))
+;; 	   (default-directory mandoku-root)
+;; 	   (process-connection-type nil)   ; pipe, no pty (--no-progress)
 
