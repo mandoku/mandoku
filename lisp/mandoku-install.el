@@ -1,13 +1,13 @@
 ;;; mandoku-install.el
 ;; inspired by el-get
-
+(setq mandoku-base-dir nil)
 (let ((mandoku-root
        (file-name-as-directory
-	(or (bound-and-true-p mandoku-dir)
+	(or (bound-and-true-p mandoku-base-dir)
 	    (concat (file-name-as-directory user-emacs-directory) "mandoku")))))
 
   (when (file-directory-p mandoku-root)
-    (add-to-list 'load-path mandoku-root))
+    (add-to-list 'load-path (concat mandoku-root "mandoku/lisp")))
 
   ;; try to require mandoku, failure means we have to install it
   (unless (require 'mandoku nil t)
@@ -20,7 +20,7 @@
 	   (git       (or (executable-find "git")
 			  (error "Unable to find `git'")))
 	   (url       (or (bound-and-true-p mandoku-git-install-url)
-			  "http://github.com/dimitri/mandoku.git"))
+			  "http://github.com/cwittern/mandoku.git"))
 	   (default-directory mandoku-root)
 	   (process-connection-type nil)   ; pipe, no pty (--no-progress)
 
