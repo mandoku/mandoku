@@ -61,10 +61,10 @@
 Click on a link or move the cursor to the link and then press enter
 
 ")
-    (dolist (x mandoku-catalogs-alist)
-      (insert (format "* [[file:%s][%s]]" (cdr x) (cadr x)))))
-  (save-buffer)
-  )
+    (dolist (x (sort mandoku-catalogs-alist (lambda (a b) (string< (car a) (car b)))))
+      (insert (format "* [[file:%s][%s]]\n" (cdr x) (car x))))
+    (save-buffer)
+  ))
 
 
     
