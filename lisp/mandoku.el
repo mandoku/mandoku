@@ -63,7 +63,7 @@
 	(dolist (y mandoku-catalogs-alist)
 	  (let ((tlist 
 		 (with-current-buffer (find-file-noselect (cdr y))
-		   (org-map-entries 'mandoku-get-header-item "+LEVEL=2"))))
+		   (org-map-entries 'mandoku-get-header-item "+LEVEL<=2"))))
 	    (with-current-buffer (file-name-nondirectory scfile)
 	      (dolist (z tlist)
 		(insert (concat (car z) "\t" (car (last z)) "\n")))

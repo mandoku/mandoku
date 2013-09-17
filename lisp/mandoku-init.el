@@ -66,7 +66,7 @@ Click on a link or move the cursor to the link and then press enter
       (insert (format "* [[file:%s][%s]]\n" (cdr x) (car t))))
     (save-buffer)
   ))
-
+)
 
     
       
