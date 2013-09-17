@@ -48,6 +48,11 @@
 
 (defvar mandoku-regex "<[^>]*>\\|[　-㄀＀-￯\n¶]+\\|\t[^\n]+\n")
 
+;; Add this since it appears to miss in emacs-2x
+(or (fboundp 'replace-in-string)
+    (defun replace-in-string (target old new)
+      (replace-regexp-in-string old new  target)))
+
 (defun mandoku-update-subcoll-list ()
   ;; dont really need this outer loop at the moment...
   (dolist (x mandoku-repositories-alist)
