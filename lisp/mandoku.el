@@ -1134,7 +1134,7 @@ Letters do not insert themselves; instead, they are commands.
   (let ((map (make-sparse-keymap))
 ;	(menu-map (make-sparse-keymap "Catalog")))
 	)
-    (set-keymap-parent map tabulated-list-mode-map)
+;    (set-keymap-parent map tabulated-list-mode-map)
     (define-key map "t" 'mandoku-title-list-goto-text)
     (define-key map "c" 'mandoku-title-list-goto-catalog)
     (define-key map "i" 'mandoku-title-list-goto-catalog)
