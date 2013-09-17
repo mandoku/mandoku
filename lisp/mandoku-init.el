@@ -62,7 +62,8 @@ Click on a link or move the cursor to the link and then press enter
 
 ")
     (dolist (x (sort mandoku-catalogs-alist (lambda (a b) (string< (car a) (car b)))))
-      (insert (format "* [[file:%s][%s]]\n" (cdr x) (car x))))
+      (let ((t (org-map-entries 'mandoku-get-header-item "+LEVEL=1" (list (cdr x)))))
+      (insert (format "* [[file:%s][%s]]\n" (cdr x) (car t))))
     (save-buffer)
   ))
 

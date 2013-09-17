@@ -725,7 +725,7 @@ One character is either a character or one entity expression"
 
 
 (define-key mandoku-view-mode-map
-             "C-ce" 'view-mode)
+  "C-ce" 'view-mode)
 
 
 
