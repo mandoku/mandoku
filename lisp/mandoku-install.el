@@ -6,6 +6,8 @@
 	(or (bound-and-true-p mandoku-base-dir)
 	    (concat (file-name-as-directory user-emacs-directory) "mandoku")))))
 
+  (setq mandoku-base-dir mandoku-root)
+
   (when (file-directory-p mandoku-root)
     (add-to-list 'load-path (concat mandoku-root "mandoku/lisp")))
 
@@ -13,7 +15,7 @@
   (unless (require 'mandoku nil t)
     (unless (file-directory-p mandoku-root)
       (make-directory mandoku-root t))
-
+    
     (let* ((package   "mandoku")
 	   (buf       (switch-to-buffer "*mandoku bootstrap*"))
 	   (pdir      (file-name-as-directory (concat mandoku-root package)))
@@ -59,3 +61,17 @@
       (with-current-buffer buf
 	(goto-char (point-max))
 	(insert "\nCongrats, mandoku is installed and ready to serve!")))))
+
+
+(defun mandoku-post-install (package)
+  "install the other necessary files, make the system files etc."
+  (let*  (
+	   (buf       (switch-to-buffer "*mandoku bootstrap*"))
+	   (pdir      (file-name-as-directory (concat mandoku-root package)))
+	   (git       (or (executable-find "git")
+			  (error "Unable to find `git'")))
+	   (url       (or (bound-and-true-p mandoku-git-install-url)
+			  "http://github.com/cwittern/mandoku.git"))
+	   (default-directory mandoku-root)
+	   (process-connection-type nil)   ; pipe, no pty (--no-progress)
+
