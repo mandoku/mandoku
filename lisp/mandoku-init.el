@@ -8,13 +8,13 @@
 
 (setq mandoku-repositories-alist '(("ZB" . "http://www.kanripo.org/zb")))
 
-(setq mandoku-catalogs-alist '(
-			       ("ZB1 經部" . "/Users/Shared/md/meta/ZB/ZB1.org")
-			       ("ZB2 史部" . "/Users/Shared/md/meta/ZB/ZB2.org")
-			       ("ZB3 子部" . "/Users/Shared/md/meta/ZB/ZB3.org")
-			       ("ZB4 集部" . "/Users/Shared/md/meta/ZB/ZB4.org")
-			       ("ZB6 佛部" . "/Users/Shared/md/meta/ZB/ZB6.org")
-))
+;; (setq mandoku-catalogs-alist '(
+;; 			       ("ZB1 經部" . "/Users/Shared/md/meta/ZB/ZB1.org")
+;; 			       ("ZB2 史部" . "/Users/Shared/md/meta/ZB/ZB2.org")
+;; 			       ("ZB3 子部" . "/Users/Shared/md/meta/ZB/ZB3.org")
+;; 			       ("ZB4 集部" . "/Users/Shared/md/meta/ZB/ZB4.org")
+;; 			       ("ZB6 佛部" . "/Users/Shared/md/meta/ZB/ZB6.org")
+;; ))
 
 (setq mandoku-do-remote t)
 (mandoku-read-titletables)    

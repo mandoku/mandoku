@@ -75,6 +75,7 @@
 	  (error "Couldn't clone mandoku catalogs from the Git repository: %s" url)))
 
       (load "mandoku-init")
+      (unless mandoku-catalogs-alist
       (mandoku-update-subcoll-list)
       (mandoku-update-title-lists)
       (mandoku-read-titletables)
