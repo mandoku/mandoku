@@ -1130,9 +1130,10 @@ Letters do not insert themselves; instead, they are commands.
 	(dB (aref (cadr B) 3)))
   (string< dA dB)))
 
-(defvar mandoku-title-list-mode-map
+(defvar mandoku-title-list-mode-map 
   (let ((map (make-sparse-keymap))
-	(menu-map (make-sparse-keymap "TL")))
+;	(menu-map (make-sparse-keymap "Catalog")))
+	)
     (set-keymap-parent map tabulated-list-mode-map)
     (define-key map "t" 'mandoku-title-list-goto-text)
     (define-key map "c" 'mandoku-title-list-goto-catalog)

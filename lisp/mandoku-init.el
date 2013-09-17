@@ -29,6 +29,9 @@
 (load "mandoku-dict" t)
 (global-set-key [f5] 'mandoku-dict-get-line)
 )
+(global-set-key [f6] 'mandoku-search-text)
+(global-set-key [S-f6] 'mandoku-search-titles)
+
 (setq mandoku-dict-url "http://www.kanripo.org/zb")
 
 (global-set-key "\M-\_" 'mandoku-annotate)
