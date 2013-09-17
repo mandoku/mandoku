@@ -38,12 +38,6 @@
                       ((bound-and-true-p mandoku-install-branch))
                       ;; Check if master branch is requested
                       ((boundp 'mandoku-master-branch) "master")
-                      ;; Read the default branch from the mandoku recipe
-                      ((plist-get (with-temp-buffer
-                                    (insert-file-contents-literally
-                                     (expand-file-name "recipes/mandoku.rcp" pdir))
-                                    (read (current-buffer)))
-                                  :branch))
                       ;; As a last resort, use the master branch
                       ("master")))
              (remote-branch (format "origin/%s" branch))
