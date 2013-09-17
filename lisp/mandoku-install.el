@@ -74,9 +74,8 @@
         (unless (zerop status)
 	  (error "Couldn't clone mandoku catalogs from the Git repository: %s" url)))
 
-      ;; now create the aux files
-      (mandoku-update-subcoll-list)
-      (mandoku-update-title-lists)
+      (load "mandoku-init")
+
       (with-current-buffer buf
 	(goto-char (point-max))
 	(insert "\nCongrats, mandoku is installed and ready to serve!")))))

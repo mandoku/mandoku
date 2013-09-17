@@ -18,12 +18,12 @@
 
 (setq mandoku-do-remote t)
 (mandoku-read-titletables)    
-(setq mandoku-base-dir (expand-file-name  "/Users/Shared/md/"))
+;(setq mandoku-base-dir (expand-file-name  "/Users/Shared/md/"))
 (setq mandoku-image-dir (expand-file-name  (concat mandoku-base-dir "images/")))
 (setq mandoku-index-dir (expand-file-name  (concat mandoku-base-dir "index/")))
 
 ;; dic
-(setq mandoku-dict-img-dir "/Users/Shared/md/images/dic/")
+;(setq mandoku-dict-img-dir "/Users/Shared/md/images/dic/")
 (setq mandoku-dict-img-dir nil)
 (ignore-errors 
 (load "mandoku-dict" t)
@@ -41,8 +41,8 @@
 ;(setq mandoku-index-dir "/Users/chris/tmp/index/")
 ;(setq mandoku-index-dir (expand-file-name  (concat mandoku-base-dir "index/")))
 
-(setq mandoku-index-dir "/Users/Shared/md-remote/index/")
-(setq mandoku-text-dir   "/Users/Shared/md-remote/text/")
+;(setq mandoku-index-dir "/Users/Shared/md-remote/index/")
+;(setq mandoku-text-dir   "/Users/Shared/md-remote/text/")
 ;; /Volumes/verbatimssd/db/images/skqs/s1/64/64268/06064268-055.tif
 ;; this part will be generated : s1/64/64268/
 ;; from this filename: 06064268-055.tif
