@@ -43,7 +43,7 @@
                       ;; As a last resort, use the master branch
                       ("master")))
              (remote-branch (format "origin/%s" branch))
-             (default-directory pdir)
+	     (default-directory mandoku-root)
              (bstatus
                (if (string-equal branch "master")
                  0
@@ -53,16 +53,23 @@
 
       (add-to-list 'load-path pdir)
       (load package)
+
+      (unless (file-directory-p mandoku-meta-dir)
+	(make-directory mandoku-meta-dir t))
+
 ;;
-      (let* ((pdir (file-name-as-directory (concat mandoku-base-dir "/meta" )))
+      (let* ((pdir (file-name-as-directory mandoku-meta-dir))
 	    (url       (or (bound-and-true-p mandoku-catalog-clone-url)
 			  "http://github.com/cwittern/ZB"))
-	    (default-directory pdir))
+	    (default-directory pdir)
 	    
 	   ;; Now clone the catalogs
 	   (status
 	    (call-process
 	     git nil `(,buf t) t "--no-pager" "clone" "-v" url)))
+        (unless (zerop status)
+	  (error "Couldn't clone mandoku catalogs from the Git repository: %s" url)))
+      
 
       (with-current-buffer buf
 	(goto-char (point-max))

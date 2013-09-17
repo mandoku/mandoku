@@ -16,6 +16,7 @@
 
 (defvar mandoku-string-limit 10)
 
+(defvar mandoku-catalog-clone-url "http://github.com/cwittern/ZB")
 ;; Defined somewhere in this file, but used before definition.
 (defvar mandoku-md-menu)
 
