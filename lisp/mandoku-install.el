@@ -53,6 +53,11 @@
 
       (add-to-list 'load-path pdir)
       (load package)
+;;
+      (let ((pdir (file-name-as-directory (concat mandoku-base-dir "/meta" )))
+	    (url       (or (bound-and-true-p mandoku-git-install-url)
+			  "http://github.com/cwittern/mandoku.git"))
+
       (let ((mandoku-default-process-sync t) ; force sync operations for installer
             (mandoku-verbose t))		    ; let's see it all
         (mandoku-post-install "mandoku"))
