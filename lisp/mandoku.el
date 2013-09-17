@@ -1135,9 +1135,9 @@ Letters do not insert themselves; instead, they are commands.
 	(menu-map (make-sparse-keymap "TL")))
     (set-keymap-parent map tabulated-list-mode-map)
     (define-key map "t" 'mandoku-title-list-goto-text)
-    (define-key map "c" 'mandoku-title-list-goto-title)
-    (define-key map "v" 'mandoku-title-list-goto-title)
-    (define-key map "[RET]" 'mandoku-title-list-goto-text)
+    (define-key map "c" 'mandoku-title-list-goto-catalog)
+    (define-key map "i" 'mandoku-title-list-goto-catalog)
+;    (define-key map "[RET]" 'mandoku-title-list-goto-text)
     map)
   "Local keymap for `mandoku-title-list-mode' buffers.")
 
@@ -1155,7 +1155,7 @@ Letters do not insert themselves; instead, they are commands.
 	 (entry (and id (assq id tabulated-list-entries))))
     (if entry
 ;; this is where I need to implement the jump
-	(aref (cadr entry) 2)
+	(org-mandoku-open (concat "meta:" (aref (cadr entry) 1) ":10"))
       "")))
 
 (provide 'mandoku)
