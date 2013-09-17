@@ -2,9 +2,11 @@
 ;; created [2001-03-13T20:32:32+0800]  (as smart.el)
 ;; renamed and refactored [2010-01-08T17:01:43+0900]
 (require 'org)
+;; the root of the mandoku hierarchy
 (defvar mandoku-base-dir (expand-file-name  "/Users/Shared/md/"))
 (defvar mandoku-do-remote nil)
 
+(defvar mandoku-lisp-dir nil)
 (defvar mandoku-text-dir (expand-file-name (concat mandoku-base-dir "text/")))
 (defvar mandoku-image-dir nil)
 (defvar mandoku-index-dir nil)
