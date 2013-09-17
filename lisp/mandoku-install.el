@@ -75,7 +75,9 @@
 	  (error "Couldn't clone mandoku catalogs from the Git repository: %s" url)))
 
       (load "mandoku-init")
-
+      (mandoku-update-subcoll-list)
+      (mandoku-update-title-lists)
+      (mandoku-read-titletables)
       (with-current-buffer buf
 	(goto-char (point-max))
 	(insert "\nCongrats, mandoku is installed and ready to serve!")))))
