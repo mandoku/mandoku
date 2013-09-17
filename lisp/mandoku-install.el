@@ -56,6 +56,10 @@
 
       (unless (file-directory-p mandoku-meta-dir)
 	(make-directory mandoku-meta-dir t))
+      (unless (file-directory-p mandoku-sys-dir)
+	(make-directory mandoku-sys-dir t))
+      (unless (file-directory-p mandoku-temp-dir)
+	(make-directory mandoku-temp-dir t))
 
 ;;
       (let* ((pdir (file-name-as-directory mandoku-meta-dir))
@@ -69,8 +73,10 @@
 	     git nil `(,buf t) t "--no-pager" "clone" "-v" url)))
         (unless (zerop status)
 	  (error "Couldn't clone mandoku catalogs from the Git repository: %s" url)))
-      
 
+      ;; now create the aux files
+      (mandoku-update-subcoll-list)
+      (mandoku-update-title-lists)
       (with-current-buffer buf
 	(goto-char (point-max))
 	(insert "\nCongrats, mandoku is installed and ready to serve!")))))
