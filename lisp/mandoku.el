@@ -1142,11 +1142,12 @@ Letters do not insert themselves; instead, they are commands.
   "Local keymap for `mandoku-title-list-mode' buffers.")
 
 (defun mandoku-title-list-goto-text ()
+  (interactive)
   (let* ((id (tabulated-list-get-id))
 	 (entry (and id (assq id tabulated-list-entries))))
     (if entry
 ;; this is where I need to implement the jump
-	(aref (cadr entry) 2)
+	(org-mandoku-open (concat  (aref (cadr entry) 1) ".org"))
       "")))
 
 (defun mandoku-title-list-goto-catalog ()
