@@ -5,8 +5,8 @@
 (require 'url-http)
 ;; probably best to make this a list sometime...
 (defvar mandoku-repositories-alist nil)
-(defvar mandoku-remote-url "http://localhost:5000/search")
-(setq mandoku-remote-url "http://127.0.0.1:5000")
+;(defvar mandoku-remote-url "http://localhost:5000/search")
+;(setq mandoku-remote-url "http://127.0.0.1:5000")
 
 (defun mandoku-search-remote (search-string index-buffer)
   (with-current-buffer index-buffer 
@@ -16,9 +16,12 @@
 
 
 (defun mandoku-open-remote-file (filename src page)
-  (let ((buffer (car (last (split-string filename "/")))))
+  (let* ((buffer (car (last (split-string filename "/"))))
+	 (rep (car (split-string buffer "[0-9]")))
+	 (rep-url (cdr (assoc rep mandoku-repositories-alist )))
+	 )
     (with-current-buffer (get-buffer-create buffer)
-      (url-insert-file-contents (concat mandoku-remote-url "/getfile?filename=" filename )
+      (url-insert-file-contents (concat rep-url "/getfile?filename=" filename )
 			      (lambda (status) (switch-to-buffer buffer))))
     (switch-to-buffer buffer)
     (setq buffer-file-name (concat mandoku-temp-dir buffer))
