@@ -22,6 +22,8 @@
 			      (lambda (status) (switch-to-buffer buffer))))
     (switch-to-buffer buffer)
     (setq buffer-file-name (concat mandoku-temp-dir buffer))
+    (unless (file-directory-p mandoku-temp-dir)
+      (make-directory mandoku-temp-dir t))
     (save-buffer)
     (mandoku-view-mode)
     (mandoku-execute-file-search 
