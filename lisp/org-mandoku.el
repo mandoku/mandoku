@@ -36,9 +36,10 @@ LINK will consist of a <textid> recognized by mandoku."
 					;      (message (format "%s" (concat mandoku-meta-dir  textid ".org" )))
       (if (file-exists-p (concat mandoku-text-dir "/" filename))
 	  (org-open-file (concat mandoku-text-dir "/" filename) t nil 
-			 (if src 
-			     (concat page "::" src)
-			   page))
+			 (or src page))
+			 ;; (if src 
+			 ;;     (concat page "::" src)
+			 ;;   page))
 	(if (file-exists-p (concat mandoku-temp-dir fname))
 	    (org-open-file (concat mandoku-temp-dir fname) t nil 
 			   (if src 
