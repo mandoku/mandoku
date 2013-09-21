@@ -25,7 +25,7 @@
 (setq mandoku-sys-dir (expand-file-name  (concat mandoku-base-dir "system/")))
 (setq mandoku-temp-dir (expand-file-name  (concat mandoku-base-dir "temp/")))
 
-(mandoku-read-titletables) 
+;; need to -install -> write mandoku-local-init -> load mandoku-local-init
 
 ;; dic
 ;(setq mandoku-dict-img-dir "/Users/Shared/md/images/dic/")
@@ -80,6 +80,7 @@ Click on a link or move the cursor to the link and then press enter
   )
 )
 
+
     
 (unless mandoku-catalogs-alist
   (dolist (dir (directory-files mandoku-meta-dir nil "^[^.,].*"))
@@ -89,6 +90,10 @@ Click on a link or move the cursor to the link and then press enter
 		     (cons (file-name-sans-extension file) (concat mandoku-meta-dir dir "/" file)))))))
       
 	    
+(mandoku-read-titletables) 
+(define-key mandoku-title-list-mode-map  "t" 'mandoku-title-list-goto-text)
+(define-key mandoku-title-list-mode-map "c" 'mandoku-title-list-goto-catalog)
+(define-key mandoku-title-list-mode-map "i" 'mandoku-title-list-goto-catalog)
  
 (setq mandoku-initialized t)
 

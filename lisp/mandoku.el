@@ -297,11 +297,12 @@ One character is either a character or one entity expression"
       (if (gethash m tabhash)
 	  (puthash m (+ (gethash m tabhash) 1) tabhash)
 	(puthash m 1 tabhash)))
-    (setq myList (mandoku-hash-to-list tabhash))
-    (set-buffer result-buffer)
-    (dolist (x   
-	     (sort myList (lambda (a b) (string< (car a) (car b)))))
-      (insert (format "* %s\t%s\t%d\n" (car x) (gethash (car x) mandoku-subcolls) (car (cdr x)))))))
+    (setq myList (mandoku-hash-to-list tabhash))))
+
+    ;; (set-buffer result-buffer)
+    ;; (dolist (x   
+    ;; 	     (sort myList (lambda (a b) (string< (car a) (car b)))))
+    ;;   (insert (format "* %s\t%s\t%d\n" (car x) (gethash (car x) mandoku-subcolls) (car (cdr x)))))))
 
 (defun mandoku-hash-to-list (hashtable)
   "Return a list that represent the HASHTABLE."
@@ -316,11 +317,11 @@ One character is either a character or one entity expression"
 	(mandoku-count 0)
 	(mandoku-filtered-count 0)
       	(search-char (string-to-char search-string)))
-;    (mandoku-tabulate-index-buffer index-buffer result-buffer)
-      (switch-to-buffer-other-window index-buffer t)
+    (mandoku-tabulate-index-buffer index-buffer result-buffer)
+    (switch-to-buffer-other-window index-buffer t)
 ;;xx      (set-buffer index-buffer)
 ;; first: sort the result (after the filename)
-      (setq buffer-file-name nil)
+    (setq buffer-file-name nil)
       (sort-lines nil (point-min) (point-max))
       (goto-char (point-min))
       (while (re-search-forward
