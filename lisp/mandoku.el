@@ -297,7 +297,8 @@ One character is either a character or one entity expression"
       (if (gethash m tabhash)
 	  (puthash m (+ (gethash m tabhash) 1) tabhash)
 	(puthash m 1 tabhash)))
-    (setq myList (mandoku-hash-to-list tabhash))))
+    tabhash))
+;    (setq myList (mandoku-hash-to-list tabhash))))
 
     ;; (set-buffer result-buffer)
     ;; (dolist (x   
