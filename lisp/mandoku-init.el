@@ -13,14 +13,19 @@
 ;; 			       ("ZB6 佛部" . "/Users/Shared/md/meta/ZB/ZB6.org")
 ;; ))
 
+
 (setq org-return-follows-link t)
 
 (setq mandoku-do-remote t)
 
-(mandoku-read-titletables) 
 ;(setq mandoku-base-dir (expand-file-name  "/Users/Shared/md-remote/"))
 (setq mandoku-image-dir (expand-file-name  (concat mandoku-base-dir "images/")))
 (setq mandoku-index-dir (expand-file-name  (concat mandoku-base-dir "index/")))
+(setq mandoku-meta-dir (expand-file-name  (concat mandoku-base-dir "meta/")))
+(setq mandoku-sys-dir (expand-file-name  (concat mandoku-base-dir "system/")))
+(setq mandoku-temp-dir (expand-file-name  (concat mandoku-base-dir "temp/")))
+
+(mandoku-read-titletables) 
 
 ;; dic
 ;(setq mandoku-dict-img-dir "/Users/Shared/md/images/dic/")
@@ -76,6 +81,12 @@ Click on a link or move the cursor to the link and then press enter
 )
 
     
+(unless mandoku-catalogs-alist
+  (dolist (dir (directory-files mandoku-meta-dir nil "^[^.,].*"))
+    (when (file-directory-p (concat mandoku-meta-dir dir))
+      (dolist (file (directory-files (concat mandoku-meta-dir dir) nil ".txt" ))
+	(add-to-list 'mandoku-catalogs-alist 
+		     (cons (file-name-sans-extension file) (concat mandoku-meta-dir dir "/" file)))))))
       
 	    
  
