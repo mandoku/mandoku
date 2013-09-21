@@ -311,13 +311,14 @@ One character is either a character or one entity expression"
     myList
   )
 )    
+
   
 (defun mandoku-read-index-buffer (index-buffer result-buffer search-string)
   (let (
 	(mandoku-count 0)
 	(mandoku-filtered-count 0)
-      	(search-char (string-to-char search-string)))
-    (mandoku-tabulate-index-buffer index-buffer result-buffer)
+      	(search-char (string-to-char search-string))
+	(tab (mandoku-tabulate-index-buffer index-buffer result-buffer)))
     (switch-to-buffer-other-window index-buffer t)
 ;;xx      (set-buffer index-buffer)
 ;; first: sort the result (after the filename)
