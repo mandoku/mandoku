@@ -997,6 +997,25 @@ One character is either a character or one entity expression"
      )
 ))     
 
+;; tab
+
+(defun mandoku-index-tab-change (state)
+  (interactive)
+  (cond 
+   ((and (eq major-mode 'mandoku-index-mode)
+	     (memq state '(children subtree)))
+    (save-excursion
+      (let ((hw 	(car (split-string  (org-get-heading)))))
+	(hi-lock-mode 1)
+	(highlight-regexp hw))))
+   ((and (eq major-mode 'mandoku-index-mode)
+	     (memq state '(overview folded)))
+      (hi-lock-mode 0))))
+
+(add-hook 'org-cycle-hook 'mandoku-index-tab-change) 
+
+
+
 (defun mandoku-get-catalog-entries(file search &rest type)
 ;; have not yet defined search types, this will be parallel to org-agenda-entry-types
 ;;  (setq type (or type mandoku-search-types))
