@@ -286,7 +286,7 @@ One character is either a character or one entity expression"
 ))
 
 
-(defun mandoku-tabulate-index-buffer (index-buffer result-buffer)
+(defun mandoku-tabulate-index-buffer (index-buffer)
   (switch-to-buffer-other-window index-buffer t)
   (let ((tabhash (make-hash-table :test 'equal))
 	(m))
@@ -318,7 +318,7 @@ One character is either a character or one entity expression"
 	(mandoku-count 0)
 	(mandoku-filtered-count 0)
       	(search-char (string-to-char search-string))
-	(tab (mandoku-tabulate-index-buffer index-buffer result-buffer)))
+	(tab (mandoku-tabulate-index-buffer index-buffer)))
     (switch-to-buffer-other-window index-buffer t)
 ;;xx      (set-buffer index-buffer)
 ;; first: sort the result (after the filename)
