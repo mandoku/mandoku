@@ -930,31 +930,6 @@ One character is either a character or one entity expression"
 )
 
 
-
-;; (defun mandoku-read-titletable (filename tablename) 
-;;   "reads a titles table"
-;;   (when (file-exists-p filename)
-;;     (if (> (hash-table-count tablename) 0)
-;;       (setq tablename (make-hash-table :test 'equal))
-;;       (put 'tablename :filename filename)
-;;       (with-temp-buffer
-;;         (let ((coding-system-for-read 'utf-8)
-;;               textid)
-;;           (insert-file-contents filename)
-;;           (goto-char (point-min))
-;;           (while (re-search-forward "^\\([a-z0-9]+\\)\s+\\([^\s\n]+\\)" nil t)
-;; 	    (puthash (match-string 1) (match-string 2) tablename)))))))
-
-;;[2012-02-28T08:26:29+0900]
-
-;; (defun mandoku-get-heading (&optional n)
-;;   (interactive "p")
-;;  (car (split-string (car (org-get-outline-path)) "\t" )))
-
-;; (defun mandoku-display-heading (&optional n)
-;;   (interactive "p")
-;; (message (mandoku-get-heading)))
-
 (defun mandoku-get-juan ()
   (save-excursion
     (goto-char (point-min))
