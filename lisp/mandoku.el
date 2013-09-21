@@ -305,6 +305,13 @@ One character is either a character or one entity expression"
     ;; 	     (sort myList (lambda (a b) (string< (car a) (car b)))))
     ;;   (insert (format "* %s\t%s\t%d\n" (car x) (gethash (car x) mandoku-subcolls) (car (cdr x)))))))
 
+(defun mandoku-index-insert-tablist (hashtable index-buffer)
+  (let ((myList (mandoku-hash-to-list hashtable)))
+    (set-buffer result-buffer)
+    (dolist (x   
+	     (sort myList (lambda (a b) (string< (car a) (car b)))))
+      (insert (format "* %s\t%s\t%d\n" (car x) (gethash (car x) mandoku-subcolls) (car (cdr x)))))))
+
 (defun mandoku-hash-to-list (hashtable)
   "Return a list that represent the HASHTABLE."
   (let (myList)
@@ -325,6 +332,10 @@ One character is either a character or one entity expression"
       	(search-char (string-to-char search-string))
 	(tab (mandoku-tabulate-index-buffer index-buffer))
 	(cnt (mandoku-sum-hash tab)))
+;    (if (> cnt 200)
+    (if nil
+	(mandoku-index-insert-tablist tab result-buffer)
+      (progn
     (switch-to-buffer-other-window index-buffer t)
 ;;xx      (set-buffer index-buffer)
 ;; first: sort the result (after the filename)
@@ -425,7 +436,7 @@ One character is either a character or one entity expression"
       (hide-sublevels 2)
       (replace-buffer-in-windows index-buffer)
 ;      (kill-buffer index-buffer)
-))
+))))
 
 (defun mandoku-textid-to-vol (txtid) nil)
 
