@@ -1152,6 +1152,7 @@ Letters do not insert themselves; instead, they are commands.
       "")))
 
 (defun mandoku-title-list-goto-catalog ()
+  (interactive)
   (let* ((id (tabulated-list-get-id))
 	 (entry (and id (assq id tabulated-list-entries))))
     (if entry
