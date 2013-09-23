@@ -7,7 +7,7 @@
 (defvar mandoku-do-remote nil)
 
 (defvar mandoku-lisp-dir nil)
-(defvar mandoku-subdirs (list "text" "images" "index" "meta" "temp" "system" "work"))
+;(defvar mandoku-subdirs (list "text" "images" "index" "meta" "temp" "system" "work"))
 (defvar mandoku-text-dir (expand-file-name (concat mandoku-base-dir "text/")))
 (defvar mandoku-image-dir nil)
 (defvar mandoku-index-dir nil)
@@ -17,7 +17,6 @@
 
 (defvar mandoku-string-limit 10)
 
-(defvar mandoku-catalog-clone-url "http://github.com/cwittern/ZB")
 ;; Defined somewhere in this file, but used before definition.
 (defvar mandoku-md-menu)
 

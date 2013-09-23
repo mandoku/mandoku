@@ -1,6 +1,7 @@
 ;;; mandoku-install.el
 ;; inspired by el-get
 (setq mandoku-base-dir nil)
+(defun mandoku-install ()
 (let ((mandoku-root
        (file-name-as-directory
 	(or (bound-and-true-p mandoku-base-dir)
@@ -92,7 +93,8 @@
       (mandoku-read-lookup-list)
       (with-current-buffer buf
 	(goto-char (point-max))
-	(insert "\nCongrats, mandoku is installed and ready to serve!")))))
+	(insert "\nCongrats, mandoku is installed and ready to serve!"))))))
+
 
 
 ;; (defun mandoku-post-install (package)
