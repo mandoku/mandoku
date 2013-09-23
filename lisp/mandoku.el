@@ -1003,7 +1003,9 @@ One character is either a character or one entity expression"
      ["New version" mandoku-new-version nil]
      )
     ("Maintenance"
-     ["Update installed texts" mandoku-update nil]
+     ["Update mandoku" mandoku-update t]
+     ["Update installed texts" mandoku-update-texts nil]
+     
      ["Add repository" mandoku-setting nil]
      )
 ))     
@@ -1178,6 +1180,27 @@ Letters do not insert themselves; instead, they are commands.
 ;; this is where I need to implement the jump
 	(org-mandoku-open (concat "meta:" (aref (cadr entry) 1) ":10"))
       "")))
+
+
+;; maintenance
+
+(defun mandoku-update()
+  (interactive)
+  (let* ((package   "mandoku")
+	 (buf       (switch-to-buffer "*mandoku bootstrap*"))
+	 (git       (or (executable-find "git")
+			(error "Unable to find `git'")))
+	 (default-directory (concat mandoku-base-dir package "/lisp"))
+	 (process-connection-type nil)   ; pipe, no pty (--no-progress)
+
+	   ;; First clone mandoku
+	 (status
+	  (call-process
+	   git nil `(,buf t) t "pull" "origin" "-v" )))
+
+	(unless (zerop status)
+	  (error "Couldn't update %s from the remote Git repository." (concat mandoku-base-dir package)))))
+
 
 (provide 'mandoku)
 
