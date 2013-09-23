@@ -73,7 +73,9 @@
 	  (byte-recompile-directory file 0)))
       ;; TODO to loop over the repository list, get the clone URL there and clone the catalog
       (mandoku-clone-catalog "http://github.com/cwittern/ZB")
-      (load "mandoku-init")
+      ;; TODO: write the file local init! // or load mandoku-init only if the local init has not been loaded...
+      (ignore-errors
+	(load "mandoku-local-init"))
 
       (mandoku-update-subcoll-list)
       (mandoku-update-title-lists)
