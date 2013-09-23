@@ -1179,6 +1179,27 @@ Letters do not insert themselves; instead, they are commands.
 	(org-mandoku-open (concat "meta:" (aref (cadr entry) 1) ":10"))
       "")))
 
+
+;; maintenance
+
+(defun mandoku-update()
+  (interactive)
+  (let* ((package   "mandoku")
+	 (buf       (switch-to-buffer "*mandoku bootstrap*"))
+	 (git       (or (executable-find "git")
+			(error "Unable to find `git'")))
+	 (default-directory (concat mandoku-base-dir package))
+	 (process-connection-type nil)   ; pipe, no pty (--no-progress)
+
+	   ;; First clone mandoku
+	 (status
+	  (call-process
+	   git nil `(,buf t) t "pull" "origin" "-v" )))
+
+	(unless (zerop status)
+	  (error "Couldn't update %s from the remote Git repository." (concat mandoku-base-dir package)))))
+
+
 (provide 'mandoku)
 
 ;; end of file mandoku.el
