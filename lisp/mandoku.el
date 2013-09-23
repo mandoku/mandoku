@@ -1003,7 +1003,9 @@ One character is either a character or one entity expression"
      ["New version" mandoku-new-version nil]
      )
     ("Maintenance"
-     ["Update installed texts" mandoku-update nil]
+     ["Update mandoku" mandoku-update t]
+     ["Update installed texts" mandoku-update-texts nil]
+     
      ["Add repository" mandoku-setting nil]
      )
 ))     
@@ -1188,7 +1190,7 @@ Letters do not insert themselves; instead, they are commands.
 	 (buf       (switch-to-buffer "*mandoku bootstrap*"))
 	 (git       (or (executable-find "git")
 			(error "Unable to find `git'")))
-	 (default-directory (concat mandoku-base-dir package))
+	 (default-directory (concat mandoku-base-dir package "/lisp"))
 	 (process-connection-type nil)   ; pipe, no pty (--no-progress)
 
 	   ;; First clone mandoku
