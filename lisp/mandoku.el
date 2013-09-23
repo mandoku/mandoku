@@ -7,6 +7,7 @@
 (defvar mandoku-do-remote nil)
 
 (defvar mandoku-lisp-dir nil)
+(defvar mandoku-subdirs (list "text" "images" "index" "meta" "temp" "system" "work"))
 (defvar mandoku-text-dir (expand-file-name (concat mandoku-base-dir "text/")))
 (defvar mandoku-image-dir nil)
 (defvar mandoku-index-dir nil)
@@ -1155,6 +1156,11 @@ Letters do not insert themselves; instead, they are commands.
 ;    (define-key map "[RET]" 'mandoku-title-list-goto-text)
     map)
   "Local keymap for `mandoku-title-list-mode' buffers.")
+
+(define-key mandoku-title-list-mode-map  "t" 'mandoku-title-list-goto-text)
+(define-key mandoku-title-list-mode-map "c" 'mandoku-title-list-goto-catalog)
+(define-key mandoku-title-list-mode-map "i" 'mandoku-title-list-goto-catalog)
+
 
 (defun mandoku-title-list-goto-text ()
   (interactive)
