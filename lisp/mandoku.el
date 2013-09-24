@@ -613,16 +613,20 @@ One character is either a character or one entity expression"
 (defun mandoku-position-at-point-internal ()
   (save-excursion
     (let ((p (point)))
-      (re-search-backward "<pb:" nil t)
-      (re-search-forward "\\([^_]*\\)_\\([^_>]*\\)>" nil t)
-      (setq textid (match-string 1))
-      (setq page (match-string 2))
-      (setq line -1)
-      (while (and
-	      (< (point) p )
-	      (re-search-forward "¶" (point-max) t))
-	(setq line (+ line 1)))
-      (format "%s%s, p%s%2.2d" textid (if (mandoku-get-vol) (mandoku-get-vol) "") (car (cdr (split-string page "-"))) line))))
+      (if 
+	  (re-search-backward "<pb:" nil t)
+	  (progn
+	    (re-search-forward "\\([^_]*\\)_\\([^_>]*\\)>" nil t)
+	    (setq textid (match-string 1))
+	    (setq page (match-string 2))
+	    (setq line -1)
+	    (while (and
+		    (< (point) p )
+		    (re-search-forward "¶" (point-max) t))
+	      (setq line (+ line 1)))
+      (format "%s%s, p%s%2.2d" textid (if (mandoku-get-vol) (mandoku-get-vol) "") (car (cdr (split-string page "-"))) line)))
+      " -- "
+      )))
 
 (defun mandoku-open-image-at-page ()
   (interactive)
@@ -1025,7 +1029,7 @@ One character is either a character or one entity expression"
 	     (memq state '(overview folded)))
       (hi-lock-mode 0))))
 
-(add-hook 'org-cycle-hook 'mandoku-index-tab-change) 
+;(add-hook 'org-cycle-hook 'mandoku-index-tab-change) 
 
 
 
