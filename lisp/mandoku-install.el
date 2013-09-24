@@ -89,6 +89,8 @@
 (defun mandoku-clone-catalog (url)
       (let* ((default-directory (file-name-as-directory mandoku-meta-dir))
 	   ;; Now clone the catalogs
+	     (git       (or (executable-find "git")
+			    (error "Unable to find `git'")))
 	   (status
 	    (call-process
 	     git nil `(,buf t) t "--no-pager" "clone" "-v" url)))
