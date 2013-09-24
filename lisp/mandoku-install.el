@@ -84,7 +84,7 @@
       (mandoku-update-title-lists)
 ;      (mandoku-read-titletables)
       (mandoku-read-lookup-list)
-      (with-current-buffer buf
+      (with-current-buffer (switch-to-buffer "*mandoku bootstrap*")
 	(goto-char (point-max))
 	(insert "\nCongrats, mandoku is installed and ready to serve!")))))
 
