@@ -23,13 +23,11 @@
     (toggle-read-only 0)
     (erase-buffer)
     (insert "* " (if pos pos "")  "\n")
-;    (with-current-buffer (get-buffer-create result-buffer)
     (url-insert-file-contents (concat mandoku-dict-url "/procline?query=" inp))
-;  (switch-to-buffer result-buffer)
-  (mandoku-dict-mode)
-  (hide-sublevels 2)
-  (goto-char (point-min))
-  (switch-to-buffer-other-window result-buffer t)))
+    (mandoku-dict-mode)
+    (hide-sublevels 2)
+    (goto-char (point-min))
+    (switch-to-buffer-other-window result-buffer t)))
 
 ;;;###autoload
 (defun mandoku-dict-mlookup (arg)
