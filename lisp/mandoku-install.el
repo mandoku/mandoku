@@ -89,6 +89,7 @@
 (defun mandoku-clone-catalog (url)
       (let* ((default-directory (file-name-as-directory mandoku-meta-dir))
 	   ;; Now clone the catalogs
+	     (buf       (switch-to-buffer "*mandoku bootstrap*"))
 	     (git       (or (executable-find "git")
 			    (error "Unable to find `git'")))
 	   (status
