@@ -109,11 +109,11 @@
 			;; As a last resort, use the master branch
 			("master")))
 ;	       (remote-branch (format "origin/%s" branch))
-	       (default-directory (concat default-directory (car (last (split-string url "/")))))
+;	       (default-directory (concat default-directory (car (last (split-string url "/")))))
 	       (bstatus
 		(if (string-equal branch "master")
 		    0
-		  (progn (insert "defdir: " default-directory)
+		  (progn (insert "defdir: " default-directory "\n")
 		  (call-process git nil (list buf t) t "checkout" "-b" branch)))))
 	  (unless (zerop bstatus)
 	    (error "Couldn't `git checkout -b %s`" branch)))
