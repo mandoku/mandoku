@@ -30,7 +30,6 @@
 
 (setq mandoku-dict-url "http://www.kanripo.org/zb")
 
-(global-set-key "\M-\_" 'mandoku-annotate)
 (setq mandoku-string-limit 20)
 
 (setq mandoku-catalog (concat mandoku-meta-dir "mandoku-catalog.txt"))
