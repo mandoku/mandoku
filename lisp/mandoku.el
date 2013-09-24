@@ -1203,7 +1203,14 @@ Letters do not insert themselves; instead, they are commands.
 	   git nil `(,buf t) t "pull" "origin" "-v" )))
 
 	(unless (zerop status)
-	  (error "Couldn't update %s from the remote Git repository." (concat mandoku-base-dir package)))))
+	  (error "Couldn't update %s from the remote Git repository." (concat mandoku-base-dir package)))
+	(let ((byte-compile-warnings nil)
+	      ;; Byte-compile runs emacs-lisp-mode-hook; disable it
+	      (file pdir)
+	      emacs-lisp-mode-hook)
+	  (byte-recompile-directory file 0)))
+
+	  ))
 
 
 (provide 'mandoku)
