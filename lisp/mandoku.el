@@ -1206,11 +1206,8 @@ Letters do not insert themselves; instead, they are commands.
 	  (error "Couldn't update %s from the remote Git repository." (concat mandoku-base-dir package)))
 	(let ((byte-compile-warnings nil)
 	      ;; Byte-compile runs emacs-lisp-mode-hook; disable it
-	      (file pdir)
 	      emacs-lisp-mode-hook)
-	  (byte-recompile-directory file 0)))
-
-	  ))
+	  (byte-recompile-directory default-directory 0))))
 
 
 (provide 'mandoku)
