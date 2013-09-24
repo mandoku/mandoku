@@ -79,7 +79,7 @@
       (ignore-errors
 	(load "mandoku-init")
 	(load "mandoku-local-init"))
-
+      (insert "Now compiling the title list, this can take a few minutes...\n")
       (mandoku-update-subcoll-list)
       (mandoku-update-title-lists)
 ;      (mandoku-read-titletables)
