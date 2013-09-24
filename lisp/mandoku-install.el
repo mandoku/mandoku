@@ -137,7 +137,7 @@
 (setq mandoku-do-remote t)
 
 
-;(setq mandoku-base-dir (expand-file-name  \"/Users/Shared/md-remote/\"))
+(setq mandoku-base-dir (expand-file-name  \"" mandoku-base-dir   "\"))
 (setq mandoku-image-dir (expand-file-name  (concat mandoku-base-dir \"images/\")))
 (setq mandoku-index-dir (expand-file-name  (concat mandoku-base-dir \"index/\")))
 (setq mandoku-meta-dir (expand-file-name  (concat mandoku-base-dir \"meta/\")))
