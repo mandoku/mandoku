@@ -74,12 +74,15 @@
       ;; TODO to loop over the repository list, get the clone URL there and clone the catalog
       (mandoku-clone-catalog "http://github.com/cwittern/ZB")
       ;; TODO: write the file local init! // or load mandoku-init only if the local init has not been loaded...
+      (add-to-list 'load-path user-emacs-directory)
+      (mandoku-setup-local-init-file)
       (ignore-errors
+	(load "mandoku-init")
 	(load "mandoku-local-init"))
 
       (mandoku-update-subcoll-list)
       (mandoku-update-title-lists)
-      (mandoku-read-titletables)
+;      (mandoku-read-titletables)
       (mandoku-read-lookup-list)
       (with-current-buffer buf
 	(goto-char (point-max))
@@ -100,6 +103,8 @@
       
 
 (defun mandoku-setup-local-init-file ()
+  (let ((local-init-file (concat (file-name-as-directory user-emacs-directory) "mandoku-local-init.el")))
+    (with-current-buffer (find-file-noselect local-init-file)
   (insert ";; local init file for mandoku
 (require 'mandoku)
 (require 'mandoku-remote)
@@ -113,27 +118,44 @@
 (setq mandoku-do-remote t)
 
 
-;(setq mandoku-base-dir (expand-file-name  "/Users/Shared/md-remote/"))
-(setq mandoku-image-dir (expand-file-name  (concat mandoku-base-dir "images/")))
-(setq mandoku-index-dir (expand-file-name  (concat mandoku-base-dir "index/")))
-(setq mandoku-meta-dir (expand-file-name  (concat mandoku-base-dir "meta/")))
-(setq mandoku-sys-dir (expand-file-name  (concat mandoku-base-dir "system/")))
-(setq mandoku-temp-dir (expand-file-name  (concat mandoku-base-dir "temp/")))
+;(setq mandoku-base-dir (expand-file-name  \"/Users/Shared/md-remote/\"))
+(setq mandoku-image-dir (expand-file-name  (concat mandoku-base-dir \"images/\")))
+(setq mandoku-index-dir (expand-file-name  (concat mandoku-base-dir \"index/\")))
+(setq mandoku-meta-dir (expand-file-name  (concat mandoku-base-dir \"meta/\")))
+(setq mandoku-sys-dir (expand-file-name  (concat mandoku-base-dir \"system/\")))
+(setq mandoku-temp-dir (expand-file-name  (concat mandoku-base-dir \"temp/\")))
 
 ;; need to -install -> write mandoku-local-init -> load mandoku-local-init
 
 ;; dic
 (setq mandoku-dict-img-dir nil)
 (ignore-errors 
-(load "mandoku-dict" t)
+(load \"mandoku-dict\" t)
 (global-set-key [f5] 'mandoku-dict-get-line)
 )
 (global-set-key [f6] 'mandoku-search-text)
 (global-set-key [S-f6] 'mandoku-search-titles)
 
-(setq mandoku-dict-url "http://www.kanripo.org/zb")
+(setq mandoku-dict-url \"http://www.kanripo.org/zb\")
 
-"
+(unless mandoku-catalogs-alist
+  (dolist (dir (directory-files mandoku-meta-dir nil \"^[^.,].*\"))
+    (when (file-directory-p (concat mandoku-meta-dir dir))
+      (dolist (file (directory-files (concat mandoku-meta-dir dir) nil \".txt\" ))
+	(add-to-list 'mandoku-catalogs-alist 
+		     (cons (file-name-sans-extension file) (concat mandoku-meta-dir dir \"/\" file)))))))
+
+(mandoku-read-titletables) 
+ 
+(setq mandoku-initialized t)
+(message \"Loading of local setup for Mandoku finished\")
+
+;; mandoku-init ends here
+
+")
+(save-buffer)
+)))
+
 
 (unless (require 'mandoku)
   (mandoku-install)
