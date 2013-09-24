@@ -115,7 +115,7 @@
 		    0
 		  (call-process git nil (list buf t) t "checkout" "-b" branch))))
 	  (unless (zerop bstatus)
-	    (error "Couldn't `git checkout -t %s`" branch)))
+	    (error "Couldn't `git checkout -b %s`" branch)))
 ))	
       
 
