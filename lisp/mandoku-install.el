@@ -96,6 +96,8 @@
 	  (error "Couldn't clone mandoku catalogs from the Git repository: %s" url))))
       
 
-
-
+(unless (require 'mandoku)
+  (mandoku-install)
+  (eval-buffer)
+)
 ;; mandoku-install ends here
