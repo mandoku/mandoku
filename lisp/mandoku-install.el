@@ -72,7 +72,7 @@
 	      emacs-lisp-mode-hook)
 	  (byte-recompile-directory file 0)))
       ;; TODO to loop over the repository list, get the clone URL there and clone the catalog
-      (mandoku-clone-catalog "http://github.com/cwittern/ZB")
+      (mandoku-clone-catalog "http://github.com/cwittern/ZB" (user-login-name))
       ;; TODO: write the file local init! // or load mandoku-init only if the local init has not been loaded...
       (add-to-list 'load-path user-emacs-directory)
       (mandoku-setup-local-init-file)
@@ -89,7 +89,7 @@
 	(insert "\nCongrats, mandoku is installed and ready to serve!")))))
 
 
-(defun mandoku-clone-catalog (url)
+(defun mandoku-clone-catalog (url &optional mandoku-install-branch)
       (let* ((default-directory (file-name-as-directory mandoku-meta-dir))
 	   ;; Now clone the catalogs
 	     (buf       (switch-to-buffer "*mandoku bootstrap*"))
@@ -99,7 +99,24 @@
 	    (call-process
 	     git nil `(,buf t) t "--no-pager" "clone" "-v" url)))
         (unless (zerop status)
-	  (error "Couldn't clone mandoku catalogs from the Git repository: %s" url))))
+	  (error "Couldn't clone mandoku catalogs from the Git repository: %s" url))
+	;; switch branch if we have to
+	(let* ((branch (cond
+			;; Check if a specific branch is requested
+			((bound-and-true-p mandoku-install-branch))
+			;; Check if master branch is requested
+			((boundp 'mandoku-master-branch) "master")
+			;; As a last resort, use the master branch
+			("master")))
+;	       (remote-branch (format "origin/%s" branch))
+	       (default-directory (concat mandoku-meta-dir (car (last (split-string url "/")))))
+	       (bstatus
+		(if (string-equal branch "master")
+		    0
+		  (call-process git nil (list buf t) t "checkout" "-b" branch))))
+	  (unless (zerop bstatus)
+	    (error "Couldn't `git checkout -t %s`" branch)))
+))	
       
 
 (defun mandoku-setup-local-init-file ()
@@ -157,8 +174,4 @@
 )))
 
 
-(unless (require 'mandoku)
-  (mandoku-install)
-  (eval-buffer)
-)
 ;; mandoku-install ends here
