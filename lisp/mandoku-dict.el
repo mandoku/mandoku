@@ -10,9 +10,6 @@
 (defvar mandoku-dict-regex "<[^>]*>\\|[　-㄀＀-￯\n¶]+\\|\t[^\n]+\n")
 (defvar mandoku-dict-url "http://www.kanripo.org/zb" )
 
-;; pron-kanwa-01 for kanwa!
-;(defvar mandoku-dict-pron "pron-pinyin-01")
-;(defvar mandoku-dict-prefdic "def-abc-01-01")
 (defvar mandoku-dict-img-dir nil) 
 
 
