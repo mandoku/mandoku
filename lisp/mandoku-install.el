@@ -109,7 +109,7 @@
 			;; As a last resort, use the master branch
 			("master")))
 ;	       (remote-branch (format "origin/%s" branch))
-	       (default-directory (concat mandoku-meta-dir (car (last (split-string url "/")))))
+	       (default-directory (concat default-directory (car (last (split-string url "/")))))
 	       (bstatus
 		(if (string-equal branch "master")
 		    0
