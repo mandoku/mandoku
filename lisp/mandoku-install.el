@@ -101,22 +101,23 @@
         (unless (zerop status)
 	  (error "Couldn't clone mandoku catalogs from the Git repository: %s" url))
 	;; switch branch if we have to
-	(let* ((branch (cond
-			;; Check if a specific branch is requested
-			((bound-and-true-p mandoku-install-branch))
-			;; Check if master branch is requested
-			((boundp 'mandoku-master-branch) "master")
-			;; As a last resort, use the master branch
-			("master")))
-;	       (remote-branch (format "origin/%s" branch))
-;	       (default-directory (concat default-directory (car (last (split-string url "/")))))
-	       (bstatus
-		(if (string-equal branch "master")
-		    0
-		  (progn (insert "defdir: " default-directory "\n")
-		  (call-process git nil (list buf t) t "checkout" "-b" branch)))))
-	  (unless (zerop bstatus)
-	    (error "Couldn't `git checkout -b %s`" branch)))
+;; arrgh, cant get this to work yet... git keeps complaining about not being in a git directory...
+;; 	(let* ((branch (cond
+;; 			;; Check if a specific branch is requested
+;; 			((bound-and-true-p mandoku-install-branch))
+;; 			;; Check if master branch is requested
+;; 			((boundp 'mandoku-master-branch) "master")
+;; 			;; As a last resort, use the master branch
+;; 			("master")))
+;; ;	       (remote-branch (format "origin/%s" branch))
+;; ;	       (default-directory (concat default-directory (car (last (split-string url "/")))))
+;; 	       (bstatus
+;; 		(if (string-equal branch "master")
+;; 		    0
+;; 		  (progn (insert "defdir: " default-directory "\n")
+;; 		  (call-process git nil (list buf t) t "checkout" "-b" branch)))))
+;; 	  (unless (zerop bstatus)
+;; 	    (error "Couldn't `git checkout -b %s`" branch)))
 ))	
       
 
