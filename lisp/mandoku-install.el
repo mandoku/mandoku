@@ -150,7 +150,7 @@
 (setq mandoku-dict-img-dir nil)
 (ignore-errors 
 (load \"mandoku-dict\" t)
-(global-set-key [f5] 'mandoku-dict-get-line)
+(global-set-key [f5] 'mandoku-dict-mlookup)
 )
 (global-set-key [f6] 'mandoku-search-text)
 (global-set-key [S-f6] 'mandoku-search-titles)
