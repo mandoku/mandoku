@@ -113,7 +113,8 @@
 	       (bstatus
 		(if (string-equal branch "master")
 		    0
-		  (call-process git nil (list buf t) t "checkout" "-b" branch))))
+		  (progn (insert "defdir: " default-directory)
+		  (call-process git nil (list buf t) t "checkout" "-b" branch)))))
 	  (unless (zerop bstatus)
 	    (error "Couldn't `git checkout -b %s`" branch)))
 ))	
