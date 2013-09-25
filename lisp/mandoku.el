@@ -310,7 +310,7 @@ One character is either a character or one entity expression"
     (set-buffer result-buffer)
     (dolist (x   
 	     (sort myList (lambda (a b) (string< (car a) (car b)))))
-      (insert (format "* %s\t%s\t%d\n" (car x) (gethash (car x) mandoku-subcolls) (car (cdr x)))))))
+      (insert (format "* %s\t%s\t%d\n\n" (car x) (gethash (car x) mandoku-subcolls) (car (cdr x)))))))
 
 (defun mandoku-hash-to-list (hashtable)
   "Return a list that represent the HASHTABLE."
