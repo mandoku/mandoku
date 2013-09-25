@@ -124,6 +124,7 @@
 (defun mandoku-setup-local-init-file ()
   (let ((local-init-file (concat (file-name-as-directory user-emacs-directory) "mandoku-local-init.el")))
     (with-current-buffer (find-file-noselect local-init-file)
+      (erase-buffer)
   (insert ";; local init file for mandoku
 (require 'mandoku)
 (require 'mandoku-remote)
@@ -166,11 +167,39 @@
 	(add-to-list 'mandoku-catalogs-alist 
 		     (cons (file-name-sans-extension file) (concat mandoku-meta-dir dir \"/\" file)))))))
 
+(setq mandoku-catalog (concat mandoku-meta-dir \"mandoku-catalog.txt\"))
+
+(unless (file-exists-p mandoku-catalog)
+  (with-current-buffer (find-file-noselect mandoku-catalog)
+    (erase-buffer)
+    (insert \"#-*- mode: mandoku-view; -*-
+#+DATE: \" (format-time-string \"%Y-%m-%d\\n\" (current-time))  
+\"#+TITLE: 漢籍リポジトリ目録
+
+# このファイルは自動作成しますので、編集しないでください
+# This file is generated automatically, so please do not edit
+
+リンクをクリックするかカーソルをリンクの上に移動して<enter>してください
+Click on a link or move the cursor to the link and then press enter
+
+\")
+
+    (dolist (x (sort mandoku-catalogs-alist (lambda (a b) (string< (car a) (car b)))))
+      (insert 
+       (format \"* [[file:%s][%s %s]]\\n\" 
+	       (cdr x) 
+	       (car x)
+	       (gethash (substring (car x) 2)  mandoku-subcolls))))
+    (save-buffer)
+    )
+  )
+
+
 (mandoku-read-titletables) 
  
 (setq mandoku-initialized t)
 (message \"Loading of local setup for Mandoku finished\")
-
+(find-file mandoku-catalog)
 ;; mandoku-init ends here
 
 ")

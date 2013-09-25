@@ -45,8 +45,9 @@
 
 (unless (file-exists-p mandoku-catalog)
   (with-current-buffer (find-file-noselect mandoku-catalog)
+    (erase-buffer)
     (insert "#-*- mode: mandoku-view; -*-
-#+DATE: " (current-time)  "
+#+DATE: " (format-time-string "%Y-%m-%d" (current-time))  "
 #+TITLE: 漢籍リポジトリ目録
 
 # このファイルは自動作成しますので、編集しないでください
