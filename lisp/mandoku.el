@@ -325,16 +325,8 @@ One character is either a character or one entity expression"
     (maphash (lambda (kk vv) (setq cnt (+ cnt vv))) hashtable)
     cnt))
 
-(defun mandoku-read-index-buffer (index-buffer result-buffer search-string)
-  (let* (
-	(mandoku-count 0)
-	(mandoku-filtered-count 0)
-      	(search-char (string-to-char search-string))
-	(tab (mandoku-tabulate-index-buffer index-buffer))
-	(cnt (mandoku-sum-hash tab)))
-    (if (and (not (= 0 mandoku-index-display-limit)) (> cnt mandoku-index-display-limit))
-;    (if nil
-	(mandoku-index-insert-tablist tab result-buffer)
+(defun mandoku-index-insert-result (index-buffer result-buffer  &optional filter)
+  (let ((tmp))
       (progn
     (switch-to-buffer-other-window index-buffer t)
 ;;xx      (set-buffer index-buffer)
@@ -359,7 +351,7 @@ One character is either a character or one entity expression"
 	       ;; the following are optional:
 	       ;; match-string 6: dummy
 	       ;; match-string 7: addinfo
-	       "^\\([^,]*\\),\\([^\t]*\\)\t\\([^\t \n]*\\)\\(\t[^\n\t ]*\\)?$"
+	       (concat "^\\([^,]*\\),\\([^\t]*\\)\t" filter  "\\([^\t \n]*\\)\\(\t[^\n\t ]*\\)?$")
 	) nil t )
 	(let* (
 	       ;;if no subcoll, need to switch the match assignments.
@@ -420,7 +412,19 @@ One character is either a character or one entity expression"
 		    ))
 	    (set-buffer index-buffer)
 	    (setq mandoku-count (+ mandoku-count 1))
-	    )))))
+))))))    
+
+(defun mandoku-read-index-buffer (index-buffer result-buffer search-string)
+  (let* (
+	(mandoku-count 0)
+	(mandoku-filtered-count 0)
+      	(search-char (string-to-char search-string))
+	(tab (mandoku-tabulate-index-buffer index-buffer))
+	(cnt (mandoku-sum-hash tab)))
+    (if (and (not (= 0 mandoku-index-display-limit)) (> cnt mandoku-index-display-limit))
+;    (if nil
+	(mandoku-index-insert-tablist tab result-buffer)
+      (mandoku-index-insert-result index-buffer result-buffer)
 
       (switch-to-buffer-other-window result-buffer t)
       (goto-char (point-min))
