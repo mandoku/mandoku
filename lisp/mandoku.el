@@ -624,8 +624,8 @@ One character is either a character or one entity expression"
 		    (< (point) p )
 		    (re-search-forward "¶" (point-max) t))
 	      (setq line (+ line 1)))
-      (format "%s%s, p%s%2.2d" textid (if (mandoku-get-vol) (mandoku-get-vol) "") (car (cdr (split-string page "-"))) line)))
-      " -- "
+	    (format "%s%s, p%s%2.2d" textid (if (mandoku-get-vol) (mandoku-get-vol) "") (car (cdr (split-string page "-"))) line))
+	" -- ")
       )))
 
 (defun mandoku-open-image-at-page ()
@@ -687,7 +687,7 @@ One character is either a character or one entity expression"
   "a mode to view mandoku files
   \\{mandoku-view-mode-map}"
   (setq case-fold-search nil)
-;  (setq header-line-format (mandoku-header-line))
+  (setq header-line-format (mandoku-header-line))
   (set (make-local-variable 'org-startup-folded) 'showeverything)
   (set (make-local-variable 'tab-with) 30)
   (mandoku-hide-p-markers)
