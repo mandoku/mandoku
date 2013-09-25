@@ -32,7 +32,7 @@
 
 (setq mandoku-string-limit 20)
 
-(setq mandoku-catalog (concat mandoku-meta-dir "mandoku-catalog.txt"))
+(setq mandoku-catalog (concat mandoku-meta-dir "mandoku-catalogx.txt"))
 
 (unless (file-exists-p mandoku-catalog)
   (with-current-buffer (find-file-noselect mandoku-catalog)
@@ -48,15 +48,15 @@ Click on a link or move the cursor to the link and then press enter
 
 ")
 
-(dolist (x (sort mandoku-catalogs-alist (lambda (a b) (string< (car a) (car b)))))
-  (insert 
-   (format "* [[file:%s][%s %s]]\n" 
-	   (cdr x) 
-	   (car x)
-	   (gethash (substring (car x) 2)  mandoku-subcolls))))
+    (dolist (x (sort mandoku-catalogs-alist (lambda (a b) (string< (car a) (car b)))))
+      (insert 
+       (format "* [[file:%s][%s %s]]\n" 
+	       (cdr x) 
+	       (car x)
+	       (gethash (substring (car x) 2)  mandoku-subcolls))))
     (save-buffer)
+    )
   )
-)
 
 
     
