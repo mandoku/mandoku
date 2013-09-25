@@ -3,7 +3,7 @@
 ;; renamed and refactored [2010-01-08T17:01:43+0900]
 (require 'org)
 ;; the root of the mandoku hierarchy
-(defvar mandoku-base-dir (expand-file-name  "/Users/Shared/md/"))
+(defvar mandoku-base-dir (expand-file-name  "~/krp/"))
 (defvar mandoku-do-remote nil)
 
 (defvar mandoku-lisp-dir nil)
@@ -16,7 +16,7 @@
 (defvar mandoku-sys-dir (expand-file-name  (concat mandoku-base-dir "system/")))
 
 (defvar mandoku-string-limit 10)
-
+(defvar mandoku-index-display-limit 200)
 ;; Defined somewhere in this file, but used before definition.
 (defvar mandoku-md-menu)
 
@@ -332,8 +332,8 @@ One character is either a character or one entity expression"
       	(search-char (string-to-char search-string))
 	(tab (mandoku-tabulate-index-buffer index-buffer))
 	(cnt (mandoku-sum-hash tab)))
-;    (if (> cnt 200)
-    (if nil
+    (if (and (not (= 0 mandoku-index-display-limit)) (> cnt mandoku-index-display-limit))
+;    (if nil
 	(mandoku-index-insert-tablist tab result-buffer)
       (progn
     (switch-to-buffer-other-window index-buffer t)
