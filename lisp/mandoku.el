@@ -420,7 +420,8 @@ One character is either a character or one entity expression"
 		    ))
 	    (set-buffer index-buffer)
 	    (setq mandoku-count (+ mandoku-count 1))
-	    )))
+	    )))))
+
       (switch-to-buffer-other-window result-buffer t)
       (goto-char (point-min))
 ;      (insert (format "There were %d matches for your search of %s:\n"
@@ -430,13 +431,13 @@ One character is either a character or one entity expression"
 			  (mapconcat 'mandoku-active-filter mandoku-textfilter-list "")
 			  mandoku-filtered-count))
 	)
-      (insert (format "Location\tMatch\tSource\n* %s (%d/%d)\n"  search-string mandoku-filtered-count mandoku-count))
+      (insert (format "Location\tMatch\tSource\n* %s (%d/%d)\n"  search-string mandoku-filtered-count cnt))
       (mandoku-index-mode)
  ;     (org-overview)
       (hide-sublevels 2)
       (replace-buffer-in-windows index-buffer)
 ;      (kill-buffer index-buffer)
-))))
+))
 
 (defun mandoku-textid-to-vol (txtid) nil)
 
