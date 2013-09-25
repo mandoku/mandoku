@@ -155,6 +155,8 @@
 (global-set-key [f6] 'mandoku-search-text)
 (global-set-key [S-f6] 'mandoku-search-titles)
 
+(setq org-support-shift-select 'always)
+
 (setq mandoku-dict-url \"http://www.kanripo.org/zb\")
 
 (unless mandoku-catalogs-alist
