@@ -32,12 +32,21 @@
 
 (setq mandoku-string-limit 20)
 
-(setq mandoku-catalog (concat mandoku-meta-dir "mandoku-catalogx.txt"))
+
+    
+(unless mandoku-catalogs-alist
+  (dolist (dir (directory-files mandoku-meta-dir nil "^[^.,].*"))
+    (when (file-directory-p (concat mandoku-meta-dir dir))
+      (dolist (file (directory-files (concat mandoku-meta-dir dir) nil ".txt" ))
+	(add-to-list 'mandoku-catalogs-alist 
+		     (cons (file-name-sans-extension file) (concat mandoku-meta-dir dir "/" file)))))))
+
+(setq mandoku-catalog (concat mandoku-meta-dir "mandoku-catalog.txt"))
 
 (unless (file-exists-p mandoku-catalog)
   (with-current-buffer (find-file-noselect mandoku-catalog)
     (insert "#-*- mode: mandoku-view; -*-
-#+DATE: 2013-09-05
+#+DATE: " (current-time)  "
 #+TITLE: 漢籍リポジトリ目録
 
 # このファイルは自動作成しますので、編集しないでください
@@ -58,14 +67,6 @@ Click on a link or move the cursor to the link and then press enter
     )
   )
 
-
-    
-(unless mandoku-catalogs-alist
-  (dolist (dir (directory-files mandoku-meta-dir nil "^[^.,].*"))
-    (when (file-directory-p (concat mandoku-meta-dir dir))
-      (dolist (file (directory-files (concat mandoku-meta-dir dir) nil ".txt" ))
-	(add-to-list 'mandoku-catalogs-alist 
-		     (cons (file-name-sans-extension file) (concat mandoku-meta-dir dir "/" file)))))))
       
 	    
 (mandoku-read-titletables) 
