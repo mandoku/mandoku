@@ -180,4 +180,12 @@
    minibuffer and serves a similar purpose dialog boxes have in other
    applications, that is, they are used for interaction with the user)
 
-   
+   =Mandoku= suggests six characters, but in most cases fewer
+   characters are sufficient as search word.  However, at the moment
+   =Mandoku= will refuse to display more than 2000 hits, so a search
+   for just one or two characters will in many cases go over the
+   limit, which then only displays a breakdown of the number of hits
+   across the different parts of the collection, so it is recommended
+   to use at least 3 characters for searching.
+
+
