@@ -139,6 +139,10 @@
   of catalog files available locally.  The catalog files themselves
   can be browsed by clicking on the filename links.  
 
+  In some cases, the catalog file might be obscured by the Emacs splash screen. In such a case, the file can be brought to the front using the buffer menu as shown here:
+
+[[file:images/emacs-splash.png]]
+
   Another purpose of displaying the catalog list is the fact that this
   allows the menu for =Mandoku= to appear.  This menu is only
   available in =Mandoku= files (Emacs can display a large number of
@@ -216,6 +220,10 @@
    text or look at the digital facsimile of a text, but all these are
    features to be implemented.
 
+   Here is a selection of a index display for "修行人", which has 1095 matches in the text corpus:
+
+[[file:images/mandoku-index-1.png]]
+
 ** Title search
    To locate a text and start reading it, title search is most
    convenient. Title search is activated with F7 or from the menu as
@@ -238,6 +246,8 @@
    will display the text, while pressing "i" (information) or "c"
    (catalog) will go to the catalog entry.
 
+   Here is an example of the title display:
+[[file:images/mandoku-title-search-1.png]]
 
 ** Dictionary search
 
