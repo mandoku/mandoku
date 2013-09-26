@@ -78,7 +78,6 @@
       (setq mandoku-catalogs-alist nil)
       (mandoku-setup-local-init-file)
       (ignore-errors
-	(load "mandoku-init")
 	(load "mandoku-local-init"))
       (insert "Now compiling the title list, this can take a few minutes...\n")
       (mandoku-update-subcoll-list)
@@ -145,8 +144,6 @@
 (setq mandoku-meta-dir (expand-file-name  (concat mandoku-base-dir \"meta/\")))
 (setq mandoku-sys-dir (expand-file-name  (concat mandoku-base-dir \"system/\")))
 (setq mandoku-temp-dir (expand-file-name  (concat mandoku-base-dir \"temp/\")))
-
-;; need to -install -> write mandoku-local-init -> load mandoku-local-init
 
 ;; dic
 (setq mandoku-dict-img-dir nil)
