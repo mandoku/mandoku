@@ -1,4 +1,5 @@
 ;; default settings for mandoku
+;; change filename to default.el and copy to site-lisp or any other directory Emacs loads by default
 (if (eq window-system 'w32)
 ;; we try to get the driveletter and base directory, which should be the same as the emacs executable
     (progn
