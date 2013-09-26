@@ -2,7 +2,7 @@
 #+DATE: 2013-09-26
 #+OPTIONS: toc:nil ^:nil
 
-* Preview version of Mandoku
+* Installing the preview version of Mandoku
 
   As of late September 2013, a preview version of =Mandoku= is
   available.  This implements a not yet complete new version of
@@ -81,7 +81,57 @@
 
 
 
-** Installing =Mandoku= manually
+** Installing =Mandoku= into existing Emacs installations
 
    =Mandoku= consists of a package with Emacs-lisp (and some other)
-   code, and of metadata necessary for the operation, this makes the 
+   code, and of metadata necessary for the operation, this makes the
+   installation more complicated than is usually the case for Emacs
+   add-on packages.
+
+   The easiest way to include it into existing installations (on
+   Windows or Macintosh) is to use the above mentioned packages and
+   then make sure that =mandoku-default.el= (in the =mandoku/lisp=
+   directory) is loaded; this should take care of the initialization
+   by setting some variables and then loading =mandoku-local-init=
+   from your Emacs init directory; the latter file should have been
+   created during installation.
+   
+   In addition to this, there are two ways to accomplish the install manually:
+   1. Using the file =mandoku-install= by evaluating the following
+      elisp expression:
+#+BEGIN_SRC elisp
+(setq mandoku-base-dir "~/krp")
+(with-temp-buffer (url-insert-file-contents 
+       "https://raw.github.com/cwittern/mandoku/master/lisp/mandoku-install.el")
+  (eval-region (point-min) (point-max)))
+  (mandoku-install mandoku-base-dir)
+  (add-to-list 'load-path user-emacs-directory)
+  (mandoku-setup-local-init-file)
+  (load "mandoku-local-init")
+#+END_SRC
+      This will install the program code and necessary files under the
+      base directory =krp= in your home directory. It will also clone
+      the metadata repository and compile the necessary files, this
+      might take at least 10 minutes to finish.
+
+
+
+   2. Alternatively, you might want to follow the steps in
+      =mandoku-install= manually to understand what exactly is
+      installed to your computer.  
+
+      
+   So far, the preview package has not been tested under systems other
+   than Windows and Macintosh, but I would be very interested to know
+   the results of such an experiment.
+
+
+
+
+
+* Using the preview version
+
+  At the moment, only a small fraction of the planned functionality
+  has been realized.
+
+  
