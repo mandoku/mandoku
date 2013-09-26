@@ -5,4 +5,17 @@
 * Preview version of Mandoku
 
   As of late September 2013, a preview version of =Mandoku= is
-  available.  This implements a not yet complete new version of =Mandoku=.
+  available.  This implements a not yet complete new version of
+  =Mandoku=.  This preview version can be installed by either
+  downloading a package for Mac or for Windows, or by downloading the
+  Mandoku library and manually installing it.  The latter is only
+  recommended for experienced Emacs users and does not work (well?) on
+  Windows.
+
+  Requirements:
+  
+** Installing a package for Windows
+   
+   1. Please download the Installation package
+
+
