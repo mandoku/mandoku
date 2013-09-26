@@ -196,5 +196,11 @@
    few characters left and right of the match and the text, where this
    match is found.  The text identification consists of the text
    number and the title of the text.  Both the location and the text
-   title are active links.  Clicking on the location
+   title are active links.  Clicking on the location will open the
+   text at the place where this passage is found and usually highlight
+   the search term (this will not work always,
+   unfortunately). Clicking on the text title will open the
+   corresponding catalog file and display the entry for this text.
+
+   
 
