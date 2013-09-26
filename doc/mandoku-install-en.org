@@ -134,4 +134,32 @@
   At the moment, only a small fraction of the planned functionality
   has been realized.
 
-  After starting Emacs with the =Mandoku= preview package installed, 
+  After starting Emacs with the =Mandoku= preview package installed,
+  Emacs will display the file =mandoku-catalog.txt=, which is a list
+  of catalog files available locally.  The catalog files themselves
+  can be browsed by clicking on the filename links.  
+
+  Another purpose of displaying the catalog list is the fact that this
+  allows the menu for =Mandoku= to appear.  This menu is only
+  available in =Mandoku= files (Emacs can display a large number of
+  different file types, most of them are accompanied by corresponding
+  menu entries).  =Mandoku= files are recognizable by the string
+  "mandoku-view" in the lower part of the part of the screen that
+  displays this file, in addition to that, they also show the title of
+  the text and some more information about the text and the current
+  location within the text.
+
+  The =Mandoku= menu has the following top level entries:
+  - Markers
+  - Browse
+  - Search
+  - Versions
+  - Maintenance
+
+  Of these, we will first look at the "Search" menu, which has the following entries:
+  - Texts       <f6>
+  - Titles      <f7>
+  - Dictionary  <f5>
+
+  
+  
