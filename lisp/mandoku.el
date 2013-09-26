@@ -360,7 +360,7 @@ One character is either a character or one entity expression"
 	      (location (split-string (match-string 3) ":" ))
 	      (extra (match-string 8))
 	      )
-	  (let* ((txtid (car location))
+	  (let* ((txtid (concat filter (car location)))
 		 (pag (car (cdr location)))
 		 (line (car (cdr (cdr location))))
 		 (page (if (string-match "[-_]"  pag)
@@ -411,7 +411,7 @@ One character is either a character or one entity expression"
 		    "\n:END:\n"
 		    ))
 	    (set-buffer index-buffer)
-	    (setq mandoku-count (+ mandoku-count 1))
+;	    (setq mandoku-count (+ mandoku-count 1))
 ))))))    
 
 (defun mandoku-read-index-buffer (index-buffer result-buffer search-string)
