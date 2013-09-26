@@ -73,8 +73,9 @@
 	  (byte-recompile-directory file 0)))
       ;; TODO to loop over the repository list, get the clone URL there and clone the catalog
       (mandoku-clone-catalog "http://github.com/cwittern/ZB" (user-login-name))
-      ;; TODO: write the file local init! // or load mandoku-init only if the local init has not been loaded...
+
       (add-to-list 'load-path user-emacs-directory)
+      (setq mandoku-catalogs-alist nil)
       (mandoku-setup-local-init-file)
       (ignore-errors
 	(load "mandoku-init")
@@ -167,6 +168,8 @@
 	(add-to-list 'mandoku-catalogs-alist 
 		     (cons (file-name-sans-extension file) (concat mandoku-meta-dir dir \"/\" file)))))))
 
+(mandoku-read-titletables) 
+
 (setq mandoku-catalog (concat mandoku-meta-dir \"mandoku-catalog.txt\"))
 
 (unless (file-exists-p mandoku-catalog)
@@ -195,7 +198,6 @@ Click on a link or move the cursor to the link and then press enter
   )
 
 
-(mandoku-read-titletables) 
  
 (setq mandoku-initialized t)
 (message \"Loading of local setup for Mandoku finished\")
