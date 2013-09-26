@@ -49,12 +49,14 @@
     (unless 
 	(ignore-errors
 	  (load (concat (file-name-as-directory user-emacs-directory) "mandoku-local-init")))
+      (load "mandoku-install")
       (mandoku-setup-local-init-file)
       (load "mandoku-local-init")
       ))
 
 
-
+(setq inhibit-splash-screen t)
+(prefer-coding-system 'utf-8)
 
 (message "Default setup for Mandoku finished")
 

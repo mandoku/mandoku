@@ -159,12 +159,12 @@
 
 (setq mandoku-dict-url \"http://www.kanripo.org/zb\")
 
-(unless mandoku-catalogs-alist
-  (dolist (dir (directory-files mandoku-meta-dir nil \"^[^.,].*\"))
-    (when (file-directory-p (concat mandoku-meta-dir dir))
-      (dolist (file (directory-files (concat mandoku-meta-dir dir) nil \".txt\" ))
-	(add-to-list 'mandoku-catalogs-alist 
-		     (cons (file-name-sans-extension file) (concat mandoku-meta-dir dir \"/\" file)))))))
+(setq mandoku-catalogs-alist nil)
+(dolist (dir (directory-files mandoku-meta-dir nil \"^[^.,].*\"))
+  (when (file-directory-p (concat mandoku-meta-dir dir))
+    (dolist (file (directory-files (concat mandoku-meta-dir dir) nil \".txt\" ))
+      (add-to-list 'mandoku-catalogs-alist 
+		   (cons (file-name-sans-extension file) (concat mandoku-meta-dir dir \"/\" file))))))
 
 (mandoku-read-titletables) 
 
