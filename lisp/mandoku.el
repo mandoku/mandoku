@@ -325,8 +325,10 @@ One character is either a character or one entity expression"
     (maphash (lambda (kk vv) (setq cnt (+ cnt vv))) hashtable)
     cnt))
 
-(defun mandoku-index-insert-result (index-buffer result-buffer  &optional filter)
-  (let ((tmp))
+(defun mandoku-index-insert-result (search-string index-buffer result-buffer  &optional filter)
+  (let ((mandoku-use-textfilter nil)
+      	(search-char (string-to-char search-string))
+	(mandoku-filtered-count 0))
       (progn
     (switch-to-buffer-other-window index-buffer t)
 ;;xx      (set-buffer index-buffer)
@@ -424,7 +426,7 @@ One character is either a character or one entity expression"
     (if (and (not (= 0 mandoku-index-display-limit)) (> cnt mandoku-index-display-limit))
 ;    (if nil
 	(mandoku-index-insert-tablist tab result-buffer)
-      (mandoku-index-insert-result index-buffer result-buffer)
+      (mandoku-index-insert-result search-string index-buffer result-buffer)
 
       (switch-to-buffer-other-window result-buffer t)
       (goto-char (point-min))
@@ -441,7 +443,7 @@ One character is either a character or one entity expression"
       (hide-sublevels 2)
       (replace-buffer-in-windows index-buffer)
 ;      (kill-buffer index-buffer)
-))
+)))
 
 (defun mandoku-textid-to-vol (txtid) nil)
 
