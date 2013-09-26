@@ -33,7 +33,7 @@
       recommended to download and install the =git= software from the
       [[http://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git][msysgit software repository]]; the current version is
       [[http://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git][Git-1.8.4-preview]].
-   2. Download the =Mandoku= installation package [[file:data/mandoku-preview-2013-09-26.zip][mandoku-preview-2013-09-26.zip]].
+   2. Download the =Mandoku= installation package [[file:data/mandoku-preview-2013-09-26.zip][mandoku-preview-2013-09-26.zip]] (165MB).
    3. Doubleclick on the package and move the folder =krp=, which is
       found inside the package to a destination on a root directory of
       your computer.  It is highly recommended to use the system drive
@@ -68,7 +68,7 @@
       =name=git-1.8.3.2-intel-universal-snow-leopard.pkg= and follow
       the on-screen instructions to install the software.  This is not
       necessary on OS X 10.8.
-   2. Download and open the =Mandoku= preview package [[mandoku-preview-2013-09-26.dmg]].
+   2. Download and open the =Mandoku= preview package [[file:data/mandoku-preview-2013-09-26.dmg][mandoku-preview-2013-09-26.dmg]] (55MB).
    3. There are two items in the volume:
       - =Emacs=
       - =krp=
