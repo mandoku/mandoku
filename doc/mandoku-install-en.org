@@ -140,7 +140,7 @@
   can be browsed by clicking on the filename links.  
 
   In some cases, the catalog file might be obscured by the Emacs splash screen. In such a case, the file can be brought to the front using the buffer menu as shown here:
-
+#+ATTR_HTML: :alt Emacs splash screen  :width 600
 [[file:images/emacs-splash.png]]
 
   Another purpose of displaying the catalog list is the fact that this
@@ -222,6 +222,7 @@
 
    Here is a selection of a index display for "修行人", which has 1095 matches in the text corpus:
 
+#+ATTR_HTML: :alt Emacs index display  :width 500
 [[file:images/mandoku-index-1.png]]
 
 ** Title search
@@ -247,6 +248,7 @@
    (catalog) will go to the catalog entry.
 
    Here is an example of the title display:
+#+ATTR_HTML: :alt Emacs title display  :width 500
 [[file:images/mandoku-title-search-1.png]]
 
 ** Dictionary search
@@ -268,4 +270,16 @@
    desired line and press "tab" again. Some dictionaries have the full
    text, others have only a reference to the page (and volume) where
    the entry is found.  These are listed under the last entry "其他詞典".
+
+   Here is an example of a dictionary search, in this case for "周易", which will display three items:
+#+ATTR_HTML: :alt Emacs dictionary result display  :width 300
+[[file:images/mandoku-dict-1.png]]
+
+  Pressing tab on the start of the line displaying "** 周易" changes the display to:
+#+ATTR_HTML: :alt Emacs dictionary result display  :width 400
+[[file:images/mandoku-dict-2.png]]
+
+  And here is what is displayed under "其他詞典":
+#+ATTR_HTML: :alt Emacs dictionary result display  :width 400
+[[file:images/mandoku-dict-3.png]]
    
