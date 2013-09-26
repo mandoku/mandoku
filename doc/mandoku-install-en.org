@@ -134,4 +134,4 @@
   At the moment, only a small fraction of the planned functionality
   has been realized.
 
-  
+  After starting Emacs with the =Mandoku= preview package installed, 
