@@ -54,4 +54,8 @@
    by applying a patch from Yamamoto Mitsuharu and by placing a
    startup file in the =site-lisp= directory.
 
-   On OS X 10.6 it is necessary to first install the =git= program. 
+   1. On OS X 10.6 it is necessary to first install the =git=
+      program. Please download the installer from the
+      [[http://code.google.com/p/git-osx-installer/][git-osx-installer]] software archive: the current version is [[http://code.google.com/p/git-osx-installer/downloads/detail?name=git-1.8.3.2-intel-universal-snow-leopard.dmg&can=3&q=&sort=-uploaded][Git
+      1.8.3.2]]
+   2. 
