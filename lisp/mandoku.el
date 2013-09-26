@@ -1038,9 +1038,9 @@ One character is either a character or one entity expression"
     (save-excursion
       (let ((hw 	(car (split-string  (org-get-heading)))))
 	(forward-line)
-	(mandoku-index-insert-result mandoku-search-string (current-buffer) "*temp-buffer*" hw)
-	(hi-lock-mode 1)
-	(highlight-regexp hw))))
+	(if (looking-at "\n")
+	    (mandoku-index-insert-result (mandoku-index-get-search-string) (current-buffer) "*temp-buffer*" hw))
+	)))
    ((and (eq major-mode 'mandoku-index-mode)
 	     (memq state '(overview folded)))
       (hi-lock-mode 0))))
