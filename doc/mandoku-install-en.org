@@ -1,0 +1,8 @@
+#+TITLE: Installing Mandoku
+#+DATE: 2013-09-26
+#+OPTIONS: toc:nil ^:nil
+
+* Preview version of Mandoku
+
+  As of late September 2013, a preview version of =Mandoku= is
+  available.  This implements a not yet complete new version of =Mandoku=.
