@@ -234,7 +234,14 @@ One character is either a character or one entity expression"
 		(mandoku-forward-one-char))
 )
 
-
+(defun mandoku-index-get-search-string ()
+  "Get the search-string from the Index Buffer"
+  (save-excursion
+    (goto-char (point-min))
+    (search-forward "
+* " nil t)
+    (car (split-string  (org-get-heading))))
+)
 
 (defun mandoku-grep-internal (search-string)
   (interactive "s")
@@ -254,6 +261,7 @@ One character is either a character or one entity expression"
       (set-buffer result-buffer)
       (setq buffer-read-only nil)
       (erase-buffer)
+      (set (make-local-variable 'mandoku-search-string) search-string)
       ;; switch to index-buffer and get the results
       (mandoku-read-index-buffer index-buffer result-buffer search-string)
       )))
@@ -1029,6 +1037,8 @@ One character is either a character or one entity expression"
 	     (memq state '(children subtree)))
     (save-excursion
       (let ((hw 	(car (split-string  (org-get-heading)))))
+	(forward-line)
+	(mandoku-index-insert-result mandoku-search-string (current-buffer) "*temp-buffer*" hw)
 	(hi-lock-mode 1)
 	(highlight-regexp hw))))
    ((and (eq major-mode 'mandoku-index-mode)
