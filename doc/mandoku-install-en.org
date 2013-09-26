@@ -238,4 +238,6 @@
    Dictionary search is initiated by pressing F5. If some text has
    been selected, this selected text will be the search term.
    Otherwise, the line of text that is currently displayed will be the
-   searched for.  
+   searched for.  For every string of one or more characters that has
+   an entry in at least one of the dictionaries, an item is generated
+   in the dictionary display.  
