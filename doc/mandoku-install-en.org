@@ -26,8 +26,12 @@
    only modification is that a startup file has been placed in the
    =site-lisp= directory.
    
-   1. Before installing the =Mandoku= package, please download and install the =git= software from the 
-      [[http://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git][msysgit software repository]]; the current version is [[http://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git][Git-1.8.4-preview]].
+   1. The =Mandoku= preview package includes a version of the =git=
+      program, which is used to download and update necessary
+      files. If you want to use =git= outside of =Mandoku=, it is
+      recommended to download and install the =git= software from the
+      [[http://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git][msysgit software repository]]; the current version is
+      [[http://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git][Git-1.8.4-preview]].
    2. Download the =Mandoku= installation package from [[http://www.mandoku.org/]
    3. Doubleclick on the package and move the folder =krp=, which is
       found inside the package to a destination on a root directory of
