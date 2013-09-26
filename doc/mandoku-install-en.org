@@ -161,5 +161,23 @@
   - Titles      <f7>
   - Dictionary  <f5>
 
+  There are three different search actions, that is, within the texts,
+  within the titles of the texts and within the dictionaries.  We will
+  look at these in turns, but before that I want to mention that the
+  mysterious "<f6>", "<f7>" and "<f5>" that appear on the menu are the
+  keys that can be used to access this same functionality; usually it
+  is much faster to use the keyboard.
   
-  
+** Text search
+   At the moment, the text search function conducts a full-text search
+   in the index, that has been generated for this purpose and displays
+   the results as a keywoard in context (KWIC) list of matches. 
+
+   When activating the menu or pressing the key F6, =Mandoku= will
+   look at the characters immediately following the current position
+   in the text displayed and offer them as default search key at the
+   bottom of the =Emacs= application window. (This is called the
+   minibuffer and serves a similar purpose dialog boxes have in other
+   applications, that is, they are used for interaction with the user)
+
+   
