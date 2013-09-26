@@ -1,22 +1,28 @@
 ;; default settings for mandoku
 ;; change filename to default.el and copy to site-lisp or any other directory Emacs loads by default
+;; default settings for mandoku
 (if (eq window-system 'w32)
 ;; we try to get the driveletter and base directory, which should be the same as the emacs executable
     (progn
       (setq tmp (split-string (car load-path) "/"))
-      (setq mandoku-base-dir (concat (car tmp) "/" (car (cdr tmp))"/" ))))
-  
+      (setq mandoku-base-dir (concat (car tmp) "/" (car (cdr tmp))"/" )))
+  (ignore-errors
+    ;; otherwise (mac or linux):
+    ;; we look in some popular destinations for mandoku
+    (let ((fn1 (concat (file-name-as-directory "/Users/Shared/") "krp"))
+	  (fn2 (concat (file-name-as-directory "/Users/Shared/") "mandoku"))
+	  (fn3 (concat (expand-file-name "~/") "krp"))
+	  (fn4 (concat (expand-file-name "~/") "mandoku"))
+	  (fn5 (concat (expand-file-name "~/") "db")))
+      (setq mandoku-base-dir
+	    (file-name-as-directory (cond 
+				     ((file-exists-p fn1) fn1)
+				     ((file-exists-p fn2) fn2)
+				     ((file-exists-p fn3) fn3)
+				     ((file-exists-p fn4) fn4)
+				     ((file-exists-p fn5) fn5))))))
+)
 
-;; we look in some popular destinations for mandoku
-(ignore-errors
-  (setq mandoku-base-dir
-	(car
-	 (or (bound-and-true-p mandoku-base-dir)
-	     (file-attributes (concat (file-name-as-directory "/Users/Shared/") "krp"))
-	     (file-attributes (concat (file-name-as-directory "/Users/Shared/") "mandoku"))
-	     (file-attributes (concat (expand-file-name "~/") "krp"))
-	     (file-attributes (concat (expand-file-name "~/") "mandoku"))
-	     (file-attributes (concat (expand-file-name "~/") "db"))))))
 ;; if we do not have it yet, we make one within the emacs dir
 (let ((mandoku-root
        (file-name-as-directory
@@ -39,9 +45,13 @@
   ;; if this does not exist, install it to here!!
 )
 
- 
 (or (ignore-errors (load "mandoku-local-init"))
-    (load (concat (file-name-as-directory user-emacs-directory) "mandoku-local-init")))
+    (unless 
+	(ignore-errors
+	  (load (concat (file-name-as-directory user-emacs-directory) "mandoku-local-init")))
+      (mandoku-setup-local-init-file)
+      (load "mandoku-local-init")
+      ))
 
 
 
