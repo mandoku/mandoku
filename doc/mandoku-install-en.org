@@ -18,8 +18,15 @@
   - A working network connection
 
 ** Installing a package for Windows
+
+   The package for Windows has been tested on Windows 8.  It might
+   work on earlier versions, but there might also be problems.  The
+   Emacs application included in the =Mandoku= package below is the
+   one from [[http://ftp.gnu.org/gnu/emacs/windows/emacs-24.3-bin-i386.zip][the Gnu software archive]] (version 24.3 of March 2013); the
+   only modification is that a startup file has been placed in the
+   =site-lisp= directory.
    
-   1. Before installing =Mandoku=, please download and install the =git= software from the 
+   1. Before installing the =Mandoku= package, please download and install the =git= software from the 
       [[http://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git][msysgit software repository]]; the current version is [[http://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git][Git-1.8.4-preview]].
    2. Download the =Mandoku= installation package from [[http://www.mandoku.org/]
    3. Doubleclick on the package and move the folder =krp=, which is
@@ -29,9 +36,22 @@
    4. Within the folder =krp=, find the file "Emacs" and move it to
       the Desktop (this will work only if you put the folder on drive
       =C:=.  Alternatively, you can locate the file =(Your drive
-      letter):\krp\bin\emacs-24.3\bin\emacsclientw.exe=, right-click
+      letter):\krp\bin\emacs-24.3\bin\runemacs.exe=, right-click
       on this file and create a shortcut on a destination of your
-      liking.
+      liking.  On Windows 8 you can also start the application by
+      clicking on the file and then "pin" it to the taskbar, where you
+      will easily find it the next time.
+
       
 
+** Installing a package for Macintosh
 
+   The package for Macintosh has been tested on OS X 10.6 (Mountain
+   Lion) and OS X 10.6 (Snow Leopard).  It might also work on other
+   versions.
+
+   The Emacs binary available in the package below has been modified
+   by applying a patch from Yamamoto Mitsuharu and by placing a
+   startup file in the =site-lisp= directory.
+
+   On OS X 10.6 it is necessary to first install the =git= program. 
