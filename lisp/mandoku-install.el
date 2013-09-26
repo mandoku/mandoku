@@ -1,3 +1,4 @@
+;; -*- coding: utf-8 -*-
 ;;; mandoku-install.el
 ;; inspired by el-get
 ;(setq mandoku-base-dir nil)
