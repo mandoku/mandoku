@@ -222,3 +222,20 @@
    person) for the text.  This information is taken from the catalog
    file, but pre-indexed for faster access.  Changes in the catalog
    file will require a re-indexing. 
+
+   As usual, the cursor can be moved around to go to the desired row
+   in the file. The original order is by title, but clicking on the
+   top row, where the column names are displayed, will change the sort
+   order according to the column, this allows for example texts from
+   the same dynasty or the same author to be displayed closely
+   together. On the row with the desired text, pressing "t" (text)
+   will display the text, while pressing "i" (information) or "c"
+   (catalog) will go to the catalog entry.
+
+
+** Dictionary search
+
+   Dictionary search is initiated by pressing F5. If some text has
+   been selected, this selected text will be the search term.
+   Otherwise, the line of text that is currently displayed will be the
+   searched for.  
