@@ -1,6 +1,6 @@
 ;;; mandoku-install.el
 ;; inspired by el-get
-(setq mandoku-base-dir nil)
+;(setq mandoku-base-dir nil)
 
 (defvar mandoku-git-install-url "http://github.com/cwittern/mandoku.git")
 
