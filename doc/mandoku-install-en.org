@@ -202,5 +202,23 @@
    unfortunately). Clicking on the text title will open the
    corresponding catalog file and display the entry for this text.
 
-   
+   The search result is a text file, similar to the format of the
+   texts themselves.  It can be copied, saved and reopened or edited
+   as needed. The order of the displayed items is according to the
+   text following the term, which should put related passages in the
+   vicinity of each other.  It is also possible to change the order of
+   the displayed items, but that is an advanced topic that will be
+   dicussed later.
 
+** Title search
+   To locate a text and start reading it, title search is most
+   convenient. Title search is activated with F7 or from the menu as
+   shown.  Again it will display a prompt at the bottom of the screen
+   and ask for the title to search for.  
+
+   The result of the search will be displayed in a separate buffer in
+   a table with several columns, displaying the "Bu" (Section), text
+   number, text title, dynasty and author (or otherwise responsible
+   person) for the text.  This information is taken from the catalog
+   file, but pre-indexed for faster access.  Changes in the catalog
+   file will require a re-indexing. 
