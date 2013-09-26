@@ -19,7 +19,8 @@
 (defvar mandoku-index-display-limit 2000)
 ;; Defined somewhere in this file, but used before definition.
 (defvar mandoku-md-menu)
-
+(defvar mandoku-catalog)
+(defvar mandoku-local-init-file "~/.emacs.d/mandoku-local-init.el")
 ;; ** Textfilters
 ;; we have one default textfilter, which always exists and can be dynamically treated. 
 (defvar mandoku-default-textfilter (make-hash-table :test 'equal) )
@@ -183,9 +184,13 @@
 (defun mandoku-show-catalog ()
   (interactive)
   (unless mandoku-initialized
-    (load "mandoku-init"))
+    (load mandoku-local-init-file))
   (find-file mandoku-catalog)
 )
+
+(defun mandoku-show-local-init ()
+  (interactive)
+  (find-file mandoku-local-init-file))
 
 ;;;###autoload
 (defun mandoku-search-text (search-for)
@@ -1025,6 +1030,7 @@ One character is either a character or one entity expression"
      )
     ("Maintenance"
      ["Update mandoku" mandoku-update t]
+     ["Setup file" mandoku-show-local-init t]
      ["Update installed texts" mandoku-update-texts nil]
      
      ["Add repository" mandoku-setting nil]
