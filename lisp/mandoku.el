@@ -16,7 +16,7 @@
 (defvar mandoku-sys-dir (expand-file-name  (concat mandoku-base-dir "system/")))
 
 (defvar mandoku-string-limit 10)
-(defvar mandoku-index-display-limit 200)
+(defvar mandoku-index-display-limit 2000)
 ;; Defined somewhere in this file, but used before definition.
 (defvar mandoku-md-menu)
 
@@ -316,10 +316,9 @@ One character is either a character or one entity expression"
 (defun mandoku-index-insert-tablist (hashtable index-buffer)
   (let ((myList (mandoku-hash-to-list hashtable)))
     (set-buffer result-buffer)
-    (insert "Too many results! Displaying only overview\n")
     (dolist (x   
 	     (sort myList (lambda (a b) (string< (car a) (car b)))))
-      (insert (format "* %s\t%s\t%d\n\n" (car x) (gethash (car x) mandoku-subcolls) (car (cdr x)))))))
+      (insert (format "* %s %s\t%d\n\n" (car x) (gethash (car x) mandoku-subcolls) (car (cdr x)))))))
 
 (defun mandoku-hash-to-list (hashtable)
   "Return a list that represent the HASHTABLE."
@@ -441,11 +440,14 @@ One character is either a character or one entity expression"
 ;      (insert (format "There were %d matches for your search of %s:\n"
 ;       mandoku-count search-string))
       (if (equal mandoku-use-textfilter t)
-	  (insert (format "Active Filter: %s , Matches: %d (Press 't' to temporarily disable the filter)\n" 
+	  (insert (format "Active Filter: %s , Matches: %d (Press 't' to temporarily disable the filter)\nLocation\tMatch\tSource\n* %s (%d/%d)\n" 
 			  (mapconcat 'mandoku-active-filter mandoku-textfilter-list "")
-			  mandoku-filtered-count))
+			  mandoku-filtered-count search-string mandoku-filtered-count cnt))
+	(if (> cnt mandoku-index-display-limit )
+	    (insert "Too many results! Displaying only overview\n")
+	  (insert (format "Location\tMatch\tSource\n* %s (%d)\n"  search-string cnt))
 	)
-      (insert (format "Location\tMatch\tSource\n* %s (%d/%d)\n"  search-string mandoku-filtered-count cnt))
+	)
       (mandoku-index-mode)
  ;     (org-overview)
       (hide-sublevels 2)
