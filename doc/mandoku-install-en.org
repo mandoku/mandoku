@@ -1,4 +1,4 @@
-#+TITLE: Installing Mandoku
+#+TITLE: Installing and using the Mandoku preview version
 #+DATE: 2013-09-26
 #+OPTIONS: toc:nil ^:nil
 
@@ -50,7 +50,7 @@
 
 ** Installing a package for Macintosh
 
-   The package for Macintosh has been tested on OS X 10.6 (Mountain
+   The package for Macintosh has been tested on OS X 10.8 (Mountain
    Lion) and OS X 10.6 (Snow Leopard).  It might also work on other
    versions.
 
@@ -60,11 +60,28 @@
 
    1. On OS X 10.6 it is necessary to first install the =git=
       program. Please download the installer from the
-      [[http://code.google.com/p/git-osx-installer/][git-osx-installer]] software archive: the current version is
-      [[http://code.google.com/p/git-osx-installer/downloads/detail?name=git-1.8.3.2-intel-universal-snow-leopard.dmg&can=3&q=&sort=-uploaded][Git
+      [[http://code.google.com/p/git-osx-installer/][git-osx-installer]] software archive: the current version is [[http://code.google.com/p/git-osx-installer/downloads/detail?name=git-1.8.3.2-intel-universal-snow-leopard.dmg&can=3&q=&sort=-uploaded][Git
       1.8.3.2]]. Doubleclick on the downloaded file and again on the
       file =name=git-1.8.3.2-intel-universal-snow-leopard.dmg= to
       mount it, now click on the file
       =name=git-1.8.3.2-intel-universal-snow-leopard.pkg= and follow
-      the on-screen instructions to install the software.
-   2. 
+      the on-screen instructions to install the software.  This is not
+      necessary on OS X 10.8.
+   2. Download and open the =Mandoku= preview package [[mandoku-preview-2013-09-26.dmg]].
+   3. There are two items in the volume:
+      - =Emacs=
+      - =krp=
+   4. Drag =Emacs= into the Applications folder.  If there is already
+      an item called =Emacs=, it is recommended to replace this
+      item. If you use this frequently, you can place =Emacs= in the
+      dock for convenient access.
+   5. Drag =krp= to your home directory. Alternatively, you can also
+      drag this to the =Shared= folder so that it can be used by other
+      users of the computer.
+
+
+
+** Installing =Mandoku= manually
+
+   =Mandoku= consists of a package with Emacs-lisp (and some other)
+   code, and of metadata necessary for the operation, this makes the 
