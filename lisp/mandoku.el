@@ -316,6 +316,7 @@ One character is either a character or one entity expression"
 (defun mandoku-index-insert-tablist (hashtable index-buffer)
   (let ((myList (mandoku-hash-to-list hashtable)))
     (set-buffer result-buffer)
+    (insert "Too many results! Displaying only overview\n")
     (dolist (x   
 	     (sort myList (lambda (a b) (string< (car a) (car b)))))
       (insert (format "* %s\t%s\t%d\n\n" (car x) (gethash (car x) mandoku-subcolls) (car (cdr x)))))))
@@ -431,8 +432,8 @@ One character is either a character or one entity expression"
       	(search-char (string-to-char search-string))
 	(tab (mandoku-tabulate-index-buffer index-buffer))
 	(cnt (mandoku-sum-hash tab)))
-;    (if (and (not (= 0 mandoku-index-display-limit)) (> cnt mandoku-index-display-limit))
-    (if nil
+    (if (and (not (= 0 mandoku-index-display-limit)) (> cnt mandoku-index-display-limit))
+;    (if nil
 	(mandoku-index-insert-tablist tab result-buffer)
       (mandoku-index-insert-result search-string index-buffer result-buffer ""))
       (switch-to-buffer-other-window result-buffer t)
