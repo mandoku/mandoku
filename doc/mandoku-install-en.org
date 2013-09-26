@@ -26,7 +26,12 @@
       found inside the package to a destination on a root directory of
       your computer.  It is highly recommended to use the system drive
       =C:= as a destination.
-   4. 
+   4. Within the folder =krp=, find the file "Emacs" and move it to
+      the Desktop (this will work only if you put the folder on drive
+      =C:=.  Alternatively, you can locate the file =(Your drive
+      letter):\krp\bin\emacs-24.3\bin\emacsclientw.exe=, right-click
+      on this file and create a shortcut on a destination of your
+      liking.
       
 
 
