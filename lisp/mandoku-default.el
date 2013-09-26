@@ -3,9 +3,11 @@
 ;; default settings for mandoku
 (if (eq window-system 'w32)
 ;; we try to get the driveletter and base directory, which should be the same as the emacs executable
-    (progn
-      (setq tmp (split-string (car load-path) "/"))
-      (setq mandoku-base-dir (concat (car tmp) "/" (car (cdr tmp))"/" )))
+    (let (( tmp (split-string (car load-path) "/")))
+      (setq mandoku-base-dir (concat (car tmp) "/" (car (cdr tmp))"/" ))
+      (add-to-list 'exec-path (concat mandoku-base-dir "/bin/Git/bin")) 
+      (add-to-list 'exec-path (concat mandoku-base-dir "/bin/gnuwin32/bin")) 
+      (add-to-list 'exec-path (concat mandoku-base-dir "/bin/Git/bin/cmd")) )
   (ignore-errors
     ;; otherwise (mac or linux):
     ;; we look in some popular destinations for mandoku
