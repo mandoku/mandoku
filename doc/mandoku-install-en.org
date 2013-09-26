@@ -240,4 +240,16 @@
    Otherwise, the line of text that is currently displayed will be the
    searched for.  For every string of one or more characters that has
    an entry in at least one of the dictionaries, an item is generated
-   in the dictionary display.  
+   in the dictionary display.  In the dictionary display buffer, the
+   first line will display the text location, if one had been
+   identified, the following lines, beginning with two "**" characters
+   will contain the dictionary information.  Moving the cursor (or
+   "point") to the beginning of this line and then pressing the "tab"
+   key will open the display and reveal a list of the dictionaries
+   that contain this term. Pressing the "tab" key again will open all
+   dictionary entries at the same time. This might be a bit confusing,
+   in which case one can move the point to the beginning of the
+   desired line and press "tab" again. Some dictionaries have the full
+   text, others have only a reference to the page (and volume) where
+   the entry is found.  These are listed under the last entry "其他詞典".
+   
