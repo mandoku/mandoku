@@ -16,7 +16,7 @@
   - On all platforms, =git= is required for the installation process
     and software updates.
   - A working network connection
-  - About 200 MB of free space on the system harddisk
+  - About 400 MB of free space on the system harddisk
 
 ** Installing a package for Windows
 
