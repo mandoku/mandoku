@@ -431,8 +431,8 @@ One character is either a character or one entity expression"
       	(search-char (string-to-char search-string))
 	(tab (mandoku-tabulate-index-buffer index-buffer))
 	(cnt (mandoku-sum-hash tab)))
-    (if (and (not (= 0 mandoku-index-display-limit)) (> cnt mandoku-index-display-limit))
-;    (if nil
+;    (if (and (not (= 0 mandoku-index-display-limit)) (> cnt mandoku-index-display-limit))
+    (if nil
 	(mandoku-index-insert-tablist tab result-buffer)
       (mandoku-index-insert-result search-string index-buffer result-buffer ""))
       (switch-to-buffer-other-window result-buffer t)
@@ -1039,7 +1039,7 @@ One character is either a character or one entity expression"
       (let ((hw 	(car (split-string  (org-get-heading)))))
 	(forward-line)
 	(if (looking-at "\n")
-	    (mandoku-index-insert-result (mandoku-index-get-search-string) (current-buffer) "*temp-buffer*" hw))
+	    (mandoku-index-insert-result (mandoku-index-get-search-string) "*temp-buffer*" (current-buffer) hw))
 	)))
    ((and (eq major-mode 'mandoku-index-mode)
 	     (memq state '(overview folded)))
