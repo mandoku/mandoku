@@ -210,6 +210,12 @@
    the displayed items, but that is an advanced topic that will be
    dicussed later.
 
+   Text files are fetched for display from the remote server and
+   cached locally in a temporary location.  At the moment, it is not
+   yet possible to download full texts, access different editions of a
+   text or look at the digital facsimile of a text, but all these are
+   features to be implemented.
+
 ** Title search
    To locate a text and start reading it, title search is most
    convenient. Title search is activated with F7 or from the menu as
