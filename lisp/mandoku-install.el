@@ -154,7 +154,7 @@
 (global-set-key [f5] 'mandoku-dict-mlookup)
 )
 (global-set-key [f6] 'mandoku-search-text)
-(global-set-key [S-f6] 'mandoku-search-titles)
+(global-set-key [f7] 'mandoku-search-titles)
 
 (setq org-support-shift-select 'always)
 
