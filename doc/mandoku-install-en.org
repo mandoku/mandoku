@@ -186,6 +186,15 @@
    for just one or two characters will in many cases go over the
    limit, which then only displays a breakdown of the number of hits
    across the different parts of the collection, so it is recommended
-   to use at least 3 characters for searching.
+   to use at least 3 characters for searching. If necessary, the
+   suggested characters can of course be completely deleted and the
+   desired search term given.
 
+   If there are less than 2000 matches, a list of these matches is
+   displayed. The display is in a very simple table, that gives the
+   location of the match (usually the /juan/ number, page and line), a
+   few characters left and right of the match and the text, where this
+   match is found.  The text identification consists of the text
+   number and the title of the text.  Both the location and the text
+   title are active links.  Clicking on the location
 

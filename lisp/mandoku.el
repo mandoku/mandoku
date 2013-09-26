@@ -449,7 +449,7 @@ One character is either a character or one entity expression"
 			  (mapconcat 'mandoku-active-filter mandoku-textfilter-list "")
 			  mandoku-filtered-count search-string mandoku-filtered-count cnt))
 	(if (> cnt mandoku-index-display-limit )
-	    (insert (format "Too many results: %d! Displaying only overview\nCollection\tMatches" cnt))
+	    (insert (format "Too many results: %d for %s! Displaying only overview\nCollection\tMatches\n" cnt search-string))
 	  (insert (format "Location\tMatch\tSource\n* %s (%d)\n"  search-string cnt))
 	)
 	)
