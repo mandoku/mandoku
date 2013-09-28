@@ -170,18 +170,18 @@ Conventions for the text format used by =Mandoku= are made up of three parts:
     line break indicator "¶" is simply inserted at the appropriate
     location in the text:
 
-#+BEGIN_SRC 
+#+BEGIN_EXAMPLE 
 復有萬梵天王尸棄等，從餘四天下，來詣¶
 佛所，而聽法；復有萬二千天帝，亦從餘四¶
 天下，來在會坐；并餘大威力諸天、龍神、夜¶
 叉、乾闥婆、阿脩羅、迦樓羅、緊那羅、摩睺羅¶
 伽等，悉來會坐。
-#+END_SRC
+#+END_EXAMPLE
 
     This makes it possible to reformat the text in phrases without
     losing the navigation grid:
 
-#+BEGIN_SRC 
+#+BEGIN_EXAMPLE 
 復有萬梵天王尸棄等，
 從餘四天下，
 來詣¶佛所，
@@ -198,7 +198,7 @@ Conventions for the text format used by =Mandoku= are made up of three parts:
 緊那羅、
 摩睺羅¶伽、
 等悉來會坐。
-#+END_SRC
+#+END_EXAMPLE
 
 *** Inline notes
 
@@ -213,7 +213,7 @@ Conventions for the text format used by =Mandoku= are made up of three parts:
     placed to the right of the TAB character without influencing the
     navivational grid.  Here is an example with a translation added[fn::The translation is by the late John R. McRae, published in the BDK Tripitaka series, Berkeley 2004.]
 
-#+BEGIN_SRC 
+#+BEGIN_EXAMPLE 
 復有萬梵天王尸棄等。　　　　　　5. There were also ten thousand Brahmā heavenly kings, Śikhin and others, 
 從餘四天下來詣¶佛所而聽法。　　who descended from the other worlds of four continents to proceed to where the Buddha was in order to hear the Dharma. 
 復有萬二千天帝。　　　　　　　　There were also twelve thousand heavenly emperors (i.e., Indras), 
@@ -230,7 +230,7 @@ Conventions for the text format used by =Mandoku= are made up of three parts:
 緊那羅．　　　　　　　　　　　　kiṃnaras, 
 摩睺羅¶伽．　　　　　　　　　　and mahoragas, 
 等悉來會坐。　　　　　　　　　who all came to sit in the assembly. 
-#+END_SRC
+#+END_EXAMPLE
 
     Additionally, annotations can be placed in socalled "drawers" (of
     which the property drawer above is one example) on lines by
