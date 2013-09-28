@@ -71,10 +71,25 @@ Conventions for the text format used by =Mandoku= are made up of three parts:
 * Additional conventions for =Mandoku=
 
 
+** Text identifiers
+   As of September 2013, Mandoku switched to a new type of text
+   identifiers. This identifier, such as =ZB6i0076= is composed of three parts:
+   - "ZB", which is the repository identifier -- this indicates the origin of the text
+   - "6i", which indicates in which subcollection the text is found,
+     in this case "經集部類", which is part of the top-level grouping
+     "6 佛部".
+   - "0076" which is the serial number of the text in the collection.
+
+   Most texts of the part "6 佛部" of the ZB repository do derive from
+   the CBETA collection of Buddhist texts, which has a different set
+   of text identifiers, in this case, the text in question has the
+   title "維摩詰所說經" and the CBETA identifier =T14n0475=, this was
+   also used in =Mandoku= in previous versions.
+
 ** About texts, versions and editions
 
    In =Mandoku= every text has a text identifier, for example
-   =T14n0475=, which uniquely identifies the text within a larger
+   =ZB6i0076==, which uniquely identifies the text within a larger
    collection and makes it possible to refer to it unambiguoqusly.
    This identifier is usually also the name of the folder, where all
    files that make up a text are stored. The text is usually split up
@@ -82,11 +97,11 @@ Conventions for the text format used by =Mandoku= are made up of three parts:
    numbered in sequence.  An additional file may give the table of
    contents with links to the appropriate location in the files.
 
-: T14n0475_000.txt
-: T14n0475_001.txt
-: T14n0475_002.txt
-: T14n0475_003.txt
-: T14n0475.org
+: ZB6i0076_000.txt
+: ZB6i0076_001.txt
+: ZB6i0076_002.txt
+: ZB6i0076_003.txt
+: ZB6i0076.org
 
 
    The source of the text has to be given (at the beginning of the
@@ -116,22 +131,27 @@ Conventions for the text format used by =Mandoku= are made up of three parts:
    readable form, for example:
 
 : #+PROPERTY: BASEEDITION T
-: #+PROPERTY: ID T14n0475
+: #+PROPERTY: ID ZB6i0076
+: #+PROPERTY: CBETA_ID T14n0475
 : #+PROPERTY: WITNESS 【CBETA】
 : #+PROPERTY: JUAN 1
 
   Here the base edition is identified as "T" and the witness (the
   edition in this file) is given as "【CBETA】".  In addition, the
   identification number of the text is recorded and the number of the
-  juan. 
+  juan. As mentioned above, the text identifiers have been changed
+  recently, therefore the previously used CBETA_ID is also given for
+  reference.
 
 *** Page numbers
   The page number is given in the following form:
-: <pb:T_T14n0475_0537a>
+
+: &nbsp;<pb:ZB6i0076_T_0537a>
+
   There are three parts to this number, separated by the "_"
   character, surrounded by the page break indicator "<pb: .. >":
+  - "ZB6i0076" is the identification number of the text
   - "T" is the identifier of the edition
-  - "T14n0475" is the identification number of the text
   - "0537a" is the page number ("a" stands for the upper part of the
     text or the first half of a page in woodblock prints that are
     separated in two halves) At the moment =Mandoku= requires the page
@@ -149,6 +169,7 @@ Conventions for the text format used by =Mandoku= are made up of three parts:
     locations in the text.  To mark the occurrence of a line break, a
     line break indicator "¶" is simply inserted at the appropriate
     location in the text:
+
 #+BEGIN_SRC 
 復有萬梵天王尸棄等，從餘四天下，來詣¶
 佛所，而聽法；復有萬二千天帝，亦從餘四¶
@@ -191,6 +212,7 @@ Conventions for the text format used by =Mandoku= are made up of three parts:
     part of the source text. Annotations or a translation can be
     placed to the right of the TAB character without influencing the
     navivational grid.  Here is an example with a translation added[fn::The translation is by the late John R. McRae, published in the BDK Tripitaka series, Berkeley 2004.]
+
 #+BEGIN_SRC 
 復有萬梵天王尸棄等。　　　　　　5. There were also ten thousand Brahmā heavenly kings, Śikhin and others, 
 從餘四天下來詣¶佛所而聽法。　　who descended from the other worlds of four continents to proceed to where the Buddha was in order to hear the Dharma. 

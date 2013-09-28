@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>The <code>Mandoku</code> text format</title>
-<!-- 2013-05-28 Tue 07:33 -->
+<!-- 2013-09-28 Sat 10:55 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 
@@ -210,7 +210,7 @@ headline towards the right margin.
 </li>
 </ul>
 <pre class="example">
-* Outline level one レベル１の見出し          :important:
+* Outline level one レベル１の見出し
 </pre>
 <ul class="org-ul">
 <li>Paragraphs are indicated by at least one empty line.
@@ -251,11 +251,38 @@ are constructed like this: <code>[[target.txt][link to target.txt] ]</code>
 <h2 id="sec-2"><span class="section-number-2">2</span> Additional conventions for <code>Mandoku</code></h2>
 <div class="outline-text-2" id="text-2">
 </div><div id="outline-container-sec-2-1" class="outline-3">
-<h3 id="sec-2-1"><span class="section-number-3">2.1</span> About texts, versions and editions</h3>
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> Text identifiers</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
+As of September 2013, Mandoku switched to a new type of text
+identifiers. This identifier, such as <code>ZB6i0076</code> is composed of three parts:
+</p>
+<ul class="org-ul">
+<li>"ZB", which is the repository identifier &#x2013; this indicates the origin of the text
+</li>
+<li>"6i", which indicates in which subcollection the text is found,
+in this case "經集部類", which is part of the top-level grouping
+"6 佛部".
+</li>
+<li>"0076" which is the serial number of the text in the collection.
+</li>
+</ul>
+
+<p>
+Most texts of the part "6 佛部" of the ZB repository do derive from
+the CBETA collection of Buddhist texts, which has a different set
+of text identifiers, in this case, the text in question has the
+title "維摩詰所說經" and the CBETA identifier <code>T14n0475</code>, this was
+also used in <code>Mandoku</code> in previous versions.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> About texts, versions and editions</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
 In <code>Mandoku</code> every text has a text identifier, for example
-<code>T14n0475</code>, which uniquely identifies the text within a larger
+<code>ZB6i0076=</code>, which uniquely identifies the text within a larger
 collection and makes it possible to refer to it unambiguoqusly.
 This identifier is usually also the name of the folder, where all
 files that make up a text are stored. The text is usually split up
@@ -265,11 +292,11 @@ contents with links to the appropriate location in the files.
 </p>
 
 <pre class="example">
-T14n0475_000.txt
-T14n0475_001.txt
-T14n0475_002.txt
-T14n0475_003.txt
-T14n0475.org
+ZB6i0076_000.txt
+ZB6i0076_001.txt
+ZB6i0076_002.txt
+ZB6i0076_003.txt
+ZB6i0076.org
 </pre>
 
 
@@ -299,12 +326,12 @@ to the source edition.
 </div>
 </div>
 
-<div id="outline-container-sec-2-2" class="outline-3">
-<h3 id="sec-2-2"><span class="section-number-3">2.2</span> Syntactic conventions</h3>
-<div class="outline-text-3" id="text-2-2">
-</div><div id="outline-container-sec-2-2-1" class="outline-4">
-<h4 id="sec-2-2-1"><span class="section-number-4">2.2.1</span> Base edition and text witness</h4>
-<div class="outline-text-4" id="text-2-2-1">
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> Syntactic conventions</h3>
+<div class="outline-text-3" id="text-2-3">
+</div><div id="outline-container-sec-2-3-1" class="outline-4">
+<h4 id="sec-2-3-1"><span class="section-number-4">2.3.1</span> Base edition and text witness</h4>
+<div class="outline-text-4" id="text-2-3-1">
 <p>
 In <code>Mandoku</code> some import information about the source and
 edition of a text can be given at the beginning of a file in machine
@@ -313,7 +340,8 @@ readable form, for example:
 
 <pre class="example">
 #+PROPERTY: BASEEDITION T
-#+PROPERTY: ID T14n0475
+#+PROPERTY: ID ZB6i0076
+#+PROPERTY: CBETA_ID T14n0475
 #+PROPERTY: WITNESS 【CBETA】
 #+PROPERTY: JUAN 1
 </pre>
@@ -322,27 +350,31 @@ readable form, for example:
 Here the base edition is identified as "T" and the witness (the
 edition in this file) is given as "【CBETA】".  In addition, the
 identification number of the text is recorded and the number of the
-juan. 
+juan. As mentioned above, the text identifiers have been changed
+recently, therefore the previously used CBETA_ID is also given for
+reference.
 </p>
 </div>
 </div>
-<div id="outline-container-sec-2-2-2" class="outline-4">
-<h4 id="sec-2-2-2"><span class="section-number-4">2.2.2</span> Page numbers</h4>
-<div class="outline-text-4" id="text-2-2-2">
+<div id="outline-container-sec-2-3-2" class="outline-4">
+<h4 id="sec-2-3-2"><span class="section-number-4">2.3.2</span> Page numbers</h4>
+<div class="outline-text-4" id="text-2-3-2">
 <p>
 The page number is given in the following form:
 </p>
+
 <pre class="example">
-&lt;pb:T_T14n0475_0537a&gt;
+&amp;nbsp;
 </pre>
+
 <p>
 There are three parts to this number, separated by the "_"
-character, surrounded by the page break indicator "&lt;pb: .. &gt;":
+character, surrounded by the page break indicator "":
 </p>
 <ul class="org-ul">
-<li>"T" is the identifier of the edition
+<li>"ZB6i0076" is the identification number of the text
 </li>
-<li>"T14n0475" is the identification number of the text
+<li>"T" is the identifier of the edition
 </li>
 <li>"0537a" is the page number ("a" stands for the upper part of the
 text or the first half of a page in woodblock prints that are
@@ -352,124 +384,19 @@ number to end in a letter.
 </ul>
 
 <p>
-The page break indicator "&lt;pb:" referes always to the witness
-documented in the current file, if this differs from the base
-edition, then the reference to the base edition can be given with
-"&lt;md:", that is "pb" is replaced by "md".
-</p>
-</div>
-</div>
-<div id="outline-container-sec-2-2-3" class="outline-4">
-<h4 id="sec-2-2-3"><span class="section-number-4">2.2.3</span> Line break indicators</h4>
-<div class="outline-text-4" id="text-2-2-3">
-<p>
-To facilitate navigation in the text, <code>Mandoku</code> records the line
-breaks of the source edition.  Together with the page numnbers,
-they provide a grid of coordinates that is used to address
-locations in the text.  To mark the occurrence of a line break, a
-line break indicator "¶" is simply inserted at the appropriate
-location in the text:
-</p>
-<pre class="example">
-復有萬梵天王尸棄等，從餘四天下，來詣¶
-佛所，而聽法；復有萬二千天帝，亦從餘四¶
-天下，來在會坐；并餘大威力諸天、龍神、夜¶
-叉、乾闥婆、阿脩羅、迦樓羅、緊那羅、摩睺羅¶
-伽等，悉來會坐。
-</pre>
-
-<p>
-This makes it possible to reformat the text in phrases without
-losing the navigation grid:
-</p>
-
-<pre class="example">
-復有萬梵天王尸棄等，
-從餘四天下，
-來詣¶佛所，
-而聽法；
-復有萬二千天帝，
-亦從餘四¶天下，
-來在會坐；
-并餘大威力諸天、
-龍神、
-夜¶叉、
-乾闥婆、
-阿脩羅、
-迦樓羅、
-緊那羅、
-摩睺羅¶伽、
-等悉來會坐。
-</pre>
-</div>
-</div>
-<div id="outline-container-sec-2-2-4" class="outline-4">
-<h4 id="sec-2-2-4"><span class="section-number-4">2.2.4</span> Inline notes</h4>
-<div class="outline-text-4" id="text-2-2-4">
-<p>
-Notes that are in the original text marked as notes through
-half-size characters on smaller lines are placed within
-parentheses "(" and ")".
-</p>
-</div>
-</div>
-<div id="outline-container-sec-2-2-5" class="outline-4">
-<h4 id="sec-2-2-5"><span class="section-number-4">2.2.5</span> Additions to the text</h4>
-<div class="outline-text-4" id="text-2-2-5">
-<p>
-By convention, <code>Mandoku</code> considers only the characters from the
-beginning of the line up to the first TAB character (U+0009) as
-part of the source text. Annotations or a translation can be
-placed to the right of the TAB character without influencing the
-navivational grid.  Here is an example with a translation added<sup><a id="fnr.1" name="fnr.1" class="footref" href="#fn.1">1</a></sup>
-</p>
-<pre class="example">
-復有萬梵天王尸棄等。　　　　　　5. There were also ten thousand Brahmā heavenly kings, Śikhin and others, 
-從餘四天下來詣¶佛所而聽法。　　who descended from the other worlds of four continents to proceed to where the Buddha was in order to hear the Dharma. 
-復有萬二千天帝。　　　　　　　　There were also twelve thousand heavenly emperors (i.e., Indras), 
-亦從餘四¶天下來在會坐。　　　　who also came from the other worlds of four continents to sit in this assembly, 
-并餘大威力諸天．　　　　　　　　and the other awesomely powerful gods (devas), 
-龍神．　　　　　　　　　　　　　dragons (nāgas), 
-夜¶叉．　　　　　　　　　　　　yakṣas, 
-乾闥婆．　　　　　　　　　　　　gandharvas, 
-阿脩羅．　　　　　　　　　　　　asuras, 
-:zhu:
-阿脩羅 [a1xiu1luo1] skt Asura, deities of the lowest rank.
-:END:
-迦樓羅．　　　　　　　　　　　　garuḍas, 
-緊那羅．　　　　　　　　　　　　kiṃnaras, 
-摩睺羅¶伽．　　　　　　　　　　and mahoragas, 
-等悉來會坐。　　　　　　　　　who all came to sit in the assembly.
-</pre>
-
-<p>
-Additionally, annotations can be placed in socalled "drawers" (of
-which the property drawer above is one example) on lines by
-themselves.  <code>Mandoku</code> defines a drawer called "zhu" for
-annotation, informal notes etc. pertaining to certain characters
-or expressions, they are understood to refer to the previous line
-in the file. Drawers are introduced with the convention :&lt;name of
-drawer&gt;: on a line by themselves and are ended with :END: again on
-a line by themselves. In interactive use, the content of drawers
-can be hidden and made to appear only when needed.
+The page break indicator ": on a line by themselves and are ended with :END: again on
+  a line by themselves. In interactive use, the content of drawers
+  can be hidden and made to appear only when needed.
 </p>
 </div>
 </div>
 </div>
 </div>
-<div id="footnotes">
-<h2 class="footnotes">Footnotes: </h2>
-<div id="text-footnotes">
-
-<div class="footdef"><sup><a id="fn.1" name="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p>The translation is by the late John R. McRae, published in the BDK Tripitaka series, Berkeley 2004.</p></div>
-
-
 </div>
-</div></div>
 <div id="postamble" class="status">
 <p class="author">Author: Christian Wittern</p>
-<p class="date">Created: 2013-05-28 Tue 07:33</p>
-<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.3.1 (<a href="http://orgmode.org">Org</a> mode 8.0.2)</p>
+<p class="date">Created: 2013-09-28 Sat 10:55</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.3.1 (<a href="http://orgmode.org">Org</a> mode 8.0.5)</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
