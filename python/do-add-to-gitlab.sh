@@ -5,6 +5,8 @@ for d1 in ZB*
 do
     if [ -d $d1]
 	then
+# create this as group
+	curl --connect-timeout 60 --header "PRIVATE-TOKEN: $privtok" -X POST "http://zb.kanripo.org/api/v3/projects/$d1"
 	cd $d1 
 	for d2 in ZB*
 	do
