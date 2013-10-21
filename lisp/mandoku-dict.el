@@ -23,7 +23,7 @@
     (toggle-read-only 0)
     (erase-buffer)
     (insert "* " (if pos pos "")  "\n")
-    (url-insert-file-contents (concat mandoku-dict-url "/procline?query=" inp))
+    (url-insert-file-contents (concat mandoku-dict-url "/procline?query=" (replace-regexp-in-string "&" "&amp;" inp)))
     (mandoku-dict-mode)
     (hide-sublevels 2)
     (goto-char (point-min))
