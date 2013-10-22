@@ -1243,6 +1243,18 @@ Letters do not insert themselves; instead, they are commands.
 
 (add-hook 'mouse-leave-buffer-hook 'mandoku-abort-minibuffer)
 
+;; proxy on windows
+(if (eq system-type 'windows-nt)
+(eval-after-load "url"
+  '(progn
+     (require 'w32-registry)
+     (defadvice url-retrieve (before
+                              w32-set-proxy-dynamically
+                              activate)
+       "Before retrieving a URL, query the IE Proxy settings, and use them."
+       (let ((proxy (w32reg-get-ie-proxy-config)))
+         (setq url-using-proxy proxy
+               url-proxy-services proxy))))))
 
 
 (provide 'mandoku)
