@@ -1234,6 +1234,16 @@ Letters do not insert themselves; instead, they are commands.
 	      emacs-lisp-mode-hook)
 	  (byte-recompile-directory default-directory 0))))
 
+;; convenience: abort when using mouse in other buffer
+;; recommended by yasuoka-san 2013-10-22
+(defun mandoku-abort-minibuffer ()
+  "kill the minibuffer"
+  (when (and (>= (recursion-depth) 1) (active-minibuffer-window))
+    (abort-recursive-edit)))
+
+(add-hook 'mouse-leave-buffer-hook 'mandoku-abort-minibuffer)
+
+
 
 (provide 'mandoku)
 
