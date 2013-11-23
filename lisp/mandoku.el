@@ -1237,7 +1237,7 @@ Letters do not insert themselves; instead, they are commands.
 (defun mandoku-get-remote-text ()
   "This checks if a text is available in a repo and then clones it into the appropriate place"
   (interactive)
-  (let* ((txtid (car (split-string (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))) "_" )))
+  (let* ((txtid (downcase (car (split-string (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))) "_" ))))
 	 (repid (car (split-string txtid "\\([0-9]\\)")))
 	 (groupid (substring txtid 0 (+ (length repid) 2)))
 	 (txturl (concat clone-url groupid "/" txtid ".git"))
@@ -1248,12 +1248,12 @@ Letters do not insert themselves; instead, they are commands.
 	 (md (ignore-errors 
 	       (mkdir default-directory t))) 
 	 (git       (or (executable-find "git")
-			(error "Unable to find `git'"))))
-	 ;; (status
-	 ;;  (call-process-shell-command
-	 ;;   git nil `(,buf t) t "clone" txturl "-v" ))))
+			(error "Unable to find `git'")))
+	 (status
+	  (call-process-shell-command
+	   git nil `(,buf t) t "clone" txturl "-v" ))))
 
-  (shell-command-to-string (concat "cd " default-directory "  && " git " clone " txturl ))) 
+ ; (shell-command-to-string (concat "cd " default-directory "  && " git " clone " txturl ))) 
 
 )
 
