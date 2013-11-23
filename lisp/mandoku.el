@@ -1234,6 +1234,23 @@ Letters do not insert themselves; instead, they are commands.
 	      emacs-lisp-mode-hook)
 	  (byte-recompile-directory default-directory 0))))
 
+(defun mandoku-get-remote-text ()
+  "This checks if a text is available in a repo and then clones it into the appropriate place"
+  (interactive)
+  (let* ((txtid (car (split-string (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))) "_" )))
+	 (repid (car (split-string txtid "\\([0-9]\\)")))
+	 (groupid (substring txtid 0 (+ (length repid) 2)))
+
+
+
+
+(defun mandoku-fork-and-clone ())
+
+(defun mandoku-fork ())
+
+(defun mandoku-clone (url)
+)
+
 ;; convenience: abort when using mouse in other buffer
 ;; recommended by yasuoka-san 2013-10-22
 (defun mandoku-abort-minibuffer ()
