@@ -1238,14 +1238,15 @@ Letters do not insert themselves; instead, they are commands.
 (defun mandoku-get-remote-text ()
   "This checks if a text is available in a repo and then clones it into the appropriate place"
   (interactive)
-  (let* ((fn (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))))
+  (let* ((buf (current-buffer))
+	 (fn (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))))
 	 (txtid (downcase (car (split-string  fn "_" ))))
 	 (repid (car (split-string txtid "\\([0-9]\\)")))
 	 (groupid (substring txtid 0 (+ (length repid) 2)))
 	 (txturl (concat clone-url groupid "/" txtid ".git"))
 	 (targetdir (concat mandoku-text-dir groupid "/")))
-    (mandoku-clone targetdir txturl)
-    (kill-buffer)
+;    (mandoku-clone targetdir txturl)
+    (kill-buffer buf)
     (find-file (concat targetdir fn ".txt")))
 )
 
