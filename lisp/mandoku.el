@@ -1242,15 +1242,20 @@ Letters do not insert themselves; instead, they are commands.
 	 (groupid (substring txtid 0 (+ (length repid) 2)))
 	 (txturl (concat clone-url groupid "/" txtid ".git"))
 	 (default-directory (concat mandoku-text-dir groupid "/"))
+	 
 	 (process-connection-type nil)   ; pipe, no pty (--no-progress)
 	 (buf       (switch-to-buffer "*mandoku bootstrap*"))
+	 (md (ignore-errors 
+	       (mkdir default-directory t))) 
 	 (git       (or (executable-find "git")
 			(error "Unable to find `git'"))))
+	 ;; (status
+	 ;;  (call-process-shell-command
+	 ;;   git nil `(,buf t) t "clone" txturl "-v" ))))
 
-	 (status
-	  (call-process
-	   git nil `(,buf t) t "pull" "origin" "-v" )))
+  (shell-command-to-string (concat "cd " default-directory "  && " git " clone " txturl ))) 
 
+)
 
 
 (defun mandoku-fork-and-clone ())
