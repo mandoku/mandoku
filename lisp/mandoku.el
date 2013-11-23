@@ -1240,7 +1240,16 @@ Letters do not insert themselves; instead, they are commands.
   (let* ((txtid (car (split-string (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))) "_" )))
 	 (repid (car (split-string txtid "\\([0-9]\\)")))
 	 (groupid (substring txtid 0 (+ (length repid) 2)))
+	 (txturl (concat clone-url groupid "/" txtid ".git"))
+	 (default-directory (concat mandoku-text-dir groupid "/"))
+	 (process-connection-type nil)   ; pipe, no pty (--no-progress)
+	 (buf       (switch-to-buffer "*mandoku bootstrap*"))
+	 (git       (or (executable-find "git")
+			(error "Unable to find `git'"))))
 
+	 (status
+	  (call-process
+	   git nil `(,buf t) t "pull" "origin" "-v" )))
 
 
 
