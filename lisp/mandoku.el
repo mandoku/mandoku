@@ -1241,8 +1241,20 @@ Letters do not insert themselves; instead, they are commands.
 	 (repid (car (split-string txtid "\\([0-9]\\)")))
 	 (groupid (substring txtid 0 (+ (length repid) 2)))
 	 (txturl (concat clone-url groupid "/" txtid ".git"))
-	 (default-directory (concat mandoku-text-dir groupid "/"))
-	 
+	 (targetdir (concat mandoku-text-dir groupid "/")))
+    (mandoku-clone targetdir txturl)))
+
+ ; (shell-command-to-string (concat "cd " default-directory "  && " git " clone " txturl ))) 
+
+
+
+
+(defun mandoku-fork-and-clone ())
+
+(defun mandoku-fork ())
+
+(defun mandoku-clone (targetdir url)
+  (let* ((default-directory targetdir)
 	 (process-connection-type nil)   ; pipe, no pty (--no-progress)
 	 (buf       (switch-to-buffer "*mandoku bootstrap*"))
 	 (md (ignore-errors 
@@ -1251,18 +1263,11 @@ Letters do not insert themselves; instead, they are commands.
 			(error "Unable to find `git'")))
 	 (status
 	  (call-process-shell-command
-	   git nil `(,buf t) t "clone" txturl "-v" ))))
+	   git nil `(,buf t) t "clone" url "-v" )))
+	(unless (zerop status)
+	  (error "Couldn't clone the remote Git repository from %s." (concat url " to " targetdir ))))
 
- ; (shell-command-to-string (concat "cd " default-directory "  && " git " clone " txturl ))) 
-
-)
-
-
-(defun mandoku-fork-and-clone ())
-
-(defun mandoku-fork ())
-
-(defun mandoku-clone (url)
+  
 )
 
 ;; convenience: abort when using mouse in other buffer
