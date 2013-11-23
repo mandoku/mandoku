@@ -1024,6 +1024,7 @@ One character is either a character or one entity expression"
      ["Dictionary" mandoku-dict-mlookup t]
      )
     ("Versions"
+     ["Download text" mandoku-get-remote-text t]
      ["Switch versions" mandoku-switch-version nil]
      ["Master" mandoku-switch-to-master nil]
      ["New version" mandoku-new-version nil]
