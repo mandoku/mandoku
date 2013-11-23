@@ -1238,12 +1238,16 @@ Letters do not insert themselves; instead, they are commands.
 (defun mandoku-get-remote-text ()
   "This checks if a text is available in a repo and then clones it into the appropriate place"
   (interactive)
-  (let* ((txtid (downcase (car (split-string (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))) "_" ))))
+  (let* ((fn (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))))
+	 (txtid (downcase (car (split-string  fn "_" ))))
 	 (repid (car (split-string txtid "\\([0-9]\\)")))
 	 (groupid (substring txtid 0 (+ (length repid) 2)))
 	 (txturl (concat clone-url groupid "/" txtid ".git"))
 	 (targetdir (concat mandoku-text-dir groupid "/")))
-    (mandoku-clone targetdir txturl)))
+    (mandoku-clone targetdir txturl)
+    (kill-buffer)
+    (find-file (concat targetdir fn ".txt")))
+)
 
  ; (shell-command-to-string (concat "cd " default-directory "  && " git " clone " txturl ))) 
 
@@ -1267,8 +1271,6 @@ Letters do not insert themselves; instead, they are commands.
 	   git nil `(,buf t) t "clone" url "-v" )))
 	(unless (zerop status)
 	  (error "Couldn't clone the remote Git repository from %s." (concat url " to " targetdir ))))
-
-  
 )
 
 ;; convenience: abort when using mouse in other buffer
