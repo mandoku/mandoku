@@ -1025,7 +1025,7 @@ One character is either a character or one entity expression"
      )
     ("Versions"
      ["Download text" mandoku-get-remote-text t]
-     ["Switch versions" mandoku-switch-version nil]
+     ["Switch versions" mandoku-switch-version (mandoku-get-branches)]
      ["Master" mandoku-switch-to-master nil]
      ["New version" mandoku-new-version nil]
      )
@@ -1296,6 +1296,8 @@ Letters do not insert themselves; instead, they are commands.
          (setq url-using-proxy proxy
                url-proxy-services proxy))))))
 
+(defun mandoku-get-branches ()
+  (split-string (shell-command-to-string "git branch | cut -b3-") "\n" t))
 
 (provide 'mandoku)
 
