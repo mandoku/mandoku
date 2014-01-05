@@ -14,10 +14,10 @@
   possible to be changed easily.
 # todo: think about what to put here!
 #+NAME: uservalues
-| Server | gl.kanripo.org     |
-| Email  | cwittern@yahoo.com |
-| Token  |                    |
-|        |                    |
+| Server  | gl.kanripo.org     |
+| Email   | cwittern@yahoo.com |
+| Token   |                    |
+| textdir |                    |
 
 * Default values
 
