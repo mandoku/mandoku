@@ -13,6 +13,9 @@
   Here is some information that is available in a table to make it
   possible to be changed easily.
 
+| User name     |   |
+| Default drive | C |
+|               |   |
 
 * Default values
 
