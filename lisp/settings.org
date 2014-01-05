@@ -1,0 +1,22 @@
+#+TITLE: Settings for Mandoku
+
+* About
+
+  This file provides information about you and your system to
+  =Mandoku=.  If you want to change something, chances are that there
+  is a setting in this file that can be adopted.  There are also some
+  values you need to fill in before starting to use the system, in
+  order for it to work properly.
+
+* User information
+
+  Here is some information that is available in a table to make it
+  possible to be changed easily.
+
+
+* Default values
+
+** Directories
+#+BEGIN_SRC emacs-lisp
+(setq mandoku-base-dir (expand-file-name "~/krp/"))
+#+END_SRC
