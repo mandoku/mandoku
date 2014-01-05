@@ -12,10 +12,12 @@
 
   Here is some information that is available in a table to make it
   possible to be changed easily.
-
-| User name     |   |
-| Default drive | C |
-|               |   |
+# todo: think about what to put here!
+#+NAME: uservalues
+| Server | gl.kanripo.org     |
+| Email  | cwittern@yahoo.com |
+| Token  |                    |
+|        |                    |
 
 * Default values
 
