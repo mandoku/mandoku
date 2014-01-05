@@ -24,4 +24,8 @@
 ** Directories
 #+BEGIN_SRC emacs-lisp
 (setq mandoku-base-dir (expand-file-name "~/krp/"))
+(setq mandoku-text-dir (expand-file-name (concat mandoku-base-dir "text/")))
+(setq mandoku-meta-dir (expand-file-name  (concat mandoku-base-dir "meta/")))
+(setq mandoku-temp-dir (expand-file-name  (concat mandoku-base-dir "temp/")))
+(setq mandoku-sys-dir (expand-file-name  (concat mandoku-base-dir "system/")))
 #+END_SRC
