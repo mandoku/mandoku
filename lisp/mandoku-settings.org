@@ -64,8 +64,9 @@
 | 2 | 4 | 6 | 8 | 10 | 12 | 14 | 16 | 18 | 20 |
 
 
-#+name: fibonacci-seq(fib-inputs=fibonacci-inputs)
-#+begin_src emacs-lisp
+#+name: fibonacci-seq
+#+begin_src emacs-lisp :var fib-inputs=fibonacci-inputs 
+
   (defun fibonacci (n)
     (if (or (= n 0) (= n 1))
         n
@@ -74,3 +75,8 @@
   (mapcar (lambda (row)
             (mapcar #'fibonacci row)) fib-inputs)
 #+end_src
+
+#+RESULTS: fibonacci-seq
+| 1 | 1 | 2 |  3 |  5 |   8 |  13 |  21 |   34 |   55 |
+| 1 | 3 | 8 | 21 | 55 | 144 | 377 | 987 | 2584 | 6765 |
+
