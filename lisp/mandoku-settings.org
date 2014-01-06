@@ -20,7 +20,7 @@
 | basedir | ~/krp              |
 
 
-#+NAME: repositories
+#+NAME: search-repositories
 | ZB | http://www.kanripo.org/zb |
 
 * Default values
