@@ -91,16 +91,16 @@
 
 
 (defun mandoku-clone-catalog (url &optional mandoku-install-branch)
-      (let* ((default-directory (file-name-as-directory mandoku-meta-dir))
+      (let* ((default-directory mandoku-meta-dir)
 	   ;; Now clone the catalogs
 	     (buf       (switch-to-buffer "*mandoku bootstrap*"))
 	     (git       (or (executable-find "git")
 			    (error "Unable to find `git'")))
-	   (status
-	    (call-process
-	     git nil `(,buf t) t "--no-pager" "clone" "-v" url)))
+	     (status
+	      (call-process
+	       git nil `(,buf t) t "--no-pager" "clone" "-v" url)))
         (unless (zerop status)
-	  (error "Couldn't clone mandoku catalogs from the Git repository: %s" url))
+	  (error "Couldn't clone mandoku catalogs from the Git repository: %s " (concat url " / " default-directory)))
 	;; switch branch if we have to
 ;; arrgh, cant get this to work yet... git keeps complaining about not being in a git directory...
 ;; 	(let* ((branch (cond
