@@ -184,7 +184,7 @@
 (defun mandoku-show-catalog ()
   (interactive)
   (unless mandoku-initialized
-    (load mandoku-local-init-file))
+    (org-babel-load-file mandoku-local-init-file))
   (find-file mandoku-catalog)
 )
 

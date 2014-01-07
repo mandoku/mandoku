@@ -41,7 +41,7 @@
 (setq mandoku-do-remote t)
 (setq mandoku-string-limit 10)
 (setq mandoku-index-display-limit 2000)
-(setq mandoku-local-init-file "~/.emacs.d/mandoku-local-init.el")
+(setq mandoku-local-init-file (concat mandoku-meta-dir "settings.org"))
 (ignore-errors 
  (load "mandoku-dict" t)
  (global-set-key [f5] 'mandoku-dict-mlookup))
