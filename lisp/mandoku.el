@@ -1216,11 +1216,15 @@ Letters do not insert themselves; instead, they are commands.
 
 (defun mandoku-update()
   (interactive)
-  (let* ((package   "mandoku")
+  (dolist (pac ("mandoku" "meta")
+	  (mandoku-update-internal))))
+
+(defun mandoku-update-internal (package)
+  (let* (
 	 (buf       (switch-to-buffer "*mandoku bootstrap*"))
 	 (git       (or (executable-find "git")
 			(error "Unable to find `git'")))
-	 (default-directory (concat mandoku-base-dir package "/lisp"))
+	 (default-directory (concat mandoku-base-dir package))
 	 (process-connection-type nil)   ; pipe, no pty (--no-progress)
 
 	   ;; First clone mandoku
@@ -1251,8 +1255,6 @@ Letters do not insert themselves; instead, they are commands.
 )
 
  ; (shell-command-to-string (concat "cd " default-directory "  && " git " clone " txturl ))) 
-
-
 
 
 (defun mandoku-fork-and-clone ())
