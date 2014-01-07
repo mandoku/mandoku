@@ -33,6 +33,8 @@
   [2013-07-09] A built of Emacs 24.3 that allows the display of
   Unicode Ext. B characters can be found [[file:data/Emacs24.3+2013-07-03.dmg.zip][here]].
 
+  [2013-09-26] [[file:mandoku-install-en.html][Installation instructions]] for a preview version are now available.
+
 
 * Software
   The software for using Mandoku texts falls in two broad categories:
