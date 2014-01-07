@@ -1,9 +1,10 @@
-(let ((uval (quote (("Server" "gl.kanripo.org") ("Email" "cwittern@yahoo.com") ("Token" "") ("basedir" "~/db")))))
+(let ((uval (quote (("Server" "gl.kanripo.org") ("Email" "cwittern@yahoo.com") ("Token" "") ("basedir" "/tmp/md")))))
 (mandoku-set-settings uval)
 )
 
 (let ((uval (quote (("ZB" "http://www.kanripo.org/zb")))))
-(mandoku-set-repos uval)
+(setq test uval)
+;;(mandoku-set-repos uval)
 )
 
 (setq mandoku-text-dir (expand-file-name (concat mandoku-base-dir "text/")))

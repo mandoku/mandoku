@@ -1216,7 +1216,7 @@ Letters do not insert themselves; instead, they are commands.
 
 (defun mandoku-update()
   (interactive)
-  (mandoku-update-internal "/mandoku/lisp")
+;  (mandoku-update-internal "/mandoku/lisp")
   (mandoku-update-internal "/meta/ZB"))
 
 (defun mandoku-update-internal (package)
@@ -1301,7 +1301,7 @@ Letters do not insert themselves; instead, they are commands.
 (defun mandoku-get-branches ()
   (split-string (shell-command-to-string "git branch | cut -b3-") "\n" t))
 
-;; routines to work with settings
+;; routines to work with settings when loading settings.org
 ;;[2014-01-07T11:21:05+0900]
 
 (defun mandoku-lc-car (row)
@@ -1314,7 +1314,11 @@ Letters do not insert themselves; instead, they are commands.
     (setq mandoku-user-token (car (cdr (assoc "token" lcval ))))
     (setq mandoku-user-server (car (cdr (assoc "server" lcval ))))
     (if (car (cdr (assoc "basedir" lcval )))
-	(setq mandoku-base-dir  (expand-file-name (car (cdr (assoc "basedir" lcval ))))))
+	(progn
+	  (setq mandoku-base-dir  (expand-file-name (car (cdr (assoc "basedir" lcval )))))
+	  (unless (eq "/" (substring mandoku-base-dir (- (length mandoku-base-dir) 1 )))
+	    (setq mandoku-base-dir (concat mandoku-base-dir "/"))))
+    )
 ))
 
 (defun mandoku-set-repos (uval)
