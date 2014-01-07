@@ -1299,6 +1299,19 @@ Letters do not insert themselves; instead, they are commands.
 (defun mandoku-get-branches ()
   (split-string (shell-command-to-string "git branch | cut -b3-") "\n" t))
 
+;; routines to work with settings
+;;[2014-01-07T11:21:05+0900]
+
+(defun mandoku-lc-car (row)
+"Lowercases the first element in a list"
+(list (downcase (car row)) (car (cdr row))))
+
+(defun mandoku-set-settings  (uval)
+  (let (lcval (mapcar #'mandoku-lc-car  uval))
+    (setq mandoku-user-email (car (cdr (assoc "email" lcval ))))
+    (setq mandoku-user-token (car (cdr (assoc "token" lcval ))))
+))
+
 (provide 'mandoku)
 
 ;; end of file mandoku.el

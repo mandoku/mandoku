@@ -20,14 +20,9 @@
 | basedir | ~/krp              |
 
 #+BEGIN_SRC emacs-lisp :var uval=uservalues
-(setq test uval)
+(mandoku-set-settings uval)
 #+END_SRC
 
-#+RESULTS:
-| Server  | gl.kanripo.org     |
-| Email   | cwittern@yahoo.com |
-| Token   |                    |
-| basedir | ~/krp              |
 
 #+NAME: search-repositories
 | ZB | http://www.kanripo.org/zb |
