@@ -19,9 +19,6 @@
 | Token   |                    |
 | basedir | ~/krp              |
 
-#+BEGIN_SRC emacs-lisp :var uval=uservalues
-(mandoku-set-settings uval)
-#+END_SRC
 
 #+RESULTS:
 : /Users/chris/db/mandoku/lisp/gl.kanripo.org
@@ -30,12 +27,24 @@
 #+NAME: search-repositories
 | ZB | http://www.kanripo.org/zb |
 
+
+
+* Default values
+
+** Code
+   :PROPERTIES:
+   :VISIBILITY: folded
+   :END:
+
+#+BEGIN_SRC emacs-lisp :var uval=uservalues
+(mandoku-set-settings uval)
+#+END_SRC
+
+
 #+BEGIN_SRC emacs-lisp :var uval=search-repositories
 (mandoku-set-repos uval)
 #+END_SRC
 
-
-* Default values
 
 ** Directories
 #+BEGIN_SRC emacs-lisp

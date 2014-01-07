@@ -1311,7 +1311,8 @@ Letters do not insert themselves; instead, they are commands.
     (setq mandoku-user-email (car (cdr (assoc "email" lcval ))))
     (setq mandoku-user-token (car (cdr (assoc "token" lcval ))))
     (setq mandoku-user-server (car (cdr (assoc "server" lcval ))))
-    (setq mandoku-base-dir  (expand-file-name (car (cdr (assoc "basedir" lcval )))))
+    (if (car (cdr (assoc "basedir" lcval )))
+	(setq mandoku-base-dir  (expand-file-name (car (cdr (assoc "basedir" lcval ))))))
 ))
 
 (provide 'mandoku)
