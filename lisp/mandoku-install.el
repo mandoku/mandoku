@@ -195,6 +195,9 @@ Click on a link or move the cursor to the link and then press enter
     )
   )
 
+(ignore-errors
+  (copy-file (concat mandoku-base-dir "mandoku/lisp/mandoku-settings.org") (concat mandoku-meta-dir "settings.org")))
+(or (ignore-errors (org-babel-load-file (expand-file-name "settings.org" mandoku-meta-dir))))
 
  
 (setq mandoku-initialized t)

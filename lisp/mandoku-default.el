@@ -57,15 +57,7 @@
       (load "mandoku-local-init")
       ))
 
-(or (ignore-errors (org-babel-load-file (expand-file-name "mandoku-settings.org" "/Users/chris/db/mandoku/lisp"))
-
-    (unless 
-	(ignore-errors
-	  (load (concat (file-name-as-directory user-emacs-directory) "mandoku-local-init")))
-      (load "mandoku-install")
-      (mandoku-setup-local-init-file)
-      (load "mandoku-local-init")
-      ))
+(or (ignore-errors (org-babel-load-file (expand-file-name "settings.org" mandoku-meta-dir))))
 
 
 (setq inhibit-splash-screen t)
