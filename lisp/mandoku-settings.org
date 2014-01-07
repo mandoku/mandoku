@@ -38,8 +38,12 @@
 
 
 #+BEGIN_SRC emacs-lisp :var uval=search-repositories
-(mandoku-set-repos uval)
+(setq test uval)
+;;(mandoku-set-repos uval)
 #+END_SRC
+
+#+RESULTS:
+| ZB | http://www.kanripo.org/zb |
 
 
 ** Directories
@@ -69,9 +73,6 @@
 (global-set-key [f6] 'mandoku-search-text)
 (global-set-key [f7] 'mandoku-search-titles)
 (setq org-support-shift-select 'always)
-
-
-
 #+END_SRC
 
 

@@ -1316,9 +1316,8 @@ Letters do not insert themselves; instead, they are commands.
 ))
 
 (defun mandoku-set-repos (uval)
-  (setq mandoku-repositories-alist nil)
-  (dolist row uval
-	  (add-to-list mandoku-repositories-alist row)))
+  (setq mandoku-repositories-alist uval))
+
 
 (provide 'mandoku)
 
