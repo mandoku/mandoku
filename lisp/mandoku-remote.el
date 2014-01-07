@@ -11,7 +11,7 @@
 (defun mandoku-search-remote (search-string index-buffer)
   (with-current-buffer index-buffer 
     (dolist (rep mandoku-repositories-alist)
-      (url-insert-file-contents (concat (cdr rep) "/search?query=" search-string)
+      (url-insert-file-contents (concat (car (cdr rep)) "/search?query=" search-string)
 			      (lambda (status) (switch-to-buffer (current-buffer)))))))
 
 

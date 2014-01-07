@@ -1024,7 +1024,8 @@ One character is either a character or one entity expression"
      ["Dictionary" mandoku-dict-mlookup t]
      )
     ("Versions"
-     ["Switch versions" mandoku-switch-version nil]
+     ["Download text" mandoku-get-remote-text t]
+     ["Switch versions" mandoku-switch-version (mandoku-get-branches)]
      ["Master" mandoku-switch-to-master nil]
      ["New version" mandoku-new-version nil]
      )
@@ -1215,11 +1216,16 @@ Letters do not insert themselves; instead, they are commands.
 
 (defun mandoku-update()
   (interactive)
-  (let* ((package   "mandoku")
+;  (mandoku-update-internal "/mandoku/lisp")
+  (dolist ( rep mandoku-repositories-alist)
+		(mandoku-update-internal (concat "/meta/" (car rep)))))
+
+(defun mandoku-update-internal (package)
+  (let* (
 	 (buf       (switch-to-buffer "*mandoku bootstrap*"))
 	 (git       (or (executable-find "git")
 			(error "Unable to find `git'")))
-	 (default-directory (concat mandoku-base-dir package "/lisp"))
+	 (default-directory (concat mandoku-base-dir package))
 	 (process-connection-type nil)   ; pipe, no pty (--no-progress)
 
 	   ;; First clone mandoku
@@ -1233,6 +1239,91 @@ Letters do not insert themselves; instead, they are commands.
 	      ;; Byte-compile runs emacs-lisp-mode-hook; disable it
 	      emacs-lisp-mode-hook)
 	  (byte-recompile-directory default-directory 0))))
+
+(defun mandoku-get-remote-text ()
+  "This checks if a text is available in a repo and then clones it into the appropriate place"
+  (interactive)
+  (let* ((buf (current-buffer))
+	 (fn (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))))
+	 (txtid (downcase (car (split-string  fn "_" ))))
+	 (repid (car (split-string txtid "\\([0-9]\\)")))
+	 (groupid (substring txtid 0 (+ (length repid) 2)))
+	 (txturl (concat clone-url groupid "/" txtid ".git"))
+	 (targetdir (concat mandoku-text-dir groupid "/")))
+;    (mandoku-clone targetdir txturl)
+    (kill-buffer buf)
+    (find-file (concat targetdir fn ".txt")))
+)
+
+ ; (shell-command-to-string (concat "cd " default-directory "  && " git " clone " txturl ))) 
+
+
+(defun mandoku-fork-and-clone ())
+
+(defun mandoku-fork ())
+
+(defun mandoku-clone (targetdir url)
+  (let* ((default-directory targetdir)
+	 (process-connection-type nil)   ; pipe, no pty (--no-progress)
+	 (buf       (switch-to-buffer "*mandoku bootstrap*"))
+	 (md (ignore-errors 
+	       (mkdir default-directory t))) 
+	 (git       (or (executable-find "git")
+			(error "Unable to find `git'")))
+	 (status
+	  (call-process-shell-command
+	   git nil `(,buf t) t "clone" url "-v" )))
+	(unless (zerop status)
+	  (error "Couldn't clone the remote Git repository from %s." (concat url " to " targetdir ))))
+)
+
+;; convenience: abort when using mouse in other buffer
+;; recommended by yasuoka-san 2013-10-22
+(defun mandoku-abort-minibuffer ()
+  "kill the minibuffer"
+  (when (and (>= (recursion-depth) 1) (active-minibuffer-window))
+    (abort-recursive-edit)))
+
+(add-hook 'mouse-leave-buffer-hook 'mandoku-abort-minibuffer)
+
+;; proxy on windows
+(if (eq system-type 'windows-nt)
+(eval-after-load "url"
+  '(progn
+     (require 'w32-registry)
+     (defadvice url-retrieve (before
+                              w32-set-proxy-dynamically
+                              activate)
+       "Before retrieving a URL, query the IE Proxy settings, and use them."
+       (let ((proxy (w32reg-get-ie-proxy-config)))
+         (setq url-using-proxy proxy
+               url-proxy-services proxy))))))
+
+(defun mandoku-get-branches ()
+  (split-string (shell-command-to-string "git branch | cut -b3-") "\n" t))
+
+;; routines to work with settings when loading settings.org
+;;[2014-01-07T11:21:05+0900]
+
+(defun mandoku-lc-car (row)
+"Lowercases the first element in a list"
+(list (downcase (car row)) (car (cdr row))))
+
+(defun mandoku-set-settings  (uval)
+  (let ((lcval (mapcar #'mandoku-lc-car  uval)))
+    (setq mandoku-user-email (car (cdr (assoc "email" lcval ))))
+    (setq mandoku-user-token (car (cdr (assoc "token" lcval ))))
+    (setq mandoku-user-server (car (cdr (assoc "server" lcval ))))
+    (if (car (cdr (assoc "basedir" lcval )))
+	(progn
+	  (setq mandoku-base-dir  (expand-file-name (car (cdr (assoc "basedir" lcval )))))
+	  (unless (eq "/" (substring mandoku-base-dir (- (length mandoku-base-dir) 1 )))
+	    (setq mandoku-base-dir (concat mandoku-base-dir "/"))))
+    )
+))
+
+(defun mandoku-set-repos (uval)
+  (setq mandoku-repositories-alist uval))
 
 
 (provide 'mandoku)

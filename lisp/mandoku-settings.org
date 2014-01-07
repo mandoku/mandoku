@@ -1,0 +1,78 @@
+#+TITLE: Settings for Mandoku
+
+* About
+
+  This file provides information about you and your system to
+  =Mandoku=.  If you want to change something, chances are that there
+  is a setting in this file that can be adopted.  There are also some
+  values you need to fill in before starting to use the system, in
+  order for it to work properly.
+
+* User information
+
+  Here is some information that is available in a table to make it
+  possible to be changed easily.
+# todo: think about what to put here!
+#+NAME: uservalues
+| Server  | gl.kanripo.org     |
+| Email   | cwittern@yahoo.com |
+| Token   |                    |
+| basedir | /tmp/md            |
+
+
+#+NAME: search-repositories
+| ZB | http://www.kanripo.org/zb |
+
+
+
+* Default values
+
+** Code
+   :PROPERTIES:
+   :VISIBILITY: folded
+   :END:
+
+#+BEGIN_SRC emacs-lisp :var uval=uservalues
+(mandoku-set-settings uval)
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp :var uval=search-repositories
+(setq test uval)
+;;(mandoku-set-repos uval)
+#+END_SRC
+
+#+RESULTS:
+| ZB | http://www.kanripo.org/zb |
+
+
+** Directories
+#+BEGIN_SRC emacs-lisp
+(setq mandoku-text-dir (expand-file-name (concat mandoku-base-dir "text/")))
+(setq mandoku-meta-dir (expand-file-name  (concat mandoku-base-dir "meta/")))
+(setq mandoku-temp-dir (expand-file-name  (concat mandoku-base-dir "temp/")))
+(setq mandoku-sys-dir (expand-file-name  (concat mandoku-base-dir "system/")))
+(setq mandoku-dict-url "http://www.kanripo.org/zb")
+#+END_SRC
+
+
+** Settings
+#+BEGIN_SRC emacs-lisp
+(require 'mandoku)
+(require 'mandoku-remote)
+(require 'org-mandoku)
+(require 'mandoku-dict)
+(setq org-return-follows-link t)
+(setq mandoku-do-remote t)
+(setq mandoku-string-limit 10)
+(setq mandoku-index-display-limit 2000)
+(setq mandoku-local-init-file "~/.emacs.d/mandoku-local-init.el")
+(ignore-errors 
+ (load "mandoku-dict" t)
+ (global-set-key [f5] 'mandoku-dict-mlookup))
+(global-set-key [f6] 'mandoku-search-text)
+(global-set-key [f7] 'mandoku-search-titles)
+(setq org-support-shift-select 'always)
+#+END_SRC
+
+

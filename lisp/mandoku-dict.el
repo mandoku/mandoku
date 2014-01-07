@@ -23,7 +23,7 @@
     (toggle-read-only 0)
     (erase-buffer)
     (insert "* " (if pos pos "")  "\n")
-    (url-insert-file-contents (concat mandoku-dict-url "/procline?query=" inp))
+    (url-insert-file-contents (concat mandoku-dict-url "/procline?query=" (replace-regexp-in-string "&" "$" inp)))
     (mandoku-dict-mode)
     (hide-sublevels 2)
     (goto-char (point-min))
@@ -128,7 +128,8 @@
   "Display the dictionary page, either local or remotely"
   (if mandoku-dict-img-dir
       (org-open-file (concat mandoku-dict-img-dir  link))
-    (browse-url (concat mandoku-dict-url "/static/dic/" link))))
+;    (browse-url (concat mandoku-dict-url "/static/dic/" link))))
+    (browse-url (concat mandoku-dict-url "/dicpage/" link))))
 	 
 (provide 'mandoku-dict)
 
