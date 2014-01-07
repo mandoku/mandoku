@@ -27,36 +27,12 @@
 
 * Default values
 
-** Code
+
+** Settings
    :PROPERTIES:
    :VISIBILITY: folded
    :END:
 
-#+BEGIN_SRC emacs-lisp :var uval=uservalues
-(mandoku-set-settings uval)
-#+END_SRC
-
-
-#+BEGIN_SRC emacs-lisp :var uval=search-repositories
-(setq test uval)
-;;(mandoku-set-repos uval)
-#+END_SRC
-
-#+RESULTS:
-| ZB | http://www.kanripo.org/zb |
-
-
-** Directories
-#+BEGIN_SRC emacs-lisp
-(setq mandoku-text-dir (expand-file-name (concat mandoku-base-dir "text/")))
-(setq mandoku-meta-dir (expand-file-name  (concat mandoku-base-dir "meta/")))
-(setq mandoku-temp-dir (expand-file-name  (concat mandoku-base-dir "temp/")))
-(setq mandoku-sys-dir (expand-file-name  (concat mandoku-base-dir "system/")))
-(setq mandoku-dict-url "http://www.kanripo.org/zb")
-#+END_SRC
-
-
-** Settings
 #+BEGIN_SRC emacs-lisp
 (require 'mandoku)
 (require 'mandoku-remote)
@@ -73,6 +49,31 @@
 (global-set-key [f6] 'mandoku-search-text)
 (global-set-key [f7] 'mandoku-search-titles)
 (setq org-support-shift-select 'always)
+#+END_SRC
+
+** Code
+   :PROPERTIES:
+   :VISIBILITY: folded
+   :END:
+
+#+BEGIN_SRC emacs-lisp :var uval=uservalues
+(mandoku-set-settings uval)
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp :var uval=search-repositories
+(setq test uval)
+;;(mandoku-set-repos uval)
+#+END_SRC
+
+
+*** Directories
+#+BEGIN_SRC emacs-lisp
+(setq mandoku-text-dir (expand-file-name (concat mandoku-base-dir "text/")))
+(setq mandoku-meta-dir (expand-file-name  (concat mandoku-base-dir "meta/")))
+(setq mandoku-temp-dir (expand-file-name  (concat mandoku-base-dir "temp/")))
+(setq mandoku-sys-dir (expand-file-name  (concat mandoku-base-dir "system/")))
+(setq mandoku-dict-url "http://www.kanripo.org/zb")
 #+END_SRC
 
 
