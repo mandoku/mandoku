@@ -1216,8 +1216,8 @@ Letters do not insert themselves; instead, they are commands.
 
 (defun mandoku-update()
   (interactive)
-  (dolist (pac ("mandoku" "meta")
-	  (mandoku-update-internal))))
+  (mandoku-update-internal "/mandoku/lisp")
+  (mandoku-update-internal "/meta/ZB"))
 
 (defun mandoku-update-internal (package)
   (let* (
