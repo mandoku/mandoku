@@ -20,10 +20,6 @@
 | basedir | ~/db               |
 
 
-#+RESULTS:
-: /Users/chris/db/mandoku/lisp/gl.kanripo.org
-
-
 #+NAME: search-repositories
 | ZB | http://www.kanripo.org/zb |
 

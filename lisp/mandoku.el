@@ -1315,6 +1315,11 @@ Letters do not insert themselves; instead, they are commands.
 	(setq mandoku-base-dir  (expand-file-name (car (cdr (assoc "basedir" lcval ))))))
 ))
 
+(defun mandoku-set-repos (uval)
+  (setq mandoku-repositories-alist nil)
+  (dolist row uval
+	  (add-to-list mandoku-repositories-alist row)))
+
 (provide 'mandoku)
 
 ;; end of file mandoku.el
