@@ -17,7 +17,6 @@
 | Server  | gl.kanripo.org     |
 | Email   | cwittern@yahoo.com |
 | Token   |                    |
-| basedir | /tmp/md            |
 
 
 #+NAME: search-repositories
@@ -75,5 +74,3 @@
 (setq mandoku-sys-dir (expand-file-name  (concat mandoku-base-dir "system/")))
 (setq mandoku-dict-url "http://www.kanripo.org/zb")
 #+END_SRC
-
-
