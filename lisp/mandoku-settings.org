@@ -12,11 +12,12 @@
 
   Here is some information that is available in a table to make it
   possible to be changed easily.
-# todo: think about what to put here!
+
+
 #+NAME: uservalues
-| Server  | gl.kanripo.org     |
-| Email   | cwittern@yahoo.com |
-| Token   |                    |
+| Server | gl.kanripo.org |
+| Email  |                |
+| Token  |                |
 
 
 #+NAME: search-repositories
@@ -73,4 +74,7 @@
 (setq mandoku-temp-dir (expand-file-name  (concat mandoku-base-dir "temp/")))
 (setq mandoku-sys-dir (expand-file-name  (concat mandoku-base-dir "system/")))
 (setq mandoku-dict-url "http://www.kanripo.org/zb")
+(setq mandoku-initialized t)
+(message "Loading of local setup for Mandoku finished")
+(find-file mandoku-catalog)
 #+END_SRC
