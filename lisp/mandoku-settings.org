@@ -17,7 +17,7 @@
 | Server  | gl.kanripo.org     |
 | Email   | cwittern@yahoo.com |
 | Token   |                    |
-| basedir | ~/krp              |
+| basedir | ~/db               |
 
 
 #+RESULTS:
