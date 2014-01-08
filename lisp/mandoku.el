@@ -1228,7 +1228,7 @@ Letters do not insert themselves; instead, they are commands.
 	 (default-directory (concat mandoku-base-dir package))
 	 (process-connection-type nil)   ; pipe, no pty (--no-progress)
 
-	   ;; First clone mandoku
+	   ;; First update mandoku
 	 (status
 	  (call-process
 	   git nil `(,buf t) t "pull" "origin" "-v" )))
@@ -1238,7 +1238,13 @@ Letters do not insert themselves; instead, they are commands.
 	(let ((byte-compile-warnings nil)
 	      ;; Byte-compile runs emacs-lisp-mode-hook; disable it
 	      emacs-lisp-mode-hook)
-	  (byte-recompile-directory default-directory 0))))
+	  (byte-recompile-directory default-directory 0))
+	(mandoku-post-update)
+	))
+
+(defun mandoku-post-update ()
+  "This gets called immediately after an update to perform necessary additional steps"
+)
 
 (defun mandoku-get-remote-text ()
   "This checks if a text is available in a repo and then clones it into the appropriate place"
@@ -1258,7 +1264,7 @@ Letters do not insert themselves; instead, they are commands.
 
  ; (shell-command-to-string (concat "cd " default-directory "  && " git " clone " txturl ))) 
 
-
+;; this will be implemented once the gitlab API change is in place
 (defun mandoku-fork-and-clone ())
 
 (defun mandoku-fork ())
