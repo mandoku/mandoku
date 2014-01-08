@@ -8,7 +8,8 @@
       (setq mandoku-base-dir (concat (car tmp) "/" (car (cdr tmp))"/" ))
       (add-to-list 'exec-path (concat mandoku-base-dir "/bin/Git/bin")) 
       (add-to-list 'exec-path (concat mandoku-base-dir "/bin/gnuwin32/bin")) 
-      (add-to-list 'exec-path (concat mandoku-base-dir "/bin/Git/bin/cmd")) )
+      (add-to-list 'exec-path (concat mandoku-base-dir "/bin/Git/bin/cmd")) 
+      (setenv "HOME" (getenv "USERPROFILE")))
   (ignore-errors
     ;; otherwise (mac or linux):
     ;; we look in some popular destinations for mandoku
@@ -57,8 +58,7 @@
       (load "mandoku-local-init")
       ))
 
-(or (ignore-errors (org-babel-load-file (expand-file-name "settings.org" mandoku-meta-dir))))
-
+(ignore-errors (org-babel-load-file (expand-file-name "settings.org" mandoku-meta-dir)))
 
 (setq inhibit-splash-screen t)
 (prefer-coding-system 'utf-8)
