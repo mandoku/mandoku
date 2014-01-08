@@ -1,16 +1,15 @@
 #!/bin/sh
-
 mandokudir=`dirname $0`
-idxdir=/tmp/cdl-index
+idxdir=$mandokudir/index
 mkdir -p $idxdir
 coll=krp
-src=/tmp/cdl
+src=~/md/text/ZB6q/
 cd $src
-for subcoll in ZB6q*
+for subcoll in ZB6q
 do
     cd $subcoll
     rm index.log
-    for file in */*.txt
+    for file in ZB6q0002/*.txt
     do
 	echo $file $subcoll.$coll
 	python $mandokudir/mandoku_idx.py $file $subcoll.$coll $idxdir
