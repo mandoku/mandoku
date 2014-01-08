@@ -195,7 +195,7 @@ Click on a link or move the cursor to the link and then press enter
     )
   )
 
-(or (ignore-errors (org-babel-load-file (expand-file-name \"settings.org\" mandoku-meta-dir)))))
+(or (ignore-errors (org-babel-load-file (expand-file-name \"settings.org\" mandoku-meta-dir))))
 
  
 (setq mandoku-initialized t)
