@@ -132,7 +132,7 @@
 (require 'org-mandoku)
 (require 'mandoku-dict)
 
-(setq mandoku-repositories-alist '((\"ZB\" . \"http://www.kanripo.org/zb\")))
+(setq mandoku-repositories-alist '((\"ZB\"  \"http://www.kanripo.org/zb\")))
 
 (setq org-return-follows-link t)
 
