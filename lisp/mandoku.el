@@ -961,7 +961,7 @@ One character is either a character or one entity expression"
   (setq case-fold-search nil)
   (set-variable 'tab-with 24 t)
 ;  (set (make-local-variable 'tab-with) 24)
-  (set (make-local-variable 'org-startup-folded) 'overview)
+  (set (make-local-variable 'org-startup-folded) "nofold")
 ;  (toggle-read-only 1)
 ;  (view-mode)
 )

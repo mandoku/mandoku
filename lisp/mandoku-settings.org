@@ -73,6 +73,13 @@
 (setq mandoku-temp-dir (expand-file-name  (concat mandoku-base-dir "temp/")))
 (setq mandoku-sys-dir (expand-file-name  (concat mandoku-base-dir "system/")))
 (setq mandoku-dict-url "http://www.kanripo.org/zb")
+(setq mandoku-catalogs-alist nil)
+(dolist (dir (directory-files mandoku-meta-dir nil "^[^.,].*"))
+  (when (file-directory-p (concat mandoku-meta-dir dir))
+    (dolist (file (directory-files (concat mandoku-meta-dir dir) nil ".txt" ))
+      (add-to-list 'mandoku-catalogs-alist 
+   (cons (file-name-sans-extension file) (concat mandoku-meta-dir dir "/" file))))))
+(mandoku-read-titletables) 
 (setq mandoku-initialized t)
 (message "Loading of local setup for Mandoku finished")
 (find-file mandoku-catalog)
