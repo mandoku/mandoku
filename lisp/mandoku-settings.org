@@ -62,8 +62,7 @@
 
 
 #+BEGIN_SRC emacs-lisp :var uval=search-repositories
-(setq test uval)
-;;(mandoku-set-repos uval)
+(mandoku-set-repos uval)
 #+END_SRC
 
 
