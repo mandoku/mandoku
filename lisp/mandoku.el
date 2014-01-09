@@ -719,6 +719,7 @@ One character is either a character or one entity expression"
   (local-unset-key [menu-bar Org])
   (local-unset-key [menu-bar Tbl])
   (easy-menu-add mandoku-md-menu mandoku-view-mode-map)
+  (mandoku-install-version-files-menu)
 ;  (view-mode)
 )
 
@@ -1033,6 +1034,12 @@ One character is either a character or one entity expression"
      ["Add repository" mandoku-setting nil]
      )
 ))     
+
+     [("Switch versions")]
+;     ["Switch versions" mandoku-switch-version (mandoku-get-branches)]
+     ["Master" mandoku-switch-to-master nil]
+     ["New version" mandoku-new-version nil]
+
 
 (defun mandoku-version-menu-entry (branch)
   (vector branch (list 'mandoku-switch-version branch) t))
