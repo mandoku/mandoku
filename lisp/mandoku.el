@@ -1035,10 +1035,22 @@ One character is either a character or one entity expression"
      )
 ))     
 
-     [("Switch versions")]
-;     ["Switch versions" mandoku-switch-version (mandoku-get-branches)]
-     ["Master" mandoku-switch-to-master nil]
-     ["New version" mandoku-new-version nil]
+
+(defun mandoku-install-version-files-menu ()
+  (let ((bl (buffer-list)))
+    (save-excursion
+      (while bl
+	(set-buffer (pop bl))
+	(if (derived-mode-p 'mandoku-view-mode) (setq bl nil)))
+      (when (derived-mode-p 'mandoku-view-mode)
+	(easy-menu-change
+	 '("Mandoku") "Versions"
+	 (append
+	  (list
+	   ["Master" mandoku-switch-to-master nil]
+	   ["New version" mandoku-new-version nil]
+	   "--")
+	  (mapcar 'mandoku-version-menu-entry (mandoku-get-branches))))))))	  
 
 
 (defun mandoku-version-menu-entry (branch)
