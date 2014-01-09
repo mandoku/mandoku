@@ -1047,8 +1047,8 @@ One character is either a character or one entity expression"
 	 '("Mandoku") "Versions"
 	 (append
 	  (list
-	   ["Master" mandoku-switch-to-master nil]
-	   ["New version" mandoku-new-version nil]
+;	   ["Master" mandoku-switch-to-master nil]
+	   ["New version" mandoku-new-version t]
 	   "--")
 	  (mapcar 'mandoku-version-menu-entry (mandoku-get-branches))))))))	  
 
@@ -1336,7 +1336,12 @@ Letters do not insert themselves; instead, they are commands.
 (defun mandoku-switch-version (branch)
   (mandoku-shell-command (format "git checkout %s" branch)))
 
+(defun mandoku-new-version (&optional branch)
+  (interactive)
+  (setq branch (or branch (read-string "Create and switch to new branch: ")))
+  (mandoku-shell-command (format "git checkout -b %s" branch)))
 
+  
 (defun mandoku-get-branches ()
   (split-string (shell-command-to-string "git branch | cut -b3-") "\n" t))
 
