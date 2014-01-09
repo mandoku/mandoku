@@ -1023,22 +1023,19 @@ One character is either a character or one entity expression"
      ["Titles" mandoku-search-titles t]
      ["Dictionary" mandoku-dict-mlookup t]
      )
-    ("Versions"
-     ["Download text" mandoku-get-remote-text t]
-     ["Switch versions" (["CBETA" (mandoku-switch-version "CBETA")])]
-;     ["Switch versions" mandoku-switch-version (mandoku-get-branches)]
-     ["Master" mandoku-switch-to-master nil]
-     ["New version" mandoku-new-version nil]
-     )
+    ("Versions")
     ("Maintenance"
-     ["Update mandoku" mandoku-update t]
+     ["Download text" mandoku-get-remote-text t]
      ["Setup file" mandoku-show-local-init t]
+     ["Update mandoku" mandoku-update t]
      ["Update installed texts" mandoku-update-texts nil]
      
      ["Add repository" mandoku-setting nil]
      )
 ))     
 
+(defun mandoku-version-menu-entry (branch)
+  (vector branch (list 'mandoku-switch-version branch) t))
 ;; tab
 
 (defun mandoku-index-tab-change (state)
