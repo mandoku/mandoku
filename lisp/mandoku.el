@@ -1244,6 +1244,12 @@ Letters do not insert themselves; instead, they are commands.
 
 (defun mandoku-post-update ()
   "This gets called immediately after an update to perform necessary additional steps"
+;; the actual code will have to be in an external file that gets loaded before execution
+  (ignore-errors 
+    (load-library "mandoku-update")
+    (mandoku-post-update-internal))
+)
+
 )
 
 (defun mandoku-get-remote-text ()
@@ -1259,7 +1265,7 @@ Letters do not insert themselves; instead, they are commands.
 	 (targetdir (concat mandoku-text-dir groupid "/")))
     (mandoku-clone targetdir txturl)
     (kill-buffer buf)
-    (find-file (concat targetdir fn ".txt")))
+    (find-file (concat targetdir txtid "/" fn ".txt")))
 )
 
  ; (shell-command-to-string (concat "cd " default-directory "  && " git " clone " txturl ))) 
