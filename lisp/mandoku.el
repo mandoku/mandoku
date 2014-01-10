@@ -1330,20 +1330,25 @@ Letters do not insert themselves; instead, they are commands.
                url-proxy-services proxy))))))
 
 
-(defun mandoku-shell-command (command)
-  (shell-command command " *mandoku-shell*"))
+(defun mandoku-shell-command (command param)
+  (let ((ex       (or (executable-find command)
+			(error (concat "Unable to find " command)))))
+
+  (shell-command (concat ex param) " *mandoku-shell*")))
 
 (defun mandoku-switch-version (branch)
-  (mandoku-shell-command (format "git checkout %s" branch)))
+  (mandoku-shell-command "git" (format " checkout %s" branch)))
 
 (defun mandoku-new-version (&optional branch)
   (interactive)
   (setq branch (or branch (read-string "Create and switch to new branch: ")))
-  (mandoku-shell-command (format "git checkout -b %s" branch)))
+  (mandoku-shell-command "git" (format " checkout -b %s" branch)))
 
   
 (defun mandoku-get-branches ()
-  (split-string (shell-command-to-string "git branch | cut -b3-") "\n" t))
+  (let ( (git       (or (executable-find "git")
+			(error "Unable to find `git'"))))
+    (split-string (shell-command-to-string (concat git " branch | cut -b3-")) "\n" t)))
 
 ;; routines to work with settings when loading settings.org
 ;;[2014-01-07T11:21:05+0900]
