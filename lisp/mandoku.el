@@ -1275,12 +1275,15 @@ Letters do not insert themselves; instead, they are commands.
 	 (fn (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))))
 ;	 (txtid (downcase (car (split-string  fn "_" ))))
 	 (tmpid (car (split-string  fn "_" )))
-	 (txtid  (if (string-match (car (split-string  fn "_" )))
+	 (txtid  (if (string-match "[a-z]"  tmpid (- (length tmpid) 1))
+		     (substring tmpid 0 (- (length tmpid) 1))
+		   tmpid))
 	 (repid (car (split-string txtid "\\([0-9]\\)")))
 	 (groupid (substring txtid 0 (+ (length repid) 2)))
 	 (clone-url (concat "git@" mandoku-user-server ":"))
 	 (txturl (concat clone-url groupid "/" txtid ".git"))
 	 (targetdir (concat mandoku-text-dir groupid "/")))
+    (mkdir targetdir t)
     (mandoku-clone targetdir txturl)
     (kill-buffer buf)
     (find-file (concat targetdir txtid "/" fn ".txt")))
@@ -1294,7 +1297,8 @@ Letters do not insert themselves; instead, they are commands.
 (defun mandoku-fork ())
 
 (defun mandoku-clone (targetdir url)
-  (let* ((default-directory targetdir)
+  (setq default-directory targetdir)
+  (let* (
 	 (process-connection-type nil)   ; pipe, no pty (--no-progress)
 	 (buf       (switch-to-buffer "*mandoku bootstrap*"))
 	 (md (ignore-errors 
