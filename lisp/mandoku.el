@@ -1267,7 +1267,6 @@ Letters do not insert themselves; instead, they are commands.
     (mandoku-post-update-internal))
 )
 
-)
 
 (defun mandoku-get-remote-text ()
   "This checks if a text is available in a repo and then clones it into the appropriate place"
