@@ -1353,7 +1353,7 @@ Letters do not insert themselves; instead, they are commands.
 (defun mandoku-get-branches ()
   (let* ( (git       (or (executable-find "git")
 			(error "Unable to find `git'")))
-	  (res (shell-command-to-string (concat git " branch | cut -b3-"))) )
+	  (res (shell-command-to-string (concat git " branch"))) )
     (split-string res "\n")))
 
 ;; routines to work with settings when loading settings.org
