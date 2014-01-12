@@ -1351,9 +1351,10 @@ Letters do not insert themselves; instead, they are commands.
 
   
 (defun mandoku-get-branches ()
-  (let ( (git       (or (executable-find "git")
-			(error "Unable to find `git'"))))
-    (split-string (shell-command-to-string (concat git " branch | cut -b3-")) "\n" t)))
+  (let* ( (git       (or (executable-find "git")
+			(error "Unable to find `git'")))
+	  (res (shell-command-to-string (concat git " branch | cut -b3-"))) )
+    (split-string res "\n")))
 
 ;; routines to work with settings when loading settings.org
 ;;[2014-01-07T11:21:05+0900]
@@ -1365,6 +1366,7 @@ Letters do not insert themselves; instead, they are commands.
 (defun mandoku-set-settings  (uval)
   (let ((lcval (mapcar #'mandoku-lc-car  uval)))
     (setq mandoku-user-email (car (cdr (assoc "email" lcval ))))
+    (setq mandoku-user-account (car (cdr (assoc "account" lcval ))))
     (setq mandoku-user-token (car (cdr (assoc "token" lcval ))))
     (setq mandoku-user-server (car (cdr (assoc "server" lcval ))))
     (if (car (cdr (assoc "basedir" lcval )))
