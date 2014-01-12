@@ -1,6 +1,6 @@
-#+TITLE: Settings for Mandoku
+#+TITLE: Settings for Mandoku / モンドクの設定
 
-* About
+* About / このファイルについて
 
   This file provides information about you and your system to
   =Mandoku=.  If you want to change something, chances are that there
@@ -8,16 +8,26 @@
   values you need to fill in before starting to use the system, in
   order for it to work properly.
 
-* User information
+  このファイルにマンドクの使用に必要な設定書かれています。漢籍リポジト
+  リ(カンリポ)のアカウント情報は全文検索、辞書検索とテキストのダウンロー
+  ドに必要です。
+
+
+* Settings for Kanripo server / 漢籍リポジトリの設定
 
   Here is some information that is available in a table to make it
   possible to be changed easily.
-
-
+  以下のテーブルに必要な情報を記入してください。
+** ユーザー情報
+   Please fill in the values in the second column
+   第二欄に必要な情報を記入してください。
+   
 #+NAME: uservalues
-| Server | gl.kanripo.org |
-| Email  |                |
-| Token  |                |
+   | Key     | Value          | 備考         |
+   | Server  | gl.kanripo.org |              |
+   | Email   |                | メール       |
+   | Account |                | アカウント名 |
+   | Token   |                | トークン     |
 
 
 #+NAME: search-repositories
@@ -58,7 +68,11 @@
 
 #+BEGIN_SRC emacs-lisp :var uval=uservalues
 (mandoku-set-settings uval)
+(car (cdr (assoc "Email" uval ))) 
 #+END_SRC
+
+#+RESULTS:
+: cwi
 
 
 #+BEGIN_SRC emacs-lisp :var uval=search-repositories
