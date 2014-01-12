@@ -44,9 +44,6 @@
 (ignore-errors (org-babel-load-file (buffer-file-name)))
 #+END_SRC
 
-#+RESULTS:
-: Loaded /Users/chris/db/mandoku/lisp/mandoku-settings.el
-
 
 
 * Other settings / その他の設定
