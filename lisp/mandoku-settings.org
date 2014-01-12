@@ -61,6 +61,9 @@
 (setq org-support-shift-select 'always)
 #+END_SRC
 
+#+RESULTS:
+: always
+
 ** Code
    :PROPERTIES:
    :VISIBILITY: folded
@@ -72,12 +75,14 @@
 #+END_SRC
 
 #+RESULTS:
-: cwi
 
 
 #+BEGIN_SRC emacs-lisp :var uval=search-repositories
 (mandoku-set-repos uval)
 #+END_SRC
+
+#+RESULTS:
+| ZB | http://www.kanripo.org/zb |
 
 
 *** Directories
@@ -94,6 +99,7 @@
       (add-to-list 'mandoku-catalogs-alist 
    (cons (file-name-sans-extension file) (concat mandoku-meta-dir dir "/" file))))))
 (mandoku-read-titletables) 
+(setq mandoku-catalog (concat mandoku-meta-dir "mandoku-catalog.txt"))
 (setq mandoku-initialized t)
 (message "Loading of local setup for Mandoku finished")
 (find-file mandoku-catalog)
