@@ -33,10 +33,29 @@
 #+NAME: search-repositories
 | ZB | http://www.kanripo.org/zb |
 
+  To activate the new settings, move the cursor to the line starting
+  with "#+BEGIN_SRC" below and press C-c, then answer to the question
+  with yes.
+
+  新しい設定を実行するため、カーソルを下の"#+BEGIN_SRC"で始まる行へ移動
+  して、そして"C-c"を押して、つぎの質問に"yes"を答えてください。
+
+#+BEGIN_SRC emacs-lisp
+(ignore-errors (org-babel-load-file (buffer-file-name)))
+#+END_SRC
+
+#+RESULTS:
+: Loaded /Users/chris/db/mandoku/lisp/mandoku-settings.el
 
 
-* Default values
 
+* Other settings / その他の設定
+
+  The settings below should come with a reasonably value and should
+  only be changed with a good understanding of the system.
+
+  以下の設定は初期設定で使用可能になっています。システムの設計の理解の
+  上で変更してください。
 
 ** Settings
    :PROPERTIES:
