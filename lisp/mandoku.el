@@ -649,6 +649,7 @@ One character is either a character or one entity expression"
 	    (format "%s%s, p%s%2.2d" textid (if (mandoku-get-vol) (mandoku-get-vol) "") (car (cdr (split-string page "-"))) line))
 	" -- ")
       )))
+;; image handling
 
 (defun mandoku-open-image-at-page ()
   (interactive)
@@ -661,20 +662,17 @@ One character is either a character or one entity expression"
   (find-file-other-window path )))
 
 
-;; (defun mandoku-position-at-point-internal ()
-;;   (interactive)
-;;   (save-excursion
-;;     (let ((p (point)))
-;;       (re-search-backward "<pb:" nil t)
-;;       (re-search-forward "\\([^_:]*\\)_\\([^_]*\\)_\\([^_]*\\)>" nil t)
-;;       (setq textid (match-string 1))
-;;       (setq page (match-string 3))
-;;       (setq line 0)
-;;       (while (and
-;; 	      (< (point) p )
-;; 	      (re-search-forward "¶" (point-max) t))
-;; 	(setq line (+ line 1)))
-;;       (concat textid ":" page (int-to-string line)))))
+(defun mandoku-img-to-text (arg)
+  "when looking at an image, try to find the corresponding text location"
+  (interactive "P")
+  (let* ((pb (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))
+         (this (split-string pb "_")))
+	  (if (file-exists-p (concat mandoku-text-dir "dzjy/" (elt this 1) "/" (elt this 1 ) ".txt"))
+	      (find-file-other-window (concat mandoku-text-dir "dzjy/" (elt this 1) "/" (elt this 1 ) ".txt"))
+	    (find-file-other-window (concat mandoku-text-dir "dzjy-can/" (elt this 1) "/" (elt this 1 ) ".txt")))
+	  (goto-char (point-min))
+	  (message pb)
+	  (search-forward (concat "<pb:" pb))))
 
 (defun mandoku-get-coll (filename)
 "find the collection of the file"
@@ -934,19 +932,6 @@ One character is either a character or one entity expression"
     (deactivate-mark)
 ;    (lookup-word)
 ))
-
-
-(defun mandoku-img-to-text (arg)
-  "when looking at an image, try to find the corresponding text location"
-  (interactive "P")
-  (let* ((pb (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))
-         (this (split-string pb "_")))
-	  (if (file-exists-p (concat mandoku-text-dir "dzjy/" (elt this 1) "/" (elt this 1 ) ".txt"))
-	      (find-file-other-window (concat mandoku-text-dir "dzjy/" (elt this 1) "/" (elt this 1 ) ".txt"))
-	    (find-file-other-window (concat mandoku-text-dir "dzjy-can/" (elt this 1) "/" (elt this 1 ) ".txt")))
-	  (goto-char (point-min))
-	  (message pb)
-	  (search-forward (concat "<pb:" pb))))
 
 (defun mandoku-string-remove-all-properties (string)
 ;  (set-text-properties 0 (length string) nil string))
