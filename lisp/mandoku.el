@@ -769,6 +769,8 @@ One character is either a character or one entity expression"
 	    (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'invisible 'mandoku)))
 ))))
 ;; faces
+;(set-face-attribute 'mandoku-comment-face nil :height 150)
+;(set-face-attribute 'mandoku-comment-face nil :background "yellow1")
 
 (setq mandoku-comment-face-markers-re "\\(([^)]+\\)")
 
