@@ -775,10 +775,15 @@ One character is either a character or one entity expression"
 (setq mandoku-comment-face-markers-re "\\(([^)]+\\)")
 
 (defface mandoku-comment-face
-  (org-compatible-face 'org-column
-    '((t nil)))
-  "Face used for comments in a mandoku text."
-  :group 'mandoku-faces)
+   '((((class grayscale) (background light))
+      (:foreground "DimGray" :bold t :italic t))
+     (((class grayscale) (background dark))
+      (:foreground "LightGray" :bold t :italic t))
+     (((class color) (background light)) (:foreground "dark magenta"))
+     (((class color) (background dark)) (:foreground "OrangeRed"))
+     (t (:bold t :italic t)))
+   "Font Lock mode face used to highlight comments."
+   :group 'mandoku-faces)
 
 (defun mandoku-add-comment-face-markers ()
   (save-match-data
