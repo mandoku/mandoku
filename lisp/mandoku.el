@@ -768,7 +768,16 @@ One character is either a character or one entity expression"
 	    (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'invisible 'mandoku)))
 ))))
 
-
+(setq mandoku-comment-face-markers-re "\\(([^)]+\\)")
+(defun mandoku-add-comment-face-markers ()
+  (save-match-data
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward mandoku-comment-face-markers-re nil t)
+	(if (match-beginning 1)
+	    (overlay-put (make-overlay (match-beginning 1) (match-end 1)) 'face 'org-agenda-column-dateline)
+	  (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'face 'org-agenda-column-dateline))))
+    ))
 
 (define-key mandoku-view-mode-map
   "C-ce" 'view-mode)
