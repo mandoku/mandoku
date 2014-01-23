@@ -779,8 +779,8 @@ One character is either a character or one entity expression"
       (:foreground "DimGray" :bold t :italic t))
      (((class grayscale) (background dark))
       (:foreground "LightGray" :bold t :italic t))
-     (((class color) (background light)) (:foreground "dark magenta" :height 0.8))
-     (((class color) (background dark)) (:foreground "OrangeRed" :height 0.8))
+     (((class color) (background light)) (:foreground "dark magenta" :height 0.85))
+     (((class color) (background dark)) (:foreground "OrangeRed" :height 0.85))
      (t (:bold t :italic t)))
    "Font Lock mode face used to highlight comments."
    :group 'mandoku-faces)
@@ -1362,8 +1362,8 @@ Letters do not insert themselves; instead, they are commands.
 
 (defun mandoku-shell-command (command param)
   (let ((ex       (or (executable-find command)
-			(error (concat "Unable to find " command)))))
-
+			(error (concat "Unable to find " command))))
+	(default-directory (file-name-directory (buffer-file-name ))))
   (shell-command (concat ex param) " *mandoku-shell*")))
 
 (defun mandoku-switch-version (branch)
@@ -1378,6 +1378,7 @@ Letters do not insert themselves; instead, they are commands.
 (defun mandoku-get-branches ()
   (let* ( (git       (or (executable-find "git")
 			(error "Unable to find `git'")))
+	  (default-directory (file-name-directory (buffer-file-name )))
 	  (res (shell-command-to-string (concat git " branch"))) )
     (split-string res "\n")))
 
