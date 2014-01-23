@@ -712,6 +712,7 @@ One character is either a character or one entity expression"
   (setq header-line-format (mandoku-header-line))
   (set (make-local-variable 'org-startup-folded) 'showeverything)
   (set (make-local-variable 'tab-with) 30)
+  (mandoku-add-comment-face-markers)
   (mandoku-hide-p-markers)
   (add-to-invisibility-spec 'mandoku)
 ;  (easy-menu-remove-item org-mode-map (list "Org") org-org-menu)
@@ -767,9 +768,16 @@ One character is either a character or one entity expression"
 	      (overlay-put (make-overlay (match-beginning 1) (match-end 1)) 'invisible 'mandoku)
 	    (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'invisible 'mandoku)))
 ))))
+;; faces
 
 (setq mandoku-comment-face-markers-re "\\(([^)]+\\)")
-(setq mandoku-comment-face 'org-agenda-column-dateline)
+
+(defface mandoku-comment-face
+  (org-compatible-face 'org-column
+    '((t nil)))
+  "Face used for comments in a mandoku text."
+  :group 'mandoku-faces)
+
 (defun mandoku-add-comment-face-markers ()
   (save-match-data
     (save-excursion
