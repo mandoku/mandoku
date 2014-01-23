@@ -779,8 +779,8 @@ One character is either a character or one entity expression"
       (:foreground "DimGray" :bold t :italic t))
      (((class grayscale) (background dark))
       (:foreground "LightGray" :bold t :italic t))
-     (((class color) (background light)) (:foreground "dark magenta"))
-     (((class color) (background dark)) (:foreground "OrangeRed"))
+     (((class color) (background light)) (:foreground "dark magenta" :height 0.8))
+     (((class color) (background dark)) (:foreground "OrangeRed" :height 0.8))
      (t (:bold t :italic t)))
    "Font Lock mode face used to highlight comments."
    :group 'mandoku-faces)
