@@ -1294,7 +1294,7 @@ Letters do not insert themselves; instead, they are commands.
 	 (txturl (concat clone-url groupid "/" txtid ".git"))
 	 (targetdir (concat mandoku-text-dir groupid "/")))
     (mkdir targetdir t)
-    (mandoku-clone targetdir txturl)
+    (mandoku-clone (concat targetdir txtid)  txturl)
     (kill-buffer buf)
     (find-file (concat targetdir txtid "/" fn ".txt")))
 )
@@ -1310,12 +1310,12 @@ Letters do not insert themselves; instead, they are commands.
   (let* ((default-directory targetdir)
 	 (process-connection-type nil)   ; pipe, no pty (--no-progress)
 	 (buf       (switch-to-buffer "*mandoku bootstrap*"))
-;	 (md (ignore-errors  (mkdir default-directory t))) 
+;	 (md (ignore-errors  (mkdir targetdir t))) 
 	 (git       (or (executable-find "git")
 			(error "Unable to find `git'")))
 	 (status
 	  (call-process-shell-command
-	   git nil `(,buf t) t "clone" url "-v" )))
+	   git nil `(,buf t) t "clone" url "-v" targetdir)))
 	(unless (zerop status)
 	  (error "Couldn't clone the remote Git repository from %s." (concat url " to " targetdir ))))
 )
