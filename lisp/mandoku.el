@@ -1307,12 +1307,10 @@ Letters do not insert themselves; instead, they are commands.
 (defun mandoku-fork ())
 
 (defun mandoku-clone (targetdir url)
-  (setq default-directory targetdir)
-  (let* (
+  (let* ((default-directory targetdir)
 	 (process-connection-type nil)   ; pipe, no pty (--no-progress)
 	 (buf       (switch-to-buffer "*mandoku bootstrap*"))
-	 (md (ignore-errors 
-	       (mkdir default-directory t))) 
+;	 (md (ignore-errors  (mkdir default-directory t))) 
 	 (git       (or (executable-find "git")
 			(error "Unable to find `git'")))
 	 (status
