@@ -631,14 +631,14 @@ One character is either a character or one entity expression"
     t))
 (defun mandoku-position-at-point ()
   (interactive)
-  (message (mandoku-position-at-point-internal)))
+  (message (mandoku-position-at-point-formatted)))
 
 (defun mandoku-position-at-point-formatted ()
-(let (p (mandoku-position-at-point-internal))
-  (if p
-      (format "%s%s, p%s%2.2d" textid (if (mandoku-get-vol) (mandoku-get-vol) "") (car (cdr (split-string page "-"))) line))
-	" -- ")
-)
+  (let ((p (mandoku-position-at-point-internal)))
+    (if p
+	(format "%s%s, p%s%2.2d" (nth 0 p) (if (mandoku-get-vol) (mandoku-get-vol) "") (car (cdr (split-string (nth 2 p) page "-"))) (nth 3 p))
+      " -- ")
+    ))
 
 (defun mandoku-position-at-point-internal ()
   (save-excursion
@@ -755,7 +755,7 @@ One character is either a character or one entity expression"
      (concat " " textid " " (mandoku-get-title)  ", " (mandoku-get-juan) " -  ")
      '(:eval  (mapconcat 'identity (mandoku-get-outline-path) " / "))
      " "
-     '(:eval (mandoku-position-at-point-internal))
+     '(:eval (mandoku-position-at-point-formatted))
      )
      ))
 
