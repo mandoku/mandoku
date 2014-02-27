@@ -636,7 +636,7 @@ One character is either a character or one entity expression"
 (defun mandoku-position-at-point-formatted ()
   (let ((p (mandoku-position-at-point-internal)))
     (if p
-	(format "%s%s, p%s%2.2d" (nth 0 p) (if (mandoku-get-vol) (mandoku-get-vol) "") (car (cdr (split-string (nth 2 p) page "-"))) (nth 3 p))
+	(format "%s%s, p%s%2.2d" (nth 0 p) (if (mandoku-get-vol) (mandoku-get-vol) "") (car (cdr (split-string (nth 2 p) "-"))) (nth 3 p))
       " -- ")
     ))
 
@@ -655,7 +655,7 @@ One character is either a character or one entity expression"
 		    (< (point) p )
 		    (re-search-forward "¶" (point-max) t))
 	      (setq line (+ line 1)))
-	    (list textid ed  (car (cdr (split-string page "-"))) line))
+	    (list textid ed page line))
 	" -- ")
       )))
 ;; image handling
