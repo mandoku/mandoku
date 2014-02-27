@@ -662,12 +662,14 @@ One character is either a character or one entity expression"
 
 (defun mandoku-open-image-at-page ()
   (interactive)
-  (let* ((p (mandoku-position-at-point-internal))
+  (if mandoku-image-dir
+      (let* ((p (mandoku-position-at-point-internal))
 	 (path (concat mandoku-image-dir coll "/"
 	   (funcall (intern
 		     (concat "mandoku-" (downcase (nth 1 p))  "-page-to-image"))
 		    p   ))))
-  (find-file-other-window path )))
+  (find-file-other-window path ))))
+
 
 
 (defun mandoku-t-page-to-image (locid)
