@@ -665,9 +665,18 @@ One character is either a character or one entity expression"
   (let* ((p (mandoku-position-at-point-internal))
 	 (path (concat mandoku-image-dir coll "/"
 	   (funcall (intern
-		     (concat "mandoku-" coll "-page-to-image"))
+		     (concat "mandoku-" (downcase (nth 1 p))  "-page-to-image"))
 		    p   ))))
   (find-file-other-window path )))
+
+
+(defun mandoku-t-page-to-image (locid)
+"given a location id, returns the path of the image"
+(let* ((textid (car (split-string locid ":" )))
+       (vol (substring textid 0 3))
+      (page (car (cdr (split-string locid ":" )))))
+  (concat (substring vol 0 1) "/" vol "/" (substring page 0 2) "/"
+	vol "-" (substring page 0 4) ".tif")))
 
 
 (defun mandoku-img-to-text (arg)
