@@ -668,7 +668,7 @@ One character is either a character or one entity expression"
 	   (funcall (intern
 		     (concat "mandoku-" (downcase (nth 1 p))  "-page-to-image"))
 		    p   ))))
-	(split-window-horizontally 35)
+	(split-window-horizontally 45)
 	(find-file-other-window path ))))
 
 
