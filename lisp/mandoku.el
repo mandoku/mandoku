@@ -636,7 +636,7 @@ One character is either a character or one entity expression"
 (defun mandoku-position-at-point-formatted ()
   (let ((p (mandoku-position-at-point-internal)))
     (if p
-	(format "%s%s, p%s%2.2d" (nth 0 p) (if (mandoku-get-vol) (mandoku-get-vol) "") (car (cdr (split-string (nth 2 p) "-"))) (nth 3 p))
+	(format "%s %sp%s%2.2d" (nth 1 p) (if (mandoku-get-vol) (concat (mandoku-get-vol) ", ") "") (car (cdr (split-string (nth 2 p) "-"))) (nth 3 p))
       " -- ")
     ))
 
@@ -662,12 +662,11 @@ One character is either a character or one entity expression"
 
 (defun mandoku-open-image-at-page ()
   (interactive)
-  (let* (
-	 (coll (mandoku-get-coll buffer-file-name))
+  (let* ((p (mandoku-position-at-point-internal))
 	 (path (concat mandoku-image-dir coll "/"
 	   (funcall (intern
 		     (concat "mandoku-" coll "-page-to-image"))
-		    (mandoku-position-at-point-internal)   ))))
+		    p   ))))
   (find-file-other-window path )))
 
 
