@@ -632,21 +632,30 @@ One character is either a character or one entity expression"
 (defun mandoku-position-at-point ()
   (interactive)
   (message (mandoku-position-at-point-internal)))
+
+(defun mandoku-position-at-point-formatted ()
+(let (p (mandoku-position-at-point-internal))
+  (if p
+      (format "%s%s, p%s%2.2d" textid (if (mandoku-get-vol) (mandoku-get-vol) "") (car (cdr (split-string page "-"))) line))
+	" -- ")
+)
+
 (defun mandoku-position-at-point-internal ()
   (save-excursion
     (let ((p (point)))
       (if 
 	  (re-search-backward "<pb:" nil t)
 	  (progn
-	    (re-search-forward "\\([^_]*\\)_\\([^_>]*\\)>" nil t)
+	    (re-search-forward ":\\([^_]*\\)_\\([^_]*\\)_\\([^_>]*\\)>" nil t)
 	    (setq textid (match-string 1))
-	    (setq page (match-string 2))
+	    (setq ed (match-string 2))
+	    (setq page (match-string 3))
 	    (setq line -1)
 	    (while (and
 		    (< (point) p )
 		    (re-search-forward "¶" (point-max) t))
 	      (setq line (+ line 1)))
-	    (format "%s%s, p%s%2.2d" textid (if (mandoku-get-vol) (mandoku-get-vol) "") (car (cdr (split-string page "-"))) line))
+	    (list textid ed  (car (cdr (split-string page "-"))) line))
 	" -- ")
       )))
 ;; image handling
