@@ -664,7 +664,7 @@ One character is either a character or one entity expression"
   (interactive)
   (if mandoku-image-dir
       (let* ((p (mandoku-position-at-point-internal))
-	 (path (concat mandoku-image-dir coll "/"
+	 (path (concat mandoku-image-dir 
 	   (funcall (intern
 		     (concat "mandoku-" (downcase (nth 1 p))  "-page-to-image"))
 		    p   ))))
@@ -673,12 +673,12 @@ One character is either a character or one entity expression"
 
 
 (defun mandoku-t-page-to-image (locid)
-"given a location id, returns the path of the image"
-(let* ((textid (car (split-string locid ":" )))
-       (vol (substring textid 0 3))
-      (page (car (cdr (split-string locid ":" )))))
-  (concat (substring vol 0 1) "/" vol "/" (substring page 0 2) "/"
-	vol "-" (substring page 0 4) ".tif")))
+  "given a location id, returns the path of the image"
+  (let ((textid (nth 0 locid))
+	(vol (concat (nth 1 locid) (mandoku-get-vol)))
+	(pg (cdr (split-string (nth 2 locid) "-"))))
+    (concat "cbeta/" (nth 1 locid ) "/" vol "/" (substring pg 0 2) "/"
+	    vol "-" (substring pg 0 4) ".tif")))
 
 
 (defun mandoku-img-to-text (arg)
