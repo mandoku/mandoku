@@ -668,7 +668,8 @@ One character is either a character or one entity expression"
 	   (funcall (intern
 		     (concat "mandoku-" (downcase (nth 1 p))  "-page-to-image"))
 		    p   ))))
-  (find-file-other-window path ))))
+	(split-window-horizontally 35)
+	(find-file-other-window path ))))
 
 
 
@@ -676,7 +677,7 @@ One character is either a character or one entity expression"
   "given a location id, returns the path of the image"
   (let ((textid (nth 0 locid))
 	(vol (concat (nth 1 locid) (mandoku-get-vol)))
-	(pg (cdr (split-string (nth 2 locid) "-"))))
+	(pg (car (cdr (split-string (nth 2 locid) "-")))))
     (concat "cbeta/" (nth 1 locid ) "/" vol "/" (substring pg 0 2) "/"
 	    vol "-" (substring pg 0 4) ".tif")))
 
