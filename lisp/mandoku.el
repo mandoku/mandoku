@@ -661,6 +661,7 @@ One character is either a character or one entity expression"
 ;; image handling
 
 (defun mandoku-open-image-at-page ()
+  "this will first look for a function for this edition, then browse the image index"
   (interactive)
   (if mandoku-image-dir
       (let* ((p (mandoku-position-at-point-internal))
