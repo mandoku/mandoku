@@ -647,16 +647,16 @@ One character is either a character or one entity expression"
 	  (re-search-backward "<pb:" nil t)
 	  (progn
 	    (re-search-forward ":\\([^_]*\\)_\\([^_]*\\)_\\([^_>]*\\)>" nil t)
-	    (setq textid (match-string 1))
-	    (setq ed (match-string 2))
-	    (setq page (match-string 3))
-	    (setq line -1)
+	    (let ((textid (match-string 1))
+	    	    (ed (match-string 2))	
+   		    	    (page (match-string	3))
+	    (line -1))
 	    (while (and
 		    (< (point) p )
 		    (re-search-forward "¶" (point-max) t))
 	      (setq line (+ line 1)))
 	    (list textid ed page line))
-	" -- ")
+	" -- "))
       )))
 ;; image handling
 
@@ -686,6 +686,8 @@ One character is either a character or one entity expression"
   "Add the current edition to an index file"
   (save-excursion 
     (goto-char (point-min))
+    (while (re-search-forward "<pb:\\([^_]*\\)_\\([^_]*\\)_\\([^_>]*\\)>" nil t)
+      
 )
 
 (defun mandoku-img-to-text (arg)
