@@ -665,7 +665,7 @@ One character is either a character or one entity expression"
 		    (re-search-forward "¶" (point-max) t))
 	      (setq line (+ line 1)))
 	    (list textid ed page line)))
-	(list " -- " " -- " " -- " " -- "))
+	(list " -- " " -- " " -- " 0))
       )))
 ;; image handling
 
@@ -690,7 +690,7 @@ One character is either a character or one entity expression"
   (let* ((f  (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))
 	 (path (concat (substring (file-name-directory (buffer-file-name)) 0 -1) ".wiki/" f ".txt"))
 	 
-)
+)))
 
 (defun mandoku-make-image-path-index (&optional il )
   "Add the current edition to an index file"
