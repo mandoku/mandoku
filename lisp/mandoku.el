@@ -644,7 +644,12 @@ One character is either a character or one entity expression"
   "This will always give the position in the base edition"
   (save-excursion
     (let ((p (or pnt (point)))
-	  (pb (or (if (re-search-forward "<md:") "<md:") "<pb:"))
+	  (pb (or (if 
+		      (progn 
+			(goto-char (point-min))
+			(re-search-forward "<md:" (point-max) t)) 
+		      "<md:")
+		  "<pb:"))
 	  )
       (goto-char p)
       (if 
@@ -688,13 +693,17 @@ One character is either a character or one entity expression"
 
 (defun mandoku-make-image-path-index ()
   "Add the current edition to an index file"
+  (let ((f  (file-name-sans-extension (file-name-nondirectory (buffer-file-name)))))
   (save-excursion 
     (goto-char (point-min))
     (while (re-search-forward "<pb:\\([^_]*\\)_\\([^_]*\\)_\\([^_>]*\\)>" nil t)
-      (let (
-	    (px (mandoku-position-at-point-internal (point)))
-      (write-region 
-)
+      (let ((ed (match-string 2))
+	    (p (match-string 3))
+	    (px (mandoku-position-at-point-internal (point))))
+      (write-region (format "%s%2.2d\t%s %s\t%s\n"  (nth 2 px)  (nth 3 px) ed p 
+			   (format "%s%s/%s/%s-%s.jpg" mandoku-image-dir (nth 0 px) ed ed p)) 
+		    nil (concat "/tmp/" f ".txt") t)
+)))))
 
 (defun mandoku-img-to-text (arg)
   "when looking at an image, try to find the corresponding text location"
