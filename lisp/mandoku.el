@@ -711,13 +711,16 @@ One character is either a character or one entity expression"
   (let ((p (or path (file-name-directory (buffer-file-name))))
 	(br (mapcar 'mandoku-chomp (mandoku-get-branches))))
     (mkdir (concat (substring p 0 -1) ".wiki/imglist") t)
-    (dolist (b (mandoku-remove-nil-recursively br))
+    (dolist (b br)
+      (if (> 1 (length b))
+	  nil
+	(progn
       (or (string-match "^*" b)
 	  (mandoku-switch-version b))
       (dolist (file (directory-files p t ".txt"))
 	(with-current-buffer (find-file-noselect file)
 	(mandoku-make-image-path-index)
-	(kill-buffer)))))
+	(kill-buffer)))))))
 )
 
 (defun mandoku-img-to-text (arg)
