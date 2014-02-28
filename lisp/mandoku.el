@@ -640,9 +640,10 @@ One character is either a character or one entity expression"
       " -- ")
     ))
 
-(defun mandoku-position-at-point-internal ()
+(defun mandoku-position-at-point-internal (&optional pnt)
   (save-excursion
-    (let ((p (point)))
+    (let ((p (or pnt (point))))
+      (goto-char p)
       (if 
 	  (re-search-backward "<pb:" nil t)
 	  (progn
@@ -655,8 +656,8 @@ One character is either a character or one entity expression"
 		    (< (point) p )
 		    (re-search-forward "¶" (point-max) t))
 	      (setq line (+ line 1)))
-	    (list textid ed page line))
-	" -- "))
+	    (list textid ed page line)))
+	" -- ")
       )))
 ;; image handling
 
@@ -688,6 +689,7 @@ One character is either a character or one entity expression"
     (goto-char (point-min))
     (while (re-search-forward "<pb:\\([^_]*\\)_\\([^_]*\\)_\\([^_>]*\\)>" nil t)
       
+      (write-region 
 )
 
 (defun mandoku-img-to-text (arg)
