@@ -641,11 +641,14 @@ One character is either a character or one entity expression"
     ))
 
 (defun mandoku-position-at-point-internal (&optional pnt)
+  "This will always give the position in the base edition"
   (save-excursion
-    (let ((p (or pnt (point))))
+    (let ((p (or pnt (point)))
+	  (pb (or (if (re-search-forward "<md:") "<md:") "<pb:"))
+	  )
       (goto-char p)
       (if 
-	  (re-search-backward "<pb:" nil t)
+	  (re-search-backward pb nil t)
 	  (progn
 	    (re-search-forward ":\\([^_]*\\)_\\([^_]*\\)_\\([^_>]*\\)>" nil t)
 	    (let ((textid (match-string 1))
@@ -688,7 +691,8 @@ One character is either a character or one entity expression"
   (save-excursion 
     (goto-char (point-min))
     (while (re-search-forward "<pb:\\([^_]*\\)_\\([^_]*\\)_\\([^_>]*\\)>" nil t)
-      
+      (let (
+	    (px (mandoku-position-at-point-internal (point)))
       (write-region 
 )
 
