@@ -689,6 +689,7 @@ One character is either a character or one entity expression"
   "Read the image index for this file if necessary and return a path to the requested image"
   (let* ((f  (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))
 	 (path (concat (substring (file-name-directory (buffer-file-name)) 0 -1) ".wiki/" f ".txt"))
+	 
 )
 
 (defun mandoku-make-image-path-index (&optional il )
