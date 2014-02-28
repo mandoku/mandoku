@@ -693,7 +693,8 @@ One character is either a character or one entity expression"
 
 (defun mandoku-make-image-path-index ()
   "Add the current edition to an index file"
-  (let ((f  (file-name-sans-extension (file-name-nondirectory (buffer-file-name)))))
+  (let ((f  (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))
+	(imglist (concat (substring (file-name-directory (buffer-file-name)) 0 -1) ".wiki/" f ".txt")))
   (save-excursion 
     (goto-char (point-min))
     (while (re-search-forward "<pb:\\([^_]*\\)_\\([^_]*\\)_\\([^_>]*\\)>" nil t)
@@ -701,7 +702,7 @@ One character is either a character or one entity expression"
 	    (p (match-string 3))
 	    (px (mandoku-position-at-point-internal (point))))
       (write-region (format "%s%2.2d\t%s %s\t%s\n"  (nth 2 px)  (nth 3 px) ed p 
-			   (format "%s%s/%s/%s-%s.jpg" mandoku-image-dir (nth 0 px) ed ed p)) 
+			    (downcase (format "%s/%s/%s-%s.jpg" (nth 0 px) ed ed p)))
 		    nil (concat "/tmp/" f ".txt") t)
 )))))
 
