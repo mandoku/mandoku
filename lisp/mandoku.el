@@ -715,9 +715,9 @@ One character is either a character or one entity expression"
       (or (string-match "^*" b)
 	  (mandoku-switch-version b))
       (dolist (file (directory-files p t ".txt"))
-	(with-buffer (find-file-noselect file)
+	(with-current-buffer (find-file-noselect file)
 	(mandoku-make-image-path-index)
-	(kill-buffer file))))
+	(kill-buffer)))))
 )
 
 (defun mandoku-img-to-text (arg)
@@ -1408,7 +1408,9 @@ Letters do not insert themselves; instead, they are commands.
   (shell-command (concat ex param) " *mandoku-shell*")))
 
 (defun mandoku-switch-version (branch)
-  (mandoku-shell-command "git" (format " checkout %s" branch)))
+  (gd-shell-command (format "git checkout %s" branch)))
+
+;  (mandoku-shell-command "git" (format " checkout %s" branch)))
 
 (defun mandoku-new-version (&optional branch)
   (interactive)
