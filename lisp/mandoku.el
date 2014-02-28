@@ -672,15 +672,21 @@ One character is either a character or one entity expression"
 		       (concat "mandoku-" (downcase (nth 1 p))  "-page-to-image")) p )))
 		  (mandoku-get-image-path-from-index p)
 	      )))
-	(split-window-horizontally 45)
+	(split-window-horizontally 55)
 	(find-file-other-window path ))))
 
 
 (defun mandoku-get-image-path-from-index (locid)
   "Read the image index for this file if necessary and return a path to the requested image"
-  
+  (let* ((f  (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))
+	 (path (concat (substring (file-name-directory (buffer-file-name)) 0 -1) ".wiki/" f ".txt"))
 )
 
+(defun mandoku-make-image-path-index ()
+  "Add the current edition to an index file"
+  (save-excursion 
+    (goto-char (point-min))
+)
 
 (defun mandoku-img-to-text (arg)
   "when looking at an image, try to find the corresponding text location"
