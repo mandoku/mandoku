@@ -11,7 +11,7 @@
 	    vol "-" (substring pg 0 4) ".tif")))
 
 (defun mandoku-x-page-to-image (locid)
-  "given a location id, returns the path of the image in the Taisho"
+  "given a location id, returns the path of the image in the Xuzangjing"
   (let ((textid (nth 0 locid))
 	(vol (concat (nth 1 locid) (mandoku-get-vol)))
 	(pg (car (cdr (split-string (nth 2 locid) "-")))))
