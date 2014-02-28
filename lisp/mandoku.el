@@ -1408,9 +1408,8 @@ Letters do not insert themselves; instead, they are commands.
   (shell-command (concat ex param) " *mandoku-shell*")))
 
 (defun mandoku-switch-version (branch)
-  (gd-shell-command (format "git checkout %s" branch)))
-
-;  (mandoku-shell-command "git" (format " checkout %s" branch)))
+;  (gd-shell-command (format "git checkout %s" branch)))
+  (mandoku-shell-command "git" (format " checkout %s" branch)))
 
 (defun mandoku-new-version (&optional branch)
   (interactive)
