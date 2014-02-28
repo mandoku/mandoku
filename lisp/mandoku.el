@@ -708,8 +708,12 @@ One character is either a character or one entity expression"
 
 (defun mandoku-make-img-index (&optional path)
   "Generate an image index for all editions in path or, if not given, in the current directory"
-  (let ((br (mandoku-get-branches)))
-    
+  (let ((br (mapcar 'mandoku-chomp (mandoku-get-branches))))
+    (dolist (b br)
+      (or (string-match "^*" b)
+	  (mandoku-switch-version b))
+      (dolist (file (directory-files t ".txt"))
+	
 )
 
 (defun mandoku-img-to-text (arg)
