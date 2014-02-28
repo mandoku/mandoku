@@ -665,7 +665,7 @@ One character is either a character or one entity expression"
 		    (re-search-forward "¶" (point-max) t))
 	      (setq line (+ line 1)))
 	    (list textid ed page line)))
-	(list " -- "))
+	(list " -- " " -- " " -- " " -- "))
       )))
 ;; image handling
 
