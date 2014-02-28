@@ -694,7 +694,7 @@ One character is either a character or one entity expression"
 (defun mandoku-make-image-path-index (&optional il )
   "Add the current edition to an index file"
   (let ((f  (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))
-	(imglist (or il (concat (substring (file-name-directory (buffer-file-name)) 0 -1) ".wiki/" f ".txt"))))
+	(imglist (or il (concat (substring (file-name-directory (buffer-file-name)) 0 -1) ".wiki/imglist/" f ".txt"))))
   (save-excursion 
     (goto-char (point-min))
     (while (re-search-forward "<pb:\\([^_]*\\)_\\([^_]*\\)_\\([^_>]*\\)>" nil t)
@@ -708,12 +708,16 @@ One character is either a character or one entity expression"
 
 (defun mandoku-make-img-index (&optional path)
   "Generate an image index for all editions in path or, if not given, in the current directory"
-  (let ((br (mapcar 'mandoku-chomp (mandoku-get-branches))))
+  (let ((p (or path (file-name-directory (buffer-file-name))))
+	(br (mapcar 'mandoku-chomp (mandoku-get-branches))))
+    (mkdir (concat (substring p 0 -1) ".wiki/imglist") t)
     (dolist (b br)
       (or (string-match "^*" b)
 	  (mandoku-switch-version b))
       (dolist (file (directory-files t ".txt"))
-	
+	(find-file-noselect file)
+	(mandoku-make-image-path-index)
+	(kill-buffer file))))
 )
 
 (defun mandoku-img-to-text (arg)
