@@ -706,9 +706,10 @@ One character is either a character or one entity expression"
 		    nil imglist t)
 )))))
 
-(defun mandoku-make-img-index ()
-  "Generate an image index for all editions"
-  
+(defun mandoku-make-img-index (&optional path)
+  "Generate an image index for all editions in path or, if not given, in the current directory"
+  (let ((br (mandoku-get-branches)))
+    
 )
 
 (defun mandoku-img-to-text (arg)
@@ -1437,6 +1438,16 @@ Letters do not insert themselves; instead, they are commands.
 
 (defun mandoku-set-repos (uval)
   (setq mandoku-repositories-alist uval))
+
+
+;; misc helper functions
+
+ (defun mandoku-chomp (str)
+   "Chomp leading and tailing whitespace from STR."
+   (replace-regexp-in-string (rx (or (: bos (* (any " \t\n")))
+                                        (: (* (any " \t\n")) eos)))
+                                ""
+                                str))
 
 
 (provide 'mandoku)
