@@ -45,7 +45,7 @@ from __future__ import absolute_import
 import sys, codecs, os ,re, operator, collections, git, time, datetime
 from difflib import *
 from itertools import *
-from mandoku.sparsedict import *
+from sparsedict import *
 
 kanji=Ur'\u3000\u3400-\u4DFF\u4e00-\u9FFF\uF900-\uFAFF\uFE30-\uFE4F\U00020000-\U0002A6DF\U0002A700-\U0002B73F\U0002B740-\U0002B81F\U0002B820-\U0002F7FF'
 pua=Ur'\uE000-\uF8FF\U000F0000-\U000FFFFD\U00100000-\U0010FFFD'
@@ -504,7 +504,7 @@ function with access to a database."""
                 continue
             if not 'mode: ' in self.defs[dx]:
                 out.write("#+PROPERTY: %s %s\n" % (dx.upper(), self.defs[dx]))
-        out.write("#+PROPERTY: JUAN %d\n" % (section + 1))
+        out.write("#+PROPERTY: JUAN %d\n" % (section ))
 
     def printNgram(self, sx, sec, pos, extra=None):
         if extra:

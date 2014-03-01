@@ -31,7 +31,10 @@ for f in os.listdir(kdir):
     f.move_pg_and_xb6tot2(0)
     f.segment(f1, f2)
     f2.sections = f2.newsections
-    f2.defs['LASTPB'] = f1.defs['lastpb'].replace('<pb:', '<md:')
+    try:
+        f2.defs['LASTPB'] = f1.defs['lastpb'].replace('<pb:', '<md:')
+    except:
+        pass
     f2.defs['title'] = f1.defs['title'].split()[-1]
     os.mkdir(outdir + fid)
     f2.write_to_sections(outdir + fid, True)
