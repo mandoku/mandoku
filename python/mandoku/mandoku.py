@@ -882,7 +882,9 @@ class MandokuComp(object):
         #ok, now we look if there are file borders close, use them
         j=0
         ##pi mal daumen...
+
         #if we have only one file to begin with, we do not need this.
+
 #         for i in range (0, len(text2.newsections)):
 #             try:
 #                 sec = text2.sections[j][0]
