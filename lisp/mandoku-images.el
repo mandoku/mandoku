@@ -19,5 +19,14 @@
 	    vol "-" (substring pg 0 4) ".tif")))
 
 
+(defun mandoku-tkd-page-to-image (locid)
+  "given a location id, returns the path of the image in the Tripitaka Koreana Dongguk reprint"
+  (let (
+	(vol (car (split-string (nth 2 locid) "-")))
+	(pg (car (cdr (split-string (nth 2 locid) "-")))))
+    (concat "TK/" vol "-tif/" (substring pg 0 2) "00-" (substring pg 0 2) "99/" vol "_" (substring pg 0 4) "_"  (upcase (substring pg -1)) ".TIF")))
+
+
+
 
 ;; end of file mandoku-images.el

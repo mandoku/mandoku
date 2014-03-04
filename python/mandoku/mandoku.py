@@ -882,22 +882,23 @@ class MandokuComp(object):
         #ok, now we look if there are file borders close, use them
         j=0
         ##pi mal daumen...
-        for i in range (0, len(text2.newsections)):
-            try:
-                sec = text2.sections[j][0]
-            except:
-                continue
-            newpos = text2.newsections[i][0]
-            while sec < newpos - 500 and j <= len(text2.sections):
-                print sec, newpos - 500
-                try:
-                    j += 1
-                    sec = text2.sections[j][0]
-                except:
-                    pass
-#            print sec, newpos, sec - newpos
-            if sec - newpos < 120:
-                text2.newsections[i] = sec, text2.newsections[i][1]
+        #if we have only one file to begin with, we do not need this.
+#         for i in range (0, len(text2.newsections)):
+#             try:
+#                 sec = text2.sections[j][0]
+#             except:
+#                 continue
+#             newpos = text2.newsections[i][0]
+#             while sec < newpos - 500 and j <= len(text2.sections):
+#                 print sec, newpos - 500
+#                 try:
+#                     j += 1
+#                     sec = text2.sections[j][0]
+#                 except:
+#                     pass
+# #            print sec, newpos, sec - newpos
+#             if sec - newpos < 120:
+#                 text2.newsections[i] = sec, text2.newsections[i][1]
 
 
     def patch(self, ignore=False, replace=False, treshold=25):

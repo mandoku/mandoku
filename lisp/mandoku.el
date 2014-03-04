@@ -544,7 +544,7 @@ One character is either a character or one entity expression"
 	  )
       nil))
 
-(defun mandoku-read-textfilter (filename )
+(defun mandoku-read-textfilter	 (filename )
   "Reads a new textfilter and adds it to the list of textfilters"
   (when (file-exists-p filename)
     (let ((fn (file-name-sans-extension (file-name-nondirectory filename))))
@@ -640,16 +640,18 @@ One character is either a character or one entity expression"
       " -- ")
     ))
 
-(defun mandoku-position-at-point-internal (&optional pnt)
+(defun mandoku-position-at-point-internal (&optional pnt arg)
   "This will always give the position in the base edition"
   (save-excursion
     (let ((p (or pnt (point)))
-	  (pb (or (if 
+	  (pb (if arg 
+		  "<pb:"
+		(or (if 
 		      (progn 
 			(goto-char (point-min))
 			(re-search-forward "<md:" (point-max) t)) 
 		      "<md:")
-		  "<pb:"))
+		  "<pb:")))
 	  )
       (goto-char p)
       (if 
@@ -669,29 +671,68 @@ One character is either a character or one entity expression"
       )))
 ;; image handling
 
-(defun mandoku-open-image-at-page ()
+(defun mandoku-open-image-at-page (arg)
   "this will first look for a function for this edition, then browse the image index"
-  (interactive)
+  (interactive "P")
   (if mandoku-image-dir
-      (let* ((p (mandoku-position-at-point-internal))
+      (let* ((p (mandoku-position-at-point-internal (point) 4))
 	     (path 
-	      (or
-		  (ignore-errors (concat mandoku-image-dir 
-		     (funcall (intern 
-		       (concat "mandoku-" (downcase (nth 1 p))  "-page-to-image")) p )))
+	      (if arg 
 		  (mandoku-get-image-path-from-index p)
-	      )))
-	(split-window-horizontally 55)
-	(find-file-other-window path ))))
+		(or 
+		 (ignore-errors  
+		   (funcall (intern 
+			     (concat "mandoku-" (downcase (nth 1 p))  "-page-to-image")) p ))))
+	      ))
+	(if path
+	   (progn
+	     (if (= (count-windows) 1)
+		 (split-window-horizontally 55))
+	     (find-file-other-window (concat mandoku-image-dir path )))
+	  (message "No facsimile available.")))))
 
 
-(defun mandoku-get-image-path-from-index (locid)
+(defun mandoku-get-editions-from-index (il)
+  (let* ((eds (list))
+	(fn (nth (- (length (split-string il "/")) 1) (split-string il "/")))
+	(thebuffer (get-buffer-create (concat " *mandoku-img-" fn)))
+	)
+    (with-current-buffer thebuffer 
+      (let ((coding-system-for-read 'utf-8))
+	(erase-buffer)
+	(insert-file-contents il)
+	(sort-lines nil (point-min) (point-max))
+	(goto-char (point-min))
+	  (while (re-search-forward "^\\([^\t]+\\)\t\\([^ ]+\\) " nil t)
+	    (add-to-list 'eds (match-string 2))) ))
+eds
+))
+
+(defun mandoku-get-image-path-from-index (loc &optional ed)
   "Read the image index for this file if necessary and return a path to the requested image"
   (let* ((f  (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))
-	 (path (concat (substring (file-name-directory (buffer-file-name)) 0 -1) ".wiki/" f ".txt")))
-    
-	 
-)))
+	 (lastpg "99")
+	 (pg (nth 2 loc))
+	 (line (nth 3 loc))
+	 (il (concat (substring (file-name-directory (buffer-file-name)) 0 -1) ".wiki/imglist/" f ".txt"))
+	 (fn (nth (- (length (split-string il "/")) 1) (split-string il "/")))
+	 (ed (or ed (ido-completing-read "Edition: " (mandoku-get-editions-from-index il) nil t))))
+
+;      (with-current-buffer (get-buffer "ZB6q0003_004.txt")
+      (with-current-buffer (get-buffer (concat " *mandoku-img-" fn))
+          (goto-char (point-max))
+	  (re-search-backward (concat "^" pg "\\([0-9][0-9]\\)\t\\([^\t\n]+\\)\t\\([^\t\n]+\\)") nil t)
+	  (message (match-string 0))
+	  (setq lastpg (string-to-int (match-string 1)))
+          (while (and (< (nth 3 loc) lastpg)  
+		      (re-search-backward (concat "^" pg "\\([0-9][0-9]\\)\t\\([^\t\n]+\\)\t\\([^\t\n]+\\)") nil t))
+	    (setq lastpg (string-to-int (match-string 1))))
+	  (next-line)
+	  (re-search-backward (concat "\t" ed " [^\t]+\t\\(.*\\)$") nil t)
+	  (match-string 1)
+	  )))
+
+
 
 (defun mandoku-make-image-path-index (&optional il )
   "Add the current edition to an index file"
@@ -773,6 +814,10 @@ One character is either a character or one entity expression"
   (setq header-line-format (mandoku-header-line))
   (set (make-local-variable 'org-startup-folded) 'showeverything)
   (set (make-local-variable 'tab-with) 30)
+;; editions will hold a list of editions, for which a facsimile exists
+  (set (make-local-variable 'editions) nil)
+;; this will be populated with the list of paths to facsimile of the pages in this file
+  (set (make-local-variable 'facsimile-list) nil)
   (mandoku-add-comment-face-markers)
   (mandoku-hide-p-markers)
   (add-to-invisibility-spec 'mandoku)
