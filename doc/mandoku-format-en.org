@@ -145,8 +145,9 @@ Conventions for the text format used by =Mandoku= are made up of three parts:
 
 *** Page numbers
   The page number is given in the following form:
-
-: <pb:ZB6i0076_T_0537a>
+#+BEGIN_EXAMPLE
+<pb:ZB6i0076_T_0537a>
+#+END_EXAMPLE
 
   There are three parts to this number, separated by the "_"
   character, surrounded by the page break indicator "<pb: .. >":
