@@ -1162,6 +1162,7 @@ def getlimits(d, n, lx, dx=100, b=10):
     else:
         i = 3
     ar = [(a[i], a[2]-a[1]) for a in d if a[0] == 'equal']
+    #ar = [(a[i], a[2]-a[1]) for a in x if a[0] == 'equal' and a[2] - a[1] > 1]
     #if the following entry is closer than double the length of the 'equal' secion, we take it to be the start of the parallel part
     buckets=[[]]
     ##arrange stuff in buckets
