@@ -1,4 +1,8 @@
+from __future__ import division
+from difflib import *
+from itertools import *
 sys.path.insert(0, '/Users/chris/db/mandoku/python/mandoku')
+
 import mandoku, os
 mddir="/Users/Shared/md/text/cbeta/T/"
 kdir = "/tmp/tkout/"
