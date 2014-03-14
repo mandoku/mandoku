@@ -875,9 +875,9 @@ class MandokuComp(object):
                 limit = text1.sections[i+1][0]
             except:
                 limit = len(text1.seq)
-                #                    print "start, limit:", start, limit
             s.set_seqs([a[text1.cpos] for a in text1.seq[start:limit]], [a[text2.cpos] for a in text2.seq])        
             l=getlimits(s.get_opcodes(), 0, limit - start, dx, b)
+            print "segment: start, limit =", start, limit, "l", l 
             text2.newsections.append((l[0], text1.sections[i][1].decode('utf-8')))
         #ok, now we look if there are file borders close, use them
         j=0
