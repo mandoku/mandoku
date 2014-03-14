@@ -1156,7 +1156,7 @@ def getlimits(d, n, lx, dx=100, b=10):
     """analyses opcodes to determine the upper and lower limits of
     sequence 1 as it maps to sequence 2.  'n' tells is 1 or 2 and
     tells us which sequence to analyse."""
-    ##target lenght should be somehow brought in??
+    ##target length should be somehow brought in??
     if n == 1:
         i = 1
     else:
@@ -1177,7 +1177,7 @@ def getlimits(d, n, lx, dx=100, b=10):
     ## if we have more than 10 buckets, we do not really have a corresponding file, so we return failure
     blen = sum([a[1] for a in buckets[index]])
     res = blen - lx / 5 
-#    print len(ix), ix, lx, blen, res
+    print "getlimits: ", len(ix), ix, lx, blen, res
     if len(buckets) > b or res < 0:
         return -1, -1
     else:
