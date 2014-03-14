@@ -1,6 +1,9 @@
 #! /usr/bin/python
 # -*- coding: utf-8 -*-
 
+import sys
+sys.path.insert(0, '/Users/chris/db/mandoku/python/mandoku')
+
 import mandoku, os
 
 mddir="/Users/Shared/md/text/cbeta/T/"
