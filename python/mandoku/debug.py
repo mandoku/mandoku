@@ -18,3 +18,15 @@ f=mandoku.MandokuComp(f1)
 f.setothertext(f2)
 f.move_pg_and_xb6tot2(0)
 f.segment(f1, f2)
+
+text1=f1
+text2=f2
+
+start=53837
+limit=59960
+ss1=[a[text1.cpos] for a in text1.seq[start:limit]]
+ss2=[a[text2.cpos] for a in text2.seq]
+s = SequenceMatcher()
+s.set_seqs(ss1, ss2)
+
+dx=mandoku.getlimits(s.get_opcodes(), 1, limit-start, 100, 35)
