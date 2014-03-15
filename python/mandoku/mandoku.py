@@ -895,9 +895,9 @@ class MandokuComp(object):
                     t2end = len(text2.seq)
                 s.set_seqs([a[text1.cpos] for a in text1.seq[start:limit]], [a[text2.cpos] for a in text2.seq[t2start:t2end]])        
                 l=getlimits(s.get_opcodes(), 0, limit - start, dx, b)
-                print "segment: start, limit =", start, limit, "l", l 
+                #print "segment: start, limit =", start, limit, "l", l 
                 text2.newsections[i] = l[0]+t2start, text2.newsections[i][1]
-                print text2.newsections
+                #print text2.newsections
 ##pi mal daumen...
 #         for i in range (0, len(text2.newsections)):
 #             try:
@@ -1194,7 +1194,7 @@ def getlimits(d, n, lx, dx=100, b=10):
     ## if we have more than 10 buckets, we do not really have a corresponding file, so we return failure
     blen = sum([a[1] for a in buckets[index]])
     res = blen - lx / 5 
-    print "getlimits: ", len(ix), ix, lx, blen, res
+    #print "getlimits: ", len(ix), ix, lx, blen, res
     if len(buckets) > b or res < 0:
         return -1, -1
     else:
