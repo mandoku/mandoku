@@ -896,7 +896,8 @@ class MandokuComp(object):
                 s.set_seqs([a[text1.cpos] for a in text1.seq[start:limit]], [a[text2.cpos] for a in text2.seq[t2start:t2end]])        
                 l=getlimits(s.get_opcodes(), 0, limit - start, dx, b)
                 print "segment: start, limit =", start, limit, "l", l 
-                text2.newsections[i][0] = l[0]
+                text2.newsections[i] = l[0]+t2start, text2.newsections[i][1]
+                print text2.newsections
 ##pi mal daumen...
 #         for i in range (0, len(text2.newsections)):
 #             try:
