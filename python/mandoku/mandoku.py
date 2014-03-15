@@ -880,7 +880,6 @@ class MandokuComp(object):
             text2.newsections.append((l[0], text1.sections[i][1].decode('utf-8')))
         #ok, now we look if there are file borders close, use them
         j=0
-<<<<<<< HEAD
         #starting at the second, we make another run to try to fix -1 positions
         for i in range (1, len(text2.newsections)):
             if text2.newsections[i][0] == -1:

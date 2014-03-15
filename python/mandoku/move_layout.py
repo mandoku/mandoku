@@ -3,6 +3,7 @@
 
 import sys
 sys.path.insert(0, '/Users/chris/db/mandoku/python/mandoku')
+sys.path.insert(0, '/Users/neko/db/mandoku/python/mandoku')
 
 import mandoku, os
 
@@ -40,4 +41,4 @@ for f in os.listdir(kdir):
         pass
     f2.defs['title'] = f1.defs['title'].split()[-1]
     os.mkdir(outdir + fid)
-    f2.write_to_sections(outdir + fid, True)
+    f2.write_to_sections(outdir + fid, True, False)
