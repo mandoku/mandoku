@@ -1,5 +1,5 @@
 #+TITLE: The Mandoku project
-#+DATE: 2011-06-17
+# #+DATE: 2011-06-17
 
 
 * About Mandoku 
@@ -34,6 +34,8 @@
   Unicode Ext. B characters can be found [[file:data/Emacs24.3+2013-07-03.dmg.zip][here]].
 
   [2013-09-26] [[file:mandoku-install-en.html][Installation instructions]] for a preview version are now available.
+
+  [2014-01-13] [[file:mandoku-install-en.html][updated Installation instructions]] for a preview version.
 
 
 * Software
