@@ -888,9 +888,9 @@ class MandokuComp(object):
                     limit = text1.sections[i+1][0]
                 except:
                     limit = len(text1.seq)
-                t2start = text2.newsections[i-1]
+                t2start = text2.newsections[i-1][0]
                 try:
-                    t2end = text2.newsections[i+1]
+                    t2end = text2.newsections[i+1][0]
                 except:
                     t2end = len(text2.seq)
                 s.set_seqs([a[text1.cpos] for a in text1.seq[start:limit]], [a[text2.cpos] for a in text2.seq[t2start:t2end]])        
