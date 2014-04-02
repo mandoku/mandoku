@@ -20,10 +20,10 @@ def getlayout(rep, src, target=None):
         rep.git.checkout(src)
     except:
         sys.exit("Branch %s does not exist!\n" % src)
-    f1 = mandoku.MandokuText(".")
+    f1 = mandoku.MandokuText(".", src)
     f1.read()
     rep.git.checkout(target)
-    f2 = mandoku.MandokuText(".")
+    f2 = mandoku.MandokuText(".", target)
     f2.read()
     f=mandoku.MandokuComp(f1)
     f.setothertext(f2)
