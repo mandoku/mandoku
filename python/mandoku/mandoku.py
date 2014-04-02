@@ -492,7 +492,7 @@ function with access to a database."""
         pass
     def writeheader(self, out, section):
         """writes the metadata for the section to the file"""
-        out.write("#-*- mode: org; -*-\n")
+        out.write("# -*- mode: mandoku-view -*-\n")
         if self.defs.has_key('title'):
             out.write("#+TITLE: %s\n" % (self.defs['title']))
         out.write("#+DATE: %s\n" % (datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
