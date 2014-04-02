@@ -1,9 +1,10 @@
 #! /usr/bin/python
 # -*- coding: utf-8 -*-
 
-import sys
-sys.path.insert(0, '/Users/chris/db/mandoku/python/mandoku')
-sys.path.insert(0, '/Users/neko/db/mandoku/python/mandoku')
+import sys, getpass
+user=getpass.getuser()
+sys.path.insert(0, '/Users/' + user + '/db/mandoku/python/mandoku')
+
 
 import mandoku, os
 
