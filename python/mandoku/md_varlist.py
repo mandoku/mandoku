@@ -9,43 +9,24 @@ sys.path.insert(0, '/Users/' + user + '/db/mandoku/python/mandoku')
 import mandoku, os, git
 
 
-def getlayout(rep, src, target=None):
+def prepare(textpath=".", src="master"):
     """Move the layout from the srcbranch to the targetbranch. If
     targetbranch is None, use the current branch."""
-    if not target:
-        target = rep.active_branch.name
-    else:
-        target = rep.git.checkout(b=target)
+    f1 = mandoku.MandokuText(textpath, src)
+    rd = os.realpath(textpath)
+    wp = rd + '.wiki'
     try:
-        rep.git.checkout(src)
+        wiki = git.Repo(wp)
     except:
-        sys.exit("Branch %s does not exist!\n" % src)
-    f1 = mandoku.MandokuText(".", src)
+        wiki = git.Repo.init(wp)
+        wiki.git.checkout(b="master")
+    try:
+        os.mkdir(wp + '/varlist')
+        wiki.index.add(['varlist'])
+    except:
+        pass
     f1.read()
-    rep.git.checkout(target)
-    f2 = mandoku.MandokuText(".", target)
-    f2.read()
-    f=mandoku.MandokuComp(f1)
-    f.setothertext(f2)
-    ## important: if we need to segment, then do this first in a different run, this assumes that the file names stay the same
-    ## ok, now write it out, register in git and commit
+    f1.add_metadata()
+    f1.addOtherBranches()
     
-try:
-    rep = git.Repo('.')
-except:
-    print "This program needs to be run within a Mandoku text directory under git control"
-    sys.exit()
 
-if rep.is_dirty():
-    print "Please commit your changes before running this program."
-    sys.exit()
-
-if len(sys.argv) < 3:
-    print "Please give the source of the layout."
-    print len(sys.argv), sys.argv
-    sys.exit()
-
-srcbranch=sys.argv[1]
-
-
-    
