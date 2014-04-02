@@ -27,6 +27,8 @@ def getlayout(rep, src, target=None):
     f2.read()
     f=mandoku.MandokuComp(f1)
     f.setothertext(f2)
+    ## important: if we need to segment, then do this first in a different run, this assumes that the file names stay the same
+    ## ok, now write it out, register in git and commit
     
 try:
     rep = git.Repo('.')
