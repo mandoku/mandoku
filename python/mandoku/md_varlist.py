@@ -33,6 +33,7 @@ def prepare(textpath=".", src="master", n=3):
     r = f1.branches
     br = r.keys()
     pp = f1.pages.keys()
+    currentpage = ""
     for i in range(1, len(f1.sections)+1):
         s, f = f1.sections[i-1]
         of = codecs.open(wp + '/varlist/' + f, 'w', 'utf-8')
@@ -69,7 +70,8 @@ def prepare(textpath=".", src="master", n=3):
                             foll = "".join(["".join(tmp[f1.cpos]) for tmp in seq[j+1:]])
                             
                         of.write("** %s%2.2d %s *%s* %s\n" % (currentpage.split('_')[-1][:-1], ll, prev, seq[j][f1.cpos], foll))
-                    of.write( " %s: %d, %s\n" % (v, j, "".join(r[v][j])))
+                    var = "".join(r[v][j])
+                    of.write( " - %s: %d, %s\n" % (v, j, var.replace('\n*', '\n *')))
         of.close()
 
 
