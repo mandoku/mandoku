@@ -630,6 +630,16 @@ function with access to a database."""
         self.refs=[]
         self.branches={}
         self.txtid = self.textpath.split('/')[-1]
+        #if possible, use sections for comparison!
+        sseq = {}
+        for i in range(1, len(self.sections)+1):
+            si, fi = self.sections[i-1]
+            start = si
+            try:
+                end = self.sections[i][0]
+            except:
+                end = len(self.seq)
+            sseq[fi] = [a[self.cpos] for a in self.seq[start:end]]
         s.set_seq1([a[self.cpos] for a in self.seq])
         for b in repo.heads:
             if b.name != self.version:
@@ -643,6 +653,7 @@ function with access to a database."""
                 self.refs.append(t2)
                 t2.read()
                 ##todo: add the necessary metadata to redis
+                ## check if we can use sections
                 s.set_seq2([a[self.cpos] for a in t2.seq])
                 #no idea what d is used for, probably not necessary anymore... (maybe it was for section-dependent code)
                 d=0
@@ -660,7 +671,7 @@ function with access to a database."""
                             if add_var_punctuation and t2.seq[i+dx][self.mpos] != '':
                                 res[i+d] = ':' + t2.seq[i+dx][self.mpos]
                     if tag == 'replace':
-                        a=t2.seq[j1:j2]
+                        a=[x[t2.cpos] for x in t2.seq[j1:j2]]
                         if add_var_punctuation:
                             b1=[x[1] for x in t2.seq[j1:j2]]
                             a=map(lambda xx : xx[self.cpos] + ':' + xx[1], zip(a,b1))
