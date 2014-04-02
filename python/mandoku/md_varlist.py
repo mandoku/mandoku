@@ -56,3 +56,16 @@ def prepare(textpath=".", src="master", n=3):
                         of.write("** %s%2.2d %s *%s* %s\n" % (currentpage.split('_')[-1][:-1], ll, s[j-n:j], s[j], s[j+n]))
                     of.write( " %s: %s\n" % (v, "".join(r[v][j])))
         of.close()
+
+
+try:
+    txpath= sys.argv[1]
+except:
+    txpath = "."
+
+try:
+    ed= sys.argv[2]
+except:
+    ed="master"
+
+prepare(txpath, ed)
