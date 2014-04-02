@@ -652,10 +652,10 @@ function with access to a database."""
                     if  tag == 'equal':
                         dx = j1 - i1
                         for i in range(i1, i2):
-                            print "=", i, t2.seq[i+dx]
+#                            print "=", i, t2.seq[i+dx]
                             if '<pb:' in t2.seq[i+dx][self.mpos]:
                                 pb = t2.seq[i+dx][self.mpos]
-                                print pb
+#                                print pb
                                 self.img[b.name][i] = pb[pb.find('<pb:'):pb.find('>', pb.find('<pb:'))+1]
                             if add_var_punctuation and t2.seq[i+dx][self.mpos] != '':
                                 res[i+d] = ':' + t2.seq[i+dx][self.mpos]
@@ -684,7 +684,7 @@ function with access to a database."""
                             try:
                                 res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[i1-1:i1][self.cpos]), "".join("".join(["".join(a) for a in t2.seq[j1:j2]])))
                             except(IndexError):
-                                print k, i1, j1, j2
+                                print "indexerror", k, i1, j1, j2
                                 print res
                                 continue
                                 #sys.exit()
