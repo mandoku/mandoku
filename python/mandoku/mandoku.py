@@ -365,6 +365,7 @@ function with access to a database."""
                 
     def parse(self, infile):
         ##we add an empty seq at the beginning of each file
+        zhu_buf = ""
         self.seq.append(('', ''))
         for line in infile:
             try:
