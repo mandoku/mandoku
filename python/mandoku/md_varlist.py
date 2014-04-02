@@ -6,7 +6,7 @@ user=getpass.getuser()
 sys.path.insert(0, '/Users/' + user + '/db/mandoku/python/mandoku')
 
 
-import mandoku, os, git, codecs
+import mandoku, os, git, codecs, datetime, time
 
 
 def prepare(textpath=".", src="master", n=3):
@@ -35,7 +35,9 @@ def prepare(textpath=".", src="master", n=3):
     pp = f1.pages.keys()
     for i in range(1, len(f1.sections)+1):
         s, f = f1.sections[i-1]
-        of = codecs.open(wp + '/varlist/' + f, 'w', 'utf-8') 
+        of = codecs.open(wp + '/varlist/' + f, 'w', 'utf-8')
+        of.write("# -*- mode: mandoku-view; -*-\n")
+        of.write("#+DATE: %s\n" % (datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
         start = s
         try:
             end = f1.sections[i][0]
@@ -55,7 +57,16 @@ def prepare(textpath=".", src="master", n=3):
                     if varflag == 0:
                         varflag = 1
                         print currentpage, ll, seq[j]
-#                        of.write("** %s%2.2d %s *%s* %s\n" % (currentpage.split('_')[-1][:-1], ll, s[j-n:j], s[j], s[j+n]))
+                        if j > n:
+                            prev = "".join(["".join(tmp[f1.cpos]) for tmp in seq[j-n:j]])
+                        else:
+                            prev = "".join(["".join(tmp[f1.cpos]) for tmp in  seq[:j]])
+                        try:
+                            foll = "".join(["".join(tmp[f1.cpos]) for tmp in  seq[j+1:j+n+1]])
+                        except:
+                            foll = "".join(["".join(tmp[f1.cpos]) for tmp in seq[j+1:]])
+                            
+                        of.write("** %s%2.2d %s *%s* %s\n" % (currentpage.split('_')[-1][:-1], ll, prev, seq[j][f1.cpos], foll))
                     of.write( " %s: %s\n" % (v, "".join(r[v][j])))
         of.close()
 
