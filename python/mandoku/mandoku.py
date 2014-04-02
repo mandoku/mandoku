@@ -56,7 +56,7 @@ ent=r'\[\[.*?\]\]|\[[^\]]*\]|&[^;]*;|&amp;[CZ][X3-7]-[A-F0-9]+'
 kp_re = re.compile(u"(%s|{[%s%s]+:[^}]*}|[%s%s])" % (ent, kanji, pua, kanji, pua))
 ch_re = re.compile(ur'(\[[^\]]*\]|&[^;]*;|&amp;C[X3-7]-[A-F0-9]+|.)')
 img_re = re.compile(ur'<i[^>]*>')
-punc_re = re.compile(ur"[\u3001-\u33FF\uFF00-\uFF7F]")
+punc_re = re.compile(ur"[\u3001-\u33FF\uFE00-\uFF7F]")
 meta_re = re.compile(ur'(<[^>]*>|\xb6|\n)')
 sys.stdout = codecs.getwriter('utf8')(sys.stdout)
 
@@ -678,7 +678,7 @@ function with access to a database."""
         self.branches={}
         self.txtid = self.textpath.split('/')[-1]
         #just in case
-        s.set_seq1([a[self.cpos] for a in self.seq])
+        s.set_seq1([a[self.cpos].replace(u'\u3000', '') for a in self.seq])
         #if possible, use sections for comparison!
         sseq = {}
         for i in range(1, len(self.sections)+1):
@@ -688,7 +688,7 @@ function with access to a database."""
                 end = self.sections[i][0]
             except:
                 end = len(self.seq)
-            sseq[fi] = (si, [a[self.cpos] for a in self.seq[start:end]])
+            sseq[fi] = (si, [a[self.cpos].replace(u'\u3000', '') for a in self.seq[start:end]])
         for b in repo.heads:
             if b.name != self.version:
                 print b.name
@@ -716,7 +716,7 @@ function with access to a database."""
                         except:
                             end = len(t2.seq)
                         s.set_seq1(sseq[fi][1])
-                        s.set_seq2([a[t2.cpos] for a in t2.seq[start:end]])
+                        s.set_seq2([a[t2.cpos].replace(u'\u3000', '') for a in t2.seq[start:end]])
                         self._processopcodes(s, t2, sseq[fi][0], start, res, b.name, add_var_punctuation)
                 else:
                     s.set_seq2([a[self.cpos] for a in t2.seq])
