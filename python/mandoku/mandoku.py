@@ -183,7 +183,7 @@ function with access to a database."""
                         m += e
                     else:
                         for j in range(0, len(e)):
-                            if e[j] in (u'〈', u'《', u'「', u'『', u'【', u'〖', u'〘', u'〚', u'\u3000', '(', '*', ' '):
+                            if e[j] in (u'〈', u'《', u'「', u'『', u'【', u'〖', u'〘', u'〚', u'\u3000', '(', '*', '.', ' '):
                                 p += e[j]
                             elif re.search(r"[0-9]", e[j]):
                                 p += e[j]
