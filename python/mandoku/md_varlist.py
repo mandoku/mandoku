@@ -37,7 +37,9 @@ def prepare(textpath=".", src="master", n=3):
         s, f = f1.sections[i-1]
         of = codecs.open(wp + '/varlist/' + f, 'w', 'utf-8')
         of.write("# -*- mode: mandoku-view; -*-\n")
+        of.write(u"#+TITLE: %s - %s - 異同 \n" % (f1.defs['title'], f.split('_')[1][:3]))
         of.write("#+DATE: %s\n" % (datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+        of.write(u"* %s - 異同 \n" % (f.split('_')[1][:3]))
         start = s
         try:
             end = f1.sections[i][0]
