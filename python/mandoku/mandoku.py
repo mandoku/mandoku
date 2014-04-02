@@ -615,47 +615,7 @@ function with access to a database."""
                         dxn += 1
                     self.printNgram(outseq, fx, j - s)
 
-
-    def addOtherBranches(self, add_var_punctuation=False):
-        """adds the other branches to MandokuText."""
-        #[2012-12-05T21:55:39+0900]
-        # todo: currently, the positions are totals for the whole text, but I need to have them by section
-        # also: look at mandoku_couch and see how to deal with different sections, number of section etc.
-        try:
-            repo = git.Repo(self.textpath)
-        except:
-            return "No git repository found"
-        s = SequenceMatcher()
-        self.s=s
-        self.refs=[]
-        self.branches={}
-        self.txtid = self.textpath.split('/')[-1]
-        #if possible, use sections for comparison!
-        sseq = {}
-        for i in range(1, len(self.sections)+1):
-            si, fi = self.sections[i-1]
-            start = si
-            try:
-                end = self.sections[i][0]
-            except:
-                end = len(self.seq)
-            sseq[fi] = [a[self.cpos] for a in self.seq[start:end]]
-        s.set_seq1([a[self.cpos] for a in self.seq])
-        for b in repo.heads:
-            if b.name != self.version:
-                print b.name
-                b.checkout()
-                self.branches[b.name]={}
-                self.img[b.name]={}
-                res = self.branches[b.name]
-                sig = self.getsigle(b.name)
-                t2 = MandokuText(self.textpath, version=b.name)
-                self.refs.append(t2)
-                t2.read()
-                ##todo: add the necessary metadata to redis
-                ## check if we can use sections
-                s.set_seq2([a[self.cpos] for a in t2.seq])
-                #no idea what d is used for, probably not necessary anymore... (maybe it was for section-dependent code)
+    def _processopcodes(self, s, t2, res):
                 d=0
                 for tag, i1, i2, j1, j2 in s.get_opcodes():
                     ##first we look for pagebreaks, we need only those with a different version
@@ -701,6 +661,66 @@ function with access to a database."""
                                 #sys.exit()
                     elif tag == 'delete':
                         res[i1+d] = ""
+
+
+    def addOtherBranches(self, add_var_punctuation=False):
+        """adds the other branches to MandokuText."""
+        #[2012-12-05T21:55:39+0900]
+        # todo: currently, the positions are totals for the whole text, but I need to have them by section
+        # also: look at mandoku_couch and see how to deal with different sections, number of section etc.
+        try:
+            repo = git.Repo(self.textpath)
+        except:
+            return "No git repository found"
+        s = SequenceMatcher()
+        self.s=s
+        self.refs=[]
+        self.branches={}
+        self.txtid = self.textpath.split('/')[-1]
+        #if possible, use sections for comparison!
+        sseq = {}
+        for i in range(1, len(self.sections)+1):
+            si, fi = self.sections[i-1]
+            start = si
+            try:
+                end = self.sections[i][0]
+            except:
+                end = len(self.seq)
+            sseq[fi] = [a[self.cpos] for a in self.seq[start:end]]
+        s.set_seq1([a[self.cpos] for a in self.seq])
+        for b in repo.heads:
+            if b.name != self.version:
+                print b.name
+                b.checkout()
+                self.branches[b.name]={}
+                self.img[b.name]={}
+                res = self.branches[b.name]
+                sig = self.getsigle(b.name)
+                t2 = MandokuText(self.textpath, version=b.name)
+                self.refs.append(t2)
+                t2.read()
+                secmatch = 0
+                ##todo: add the necessary metadata to redis
+                ## check if we can use sections
+                for i in range(1, len(t2.sections)+1):
+                    si, fi = t2.sections[i-1]
+                    if sseq.has_key(fi):
+                        secmatch += 1
+                print "secmatch: ", secmatch
+                if secmatch > max(len(t2.sections), len(self.sections)) - 2 and secmatch > 0:
+                    for i in range(1, len(t2.sections)+1):
+                        si, fi = t2.sections[i-1]
+                        start = si
+                        try:
+                            end = self.sections[i][0]
+                        except:
+                            end = len(self.seq)
+                        s.set_seq1(sseq[fi])
+                        s.set_seq2([a[self.cpos] for a in self.seq[start:end]])
+                        self._processopcodes(s, t2, res)
+                else:
+                    s.set_seq2([a[self.cpos] for a in t2.seq])
+                    self._processopcodes(s, t2, res)
         for b in repo.heads:
             if b.name == self.version:
                 b.checkout()
