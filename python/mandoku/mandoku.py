@@ -443,7 +443,7 @@ function with access to a database."""
         #reduce empty         
     def write_org(self, outfile, header=False):
         """write the text out in the supplied file object"""
-        outfile.write("".join( ["".join(a) for a in self.seq]))
+        self.write(outfile, "".join( ["".join(a) for a in self.seq]))
 
     def write_to_sections(self, path, header=False, alignpb=True):
         """write the text to path using the filename(s) in the sections array."""
@@ -470,28 +470,28 @@ function with access to a database."""
                     tmp -= 1
                     if self.seq[tmp][self.mpos].find('<') > 0:
                         pb=self.seq[tmp][self.mpos]
-                        outfile.write(u"#+PROPERTY: LASTPB  %s\n" % (pb[pb.find('<'):pb.find('>')+1]))
-                        outfile.write(u"%s¶\n" % (pb[pb.find('<'):pb.find('>')+1]))
+                        self.write(outfile, u"#+PROPERTY: LASTPB  %s\n" % (pb[pb.find('<'):pb.find('>')+1]))
+                        self.write(outfile, u"%s¶\n" % (pb[pb.find('<'):pb.find('>')+1]))
                         break
             if header and alignpb:
                 ##for the first section, we keep the position at 1
                 if tmp > 1:
                     tmp += 1
-                outfile.write("".join(["".join(a) for a in self.seq[tmp:limit]]))
+                self.write(outfile, "".join(["".join(a) for a in self.seq[tmp:limit]]))
             else:
                 #additional stuff after the regular characters in a
                 #seq entry belong before the next character, thus the
                 #next file
                 try:
                     if len(self.seq[start - 1]) > self.cpos + 2:
-                        outfile.write("".join(self.seq[start - 1][self.cpos + 2 :]))
+                        self.write(outfile, "".join(self.seq[start - 1][self.cpos + 2 :]))
                 except:
                     pass
-                outfile.write("".join(["".join(a) for a in self.seq[start:limit - 1]]))
+                self.write(outfile, "".join(["".join(a) for a in self.seq[start:limit - 1]]))
                 try:
-                    outfile.write("".join(["".join(a) for a in self.seq[limit - 1 :limit][0][: self.cpos + 2]]))
+                    self.write(outfile, "".join(["".join(a) for a in self.seq[limit - 1 :limit][0][: self.cpos + 2]]))
                 except:
-                    outfile.write("".join(["".join(a) for a in self.seq[limit - 1 :limit]]))
+                    self.write(outfile, "".join(["".join(a) for a in self.seq[limit - 1 :limit]]))
 
             outfile.close()
 
