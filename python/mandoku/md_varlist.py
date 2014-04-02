@@ -9,7 +9,7 @@ sys.path.insert(0, '/Users/' + user + '/db/mandoku/python/mandoku')
 import mandoku, os, git
 
 
-def prepare(textpath=".", src="master"):
+def prepare(textpath=".", src="master", n=3):
     """Move the layout from the srcbranch to the targetbranch. If
     targetbranch is None, use the current branch."""
     f1 = mandoku.MandokuText(textpath, src)
@@ -28,5 +28,31 @@ def prepare(textpath=".", src="master"):
     f1.read()
     f1.add_metadata()
     f1.addOtherBranches()
-    
-
+    s=f1.seq
+    r = f1.branches
+    br = r.keys()
+    pp = f1.pages.keys()
+    for i in range(1, len(self.sections)+1):
+        s, f = self.sections[i-1]
+        of = codecs.open(wp + '/varlist/' + f, 'w', 'utf-8') 
+        start = s
+        try:
+            end = f1.sections[i][0]
+        except:
+            end = len(f1.seq)
+        for j in range(start, end):
+            varflag = 0
+            if pp.has_key(j):
+                currentpage=f1.pages[j]
+                l = f1.lines[currentpage]
+                ll = 1
+            if j in l:
+                ll += 1
+                lstart = j
+            for v in br:
+                if r[v].has_key(j):
+                    if varflag == 0:
+                        varflag = 1
+                        of.write("** %s%2.2d %s *%s* %s\n" % (currentpage.split('_')[-1][:-1], ll, s[j-n:j], s[j], s[j+n]))
+                    of.write( " %s: %s\n" % (v, "".join(r[v][j])))
+        of.close()
