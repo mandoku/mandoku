@@ -185,7 +185,7 @@ function with access to a database."""
                         for j in range(0, len(e)):
                             if e[j] in (u'〈', u'《', u'「', u'『', u'【', u'〖', u'〘', u'〚', u'\u3000', '(', '*', '.', ' '):
                                 p += e[j]
-                            elif re.search(r"[0-9]", e[j]):
+                            elif re.search(r"[0-9A-Za-z]", e[j]):
                                 p += e[j]
 #                                print "p", i, p
                             else:
