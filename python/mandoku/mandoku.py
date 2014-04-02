@@ -624,16 +624,16 @@ function with access to a database."""
                         dx = j1 - i1
                         for i in range(i1, i2):
 #                            print "=", i, t2.seq[i+dx]
-                            if '<pb:' in t2.seq[i+dx][self.mpos]:
-                                pb = t2.seq[i+dx][self.mpos]
+                            if '<pb:' in t2.seq[s2start+i+dx][self.mpos]:
+                                pb = t2.seq[s2start+i+dx][self.mpos]
 #                                print pb
                                 self.img[bname][i] = pb[pb.find('<pb:'):pb.find('>', pb.find('<pb:'))+1]
-                            if add_var_punctuation and t2.seq[i+dx][self.mpos] != '':
-                                res[i+d] = ':' + t2.seq[i+dx][self.mpos]
+                            if add_var_punctuation and t2.seq[s2start+i+dx][self.mpos] != '':
+                                res[i+d] = ':' + t2.seq[s2start+i+dx][self.mpos]
                     if tag == 'replace':
-                        a=[x[t2.cpos] for x in t2.seq[j1:j2]]
+                        a=[x[t2.cpos] for x in t2.seq[s2start+j1:s2start+j2]]
                         if add_var_punctuation:
-                            b1=[x[1] for x in t2.seq[j1:j2]]
+                            b1=[x[1] for x in t2.seq[s2start+j1:s2start+j2]]
                             a=map(lambda xx : xx[self.cpos] + ':' + xx[1], zip(a,b1))
                         a.reverse()
                         for i in range(i1, i2):
@@ -650,10 +650,10 @@ function with access to a database."""
                         k = i1-1+d
                         if add_var_punctuation:
                             #here we just grab the original e, munge it together and slab it onto the rest
-                            res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[i1-1:i1][self.cpos]), "".join("".join(["".join(a) for a in t2.seq[j1:j2]])))
+                            res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[i1-1:i1][self.cpos]), "".join("".join(["".join(a) for a in t2.seq[s2start+j1:s2start+j2]])))
                         else:
                             try:
-                                res[k] =  u"%s%s%s" % (res.get(k, ''), u"".join(self.seq[i1-1:i1][self.cpos]), u"".join(u"".join(["".join(a) for a in t2.seq[j1:j2]])))
+                                res[k] =  u"%s%s%s" % (res.get(k, ''), u"".join(self.seq[i1-1:i1][self.cpos]), u"".join(u"".join(["".join(a) for a in t2.seq[s2start+j1:s2start+j2]])))
                             except(IndexError):
                                 print "indexerror", k, i1, i2, j1, j2, "a", u"".join(s.a[0:10]), "b", u"".join(s.b[0:10] )
                                 print res
@@ -688,7 +688,7 @@ function with access to a database."""
                 end = self.sections[i][0]
             except:
                 end = len(self.seq)
-            sseq[fi] = [a[self.cpos] for a in self.seq[start:end]]
+            sseq[fi] = (si, [a[self.cpos] for a in self.seq[start:end]])
         for b in repo.heads:
             if b.name != self.version:
                 print b.name
@@ -715,9 +715,9 @@ function with access to a database."""
                             end = t2.sections[i][0]
                         except:
                             end = len(t2.seq)
-                        s.set_seq1(sseq[fi])
+                        s.set_seq1(sseq[fi][1])
                         s.set_seq2([a[t2.cpos] for a in t2.seq[start:end]])
-                        self._processopcodes(s, t2, res, s1start, start, b.name, add_var_punctuation)
+                        self._processopcodes(s, t2, res, sseq[fi][0], start, b.name, add_var_punctuation)
                 else:
                     s.set_seq2([a[self.cpos] for a in t2.seq])
                     self._processopcodes(s, t2, res, 1, 1,  b.name, add_var_punctuation)
