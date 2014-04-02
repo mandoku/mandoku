@@ -136,8 +136,11 @@ class MandokuText(object):
         ## we use our own re to make it replaceable
         self.re = kp_re
 
-
-
+    def write(self, ofile, str, replace=True):
+        "optionally replaces the md before writing out the file, but only if there had not been pbs originally"
+        if replace and self.pbcnt == 0:
+            ofile.write(str.replace('<md:', '<pb:'))
+            
     def read(self):
         self.seq = []
         self.cpos=0
