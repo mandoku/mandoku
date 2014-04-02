@@ -58,7 +58,7 @@ def prepare(textpath=".", src="master", n=3):
                 if r[v].has_key(j):
                     if varflag == 0:
                         varflag = 1
-                        print currentpage, ll, seq[j]
+#                        print currentpage, ll, seq[j]
                         if j > n:
                             prev = "".join(["".join(tmp[f1.cpos]) for tmp in seq[j-n:j]])
                         else:
@@ -69,7 +69,7 @@ def prepare(textpath=".", src="master", n=3):
                             foll = "".join(["".join(tmp[f1.cpos]) for tmp in seq[j+1:]])
                             
                         of.write("** %s%2.2d %s *%s* %s\n" % (currentpage.split('_')[-1][:-1], ll, prev, seq[j][f1.cpos], foll))
-                    of.write( " %s: %s\n" % (v, "".join(r[v][j])))
+                    of.write( " %s: %d, %s\n" % (v, j, "".join(r[v][j])))
         of.close()
 
 
