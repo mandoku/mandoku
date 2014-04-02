@@ -73,7 +73,7 @@ def prepare(textpath=".", src="master", n=3):
                             
                         of.write("** %s%2.2d %s *%s* %s\n" % (currentpage.split('_')[-1][:-1], ll, prev, seq[j][f1.cpos], foll))
                     var = "".join(r[v][j])
-                    of.write( " - %s: %d, %s\n" % (v, j, var.replace('\n*', '\n *')))
+                    of.write( " - %s: %d, '%s'\n" % (v, j, var.replace('\n*', '\n *')))
         of.close()
 
 

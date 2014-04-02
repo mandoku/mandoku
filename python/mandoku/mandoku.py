@@ -629,7 +629,7 @@ function with access to a database."""
 #                                print pb
                                 self.img[bname][i] = pb[pb.find('<pb:'):pb.find('>', pb.find('<pb:'))+1]
                             if add_var_punctuation and t2.seq[s2start+i+dx][self.mpos] != '':
-                                res[i+d] = ':' + t2.seq[s2start+i+dx][self.mpos]
+                                res[s1start+i+d] = ':' + t2.seq[s2start+i+dx][self.mpos]
                     if tag == 'replace':
                         a=[x[t2.cpos] for x in t2.seq[s2start+j1:s2start+j2]]
                         if add_var_punctuation:
@@ -638,29 +638,29 @@ function with access to a database."""
                         a.reverse()
                         for i in range(i1, i2):
                             try:
-                                res[i+d] =  a.pop()
+                                res[s1start+i+d] =  a.pop()
                             except:
                                 #b is shorter than a
-                                res[i+d] = ''
+                                res[s1start+i+d] = ''
                         if len(a) > 0:
                             #b is longer than a, so we have left overs.
                             a.reverse()
-                            res[i+d] = "%s%s" % (res[i], "".join(["".join(tmp) for tmp in a])) 
+                            res[s1start+i+d] = "%s%s" % (res[s1start+i], "".join(["".join(tmp) for tmp in a])) 
                     elif tag == 'insert':
                         k = i1-1+d
                         if add_var_punctuation:
                             #here we just grab the original e, munge it together and slab it onto the rest
-                            res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[i1-1:i1][self.cpos]), "".join("".join(["".join(a) for a in t2.seq[s2start+j1:s2start+j2]])))
+                            res[s1start+k] =  "%s%s%s" % (res.get(s1start+k, ''), "".join(self.seq[s1start+i1-1:s1start+i1][self.cpos]), "".join("".join(["".join(a) for a in t2.seq[s2start+j1:s2start+j2]])))
                         else:
                             try:
-                                res[k] =  u"%s%s%s" % (res.get(k, ''), u"".join(self.seq[i1-1:i1][self.cpos]), u"".join(u"".join(["".join(a) for a in t2.seq[s2start+j1:s2start+j2]])))
+                                res[s1start+k] =  u"%s%s%s" % (res.get(s1start+k, ''), u"".join([a[self.cpos] for a in self.seq[s1start+i1-1:s1start+i1]]), u"".join(u"".join(["".join(a) for a in t2.seq[s2start+j1:s2start+j2]])))
                             except(IndexError):
                                 print "indexerror", k, i1, i2, j1, j2, "a", u"".join(s.a[0:10]), "b", u"".join(s.b[0:10] )
                                 print res
                                 continue
                                 #sys.exit()
                     elif tag == 'delete':
-                        res[i1+d] = ""
+                        res[s1start+i1+d] = ""
 
 
     def addOtherBranches(self, add_var_punctuation=False):
@@ -706,7 +706,7 @@ function with access to a database."""
                     si, fi = t2.sections[i-1]
                     if sseq.has_key(fi):
                         secmatch += 1
-                print "secmatch: ", secmatch
+#                print "secmatch: ", secmatch
                 if secmatch > max(len(t2.sections), len(self.sections)) - 2 and secmatch > 0:
                     for i in range(1, len(t2.sections)+1):
                         si, fi = t2.sections[i-1]
@@ -717,10 +717,10 @@ function with access to a database."""
                             end = len(t2.seq)
                         s.set_seq1(sseq[fi][1])
                         s.set_seq2([a[t2.cpos] for a in t2.seq[start:end]])
-                        self._processopcodes(s, t2, res, sseq[fi][0], start, b.name, add_var_punctuation)
+                        self._processopcodes(s, t2, sseq[fi][0], start, res, b.name, add_var_punctuation)
                 else:
                     s.set_seq2([a[self.cpos] for a in t2.seq])
-                    self._processopcodes(s, t2, res, 1, 1,  b.name, add_var_punctuation)
+                    self._processopcodes(s, t2, 1, 1,  res, b.name, add_var_punctuation)
         for b in repo.heads:
             if b.name == self.version:
                 b.checkout()
