@@ -652,6 +652,7 @@ function with access to a database."""
                     if  tag == 'equal':
                         dx = j1 - i1
                         for i in range(i1, i2):
+                            print "=", i, t2.seq[i+dx]
                             if '<pb:' in t2.seq[i+dx][self.mpos]:
                                 pb = t2.seq[i+dx][self.mpos]
                                 print pb
@@ -684,7 +685,9 @@ function with access to a database."""
                                 res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[i1-1:i1][self.cpos]), "".join("".join(["".join(a) for a in t2.seq[j1:j2]])))
                             except(IndexError):
                                 print k, i1, j1, j2
-                                exit
+                                print res
+                                continue
+                                #sys.exit()
                     elif tag == 'delete':
                         res[i1+d] = ""
         for b in repo.heads:
