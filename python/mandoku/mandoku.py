@@ -653,7 +653,7 @@ function with access to a database."""
                             res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[i1-1:i1][self.cpos]), "".join("".join(["".join(a) for a in t2.seq[j1:j2]])))
                         else:
                             try:
-                                res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[i1-1:i1][self.cpos]), "".join("".join(["".join(a) for a in t2.seq[j1:j2]])))
+                                res[k] =  u"%s%s%s" % (res.get(k, ''), u"".join(self.seq[i1-1:i1][self.cpos]), u"".join(u"".join(["".join(a) for a in t2.seq[j1:j2]])))
                             except(IndexError):
                                 print "indexerror", k, i1, i2, j1, j2, "a", u"".join(s.a[0:10]), "b", u"".join(s.b[0:10] )
                                 print res
@@ -701,7 +701,6 @@ function with access to a database."""
                 self.refs.append(t2)
                 t2.read()
                 secmatch = 0
-                ##todo: add the necessary metadata to redis
                 ## check if we can use sections
                 for i in range(1, len(t2.sections)+1):
                     si, fi = t2.sections[i-1]
@@ -713,11 +712,11 @@ function with access to a database."""
                         si, fi = t2.sections[i-1]
                         start = si
                         try:
-                            end = self.sections[i][0]
+                            end = t2.sections[i][0]
                         except:
-                            end = len(self.seq)
+                            end = len(t2.seq)
                         s.set_seq1(sseq[fi])
-                        s.set_seq2([a[self.cpos] for a in self.seq[start:end]])
+                        s.set_seq2([a[t2.cpos] for a in t2.seq[start:end]])
                         self._processopcodes(s, t2, res, b.name, add_var_punctuation)
                 else:
                     s.set_seq2([a[self.cpos] for a in t2.seq])
