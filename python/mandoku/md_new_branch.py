@@ -11,6 +11,7 @@ import mandoku, os, git
 try:
     rep = git.Repo('.')
 except:
-    print "This program needs to be run within a Mandoku text directory und git control"
+    print "This program needs to be run within a Mandoku text directory under git control"
     exit
+
     
