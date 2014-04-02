@@ -655,7 +655,7 @@ function with access to a database."""
                             try:
                                 res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[i1-1:i1][self.cpos]), "".join("".join(["".join(a) for a in t2.seq[j1:j2]])))
                             except(IndexError):
-                                print "indexerror", k, i1, i2, j1, j2, s.a[0:10], s.b[0:10] 
+                                print "indexerror", k, i1, i2, j1, j2, "a", u"".join(s.a[0:10]), "b", u"".join(s.b[0:10] )
                                 print res
                                 continue
                                 #sys.exit()
