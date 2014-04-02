@@ -76,6 +76,8 @@ class MandokuText(object):
         #a note for example is registered as follows: self.markup['note']
         self.markup = collections.defaultdict(SparseDict)
         #this allows me to lookup by character position
+        # the number of pb in the input file.
+        self.pbcnt = 0
         self.pages = SparseDict()
         #page per sections
         self.pps = {}
@@ -365,6 +367,7 @@ function with access to a database."""
                 line, extra = line.split('\t', 1)
             except:
                 extra = ''
+            self.pbcnt += len(re.findall(ur"<pb:", line))
             if line.startswith('*') and not(self.starlines):
                 ## we add the line always to the last string of the last tuple
                 self.seq[-1] = (self.seq[-1][:-1] + (self.seq[-1][-1] + line,))
