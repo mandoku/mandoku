@@ -615,7 +615,7 @@ function with access to a database."""
                         dxn += 1
                     self.printNgram(outseq, fx, j - s)
 
-    def _processopcodes(self, s, t2, res, bname, add_var_punctuation):
+    def _processopcodes(self, s, t2, s1start, s2start, res, bname, add_var_punctuation):
                 d=0
                 for tag, i1, i2, j1, j2 in s.get_opcodes():
                     ##first we look for pagebreaks, we need only those with a different version
@@ -717,10 +717,10 @@ function with access to a database."""
                             end = len(t2.seq)
                         s.set_seq1(sseq[fi])
                         s.set_seq2([a[t2.cpos] for a in t2.seq[start:end]])
-                        self._processopcodes(s, t2, res, b.name, add_var_punctuation)
+                        self._processopcodes(s, t2, res, s1start, start, b.name, add_var_punctuation)
                 else:
                     s.set_seq2([a[self.cpos] for a in t2.seq])
-                    self._processopcodes(s, t2, res, b.name, add_var_punctuation)
+                    self._processopcodes(s, t2, res, 1, 1,  b.name, add_var_punctuation)
         for b in repo.heads:
             if b.name == self.version:
                 b.checkout()
