@@ -650,10 +650,10 @@ function with access to a database."""
                         k = i1-1+d
                         if add_var_punctuation:
                             #here we just grab the original e, munge it together and slab it onto the rest
-                            res[s1start+k] =  "%s%s%s" % (res.get(s1start+k, ''), "".join(self.seq[s1start+i1-1:s1start+i1][self.cpos]), "".join("".join(["".join(a) for a in t2.seq[s2start+j1:s2start+j2]])))
+                            res[s1start+k] =  "%s%s%s" % (res.get(s1start+k, ''), "".join(self.seq[s1start+i1-1:s1start+i1][self.cpos]), "".join("".join(["".join(a[t2.cpos]) for a in t2.seq[s2start+j1:s2start+j2]])))
                         else:
                             try:
-                                res[s1start+k] =  u"%s%s%s" % (res.get(s1start+k, ''), u"".join([a[self.cpos] for a in self.seq[s1start+i1-1:s1start+i1]]), u"".join(u"".join(["".join(a) for a in t2.seq[s2start+j1:s2start+j2]])))
+                                res[s1start+k] =  u"%s%s%s" % (res.get(s1start+k, ''), u"".join([a[self.cpos] for a in self.seq[s1start+i1-1:s1start+i1]]), u"".join(u"".join(["".join(a[t2.cpos]) for a in t2.seq[s2start+j1:s2start+j2]])))
                             except(IndexError):
                                 print "indexerror", k, i1, i2, j1, j2, "a", u"".join(s.a[0:10]), "b", u"".join(s.b[0:10] )
                                 print res
