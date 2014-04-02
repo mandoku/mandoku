@@ -70,6 +70,7 @@ class MandokuText(object):
         except:
             pass
         self.in_note = False
+        self.in_zhu = False
         self.flags = {}
         self.sections = []
         #a dictionary of sparsedicts:
@@ -374,6 +375,18 @@ function with access to a database."""
             if line.startswith('*') and not(self.starlines):
                 ## we add the line always to the last string of the last tuple
                 self.seq[-1] = (self.seq[-1][:-1] + (self.seq[-1][-1] + line,))
+            ## parse the zhu annotations
+            elif line.startswith(u':zhu:'):
+                self.in_zhu = True
+                zhu_buf = line
+                continue
+            elif line.startswith(u':END:') and self.in_zhu:
+                self.in_zhu = False
+                zhu_buf += line
+                self.seq[-1] = (self.seq[-1][:-1] + (self.seq[-1][-1] + zhu_buf,))
+            elif self.in_zhu:
+                zhu_buf += line
+                continue
             elif line.startswith(u'<pb:') and len(self.seq) == 1:
                 #this is a pb before the text starts, add to the first element
                 #self.seq[-1] = (self.seq[-1][:-1] + (self.seq[-1][-1] + line,))
