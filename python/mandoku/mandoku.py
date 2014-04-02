@@ -655,7 +655,7 @@ function with access to a database."""
                             try:
                                 res[k] =  "%s%s%s" % (res.get(k, ''), "".join(self.seq[i1-1:i1][self.cpos]), "".join("".join(["".join(a) for a in t2.seq[j1:j2]])))
                             except(IndexError):
-                                print "indexerror", k, i1, i2, j1, j2
+                                print "indexerror", k, i1, i2, j1, j2, s.a[0:10], s.b[0:10] 
                                 print res
                                 continue
                                 #sys.exit()
@@ -677,6 +677,8 @@ function with access to a database."""
         self.refs=[]
         self.branches={}
         self.txtid = self.textpath.split('/')[-1]
+        #just in case
+        s.set_seq1([a[self.cpos] for a in self.seq])
         #if possible, use sections for comparison!
         sseq = {}
         for i in range(1, len(self.sections)+1):
@@ -687,7 +689,6 @@ function with access to a database."""
             except:
                 end = len(self.seq)
             sseq[fi] = [a[self.cpos] for a in self.seq[start:end]]
-        s.set_seq1([a[self.cpos] for a in self.seq])
         for b in repo.heads:
             if b.name != self.version:
                 print b.name

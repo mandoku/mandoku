@@ -34,6 +34,8 @@ def prepare(textpath=".", src="master", n=3):
     br = r.keys()
     pp = f1.pages.keys()
     currentpage = ""
+    l = []
+    ll = 1
     for i in range(1, len(f1.sections)+1):
         s, f = f1.sections[i-1]
         of = codecs.open(wp + '/varlist/' + f, 'w', 'utf-8')
