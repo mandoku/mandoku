@@ -10,10 +10,10 @@ tab={'a':'1', 'b':'2', 'c':'3', 'd': '4', 'e': '5', 'f': '6', 'g':'7', 'h':'8', 
 idx={}
 def PrintToIdxfile(outdir, string, collection):
     try:
-        code = ("%4.4x"%(ord(string[0])))
+        code = (u"%4.4x"%(ord(string[0])))
     except:
-        code = "gj"
-    if (not code.startswith('30') and  "()/¶*".find(string[0]) == -1 ):
+        code = u"gj"
+    if (not code.startswith('30') and  u"()/¶*".find(string[0]) == -1 ):
         try:
             os.mkdir("%s/%s"%(outdir, code[0:2]))
         except:
@@ -142,7 +142,7 @@ def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2
                 vol = defs['page'][0:2]
             for a in ch_re.split(line[:-1]):
                 if len(a) > 0:
-                    if a == '¶':
+                    if a == u'¶':
                         defs['line'] +=  1
                         defs['char'] = 0
                     else:
