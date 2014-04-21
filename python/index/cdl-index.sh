@@ -1,6 +1,6 @@
 #!/bin/sh
 mandokudir=`dirname $0`
-idxdir=$mandokudir/index
+idxdir=/Users/Shared/md-remote/index
 mkdir -p $idxdir
 coll=krp
 src=/Users/Shared/md-remote/text/
