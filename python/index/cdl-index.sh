@@ -3,9 +3,9 @@ mandokudir=`dirname $0`
 idxdir=$mandokudir/index
 mkdir -p $idxdir
 coll=krp
-src=~/md/text/ZB6q/
+src=/Users/Shared/md-remote/text/
 cd $src
-for subcoll in ZB6q
+for subcoll in ZB5a ZB5b ZB5c ZB5d ZB5e ZB5f ZB5g ZB5h
 do
     cd $subcoll
     rm index.log
