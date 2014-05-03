@@ -47,7 +47,7 @@
 
 (defvar mandoku-kanji-regex "\\([㐀-鿿𠀀-𪛟]+\\)")
 
-(defvar mandoku-regex "<[^>]*>\\|[　-㄀＀-￯\n¶]+\\|\t[^\n]+\n")
+(defvar mandoku-regex "<[^>]*>\\|[　-㏿＀-￯\n¶]+\\|\t[^\n]+\n")
 
 ;; Add this since it appears to miss in emacs-2x
 (or (fboundp 'replace-in-string)
