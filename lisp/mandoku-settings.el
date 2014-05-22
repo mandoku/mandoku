@@ -2,7 +2,7 @@
 
 (require 'mandoku)
 (require 'mandoku-remote)
-(require 'org-mandoku)
+;(require 'org-mandoku)
 (require 'mandoku-dict)
 (setq org-return-follows-link t)
 (setq mandoku-do-remote t)
