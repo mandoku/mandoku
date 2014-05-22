@@ -232,6 +232,24 @@ One character is either a character or one entity expression"
 	  (forward-char (- (match-end 0) (match-beginning 0)))))
 ))
 
+(defun mandoku-backward-one-char ()
+	"this function moves backward one character, ignoring punctuation and markup
+One character is either a character or one entity expression"
+	(interactive)
+	(ignore-errors
+	(save-match-data
+	(if (looking-at "&[^;]*;")
+	    (backward-char (- (match-end 0) (match-beginning 0)))
+	  (backward-char 1)
+	)
+	;; this skips over newlines, punctuation and markup.
+	;; Need to expand punctuation regex [2001-03-15T12:30:09+0800]
+	;; this should now skip over most ideogrph punct
+	(while (looking-at mandoku-regex)
+	  (backward-char (- (match-end 0) (match-beginning 0)))))
+))
+
+
 (defun mandoku-forward-n-characters (num)
 	(while (> num 0)
 		(setq num (- num 1))
@@ -674,13 +692,10 @@ One character is either a character or one entity expression"
   (save-excursion
     (let ((p (or pnt (point)))
 	  charcount 0)
-      (while (looking-at mandoku-regex)
-	  (backward-char (- (match-end 0) (match-beginning 0)))))
-      (while (and
-	      (< (point) p )
-	      (re-search-ward "¶" (point-max) t))
-	(setq line (+ line 1)))
-      
+      (while (and (< charcount 50 )
+		  (not (looking-at "¶" )))
+	(mandoku-backward-one-char)
+	(setq charcount (+ charcount 1)))
 )))
 
 ;; image handling
