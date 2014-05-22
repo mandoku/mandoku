@@ -53,8 +53,9 @@ LINK will consist of a <textid> recognized by mandoku."
   (when (eq major-mode 'mandoku-view-mode)
   ;; this is a mandoku file, make link
     (save-excursion
-      (let* ((coll (mandoku-get-coll (buffer-file-name)))
-	     (location (mandoku-position-at-point))
+      (let* ((fn (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))))
+	     (textid (car (split-string fn "_")))
+	     (location (mandoku-position-at-point-internal))
 	     (link (concat "mandoku:" coll ":" location))
 	     (description (mandoku-cit-format  location)))
 	(org-store-link-props
