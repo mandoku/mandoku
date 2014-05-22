@@ -69,7 +69,7 @@ LINK will consist of a <textid> recognized by mandoku."
 	 :type "mandoku"
 	 :link link
 	 :textid textid
-	 :edition 
+	 :edition br
 	 :description description)))))
 
 
