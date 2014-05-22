@@ -669,6 +669,20 @@ One character is either a character or one entity expression"
 	    (list textid ed page line)))
 	(list " -- " " -- " " -- " 0))
       )))
+
+(defun mandoku-charcount-at-point-internal (&optional pnt)
+  (save-excursion
+    (let ((p (or pnt (point)))
+	  charcount 0)
+      (while (looking-at mandoku-regex)
+	  (backward-char (- (match-end 0) (match-beginning 0)))))
+      (while (and
+	      (< (point) p )
+	      (re-search-ward "¶" (point-max) t))
+	(setq line (+ line 1)))
+      
+)))
+
 ;; image handling
 
 (defun mandoku-open-image-at-page (arg)
