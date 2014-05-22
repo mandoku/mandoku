@@ -689,13 +689,18 @@ One character is either a character or one entity expression"
       )))
 
 (defun mandoku-charcount-at-point-internal (&optional pnt)
+"return the number of characters on this line up to and including
+the character at point, ignoring non-Kanji characters"
   (save-excursion
-    (let ((p (or pnt (point)))
-	  charcount 0)
+    (let* ((p (or pnt (point)))
+	  (begol (save-excursion (goto-char p) (search-backward "¶")))
+	  (charcount 0))
+      (goto-char begol)
       (while (and (< charcount 50 )
-		  (not (looking-at "¶" )))
-	(mandoku-backward-one-char)
+		  (< (point) p ))
+	(mandoku-forward-one-char)
 	(setq charcount (+ charcount 1)))
+      charcount
 )))
 
 ;; image handling
