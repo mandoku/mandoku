@@ -48,7 +48,7 @@ LINK will consist of a <textid> recognized by mandoku."
 
 
 
-(defun mandoku-link-store-link (&optional beg end)
+(defun mandoku-link-store-link ()
   "if we are in mandoku-view-mode, or visiting a mandoku file, then store link"
   (when (eq major-mode 'mandoku-view-mode)
   ;; this is a mandoku file, make link
@@ -57,7 +57,13 @@ LINK will consist of a <textid> recognized by mandoku."
 	     (location (car (cdr (cdr (mandoku-position-at-point-internal)))))
 	     (charpos (mandoku-charcount-at-point-internal))
 	     (textid (car (split-string fn "_")))
+	     (title (mandoku-get-title))
+	     (juan (mandoku-get-juan))
+	     (br (mapcar 'mandoku-chomp (mandoku-get-branches)))
+	     (outline (mapconcat 'identity (mandoku-get-outline-path) " / "))
 	     (link (concat "mandoku:" fn ":"  location))
+	     (region (if (org-region-active-p)
+		     (buffer-substring (region-beginning) (region-end))))
 	     (description (mandoku-cit-format  location)))
 	(org-store-link-props
 	 :type "mandoku"
