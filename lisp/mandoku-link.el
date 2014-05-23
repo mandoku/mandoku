@@ -73,7 +73,10 @@ LINK will consist of a <textid> recognized by mandoku."
 	 :description description)))))
 
 
-
+(defun mandoku-insert-link ()
+  "insert the most recent link"
+  
+)
 
 (provide 'mandoku-link)
 
