@@ -58,8 +58,8 @@ LINK will consist of a <textid> recognized by mandoku."
   ;; this is a mandoku file, make link
     (save-excursion
       (let* ((fn (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))))
-	     (location (car (cdr (cdr (mandoku-position-at-point-internal)))))
-	     (charpos (mandoku-charcount-at-point-internal))
+	     (location (car (cdr (cdr (mandoku-position-at-point-internal (mandoku-start) )))))
+	     (charpos (mandoku-charcount-at-point-internal (mandoku-start)))
 	     (textid (car (split-string fn "_")))
 	     (title (mandoku-get-title))
 	     (juan (mandoku-get-juan))
@@ -71,12 +71,17 @@ LINK will consist of a <textid> recognized by mandoku."
 	     (description (mandoku-cit-format  location)))
 	(org-store-link-props
 	 :type "mandoku"
+	 :filename fn
 	 :link link
 	 :textid textid
 	 :edition br
+	 :start (concat location "-" (format "%2.2d"  charpos))
 	 :region region
 	 :title title
-	 :description description)))))
+	 :description description)
+	(if (region)
+	    (concat 
+	))))
 
 
 (defun mandoku-insert-link (&optional plink)
