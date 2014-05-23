@@ -1509,6 +1509,19 @@ Letters do not insert themselves; instead, they are commands.
 	  (res (shell-command-to-string (concat git " branch"))) )
     (split-string res "\n")))
 
+(defun mandoku-get-current-branch ()
+  (let ( (git       (or (executable-find "git")
+			(error "Unable to find `git'"))))
+	  
+    (with-temp-buffer 
+      (if (not (zerop (call-process git nil t nil 
+				   "--no-pager"  "symbolic-ref" "-q" "HEAD")))
+        (error "git error: %s " (buffer-string))
+      (goto-char (point-min))
+      (if (looking-at "^refs/heads/")
+          (buffer-substring 12 (1- (point-max)))))))
+)
+
 ;; routines to work with settings when loading settings.org
 ;;[2014-01-07T11:21:05+0900]
 
@@ -1535,6 +1548,11 @@ Letters do not insert themselves; instead, they are commands.
 
 
 ;; misc helper functions
+
+(defun mandoku-remove-markup (str)
+  "removes the special characters used by mandoku from the string"
+  (replace-regexp-in-string "\\(?:<[^>]*>\\)?¶?" ""
+    (replace-regexp-in-string "\\(\t.*\\)?\n" "" str)))
 
 (defun mandoku-split-string (str)
   "Given a string of the form \"str1::str2\", return a list of

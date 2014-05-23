@@ -63,7 +63,7 @@ LINK will consist of a <textid> recognized by mandoku."
 	     (textid (car (split-string fn "_")))
 	     (title (mandoku-get-title))
 	     (juan (mandoku-get-juan))
-	     (br (mapcar 'mandoku-chomp (mandoku-get-branches)))
+	     (br (mandoku-get-current-branch))
 	     (outline (mapconcat 'identity (mandoku-get-outline-path) " / "))
 	     (link (concat "mandoku:" fn ":"  location))
 	     (region (if (org-region-active-p)
@@ -88,7 +88,7 @@ LINK will consist of a <textid> recognized by mandoku."
 	 (edition (plist-get link :edition))
 	 (title (plist-get link :title))
 	 )
-    (insert (concat "** " title "\n:PROPERTIES:\n:edition: " edition "\n:END:\n\n" region )))
+    (insert (concat "** " title "\n:PROPERTIES:\n:edition: " edition "\n:END:\n\n" (mandoku-remove-markup region ))))
 	 
 )
 
