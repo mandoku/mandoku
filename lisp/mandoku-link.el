@@ -6,6 +6,10 @@
 (org-add-link-type "mandoku" 'mandoku-link-open)
 (add-hook 'org-store-link-functions 'mandoku-link-store-link)
 
+(defvar mandoku-store-link-plist nil
+  "Plist with info about the most recent link created with `mandoku-store-link'.")
+
+
 (defun mandoku-link-open (link)
   "Open the text (and optionally go to indicated  position) in LINK.
 LINK will consist of a <textid> recognized by mandoku."
@@ -73,9 +77,12 @@ LINK will consist of a <textid> recognized by mandoku."
 	 :description description)))))
 
 
-(defun mandoku-insert-link ()
+(defun mandoku-insert-link (&optional plink)
   "insert the most recent link"
-  
+  (let* ((link (or plink
+		   mandoku-store-link-plist
+		   org-store-link-plist))
+	 
 )
 
 (provide 'mandoku-link)
