@@ -1538,7 +1538,7 @@ Letters do not insert themselves; instead, they are commands.
 
 (defun mandoku-split-string (str)
   "Given a string of the form \"str1::str2\", return a list of
-  two substrings \'(\"str1\" \"str2\"). If no ::, then return empty string. If there are several ::, signal error"
+  two substrings \'(\"str1\" \"str2\"). If no ::, then return empty string. If there are several ::, signal error."
   (let ((strlist (split-string str "::")))
     (cond ((= 1 (length strlist))
            (list (car strlist) ""))
@@ -1547,12 +1547,12 @@ Letters do not insert themselves; instead, they are commands.
           (t (error "mandoku-split-string: only one :: allowed: %s" str)))))
 
 
- (defun mandoku-chomp (str)
-   "Chomp leading and tailing whitespace from STR."
-   (replace-regexp-in-string (rx (or (: bos (* (any " \t\n")))
-				     (: (* (any " \t\n")) eos)))
-			     ""
-			     str))
+(defun mandoku-chomp (str)
+  "Chomp leading and tailing whitespace from STR."
+  (replace-regexp-in-string (rx (or (: bos (* (any " \t\n")))
+				    (: (* (any " \t\n")) eos)))
+			    ""
+			    str))
 
 
 (provide 'mandoku)
