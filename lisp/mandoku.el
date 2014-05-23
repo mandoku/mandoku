@@ -1549,6 +1549,12 @@ Letters do not insert themselves; instead, they are commands.
 
 ;; misc helper functions
 
+(defun mandoku-start ()
+  "return the start of region if a region is active, otherwise point"
+  (if (org-region-active-p)
+      (region-beginning)
+    (point)))
+
 (defun mandoku-remove-markup (str)
   "removes the special characters used by mandoku from the string"
   (replace-regexp-in-string "\\(?:<[^>]*>\\)?¶?" ""

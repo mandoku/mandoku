@@ -69,6 +69,12 @@ LINK will consist of a <textid> recognized by mandoku."
 	     (region (if (org-region-active-p)
 		     (buffer-substring (region-beginning) (region-end))))
 	     (description (mandoku-cit-format  location)))
+	(if (org-region-active-p)
+	    (org-store-link-props
+	     :end (concat 
+		   (car (cdr (cdr (mandoku-position-at-point-internal (region-end) )))) 
+		   "-" 
+		   (format "%2.2d" (mandoku-charcount-at-point-internal (mandoku-start))))))
 	(org-store-link-props
 	 :type "mandoku"
 	 :filename fn
@@ -79,8 +85,7 @@ LINK will consist of a <textid> recognized by mandoku."
 	 :region region
 	 :title title
 	 :description description)
-	(if (region)
-	    (concat 
+
 	))))
 
 
@@ -92,8 +97,12 @@ LINK will consist of a <textid> recognized by mandoku."
 	 (region (plist-get link :region))
 	 (edition (plist-get link :edition))
 	 (title (plist-get link :title))
+	 (start (plist-get link :start))
+	 (end (or (plist-get link :end) ""))
 	 )
-    (insert (concat "** " title "\n:PROPERTIES:\n:edition: " edition "\n:END:\n\n" (mandoku-remove-markup region ))))
+    (insert (concat "** " start " - " end  "\n:PROPERTIES:\n:edition: " edition "\n:END:\n\n" (mandoku-remove-markup region )
+		    "〔" title  ", " start "-" end  "〕"
+		    )))
 	 
 )
 
