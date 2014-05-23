@@ -74,6 +74,8 @@ LINK will consist of a <textid> recognized by mandoku."
 	 :link link
 	 :textid textid
 	 :edition br
+	 :region region
+	 :title title
 	 :description description)))))
 
 
@@ -82,6 +84,11 @@ LINK will consist of a <textid> recognized by mandoku."
   (let* ((link (or plink
 		   mandoku-store-link-plist
 		   org-store-link-plist))
+	 (region (plist-get link :region))
+	 (edition (plist-get link :edition))
+	 (title (plist-get link :title))
+	 )
+    (insert (concat "** " title "\n:PROPERTIES:\n:edition: " edition "\n:END:\n\n" region )))
 	 
 )
 
