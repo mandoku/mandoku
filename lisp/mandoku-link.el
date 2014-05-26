@@ -90,6 +90,8 @@ LINK will consist of a <textid> recognized by mandoku."
 
 (defun mandoku-insert-link (&optional plink)
   "insert the link"
+  (let* ((f  (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))
+	(linklist (or il (concat (substring (file-name-directory (buffer-file-name)) 0 -1) ".wiki/notes/" f ".txt"))))
   
 )  
 (defun mandoku-link-insert-link (&optional plink)
