@@ -114,7 +114,7 @@ LINK will consist of a <textid> recognized by mandoku."
 	 )
     (insert (concat "** " start " - " end  " " title "\n:PROPERTIES:\n:edition: " edition "\n:END:\n\n"
 		    (mandoku-remove-markup region )
-		    "〔" title  ", [[mandoku:krp:" textid  ":" start  "]["  start  "]]〕\n"
+		    "〔" title  ", [[mandoku:krp:" textid  ":" (substring start 0 -3)  "]["  start  "]]〕\n"
 		    )))
 	 
 )
