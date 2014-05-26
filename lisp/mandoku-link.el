@@ -73,9 +73,9 @@ LINK will consist of a <textid> recognized by mandoku."
 	(if (org-region-active-p)
 	    (org-store-link-props
 	     :end (concat 
-		   (car (cdr (cdr (mandoku-position-at-point-internal (region-end) )))) 
-		   "-" 
-		   (format "%2.2d" (mandoku-charcount-at-point-internal (mandoku-start))))))
+		   (car (cdr (cdr (mandoku-position-at-point-internal (region-end) ))))) 
+;		   "-" 
+;		   (format "%2.2d" (mandoku-charcount-at-point-internal (mandoku-start))))))
 	(org-store-link-props
 	 :type "mandoku"
 	 :filename fn
@@ -92,12 +92,12 @@ LINK will consist of a <textid> recognized by mandoku."
 (defun mandoku-insert-link (&optional notes plink )
   "insert the link"
   (interactive)
-  (let* ((f  (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))
-	(linklist (or notes (concat (substring (file-name-directory (buffer-file-name)) 0 -1) ".wiki/notes/" f ".txt"))))
-    (with-current-buffer (find-file linklist)
-      (goto-char (point-max))
+;  (let* ((f  (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))
+;	(linklist (or notes (concat (substring (file-name-directory (buffer-file-name)) 0 -1) ".wiki/notes/" f ".txt"))))
+;;    (with-current-buffer (find-file linklist)
+;;      (goto-char (point-max))
       (mandoku-link-insert-link)
-)))  
+)  
 
 (defun mandoku-link-insert-link (&optional plink)
   "insert the most recent link"
