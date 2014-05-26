@@ -67,15 +67,15 @@ LINK will consist of a <textid> recognized by mandoku."
 	     (br (mandoku-get-current-branch))
 	     (outline (mapconcat 'identity (mandoku-get-outline-path) " / "))
 	     (link (concat "mandoku:" fn ":" loc-format))
+	     (end
+	      (if (org-region-active-p)
+		  (let* ((lc (cdr (cdr (mandoku-position-at-point-internal (region-end) ))))
+			 (lf (concat (car lc) (format "%2.2d" (car (cdr lc))))))
+		    (concat lf "-" 
+			    (format "%2.2d" (mandoku-charcount-at-point-internal (region-end)))))))
 	     (region (if (org-region-active-p)
 		     (buffer-substring (region-beginning) (region-end))))
 	     (description  loc-format))
-	(if (org-region-active-p)
-	    (org-store-link-props
-	     :end (concat 
-		   (car (cdr (cdr (mandoku-position-at-point-internal (region-end) ))))) 
-;		   "-" 
-;		   (format "%2.2d" (mandoku-charcount-at-point-internal (mandoku-start))))))
 	(org-store-link-props
 	 :type "mandoku"
 	 :filename fn
@@ -83,6 +83,7 @@ LINK will consist of a <textid> recognized by mandoku."
 	 :textid textid
 	 :edition br
 	 :start (concat loc-format "-" (format "%2.2d"  charpos))
+	 :end end
 	 :region region
 	 :title title
 	 :description description)
@@ -112,7 +113,7 @@ LINK will consist of a <textid> recognized by mandoku."
 	 )
     (insert (concat "** " start " - " end  "\n:PROPERTIES:\n:edition: " edition "\n:END:\n\n"
 		    (mandoku-remove-markup region )
-		    "〔" title  ", " start "-" end  "〕"
+		    "〔" title  ", " start  "〕\n"
 		    )))
 	 
 )
