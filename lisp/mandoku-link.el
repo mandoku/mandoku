@@ -88,12 +88,16 @@ LINK will consist of a <textid> recognized by mandoku."
 
 	))))
 
-(defun mandoku-insert-link (&optional plink)
+(defun mandoku-insert-link (&optional notes plink )
   "insert the link"
+  (interactive)
   (let* ((f  (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))
-	(linklist (or il (concat (substring (file-name-directory (buffer-file-name)) 0 -1) ".wiki/notes/" f ".txt"))))
-  
-)  
+	(linklist (or notes (concat (substring (file-name-directory (buffer-file-name)) 0 -1) ".wiki/notes/" f ".txt"))))
+    (with-current-buffer (find-file linklist)
+      (goto-char (point-max))
+      (mandoku-link-insert-link)
+)))  
+
 (defun mandoku-link-insert-link (&optional plink)
   "insert the most recent link"
   (let* ((link (or plink
