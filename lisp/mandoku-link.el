@@ -65,7 +65,7 @@ LINK will consist of a <textid> recognized by mandoku."
 	     (juan (mandoku-get-juan))
 	     (br (mandoku-get-current-branch))
 	     (outline (mapconcat 'identity (mandoku-get-outline-path) " / "))
-	     (link (concat "mandoku:" fn ":" (car location) (cdr location)))
+	     (link (concat "mandoku:" fn ":" (car location) (format "%2.2d" (car (cdr location)))))
 	     (region (if (org-region-active-p)
 		     (buffer-substring (region-beginning) (region-end))))
 	     (description (mandoku-cit-format )))
@@ -88,8 +88,11 @@ LINK will consist of a <textid> recognized by mandoku."
 
 	))))
 
-
 (defun mandoku-insert-link (&optional plink)
+  "insert the link"
+  
+)  
+(defun mandoku-link-insert-link (&optional plink)
   "insert the most recent link"
   (let* ((link (or plink
 		   mandoku-store-link-plist
