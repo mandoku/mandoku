@@ -107,13 +107,14 @@ LINK will consist of a <textid> recognized by mandoku."
 		   org-store-link-plist))
 	 (region (plist-get link :region))
 	 (edition (plist-get link :edition))
+	 (textid (plist-get link :textid))
 	 (title (plist-get link :title))
 	 (start (plist-get link :start))
 	 (end (or (plist-get link :end) ""))
 	 )
-    (insert (concat "** " start " - " end  "\n:PROPERTIES:\n:edition: " edition "\n:END:\n\n"
+    (insert (concat "** " start " - " end  " " title "\n:PROPERTIES:\n:edition: " edition "\n:END:\n\n"
 		    (mandoku-remove-markup region )
-		    "〔" title  ", " start  "〕\n"
+		    "〔" title  ", [[mandoku:krp:" textid  ":" start  "]["  start  "]]〕\n"
 		    )))
 	 
 )
