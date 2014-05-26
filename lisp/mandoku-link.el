@@ -110,7 +110,8 @@ LINK will consist of a <textid> recognized by mandoku."
 	 (start (plist-get link :start))
 	 (end (or (plist-get link :end) ""))
 	 )
-    (insert (concat "** " start " - " end  "\n:PROPERTIES:\n:edition: " edition "\n:END:\n\n" (mandoku-remove-markup region )
+    (insert (concat "** " start " - " end  "\n:PROPERTIES:\n:edition: " edition "\n:END:\n\n"
+		    (mandoku-remove-markup region )
 		    "〔" title  ", " start "-" end  "〕"
 		    )))
 	 
