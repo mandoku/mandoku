@@ -1516,11 +1516,14 @@ Letters do not insert themselves; instead, they are commands.
     (with-temp-buffer 
       (if (not (zerop (call-process git nil t nil 
 				   "--no-pager"  "symbolic-ref" "-q" "HEAD")))
-        (error "git error: %s " (buffer-string))
-      (goto-char (point-min))
-      (if (looking-at "^refs/heads/")
-          (buffer-substring 12 (1- (point-max)))))))
-)
+	  "edition not known"
+	(progn
+; TODO: better solution for non-git files
+;        (error "git error: %s " (buffer-string))
+	  (goto-char (point-min))
+	  (if (looking-at "^refs/heads/")
+	      (buffer-substring 12 (1- (point-max)))))))
+))
 
 ;; routines to work with settings when loading settings.org
 ;;[2014-01-07T11:21:05+0900]
