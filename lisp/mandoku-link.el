@@ -113,7 +113,7 @@ LINK will consist of a <textid> recognized by mandoku."
 	 (end (or (plist-get link :end) ""))
 	 )
     (insert (concat "** " start " - " end  " " title "\n:PROPERTIES:\n:edition: " edition
-		    "\n:date: " (format-time-string "[%Y-%m-%dT%T%z]" (current-time))
+		    "\n:date: " (format-time-string "%Y-%m-%dT%T%z" (current-time))
 		    "\n:END:\n\n"
 		    (mandoku-remove-markup region )
 		    "〔" title  ", [[mandoku:krp:" textid  ":" (substring start 0 -3)  "]["  start  "]]〕\n"
