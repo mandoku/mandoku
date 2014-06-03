@@ -50,7 +50,7 @@
 (defvar mandoku-regex "<[^>]*>\\|[　-㏿＀-￯\n¶]+\\|\t[^\n]+\n")
 
 ;;[2014-06-03T14:31:46+0900] better handling of git
-(defcustom mandoku-git-program "git"
+(defcustom mandoku-git-program (executable-find "git")
   "Name of the git executable used by mandoku."
   :type '(string)
   :group 'mandoku)
