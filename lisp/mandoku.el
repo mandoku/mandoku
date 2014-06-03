@@ -1446,7 +1446,7 @@ Letters do not insert themselves; instead, they are commands.
 	 (targetdir (concat mandoku-text-dir groupid "/")))
     (mkdir targetdir t)
     (mandoku-clone (concat targetdir txtid)  txturl)
-    (mandoku-clone (concat targetdir txtid ".wiki")  wikiurl)
+;    (mandoku-clone (concat targetdir txtid ".wiki")  wikiurl)
     (kill-buffer buf)
     (find-file (concat targetdir txtid "/" fn ".txt")))
 )
