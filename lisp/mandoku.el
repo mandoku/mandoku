@@ -49,6 +49,13 @@
 
 (defvar mandoku-regex "<[^>]*>\\|[　-㏿＀-￯\n¶]+\\|\t[^\n]+\n")
 
+;;[2014-06-03T14:31:46+0900] better handling of git
+(defcustom mandoku-git-program "git"
+  "Name of the git executable used by mandoku."
+  :type '(string)
+  :group 'mandoku)
+
+
 ;; Add this since it appears to miss in emacs-2x
 (or (fboundp 'replace-in-string)
     (defun replace-in-string (target old new)
