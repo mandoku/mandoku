@@ -1087,8 +1087,9 @@ eds
 ;  (save-excursion
   (let* ((term (replace-regexp-in-string "\\(?:<[^>]*>\\)?¶?" ""
 					(buffer-substring-no-properties beg end) ))
-	 (pinyin (or skip-pinyin 
-		     (concat " [" (chw-text-get-pinyin term) "] ")))
+	 (pinyin (if skip-pinyin 
+		     ""
+		   (concat " [" (chw-text-get-pinyin term) "] ")))
 	 )
     (forward-line)
     (beginning-of-line)
@@ -1098,15 +1099,14 @@ eds
 	  (re-search-forward ":END:")
 	  (beginning-of-line)
 	  (insert term 
-		  (if pinyin pinyin "")
+		  pinyin
 		  "\n" )
 	  (previous-line))
       (progn
 	(insert ":zhu:\n \n:END:\n")
 	(previous-line 2)
 	(beginning-of-line)
-	(insert term 
-		  (if pinyin pinyin ""))))
+	(insert term pinyin)))
 
     (beginning-of-line)
     (deactivate-mark)
