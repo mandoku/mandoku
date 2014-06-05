@@ -989,15 +989,18 @@ eds
 (defun mandoku-move-templink-to-next-line ()
   "moves links containing dates, names etc. to the following line"
   (interactive)
-  (let (m1 m2 m3)
+  (let (m1 m3 beg end)
     (while (re-search-forward org-bracket-link-regexp nil t)
       (if (match-end 3)
 	  (progn
 	    (setq m1 (buffer-substring-no-properties (match-beginning 1) (match-end 1)))
-	    (setq m0 (match-beginning 0))
+	    (setq beg (match-beginning 0))
 	    (setq m3 (buffer-substring-no-properties (match-beginning 3) (match-end 3)))
+	    (setq end (+ m0 (length m3)))
 	    (replace-match m3)
-	    (mandoku-annotate m0 (+ m0 (length m3)) nil)
+	    (mandoku-annotate beg end nil)
+	    
+	    (goto-char end)
 	    )))))  
 
 (defun mandoku-format-on-punc ( rep)
