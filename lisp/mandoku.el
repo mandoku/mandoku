@@ -986,6 +986,17 @@ eds
              (car pair) (cadr pair))
          (car pair))))
 
+(defun mandoku-move-templink-to-next-line ()
+  "moves links containing dates, names etc. to the following line"
+  (interactive)
+  (let (m1 m2 m3)
+    (while (re-search-forward org-bracket-link-regexp nil t)
+      (if (match-end 3)
+	  (progn
+	    (setq m1 (buffer-substring-no-properties (match-beginning 1) (match-end 1)))
+	    (setq m2 (buffer-substring-no-properties (match-beginning 2) (match-end 2)))
+	    (setq m3 (buffer-substring-no-properties (match-beginning 3) (match-end 3)))
+	    )))))  
 
 (defun mandoku-format-on-punc ( rep)
   "Formats the text from point to the end, splitting at punctuation and other splitting points."
