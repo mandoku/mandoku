@@ -993,7 +993,7 @@ eds
   (let ((curpos (point)))
     (while (search-forward "¶
 " nil t )
-      (replace-match ""))
+      (replace-match "¶"))
     (goto-char curpos)
   ;; first, lets handle the line-endings
   (save-match-data
@@ -1006,6 +1006,7 @@ eds
 	  (forward-line 1)
 	(forward-char 1))
       )))
+)
 
 (defun mandoku-pre-format-on-punc (rep)
   "hallo"
