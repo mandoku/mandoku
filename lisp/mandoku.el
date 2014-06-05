@@ -996,10 +996,11 @@ eds
 	    (setq m1 (buffer-substring-no-properties (match-beginning 1) (match-end 1)))
 	    (setq beg (match-beginning 0))
 	    (setq m3 (buffer-substring-no-properties (match-beginning 3) (match-end 3)))
-	    (setq end (+ m0 (length m3)))
+	    (setq end (+ beg (length m3)))
 	    (replace-match m3)
-	    (mandoku-annotate beg end nil)
-	    
+	    (mandoku-annotate beg end t)
+	    (end-of-line)
+	    (insert " " m1)
 	    (goto-char end)
 	    )))))  
 
@@ -1081,11 +1082,14 @@ eds
 "))
       (forward-paragraph 1)))))
 
-(defun mandoku-annotate (beg end)
+(defun mandoku-annotate (beg end &optional skip-pinyin)
   (interactive "r")
 ;  (save-excursion
-  (let ((term (replace-regexp-in-string "\\(?:<[^>]*>\\)?¶?" ""
-					(buffer-substring-no-properties beg end) )))
+  (let* ((term (replace-regexp-in-string "\\(?:<[^>]*>\\)?¶?" ""
+					(buffer-substring-no-properties beg end) ))
+	 (pinyin (or skip-pinyin 
+		     (concat " [" (chw-text-get-pinyin term) "] ")))
+	 )
     (forward-line)
     (beginning-of-line)
 
@@ -1093,13 +1097,16 @@ eds
 	(progn
 	  (re-search-forward ":END:")
 	  (beginning-of-line)
-	  (insert term " [" (chw-text-get-pinyin term) "] \n" )
+	  (insert term 
+		  (if pinyin pinyin "")
+		  "\n" )
 	  (previous-line))
       (progn
 	(insert ":zhu:\n \n:END:\n")
 	(previous-line 2)
 	(beginning-of-line)
-	(insert term " [" (chw-text-get-pinyin term) "]" )))
+	(insert term 
+		  (if pinyin pinyin ""))))
 
     (beginning-of-line)
     (deactivate-mark)
