@@ -990,6 +990,12 @@ eds
 (defun mandoku-format-on-punc ( rep)
   "Formats the text from point to the end, splitting at punctuation and other splitting points."
 ;  (interactive "s")
+  (let ((curpos (point)))
+    (while (search-forward "¶
+" nil t )
+      (replace-match ""))
+    (goto-char curpos)
+  ;; first, lets handle the line-endings
   (save-match-data
     (while (re-search-forward mandoku-punct-regex-post nil t)
       (if (or (looking-at "¶?[
