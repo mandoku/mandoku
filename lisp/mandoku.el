@@ -994,8 +994,9 @@ eds
       (if (match-end 3)
 	  (progn
 	    (setq m1 (buffer-substring-no-properties (match-beginning 1) (match-end 1)))
-	    (setq m2 (buffer-substring-no-properties (match-beginning 2) (match-end 2)))
+;	    (setq m2 (buffer-substring-no-properties (match-beginning 2) (match-end 2)))
 	    (setq m3 (buffer-substring-no-properties (match-beginning 3) (match-end 3)))
+	    (replace-match m3)
 	    )))))  
 
 (defun mandoku-format-on-punc ( rep)
