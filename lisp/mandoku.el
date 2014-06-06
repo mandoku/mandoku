@@ -667,9 +667,10 @@ One character is either a character or one entity expression"
 (defun mandoku-position-with-char-at-point (&optional pnt arg)
   "returns textid edition page line char"
   (let* ((p (or pnt (mandoku-start)))
-	 (pos (mandoku-position-at-point-internal p arg))
-	 (ch (mandoku-charcount-at-point-internal p)))
-    (cons pos ch)))
+	 (location (cdr (cdr (mandoku-position-at-point-internal p arg ))))
+	 (ch (mandoku-charcount-at-point-internal p))
+	 (loc-format (concat (car location) (format "%2.2d" (car (cdr location))))))
+    (concat loc-format "-" (format "%2.2d"  ch))))
 
 
 (defun mandoku-position-at-point-internal (&optional pnt arg)
