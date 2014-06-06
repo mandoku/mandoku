@@ -669,7 +669,7 @@ One character is either a character or one entity expression"
   (let* ((p (or pnt (mandoku-start)))
 	 (pos (mandoku-position-at-point-internal p arg))
 	 (ch (mandoku-charcount-at-point-internal p)))
-    (append pos ch)))
+    (cons pos ch)))
 
 
 (defun mandoku-position-at-point-internal (&optional pnt arg)
