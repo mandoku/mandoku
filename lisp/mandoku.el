@@ -21,6 +21,10 @@
 (defvar mandoku-md-menu)
 (defvar mandoku-catalog)
 (defvar mandoku-local-init-file "~/.emacs.d/mandoku-local-init.el")
+
+(defvar mandoku-location-plist nil
+  "Plist holds the most recent stored location with associated information.")
+
 ;; ** Textfilters
 ;; we have one default textfilter, which always exists and can be dynamically treated. 
 (defvar mandoku-default-textfilter (make-hash-table :test 'equal) )
