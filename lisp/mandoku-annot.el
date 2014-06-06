@@ -5,12 +5,17 @@
 
 (defvar mandoku-annot-dir (expand-file-name  (concat mandoku-base-dir "notes/")))
 
+(defvar mandoku-annot-regex "^\\([^ ]+\\) *\\([^:]+\\)::\\(.*?\\)$") 
 
-(defun mandoku-annot-scan ()
+(defun mandoku-annot-scan (&optional annot-dir)
 (interactive)
-(save-excursion 
-  (goto-char (point-min))
-  (while (re-search-forward "" nil t)
+(let (f1 type f3)
+  (save-excursion 
+    (goto-char (point-min))
+    (while (re-search-forward mandoku-annot-regex nil t)
+      (setq f1 (buffer-substring-no-properties (match-beginning 1) (match-end 1)))
+      (setq f2 (buffer-substring-no-properties (match-beginning 2) (match-end 2)))
+      
     
 
 
