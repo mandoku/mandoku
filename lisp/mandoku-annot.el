@@ -9,12 +9,13 @@
 
 (defun mandoku-annot-scan (&optional annot-dir)
 (interactive)
-(let (f1 type f3)
+(let (f1 type p)
   (save-excursion 
     (goto-char (point-min))
     (while (re-search-forward mandoku-annot-regex nil t)
       (setq f1 (buffer-substring-no-properties (match-beginning 1) (match-end 1)))
-      (setq f2 (buffer-substring-no-properties (match-beginning 2) (match-end 2)))
+      (setq type (buffer-substring-no-properties (match-beginning 2) (match-end 2)))
+      (setq p (mandoku-position-with-char  (search-backward f1)))
       
     
 

@@ -497,12 +497,14 @@ One character is either a character or one entity expression"
     (concat mandoku-meta-dir repid "/" (substring txtid 0 (+ (length repid) 1)) ".txt")))
 
 
-(defun mandoku-get-outline-path ()
+(defun mandoku-get-outline-path (&optional pnt)
   "this includes the first upward heading"
-  (if (org-before-first-heading-p)
-      (list "")
+  (let ((p (or pnt (mandoku-start)))
+	  olp)
     (save-excursion
-    (let ((olp ))
+      (goto-char p)
+      (if (org-before-first-heading-p)
+	  (list "")
 	  (outline-previous-visible-heading 1)
 	  (when (looking-at org-complex-heading-regexp)
 	    (push (org-trim
@@ -664,7 +666,7 @@ One character is either a character or one entity expression"
 	(format "%s %sp%s%2.2d" (nth 1 p) (if (mandoku-get-vol) (concat (mandoku-get-vol) ", ") "") (car (cdr (split-string (nth 2 p) "-"))) (nth 3 p))
       " -- ")
     ))
-(defun mandoku-position-with-char-at-point (&optional pnt arg)
+(defun mandoku-position-with-char (&optional pnt arg)
   "returns textid edition page line char"
   (let* ((p (or pnt (mandoku-start)))
 	 (location (cdr (cdr (mandoku-position-at-point-internal p arg ))))
