@@ -664,6 +664,13 @@ One character is either a character or one entity expression"
 	(format "%s %sp%s%2.2d" (nth 1 p) (if (mandoku-get-vol) (concat (mandoku-get-vol) ", ") "") (car (cdr (split-string (nth 2 p) "-"))) (nth 3 p))
       " -- ")
     ))
+(defun mandoku-position-with-char-at-point (&optional pnt arg)
+  "returns textid edition page line char"
+  (let* ((p (or pnt (mandoku-start)))
+	 (pos (mandoku-position-at-point-internal p arg))
+	 (ch (mandoku-charcount-at-point-internal p)))
+    (append pos ch)))
+
 
 (defun mandoku-position-at-point-internal (&optional pnt arg)
   "This will always give the position in the base edition"
