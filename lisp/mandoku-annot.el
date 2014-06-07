@@ -16,18 +16,22 @@
 
 (defun mandoku-annot-scan (&optional annot-dir)
   (interactive)
-  (let (f1 type p olp)
+  (let (type p olp)
     (save-excursion 
       (goto-char (point-min))
       (while (re-search-forward mandoku-annot-regex nil t)
 	(setq f1 (buffer-substring-no-properties (match-beginning 1) (match-end 1)))
-	(setq mandoku-location-plist :context f1)
+	(setq type (buffer-substring-no-properties (match-beginning 2) (match-end 2)))
+	(setq mandoku-location-plist nil )
 	(mandoku-location-put 
-	 :location (concat (mandoku-position-with-char  
-			    (search-backward f1))
+	 :context f1
+	 :location (concat (mandoku-position-with-char
+			    (save-excursion
+			      (goto-char (match-beginning 0))
+			      (search-backward f1)))
 			   "+" (number-to-string (length f1) ))
 	 :olp (mandoku-get-outline-path p)
-	 :type (buffer-substring-no-properties (match-beginning 2) (match-end 2)))
+	 :type type)
 	(mandoku-annot-insert)
 	))))      
     
