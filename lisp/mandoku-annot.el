@@ -37,7 +37,16 @@
     
 
 (defun mandoku-annot-insert ()
-  (let* ((annot-file (get-
+  (let* ((annot-file (concat mandoku-annot-dir  (plist-get mandoku-location-plist :type) ".txt"))
+	 (hd (plist-get mandoku-location-plist :region
+	 )
+    (with-current-buffer (find-file-noselect annot-file)
+      (org-mode)
+      (if (re-search-forward
+	   (format org-complex-heading-regexp-format (regexp-quote hd))
+	   nil t)
+      
+	 
 )
 
 (provide 'mandoku-annot)
