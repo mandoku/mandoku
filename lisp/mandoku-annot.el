@@ -16,14 +16,17 @@
 
 (defun mandoku-annot-scan (&optional annot-dir)
   (interactive)
-  (let (type p olp rest)
+  (let (type p olp rest f1 key)
     (save-excursion 
       (goto-char (point-min))
       (while (re-search-forward mandoku-annot-regex nil t)
 	(setq f1 (buffer-substring-no-properties (match-beginning 1) (match-end 1)))
 	(setq type (buffer-substring-no-properties (match-beginning 2) (match-end 2)))
-	(setq rest (buffer-substring-no-properties (+ 1 (match-beginning 3) (match-end 3)))
+	(setq rest (split-string (buffer-substring-no-properties (+ 1 (match-beginning 3)) (match-end 3)) "@"))
 	(setq mandoku-location-plist nil )
+	(dolist (r rest)
+	  (when (string-match "key" r) 
+	    (plist-put mandoku-location-plist :key (cadr (split-string r "="))))
 	(mandoku-location-put 
 	 :context f1
 	 :location (concat (mandoku-position-with-char
@@ -35,22 +38,27 @@
 	 :olp (mandoku-get-outline-path p)
 	 :type type)
 	(mandoku-annot-insert)
-	))))      
+	)))))      
     
 
 (defun mandoku-annot-insert ()
   (let* ((type (plist-get mandoku-location-plist :type))
 	 (annot-file (concat mandoku-annot-dir  type ".txt"))
 	 (hd (plist-get mandoku-location-plist :context))
-	 (rest (split-string (plist-get mandoku-location-plist :rest) "@"))
+	 (rest (plist-get mandoku-location-plist :rest))
+	 (key (plist-get mandoku-location-plist :key))
+	 (lf (or key hd))
 	 )
     (with-current-buffer (find-file-noselect annot-file)
       (org-mode)
       (if (re-search-forward
-	   (format org-complex-heading-regexp-format (regexp-quote hd))
+	   (format org-complex-heading-regexp-format (regexp-quote lf))
 	   nil t)
+	  (insert "** ")
+	(insert (concat "* " hd))
+
       
 	 
-)
+))))
 
 (provide 'mandoku-annot)
