@@ -16,25 +16,28 @@
 
 (defun mandoku-annot-scan (&optional annot-dir)
   (interactive)
-  (let (type p olp rest f1 key)
+  (let (type p olp start rest f1 key)
     (save-excursion 
       (goto-char (point-min))
       (while (re-search-forward mandoku-annot-regex nil t)
+	(setq key nil)
+	(setq start (match-beginning 0))
 	(setq f1 (buffer-substring-no-properties (match-beginning 1) (match-end 1)))
 	(setq type (buffer-substring-no-properties (match-beginning 2) (match-end 2)))
 	(setq rest (split-string (buffer-substring-no-properties (+ 1 (match-beginning 3)) (match-end 3)) "@"))
 	(setq mandoku-location-plist nil )
 	(dolist (r rest)
 	  (when (string-match "key" r) 
-	    (plist-put mandoku-location-plist :key (cadr (split-string r "="))))
+	    (setq key (cadr (split-string r "="))))
 	(mandoku-location-put 
 	 :context f1
 	 :location (concat (mandoku-position-with-char
 			    (save-excursion
-			      (goto-char (match-beginning 0))
+			      (goto-char start)
 			      (search-backward f1)))
 			   "+" (number-to-string (length f1) ))
 	 :rest rest
+	 :key key
 	 :olp (mandoku-get-outline-path p)
 	 :type type)
 	(mandoku-annot-insert)
@@ -49,7 +52,7 @@
 	 (key (plist-get mandoku-location-plist :key))
 	 (lf (or key hd))
 	 )
-    (with-current-buffer (find-file-noselect annot-file)
+    (with-current-buffer (find-file annot-file)
       (org-mode)
       (if (re-search-forward
 	   (format org-complex-heading-regexp-format (regexp-quote lf))
