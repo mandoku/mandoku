@@ -22,6 +22,7 @@
       (while (re-search-forward mandoku-annot-regex nil t)
 	(setq f1 (buffer-substring-no-properties (match-beginning 1) (match-end 1)))
 	(setq type (buffer-substring-no-properties (match-beginning 2) (match-end 2)))
+	(setq rest (buffer-substring-no-properties (match-beginning 3) (match-end 3)))
 	(setq mandoku-location-plist nil )
 	(mandoku-location-put 
 	 :context f1
@@ -38,7 +39,7 @@
 
 (defun mandoku-annot-insert ()
   (let* ((annot-file (concat mandoku-annot-dir  (plist-get mandoku-location-plist :type) ".txt"))
-	 (hd (plist-get mandoku-location-plist :region
+	 (hd (plist-get mandoku-location-plist :context
 	 )
     (with-current-buffer (find-file-noselect annot-file)
       (org-mode)
