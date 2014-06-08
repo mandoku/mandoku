@@ -54,14 +54,15 @@
 	 )
     (with-current-buffer (find-file annot-file)
       (org-mode)
-      (if (re-search-forward
+      (unless (re-search-forward
 	   (format org-complex-heading-regexp-format (regexp-quote lf))
 	   nil t)
-	  (insert "\n** ")
-	(insert (concat "\n* " hd "\n:PROPERTIES:\n))
+	(insert (concat "\n* " hd "\n:PROPERTIES:\n" 
+			(if key (concat ":ID: " key "\n" ) "")
+			":END:\n" )))
+      (next-line )
+      (insert (concat "\n** " (plist-get mandoku-location-plist :location) "\n")
 
-      
-	 
 ))))
 
 (provide 'mandoku-annot)
