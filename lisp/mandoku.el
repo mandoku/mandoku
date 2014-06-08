@@ -1014,7 +1014,7 @@ eds
 	    (replace-match m3)
 	    (mandoku-annotate beg end t)
 	    (end-of-line)
-	    (insert "" m1)
+	    (insert " " m1)
 	    (goto-char end)
 	    )))))  
 

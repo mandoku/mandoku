@@ -37,6 +37,7 @@
     
 
 (defun mandoku-annot-insert ()
+  (let* ((annot-file (get-
 )
 
 (provide 'mandoku-annot)
