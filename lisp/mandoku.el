@@ -1011,11 +1011,15 @@ eds
 	    (setq beg (match-beginning 0))
 	    (setq m3 (buffer-substring-no-properties (match-beginning 3) (match-end 3)))
 	    (setq end (+ beg (length m3)))
-	    (replace-match m3)
-	    (mandoku-annotate beg end t)
-	    (end-of-line)
-	    (insert " " m1)
-	    (goto-char end)
+	    (unless
+		(save-match-data 
+		  ;; TODO: process nested :zhu: here!
+		  (string-match ":zhu:\n\\(.*?\\)\n:END:\n" m3))
+	      (replace-match m3)
+	      (mandoku-annotate beg end t)
+	      (end-of-line)
+	      (insert " " m1)
+	      (goto-char end))
 	    )))))  
 
 (defun mandoku-format-on-punc ( rep)
