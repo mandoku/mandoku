@@ -57,8 +57,8 @@
       (if (re-search-forward
 	   (format org-complex-heading-regexp-format (regexp-quote lf))
 	   nil t)
-	  (insert "** ")
-	(insert (concat "* " hd))
+	  (insert "\n** ")
+	(insert (concat "\n* " hd "\n:PROPERTIES:\n))
 
       
 	 
