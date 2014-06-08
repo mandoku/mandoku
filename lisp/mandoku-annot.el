@@ -16,13 +16,13 @@
 
 (defun mandoku-annot-scan (&optional annot-dir)
   (interactive)
-  (let (type p olp)
+  (let (type p olp rest)
     (save-excursion 
       (goto-char (point-min))
       (while (re-search-forward mandoku-annot-regex nil t)
 	(setq f1 (buffer-substring-no-properties (match-beginning 1) (match-end 1)))
 	(setq type (buffer-substring-no-properties (match-beginning 2) (match-end 2)))
-	(setq rest (buffer-substring-no-properties (match-beginning 3) (match-end 3)))
+	(setq rest (buffer-substring-no-properties (+ 1 (match-beginning 3) (match-end 3)))
 	(setq mandoku-location-plist nil )
 	(mandoku-location-put 
 	 :context f1
@@ -31,6 +31,7 @@
 			      (goto-char (match-beginning 0))
 			      (search-backward f1)))
 			   "+" (number-to-string (length f1) ))
+	 :rest rest
 	 :olp (mandoku-get-outline-path p)
 	 :type type)
 	(mandoku-annot-insert)
@@ -38,8 +39,10 @@
     
 
 (defun mandoku-annot-insert ()
-  (let* ((annot-file (concat mandoku-annot-dir  (plist-get mandoku-location-plist :type) ".txt"))
-	 (hd (plist-get mandoku-location-plist :context
+  (let* ((type (plist-get mandoku-location-plist :type))
+	 (annot-file (concat mandoku-annot-dir  type ".txt"))
+	 (hd (plist-get mandoku-location-plist :context))
+	 (rest (split-string (plist-get mandoku-location-plist :rest) "@"))
 	 )
     (with-current-buffer (find-file-noselect annot-file)
       (org-mode)
