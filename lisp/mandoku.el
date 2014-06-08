@@ -21,6 +21,10 @@
 (defvar mandoku-md-menu)
 (defvar mandoku-catalog)
 (defvar mandoku-local-init-file "~/.emacs.d/mandoku-local-init.el")
+
+(defvar mandoku-location-plist nil
+  "Plist holds the most recent stored location with associated information.")
+
 ;; ** Textfilters
 ;; we have one default textfilter, which always exists and can be dynamically treated. 
 (defvar mandoku-default-textfilter (make-hash-table :test 'equal) )
@@ -48,6 +52,13 @@
 (defvar mandoku-kanji-regex "\\([㐀-鿿𠀀-𪛟]+\\)")
 
 (defvar mandoku-regex "<[^>]*>\\|[　-㏿＀-￯\n¶]+\\|\t[^\n]+\n")
+
+;;[2014-06-03T14:31:46+0900] better handling of git
+(defcustom mandoku-git-program (executable-find "git")
+  "Name of the git executable used by mandoku."
+  :type '(string)
+  :group 'mandoku)
+
 
 ;; Add this since it appears to miss in emacs-2x
 (or (fboundp 'replace-in-string)
@@ -490,12 +501,14 @@ One character is either a character or one entity expression"
     (concat mandoku-meta-dir repid "/" (substring txtid 0 (+ (length repid) 1)) ".txt")))
 
 
-(defun mandoku-get-outline-path ()
+(defun mandoku-get-outline-path (&optional pnt)
   "this includes the first upward heading"
-  (if (org-before-first-heading-p)
-      (list "")
+  (let ((p (or pnt (mandoku-start)))
+	  olp)
     (save-excursion
-    (let ((olp ))
+      (goto-char p)
+      (if (org-before-first-heading-p)
+	  (list "")
 	  (outline-previous-visible-heading 1)
 	  (when (looking-at org-complex-heading-regexp)
 	    (push (org-trim
@@ -657,6 +670,14 @@ One character is either a character or one entity expression"
 	(format "%s %sp%s%2.2d" (nth 1 p) (if (mandoku-get-vol) (concat (mandoku-get-vol) ", ") "") (car (cdr (split-string (nth 2 p) "-"))) (nth 3 p))
       " -- ")
     ))
+(defun mandoku-position-with-char (&optional pnt arg)
+  "returns textid edition page line char"
+  (let* ((p (or pnt (mandoku-start)))
+	 (location (cdr (cdr (mandoku-position-at-point-internal p arg ))))
+	 (ch (mandoku-charcount-at-point-internal p))
+	 (loc-format (concat (car location) (format "%2.2d" (car (cdr location))))))
+    (concat loc-format "-" (format "%2.2d"  ch))))
+
 
 (defun mandoku-position-at-point-internal (&optional pnt arg)
   "This will always give the position in the base edition"
@@ -979,10 +1000,33 @@ eds
              (car pair) (cadr pair))
          (car pair))))
 
+(defun mandoku-move-templink-to-next-line ()
+  "moves links containing dates, names etc. to the following line"
+  (interactive)
+  (let (m1 m3 beg end)
+    (while (re-search-forward org-bracket-link-regexp nil t)
+      (if (match-end 3)
+	  (progn
+	    (setq m1 (buffer-substring-no-properties (match-beginning 1) (match-end 1)))
+	    (setq beg (match-beginning 0))
+	    (setq m3 (buffer-substring-no-properties (match-beginning 3) (match-end 3)))
+	    (setq end (+ beg (length m3)))
+	    (replace-match m3)
+	    (mandoku-annotate beg end t)
+	    (end-of-line)
+	    (insert "" m1)
+	    (goto-char end)
+	    )))))  
 
 (defun mandoku-format-on-punc ( rep)
   "Formats the text from point to the end, splitting at punctuation and other splitting points."
 ;  (interactive "s")
+  (let ((curpos (point)))
+    (while (search-forward "¶
+" nil t )
+      (replace-match "¶"))
+    (goto-char curpos)
+  ;; first, lets handle the line-endings
   (save-match-data
     (while (re-search-forward mandoku-punct-regex-post nil t)
       (if (or (looking-at "¶?[
@@ -993,6 +1037,7 @@ eds
 	  (forward-line 1)
 	(forward-char 1))
       )))
+)
 
 (defun mandoku-pre-format-on-punc (rep)
   "hallo"
@@ -1051,11 +1096,15 @@ eds
 "))
       (forward-paragraph 1)))))
 
-(defun mandoku-annotate (beg end)
+(defun mandoku-annotate (beg end &optional skip-pinyin)
   (interactive "r")
 ;  (save-excursion
-  (let ((term (replace-regexp-in-string "\\(?:<[^>]*>\\)?¶?" ""
-					(buffer-substring-no-properties beg end) )))
+  (let* ((term (replace-regexp-in-string "\\(?:<[^>]*>\\)?¶?" ""
+					(buffer-substring-no-properties beg end) ))
+	 (pinyin (if skip-pinyin 
+		     ""
+		   (concat " [" (chw-text-get-pinyin term) "] ")))
+	 )
     (forward-line)
     (beginning-of-line)
 
@@ -1063,13 +1112,15 @@ eds
 	(progn
 	  (re-search-forward ":END:")
 	  (beginning-of-line)
-	  (insert term " [" (chw-text-get-pinyin term) "] \n" )
+	  (insert term 
+		  pinyin
+		  "\n" )
 	  (previous-line))
       (progn
 	(insert ":zhu:\n \n:END:\n")
 	(previous-line 2)
 	(beginning-of-line)
-	(insert term " [" (chw-text-get-pinyin term) "]" )))
+	(insert term pinyin)))
 
     (beginning-of-line)
     (deactivate-mark)
@@ -1435,9 +1486,12 @@ Letters do not insert themselves; instead, they are commands.
 	 (groupid (substring txtid 0 (+ (length repid) 2)))
 	 (clone-url (concat "git@" mandoku-user-server ":"))
 	 (txturl (concat clone-url groupid "/" txtid ".git"))
+	 (wikiurl (concat clone-url groupid "/" txtid ".wiki.git"))
 	 (targetdir (concat mandoku-text-dir groupid "/")))
     (mkdir targetdir t)
     (mandoku-clone (concat targetdir txtid)  txturl)
+    ;; [2014-06-03T16:07:55+0900] activate this as soon as the wiki on gl.kanripo is ready
+;    (mandoku-clone (concat targetdir txtid ".wiki")  wikiurl)
     (kill-buffer buf)
     (find-file (concat targetdir txtid "/" fn ".txt")))
 )
