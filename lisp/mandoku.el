@@ -1099,8 +1099,7 @@ eds
 (defun mandoku-annotate (beg end &optional skip-pinyin)
   (interactive "r")
 ;  (save-excursion
-  (let* ((term (replace-regexp-in-string "\\(?:<[^>]*>\\)?¶?" ""
-					(buffer-substring-no-properties beg end) ))
+  (let* ((term (mandoku-remove-markup (buffer-substring-no-properties beg end)))
 	 (pinyin (if skip-pinyin 
 		     ""
 		   (concat " [" (chw-text-get-pinyin term) "] ")))
