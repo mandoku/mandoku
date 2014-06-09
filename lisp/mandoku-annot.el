@@ -35,7 +35,10 @@
 	 :location (concat (mandoku-position-with-char
 			    (save-excursion
 			      (goto-char start)
-			      (search-backward f1)))
+			      (ignore-errors
+			      (re-search-backward 
+			       (replace-regexp-in-string "\\(.\\)" "\\1¶?" f1)
+			       ))))
 			   "+" (number-to-string (length f1) ))
 	 :title (mandoku-get-title)
 	 :textid (car (split-string fn "_"))
