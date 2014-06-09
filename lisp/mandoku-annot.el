@@ -54,14 +54,20 @@
 	 )
     (with-current-buffer (find-file annot-file)
       (org-mode)
+      (goto-char (point-min))
       (unless (re-search-forward
 	   (format org-complex-heading-regexp-format (regexp-quote lf))
 	   nil t)
-	(insert (concat "\n* " hd "\n:PROPERTIES:\n" 
+	;; if we found an entry, we still might have a different name -> all names also in location-entry
+	(insert (concat "\n** " hd "\n:PROPERTIES:\n" 
 			(if key (concat ":ID: " key "\n" ) "")
 			":END:\n" )))
       (org-end-of-subtree)
-      (insert (concat "\n** " (plist-get mandoku-location-plist :location) "\n"))
+      (insert (concat "\n*** "
+		      (plist-get mandoku-location-plist :title)
+		      " "
+		      (plist-get mandoku-location-plist :location)
+		      "\n"))
       (save-buffer)
 )))
 
