@@ -89,6 +89,6 @@
 			"\n:END:\n" )))
       
       (save-buffer)
-)))
+))
 
 (provide 'mandoku-annot)
