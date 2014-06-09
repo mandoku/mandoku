@@ -16,7 +16,8 @@
 
 (defun mandoku-annot-scan (&optional annot-dir)
   (interactive)
-  (let (type p olp start rest f1 key)
+  (let ((fn (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))))
+	type p olp start rest f1 key)
     (save-excursion 
       (goto-char (point-min))
       (while (re-search-forward mandoku-annot-regex nil t)
@@ -36,6 +37,9 @@
 			      (goto-char start)
 			      (search-backward f1)))
 			   "+" (number-to-string (length f1) ))
+	 :title (mandoku-get-title)
+	 :textid (cadr (split-string fn "_"))
+	 :filename fn
 	 :rest rest
 	 :key key
 	 :olp (mandoku-get-outline-path p)
@@ -56,22 +60,25 @@
     (with-current-buffer (find-file annot-file)
       (org-mode)
       (goto-char (point-min))
-      (unless (re-search-forward
-	   (format org-complex-heading-regexp-format (regexp-quote lf))
+      (unless (re-search-forward lf
+;	   (format org-complex-heading-regexp-format (regexp-quote lf))
 	   nil t)
 	;; if we found an entry, we still might have a different name -> all names also in location-entry
+	(goto-char (point-max))
 	(insert (concat "\n** " hd "\n:PROPERTIES:\n" 
 			(if key (concat ":ID: " key "\n" ) "")
 			":END:\n" )))
       (org-end-of-subtree)
       (insert (concat "\n*** [[mandoku:krp:"
-		      (plist-get org-store-link-plist :textid)
+		      (plist-get mandoku-location-plist :textid)
 		      ":"
 		      (plist-get mandoku-location-plist :location)
 		      "::" hd "]["
 		      hd "]] ("
 		      (plist-get mandoku-location-plist :title)
-		      " "
+		      ","
+		      (format "%d" (string-to-number (car (split-string fn "_"))))
+		      ": "
 		      (mapconcat 'identity (plist-get mandoku-location-plist :olp) " / ")
 		      ") "
 		      "\n"))
