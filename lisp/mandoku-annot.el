@@ -60,9 +60,9 @@
 	(insert (concat "\n* " hd "\n:PROPERTIES:\n" 
 			(if key (concat ":ID: " key "\n" ) "")
 			":END:\n" )))
-      (next-line )
-      (insert (concat "\n** " (plist-get mandoku-location-plist :location) "\n")
-
-))))
+      (org-end-of-subtree)
+      (insert (concat "\n** " (plist-get mandoku-location-plist :location) "\n"))
+      (save-buffer)
+)))
 
 (provide 'mandoku-annot)
