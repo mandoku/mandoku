@@ -232,17 +232,23 @@ One character is either a character or one entity expression"
 ;	(interactive)
 	(ignore-errors
 	(save-match-data
-	  (while (looking-at mandoku-regex)
-	    (forward-char (- (match-end 0) (match-beginning 0))))
 	  (if (looking-at "&[^;]*;")
 	      (forward-char (- (match-end 0) (match-beginning 0)))
 	    (if (looking-at ":zhu:")
-		(search-forward ":END:")
+		(progn
+		  (search-forward ":END:")
+		  (forward-char 1))
 	      (forward-char 1)))
 	;; this skips over newlines, punctuation and markup.
 	;; Need to expand punctuation regex [2001-03-15T12:30:09+0800]
 	;; this should now skip over most ideogrph punct
+	  (while (looking-at mandoku-regex)
+	    (forward-char (- (match-end 0) (match-beginning 0))))
 	  )
+	(if (looking-at ":zhu:")
+	    (progn
+	      (search-forward ":END:")
+	      (forward-char 1)))
 ))
 
 (defun mandoku-backward-one-char ()
