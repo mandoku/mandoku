@@ -38,7 +38,7 @@
 			      (search-backward f1)))
 			   "+" (number-to-string (length f1) ))
 	 :title (mandoku-get-title)
-	 :textid (cadr (split-string fn "_"))
+	 :textid (car (split-string fn "_"))
 	 :filename fn
 	 :rest rest
 	 :key key
@@ -70,7 +70,7 @@
 			":END:\n" )))
       (org-end-of-subtree)
       (insert (concat "\n*** [[mandoku:krp:"
-		      (plist-get mandoku-location-plist :textid)
+		      (plist-get org-store-link-plist :textid)
 		      ":"
 		      (plist-get mandoku-location-plist :location)
 		      "::" hd "]["
