@@ -77,7 +77,7 @@
 		      hd "]] ("
 		      (plist-get mandoku-location-plist :title)
 		      ","
-		      (format "%d" (string-to-number (car (split-string fn "_"))))
+		      (format "%d" (string-to-number (cadr (split-string fn "_"))))
 		      ": "
 		      (mapconcat 'identity (plist-get mandoku-location-plist :olp) " / ")
 		      ") "
