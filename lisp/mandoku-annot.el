@@ -19,7 +19,7 @@
   (let ((fn (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))))
 	type p olp start rest f1 key)
     (save-excursion 
-      (goto-char (point-min))
+;      (goto-char (point-min))
       (while (re-search-forward mandoku-annot-regex nil t)
 	(setq key nil)
 	(setq start (match-beginning 0))
