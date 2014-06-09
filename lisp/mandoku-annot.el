@@ -40,6 +40,7 @@
 	 :key key
 	 :olp (mandoku-get-outline-path p)
 	 :type type)
+	(mandoku-link-store-link)
 	(mandoku-annot-insert)
 	)))))      
     
@@ -63,10 +64,15 @@
 			(if key (concat ":ID: " key "\n" ) "")
 			":END:\n" )))
       (org-end-of-subtree)
-      (insert (concat "\n*** "
-		      (plist-get mandoku-location-plist :title)
-		      " "
+      (insert (concat "\n*** [[mandoku:krp:"
+		      (plist-get org-store-link-plist :textid)
+		      ":"
 		      (plist-get mandoku-location-plist :location)
+		      "::" hd "]["
+		      hd "]] ("
+		      (plist-get mandoku-location-plist :title)
+		      
+		      ") "
 		      "\n"))
       (save-buffer)
 )))
