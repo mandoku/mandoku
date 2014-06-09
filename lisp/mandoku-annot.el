@@ -71,9 +71,16 @@
 		      "::" hd "]["
 		      hd "]] ("
 		      (plist-get mandoku-location-plist :title)
-		      
+		      " "
+		      (mapconcat 'identity (plist-get mandoku-location-plist :olp) " / ")
 		      ") "
 		      "\n"))
+	(insert (concat ":PROPERTIES:\n:LOCATION: " 
+			(plist-get mandoku-location-plist :location)
+			"\n:TEXTID: "
+			(plist-get org-store-link-plist :textid)
+			"\n:END:\n" )))
+      
       (save-buffer)
 )))
 
