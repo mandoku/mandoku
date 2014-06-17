@@ -688,7 +688,7 @@ One character is either a character or one entity expression"
 
 
 (defun mandoku-position-at-point-internal (&optional pnt arg)
-  "This will always give the position in the base edition"
+  "This will always give the position in the base edition, except when forced to use <pb: with arg."
   (save-excursion
     (let ((p (or pnt (point)))
 	  (pb (if arg 
@@ -738,7 +738,7 @@ the character at point, ignoring non-Kanji characters"
   "this will first look for a function for this edition, then browse the image index"
   (interactive "P")
   (if mandoku-image-dir
-      (let* ((p (mandoku-position-at-point-internal (point) 4))
+      (let* ((p (mandoku-position-at-point-internal (point) ))
 	     (path 
 	      (if arg 
 		  (mandoku-get-image-path-from-index p)
