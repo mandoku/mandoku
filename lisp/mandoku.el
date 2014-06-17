@@ -1502,7 +1502,7 @@ Letters do not insert themselves; instead, they are commands.
     (mkdir targetdir t)
     (mandoku-clone (concat targetdir txtid)  txturl)
     ;; [2014-06-03T16:07:55+0900] activate this as soon as the wiki on gl.kanripo is ready
-;    (mandoku-clone (concat targetdir txtid ".wiki")  wikiurl)
+    (mandoku-clone (concat targetdir txtid ".wiki")  wikiurl)
     (kill-buffer buf)
     (find-file (concat targetdir txtid "/" fn ".txt")))
 )
