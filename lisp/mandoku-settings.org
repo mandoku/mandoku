@@ -1,0 +1,122 @@
+#+TITLE: Settings for Mandoku / モンドクの設定
+
+* About / このファイルについて
+
+  This file provides information about you and your system to
+  =Mandoku=.  If you want to change something, chances are that there
+  is a setting in this file that can be adopted.  There are also some
+  values you need to fill in before starting to use the system, in
+  order for it to work properly.
+
+  このファイルにマンドクの使用に必要な設定書かれています。漢籍リポジト
+  リ(カンリポ)のアカウント情報は全文検索、辞書検索とテキストのダウンロー
+  ドに必要です。
+
+
+* Settings for Kanripo server / 漢籍リポジトリの設定
+
+  Here is some information that is available in a table to make it
+  possible to be changed easily.
+  以下のテーブルに必要な情報を記入してください。
+** ユーザー情報
+   Please fill in the values in the second column
+   第二欄に必要な情報を記入してください。
+   
+#+NAME: uservalues
+   | Key     | Value          | 備考         |
+   | Server  | gl.kanripo.org |              |
+   | Email   |                | メール       |
+   | Account |                | アカウント名 |
+   | Token   |                | トークン     |
+
+
+#+NAME: search-repositories
+| ZB | http://www.kanripo.org/zb |
+
+  To activate the new settings, move the cursor to the line starting
+  with "#+BEGIN_SRC" below and press C-c, then answer to the question
+  with yes.
+
+  新しい設定を実行するため、カーソルを下の"#+BEGIN_SRC"で始まる行へ移動
+  して、そして"C-c"を押して、つぎの質問に"yes"を答えてください。
+
+#+BEGIN_SRC emacs-lisp
+(ignore-errors (org-babel-load-file (buffer-file-name)))
+#+END_SRC
+
+
+
+* Other settings / その他の設定
+
+  The settings below should come with a reasonably value and should
+  only be changed with a good understanding of the system.
+
+  以下の設定は初期設定で使用可能になっています。システムの設計の理解の
+  上で変更してください。
+
+** Settings
+   :PROPERTIES:
+   :VISIBILITY: folded
+   :END:
+
+#+BEGIN_SRC emacs-lisp
+(require 'mandoku)
+(require 'mandoku-remote)
+;(require 'org-mandoku)
+(require 'mandoku-dict)
+(setq org-return-follows-link t)
+(setq mandoku-do-remote t)
+(setq mandoku-string-limit 10)
+(setq mandoku-index-display-limit 2000)
+(setq mandoku-local-init-file (expand-file-name "mandoku-settings.org" starter-kit-user-dir))
+(ignore-errors 
+ (load "mandoku-dict" t)
+ (global-set-key [f5] 'mandoku-dict-mlookup))
+(global-set-key [f6] 'mandoku-search-text)
+(global-set-key [f7] 'mandoku-search-titles)
+(setq org-support-shift-select 'always)
+#+END_SRC
+
+#+RESULTS:
+: always
+
+** Code
+   :PROPERTIES:
+   :VISIBILITY: folded
+   :END:
+
+#+BEGIN_SRC emacs-lisp :var uval=uservalues
+(mandoku-set-settings uval)
+(car (cdr (assoc "Email" uval ))) 
+#+END_SRC
+
+#+RESULTS:
+
+
+#+BEGIN_SRC emacs-lisp :var uval=search-repositories
+(mandoku-set-repos uval)
+#+END_SRC
+
+#+RESULTS:
+| ZB | http://www.kanripo.org/zb |
+
+
+*** Directories
+#+BEGIN_SRC emacs-lisp
+(setq mandoku-text-dir (expand-file-name (concat mandoku-base-dir "text/")))
+(setq mandoku-meta-dir (expand-file-name  (concat mandoku-base-dir "meta/")))
+(setq mandoku-temp-dir (expand-file-name  (concat mandoku-base-dir "temp/")))
+(setq mandoku-sys-dir (expand-file-name  (concat mandoku-base-dir "system/")))
+(setq mandoku-dict-url "http://www.kanripo.org/zb")
+(setq mandoku-catalogs-alist nil)
+(dolist (dir (directory-files mandoku-meta-dir nil "^[^.,].*"))
+  (when (file-directory-p (concat mandoku-meta-dir dir))
+    (dolist (file (directory-files (concat mandoku-meta-dir dir) nil ".txt" ))
+      (add-to-list 'mandoku-catalogs-alist 
+   (cons (file-name-sans-extension file) (concat mandoku-meta-dir dir "/" file))))))
+(mandoku-read-titletables) 
+(setq mandoku-catalog (concat mandoku-meta-dir "mandoku-catalog.txt"))
+(setq mandoku-initialized t)
+(message "Loading of local setup for Mandoku finished")
+(find-file mandoku-catalog)
+#+END_SRC
