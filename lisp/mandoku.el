@@ -1019,6 +1019,7 @@ eds
 	    (setq beg (match-beginning 0))
 	    (setq m3 (buffer-substring-no-properties (match-beginning 3) (match-end 3)))
 	    (setq end (+ beg (length m3)))
+<<<<<<< HEAD
 	    (unless
 		(save-match-data 
 		  ;; TODO: process nested :zhu: here!
@@ -1028,6 +1029,13 @@ eds
 	      (end-of-line)
 	      (insert " " m1)
 	      (goto-char end))
+=======
+	    (replace-match m3)
+	    (mandoku-annotate beg end t)
+	    (end-of-line)
+	    (insert "" m1)
+	    (goto-char end)
+>>>>>>> cee70ae530ca59fcc6e3ab635ed68996fae42a3d
 	    )))))  
 
 (defun mandoku-format-on-punc ( rep)
@@ -1111,7 +1119,12 @@ eds
 (defun mandoku-annotate (beg end &optional skip-pinyin)
   (interactive "r")
 ;  (save-excursion
+<<<<<<< HEAD
   (let* ((term (mandoku-remove-markup (buffer-substring-no-properties beg end)))
+=======
+  (let* ((term (replace-regexp-in-string "\\(?:<[^>]*>\\)?¶?" ""
+					(buffer-substring-no-properties beg end) ))
+>>>>>>> cee70ae530ca59fcc6e3ab635ed68996fae42a3d
 	 (pinyin (if skip-pinyin 
 		     ""
 		   (concat " [" (chw-text-get-pinyin term) "] ")))
@@ -1502,7 +1515,11 @@ Letters do not insert themselves; instead, they are commands.
     (mkdir targetdir t)
     (mandoku-clone (concat targetdir txtid)  txturl)
     ;; [2014-06-03T16:07:55+0900] activate this as soon as the wiki on gl.kanripo is ready
+<<<<<<< HEAD
     (mandoku-clone (concat targetdir txtid ".wiki")  wikiurl)
+=======
+;    (mandoku-clone (concat targetdir txtid ".wiki")  wikiurl)
+>>>>>>> cee70ae530ca59fcc6e3ab635ed68996fae42a3d
     (kill-buffer buf)
     (find-file (concat targetdir txtid "/" fn ".txt")))
 )
