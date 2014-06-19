@@ -20,7 +20,7 @@
   (list 'flx-ido 'ido-ubiquitous 'smex
         'yasnippet
         'magit 
-	'bbdb 'bbdb-ext
+;	'bbdb 'bbdb-ext
         'auctex 'reftex
         'undo-tree
 	'diminish

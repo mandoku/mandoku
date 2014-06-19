@@ -19,7 +19,7 @@
 (add-to-list 'load-path user-dir)
 (add-to-list 'load-path mandoku-lisp)
 
-(require 'local-packages)
+(require 'install-packages)
 (require 'mdkit)
 ;;; end init
 
