@@ -225,11 +225,13 @@
 
 (require 'org)
 
-
+(setq debug-on-error t)
 ;; Mandoku [2014-05-26T17:57:33+0900]
 (when (file-exists-p mandoku-lisp)
   (mapc 'load (directory-files mandoku-lisp 't "^[^#].*el$")))
-
+;(ignore-errors
+  (org-babel-load-file (expand-file-name "mandoku-settings.org" starter-kit-dir ))
+;)
 ;; We load all .el files in the user directory. No order is guaranteed.
 (add-to-list 'load-path user-dir)
 (when (file-exists-p user-dir)

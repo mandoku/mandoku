@@ -28,6 +28,7 @@ other/
 bbdb
 lookup
 *mandoku*
+mandoku-settings.el
 *.pyg
 *.tex
 *.aux
