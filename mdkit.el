@@ -230,13 +230,19 @@
 (when (file-exists-p mandoku-lisp)
   (mapc 'load (directory-files mandoku-lisp 't "^[^#].*el$")))
 ;(ignore-errors
-  (org-babel-load-file (expand-file-name "mandoku-settings.org" starter-kit-dir ))
+(if (file-exists-p (expand-file-name "mandoku-settings.org" starter-kit-user-dir ))
+    (org-babel-load-file (expand-file-name "mandoku-settings.org" starter-kit-user-dir ))
+  (progn 
+    (copy-file (expand-file-name "mandoku-settings.org" mandoku-lisp) starter-kit-user-dir)
+    (org-babel-load-file (expand-file-name "mandoku-settings.org" starter-kit-user-dir ))
+))
 ;)
 ;; We load all .el files in the user directory. No order is guaranteed.
-(add-to-list 'load-path user-dir)
-(when (file-exists-p user-dir)
-  (mapc 'load (directory-files user-dir 't "^[^#].*el$")))
-
+(when (file-exists-p starter-kit-user-dir)
+  (ignore-errors 
+    (add-to-list 'load-path starter-kit-user-dir)
+    (mapc 'load (directory-files starter-kit-user-dir 't "^[^#].*el$")))
+)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; 

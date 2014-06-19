@@ -9,14 +9,14 @@
 (defconst starter-kit-dir (file-name-directory (or load-file-name (buffer-file-name)))
     "directory where the starterkit is installed")
 
-(defvar user-dir (expand-file-name "user" starter-kit-dir)
+(defvar starter-kit-user-dir (expand-file-name "user" starter-kit-dir)
   "user directory for personal code")
 
 (defvar mandoku-lisp (expand-file-name "lisp" starter-kit-dir)
   "directory for mandoku lisp code")
 
 (add-to-list 'load-path starter-kit-dir)
-(add-to-list 'load-path user-dir)
+(add-to-list 'load-path starter-kit-user-dir)
 (add-to-list 'load-path mandoku-lisp)
 
 (require 'install-packages)
