@@ -26,7 +26,7 @@
 	'diminish
 	;'icicles
 	'org 'org-plus-contrib
-	'elpy
+;	'elpy
         'rainbow-mode)
   "Libraries that should be installed by default.")
 
