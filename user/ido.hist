@@ -1,0 +1,31 @@
+;;; -*- coding: utf-8 -*-
+
+;; ----- ido-last-directory-list -----
+(
+ ("/Users/chris/db/" . "mandoku/")
+ ("/Users/chris/" . "db/")
+)
+
+;; ----- ido-work-directory-list -----
+(
+ 
+)
+
+;; ----- ido-work-file-list -----
+(
+ 
+)
+
+;; ----- ido-dir-file-cache -----
+(
+ ("/Users/chris/db/mandoku/" (21410 17370 0 0) "xsl/" "user/" "start-mandoku.sh" "start-mandoku.bat" "readme.org" "python/" "mdkit.el" "lisp/" "install-packages.el" "init.el" "elpa/" "doc/" ".gitignore" ".git/" ".DS_Store" "../" "./")
+
+ ("/Users/chris/db/" (21410 14498 0 0) "work/" "text/" "temp/" "system/" "redis/" "obsolete/" "notes/" "ngram/" "meta/" "mdserv/" "mandoku.zip" "mandoku/" "index/" "images/" ".DS_Store" "../" "./")
+
+ ("/Users/chris/" (21410 17553 0 0) "work/" "wget/" "VirtualBox VMs/" "uuid.txt" "unison.log" "unison.dump" "unison-shortcuts.txt" "tmp/" "TLS 2009.04/" "test" "src/" "skqs-cnt.org" "Sites/" "simple_script.py" "scantailor.xpr" "sb/" "pycon.py" "Public/" "projects/" "plots.org" "Pictures/" "OxygenExtension/" "org/" "News/" "Music/" "Movies/" "md/" "mbp3-history.txt" "Mail/" "Mac Speichern.xml" "logfile.txt" "logfile" "Library.org/" "Library/" "krp/" "index.log" "Google Drive/" "gitlab-rep.log" "erl_crash.dump" "emacs-setup.zip" "emacs-clean.el" "elpa/" "duplicates.txt" "Dropbox/" "Downloads/" "Documents/" "Dictionaries/" "Desktop/" "demo.mid" "default.el~" "db/" "Collection/" "Box Sync/" "bookmarks" "bin/" "backups/" "Awork/" "Applications (Parallels)/" "Applications/" "1382489935_gitlab_backup.tar" "00scratch/" ".zshrc" ".zlogin" ".yomichan/" ".xnviewmp/" ".Xauthority" ".w3m/" ".virtualenvs/" ".viminfo" ".vagrant.d/" ".unison/" ".Trash/" ".tor/" ".swt/" ".subversion/" ".ssh/" ".sqlitestudio/" ".sqlite_history" ".smex-items" ".signature" ".shsh/" ".sh_history" ".rvm/" ".rnd" ".rediscli_history" ".recoll/" ".recentf~" ".recentf" ".qgis2/" ".pythonve" ".python-gitlab.cfg" ".profile" ".pip/" ".pia_manager/" ".org-timestamps/" ".org-annotate-file.org" ".npm/" ".newsrc.eld" ".newsrc" ".mysql_history" ".mrtrust" ".mrconfig" ".mplayer/" ".mediathek3/" ".matplotlib/" ".m2/" ".lookup/" ".leo/" ".java/" ".ivy2/" ".irb-history" ".ipython/" ".inputrc" ".inkscape-etc/" ".ido.last~" ".ido.last" ".hgignore_global" ".gtkdbfeditor-etc/" ".gnupg/" ".gnome2/" ".glub" ".gitk" ".gitignore_global" ".gitconfig" ".git-prompt.sh" ".git-completion.sh" ".gemrc" ".gem/" ".fonts/" ".FontForge/" ".fontconfig/" ".fetch/" ".emacs.plain/" ".emacs.d/" ".emacs-places" ".elnodelogs/" ".dvdcss/" ".DS_Store" ".dropbox-master/" ".dropbox/" ".dia-etc/" ".dia/" ".dbus-keyrings/" ".cvspass" ".cups/" ".cpan/" ".couchapp.conf" ".config/" ".CFUserTextEncoding" ".cassandra.history" ".cassandra-cli/" ".cask/" ".calibre_calibre GUI.lock" ".cache/" ".bzr.log" ".bundler/" ".Box Sync/" ".bazaar/" ".bashrc" ".bash_profile" ".bash_history" ".annot/" "../" "./")
+
+ ("/tmp/t/test/" (21409 11654 0 0) "README" ".git/" "../" "./")
+)
+
+;; ----- ido-unc-hosts-cache -----
+t
