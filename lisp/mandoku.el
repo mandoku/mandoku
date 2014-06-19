@@ -20,7 +20,7 @@
 ;; Defined somewhere in this file, but used before definition.
 (defvar mandoku-md-menu)
 (defvar mandoku-catalog)
-(defvar mandoku-local-init-file "~/.emacs.d/mandoku-local-init.el")
+;(defvar mandoku-local-init-file "~/.emacs.d/mandoku-local-init.el")
 
 (defvar mandoku-location-plist nil
   "Plist holds the most recent stored location with associated information.")

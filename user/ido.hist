@@ -8,12 +8,12 @@
 
 ;; ----- ido-work-directory-list -----
 (
- 
+ "/tmp/t/test/"
 )
 
 ;; ----- ido-work-file-list -----
 (
- 
+ "mandoku-settings.org"
 )
 
 ;; ----- ido-dir-file-cache -----
