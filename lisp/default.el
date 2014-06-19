@@ -1,6 +1,5 @@
 ;; default settings for mandoku
 ;; change filename to default.el and copy to site-lisp or any other directory Emacs loads by default
-;; default settings for mandoku
 (if (eq window-system 'w32)
 ;; we try to get the driveletter and base directory, which should be the same as the emacs executable
     (let (( tmp (split-string (car load-path) "/")))
