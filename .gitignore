@@ -5,8 +5,7 @@ custom.el
 *elc
 places
 url/cookies
-elpa-to-submit/jabber/jabber.info
-elpa-to-submit/nxhtml/etc/schema/xhtml-loader.rnc
+*elpa*
 thumbs/*
 oddmuse/*
 .newsrc-dribble
@@ -16,7 +15,6 @@ oddmuse/*
 .DS_Store
 image-dired/
 elim/
-elpa-to-submit/nxhtml/etc/schema/xhtml-loader.rnc~
 session*
 tramp
 \#*
@@ -28,6 +26,7 @@ other/
 bbdb
 lookup
 *mandoku*
+*user*
 mandoku-settings.el
 mandoku-settings.org
 *.pyg
