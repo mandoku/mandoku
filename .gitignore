@@ -25,3 +25,14 @@ tramp
 *pyc
 images/
 other/
+bbdb
+lookup
+*user*
+*mandoku*
+*.pyg
+*.tex
+*.aux
+*.lof
+*.lot
+*.log
+*.spl

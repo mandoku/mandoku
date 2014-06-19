@@ -31,7 +31,25 @@
    extensions and additional conventions.  For more information, see
    [[mandoku-format.org]].
 
-** 
+** This repository
+
+   Cloning this repository will give you a functioning setup for using
+   mandoku with Emacs.
+
+*** Installation
+    To install this, clone the git repository, change into the mdkit
+    directory, and run this command:
+#+begin_src sh
+emacs -q -l init.el
+#+end_src
+
+    This will load the emacs on your path, without using whatever you
+    have defined in .emacs.d.
+
+    The first time you run this, a lot of packages will be downloaded
+    into the elpa folder. This takes a few minutes. You might have to
+    restart emacs.
+
 
 
 
