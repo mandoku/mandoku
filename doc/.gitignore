@@ -24,3 +24,8 @@ tramp
 *pyc
 images/
 other/
+*html
+*pdf
+*tex
+*xml
+*bcf
