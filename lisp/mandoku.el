@@ -734,6 +734,13 @@ the character at point, ignoring non-Kanji characters"
 
 ;; image handling
 
+(defun mandoku-find-image (path)
+  "open the file referenced through image path. Check if available locally, otherwise get from remote image server"
+  (if (file-exists-p (concat mandoku-image-dir path))
+      (find-file-other-window (concat mandoku-image-dir path))
+    ;; need to retrieve the file and store it there to open it
+    (
+)
 (defun mandoku-open-image-at-page (arg &optional il)
   "this will first look for a function for this edition, then browse the image index"
   (interactive "P")
@@ -751,7 +758,7 @@ the character at point, ignoring non-Kanji characters"
 	(progn
 	  (if (= (count-windows) 1)
 	      (split-window-horizontally 55))
-	  (find-file-other-window (concat mandoku-image-dir path )))
+	  (mandoku-find-image path ))
       (message "No facsimile available."))))
 
 
