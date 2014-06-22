@@ -1,6 +1,6 @@
-;;; init.el --- Where all the magic begins
+;;; md-init.el --- Where all the magic begins
 ;;
-;; Part of the Emacs Starter Kit
+;; Part of the Mandoku Starter Kit
 ;;
 ;; This is the first thing to get loaded.
 ;;
@@ -18,7 +18,8 @@
 (add-to-list 'load-path starter-kit-dir)
 (add-to-list 'load-path starter-kit-user-dir)
 (add-to-list 'load-path mandoku-lisp)
-
+(if (eq window-system 'w32)
+    (load "w32-registry"))
 (require 'install-packages)
 (require 'md-kit)
 ;;; end init
