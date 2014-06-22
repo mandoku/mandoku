@@ -5,7 +5,7 @@
 ;; the root of the mandoku hierarchy
 (defvar mandoku-base-dir (expand-file-name  "~/krp/"))
 (defvar mandoku-do-remote nil)
-
+(defvar mandoku-preferred-edition nil "Preselect a certain edition to avoid repeated selection")
 (defvar mandoku-lisp-dir nil)
 ;(defvar mandoku-subdirs (list "text" "images" "index" "meta" "temp" "system" "work"))
 (defvar mandoku-text-dir (expand-file-name (concat mandoku-base-dir "text/")))
@@ -806,7 +806,9 @@ eds
 	 (fn (nth (- (length (split-string il "/")) 1) (split-string il "/")))
 	 (eds (mandoku-get-editions-from-index il))
 	 ;; no need to ask if there is only one edition
-	 (ed (or ed (if (= (length eds) 1) 
+	 (ed (or ed
+		 mandoku-preferred-edition
+		 (if (= (length eds) 1) 
 			(car eds)
 		      (ido-completing-read "Edition: " (mandoku-get-editions-from-index il) nil t)))))
 
