@@ -736,10 +736,23 @@ the character at point, ignoring non-Kanji characters"
 
 (defun mandoku-find-image (path)
   "open the file referenced through image path. Check if available locally, otherwise get from remote image server"
-  (if (file-exists-p (concat mandoku-image-dir path))
-      (find-file-other-window (concat mandoku-image-dir path))
+    (if (file-exists-p (concat mandoku-image-dir path))
+	(find-file-other-window (concat mandoku-image-dir path))
     ;; need to retrieve the file and store it there to open it
-    (
+      (let* ((rep (car (split-string (car (last (split-string filename "/"))) "[0-9]")))
+	     (rep-url (car (cdr (assoc rep mandoku-repositories-alist ))))
+	     (buffer (concat mandoku-image-dir path)))
+	(with-current-buffer (get-buffer-create buffer)
+	  (url-insert-file-contents "http://localhost:8000/" path )
+;	  (url-insert-file-contents (concat rep-url "/getfile?filename=" path )
+				    (lambda (status) (switch-to-buffer buffer))))
+	(switch-to-buffer buffer)
+	(setq buffer-file-name (concat mandoku-temp-dir buffer))
+	(unless (file-directory-p mandoku-temp-dir)
+      (make-directory mandoku-temp-dir t))
+    (save-buffer)
+    
+      
 )
 (defun mandoku-open-image-at-page (arg &optional il)
   "this will first look for a function for this edition, then browse the image index"
