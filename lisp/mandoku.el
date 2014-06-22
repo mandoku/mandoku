@@ -743,7 +743,7 @@ the character at point, ignoring non-Kanji characters"
 	     (rep-url (car (cdr (assoc rep mandoku-repositories-alist ))))
 	     (buffer (concat mandoku-image-dir path)))
 	(with-current-buffer (get-buffer-create buffer)
-	  (url-insert-file-contents (concat "http://localhost/getfile?filename=" path )))
+	  (url-insert-file-contents (concat "http://localhost/getimage?filename=" path )))
 ;	  (url-insert-file-contents (concat rep-url "/getfile?filename=" path )
 	(switch-to-buffer buffer)
 	(setq buffer-file-name buffer (car (last (split-string path "/"))))
