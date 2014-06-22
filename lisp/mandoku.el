@@ -737,22 +737,22 @@ the character at point, ignoring non-Kanji characters"
 (defun mandoku-open-image-at-page (arg)
   "this will first look for a function for this edition, then browse the image index"
   (interactive "P")
-  (if mandoku-image-dir
-      (let* ((p (mandoku-position-at-point-internal (point) ))
-	     (path 
-	      (if arg 
-		  (mandoku-get-image-path-from-index p)
-		(or 
-		 (ignore-errors  
-		   (funcall (intern 
-			     (concat "mandoku-" (downcase (nth 1 p))  "-page-to-image")) p ))))
-	      ))
-	(if path
-	   (progn
-	     (if (= (count-windows) 1)
-		 (split-window-horizontally 55))
-	     (find-file-other-window (concat mandoku-image-dir path )))
-	  (message "No facsimile available.")))))
+  (let* ((f  (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))
+	 (imglist (or il (concat (substring (file-name-directory (buffer-file-name)) 0 -1) ".wiki/imglist/" f ".txt")))
+	 (p (mandoku-position-at-point-internal (point) ))
+	 ;; if function exists, use that, otherwise look for image in imglist, if not available: nil
+	 (path (or
+		(ignore-errors  
+		  (funcall (intern (concat "mandoku-" (downcase (nth 1 p))  "-page-to-image")) p ))
+	       (if (file-exists-p imglist)
+		   (mandoku-get-image-path-from-index p)
+		 nil))))
+    (if path
+	(progn
+	  (if (= (count-windows) 1)
+	      (split-window-horizontally 55))
+	  (find-file-other-window (concat mandoku-image-dir path )))
+      (message "No facsimile available."))))
 
 
 (defun mandoku-get-editions-from-index (il)
