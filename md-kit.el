@@ -235,6 +235,10 @@
     (copy-file (expand-file-name "mandoku-settings.org" mandoku-lisp) starter-kit-user-dir)
     (org-babel-load-file (expand-file-name "mandoku-settings.org" starter-kit-user-dir ))
 ))
+
+;;; sane values for encoding
+(prefer-coding-system 'utf-8)
+
 ;)
 ;; We load all .el files in the user directory. No order is guaranteed.
 (when (file-exists-p starter-kit-user-dir)
