@@ -734,18 +734,17 @@ the character at point, ignoring non-Kanji characters"
 
 ;; image handling
 
-(defun mandoku-find-image (path)
+(defun mandoku-find-image (path rep)
   "open the file referenced through image path. Check if available locally, otherwise get from remote image server"
     (if (file-exists-p (concat mandoku-image-dir path))
 	(find-file-other-window (concat mandoku-image-dir path))
     ;; need to retrieve the file and store it there to open it
-      (let* ((rep (car (split-string (car (last (split-string path "/"))) "[0-9]")))
-	     (rep-url (car (cdr (assoc rep mandoku-repositories-alist ))))
+      (let* ((rep-url (car (cdr (assoc rep mandoku-repositories-alist ))))
 	     (buffer (concat mandoku-image-dir path)))
 	(with-current-buffer (get-buffer-create buffer)
 ;	  (url-insert-file-contents "http://www.google.co.jp/intl/en_com/images/srpr/logo1w.png"))
-	  (url-insert-file-contents (concat "http://127.0.0.1:5000/getimage?filename=" path )))
-;	  (url-insert-file-contents (concat rep-url "/getfile?filename=" path )
+;	  (url-insert-file-contents (concat "http://127.0.0.1:5000/getimage?filename=" path )))
+	  (url-insert-file-contents (concat rep-url "/getimage?filename=" path )))
 	(switch-to-buffer buffer)
 	(setq buffer-file-name buffer)
 ;	(setq buffer-file-name (car  (last (split-string path "/"))))
@@ -765,6 +764,7 @@ the character at point, ignoring non-Kanji characters"
   "this will first look for a function for this edition, then browse the image index"
   (interactive "P")
   (let* ((f  (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))
+	 (rep (car (split-string f "[0-9]")))
 	 (imglist (or il (concat (substring (file-name-directory (buffer-file-name)) 0 -1) ".wiki/imglist/" f ".txt")))
 	 (p (mandoku-position-at-point-internal (point) ))
 	 ;; if function exists, use that, otherwise look for image in imglist, if not available: nil
@@ -776,7 +776,7 @@ the character at point, ignoring non-Kanji characters"
 	(progn
 	  (if (= (count-windows) 1)
 	      (split-window-horizontally 55))
-	  (mandoku-find-image path ))
+	  (mandoku-find-image path rep))
       (message "No facsimile available."))))
 
 
