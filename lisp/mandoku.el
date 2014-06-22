@@ -767,12 +767,10 @@ the character at point, ignoring non-Kanji characters"
 	 (imglist (or il (concat (substring (file-name-directory (buffer-file-name)) 0 -1) ".wiki/imglist/" f ".txt")))
 	 (p (mandoku-position-at-point-internal (point) ))
 	 ;; if function exists, use that, otherwise look for image in imglist, if not available: nil
-	 (path (or
-		(ignore-errors  
-		  (funcall (intern (concat "mandoku-" (downcase (nth 1 p))  "-page-to-image")) p ))
-	       (if (file-exists-p imglist)
-		   (mandoku-get-image-path-from-index p)
-		 nil))))
+	 (path  (if (file-exists-p imglist)
+		    (mandoku-get-image-path-from-index p)
+		  (ignore-errors  
+		    (funcall (intern (concat "mandoku-" (downcase (nth 1 p))  "-page-to-image")) p )))))
     (if path
 	(progn
 	  (if (= (count-windows) 1)
