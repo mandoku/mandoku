@@ -40,7 +40,7 @@
     To install this, clone the git repository, change into the mdkit
     directory, and run this command:
 #+begin_src sh
-emacs -q -l init.el
+emacs -q -l md-init.el
 #+end_src
 
     This will load the emacs on your path, without using whatever you
