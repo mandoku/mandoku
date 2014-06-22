@@ -27,6 +27,9 @@
     (setq buffer-file-name (concat mandoku-temp-dir buffer))
     (unless (file-directory-p mandoku-temp-dir)
       (make-directory mandoku-temp-dir t))
+    (goto-char (point-min))
+    (if (looking-at "\n")
+	(delete-char 1))
     (save-buffer)
     (mandoku-view-mode)
     (mandoku-execute-file-search 
