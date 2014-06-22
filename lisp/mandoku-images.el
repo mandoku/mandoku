@@ -2,29 +2,6 @@
 ;; created [2014-02-28T09:23:45+0900]
 ;; remote image
 
-(defun mandoku-open-remote-image (filename src page)
-  (let* ((buffer (car (last (split-string filename "/"))))
-	 (rep (car (split-string buffer "[0-9]")))
-	 (rep-url (car (cdr (assoc rep mandoku-repositories-alist ))))
-	 )
-    (with-current-buffer (get-buffer-create buffer)
-      (url-insert-file-contents (concat rep-url "/getfile?filename=" filename )
-			      (lambda (status) (switch-to-buffer buffer))))
-    (switch-to-buffer buffer)
-    (setq buffer-file-name (concat mandoku-temp-dir buffer))
-    (unless (file-directory-p mandoku-temp-dir)
-      (make-directory mandoku-temp-dir t))
-    (save-buffer)
-    (mandoku-view-mode)
-    (mandoku-execute-file-search 
-	 (if src 
-	     (concat page "::" src)
-	   page))
-    ))
-
-
-
-
 
 ;; specialized functions for specific editions:
 
