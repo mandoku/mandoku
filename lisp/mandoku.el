@@ -747,13 +747,12 @@ the character at point, ignoring non-Kanji characters"
 ;	  (url-insert-file-contents (concat rep-url "/getfile?filename=" path )
 				    (lambda (status) (switch-to-buffer buffer))))
 	(switch-to-buffer buffer)
-	(setq buffer-file-name (concat mandoku-temp-dir buffer))
-	(unless (file-directory-p mandoku-temp-dir)
-      (make-directory mandoku-temp-dir t))
-    (save-buffer)
-    
-      
-)
+	(setq buffer-file-name buffer)
+	(unless (file-directory-p (file-name-directory buffer))
+	  (make-directory (file-name-directory buffer) t))
+	(save-buffer)))
+
+
 (defun mandoku-open-image-at-page (arg &optional il)
   "this will first look for a function for this edition, then browse the image index"
   (interactive "P")
