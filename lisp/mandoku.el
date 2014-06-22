@@ -754,6 +754,7 @@ the character at point, ignoring non-Kanji characters"
 	(goto-char (point-min))
 	(if (looking-at "\n")
 	    (delete-char 1))
+	(setq buffer-file-coding-system nil)
 	(save-buffer)
 	(kill-buffer)
 	(find-file-other-window (concat mandoku-image-dir path))
@@ -803,7 +804,11 @@ eds
 	 (line (nth 3 loc))
 	 (il (concat (substring (file-name-directory (buffer-file-name)) 0 -1) ".wiki/imglist/" f ".txt"))
 	 (fn (nth (- (length (split-string il "/")) 1) (split-string il "/")))
-	 (ed (or ed (ido-completing-read "Edition: " (mandoku-get-editions-from-index il) nil t))))
+	 (eds (mandoku-get-editions-from-index il))
+	 ;; no need to ask if there is only one edition
+	 (ed (or ed (if (= (length eds) 1) 
+			(car eds)
+		      (ido-completing-read "Edition: " (mandoku-get-editions-from-index il) nil t)))))
 
       (with-current-buffer (get-buffer (concat " *mandoku-img-" fn))
           (goto-char (point-max))
