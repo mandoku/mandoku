@@ -265,4 +265,4 @@
       bibtex-autokey-titleword-length 5)
 
 
-(provide 'mdkit)
+(provide 'md-kit)

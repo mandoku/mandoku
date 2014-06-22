@@ -20,6 +20,6 @@
 (add-to-list 'load-path mandoku-lisp)
 
 (require 'install-packages)
-(require 'mdkit)
+(require 'md-kit)
 ;;; end init
 
