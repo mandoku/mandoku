@@ -225,7 +225,6 @@
 
 (require 'org)
 
-(setq debug-on-error t)
 ;; Mandoku [2014-05-26T17:57:33+0900]
 (when (file-exists-p mandoku-lisp)
   (mapc 'load (directory-files mandoku-lisp 't "^[^#].*el$")))

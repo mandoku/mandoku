@@ -758,7 +758,7 @@ the character at point, ignoring non-Kanji characters"
 (defun mandoku-get-editions-from-index (il)
   (let* ((eds (list))
 	(fn (nth (- (length (split-string il "/")) 1) (split-string il "/")))
-	(thebuffer (get-buffer-create (concat "mandoku-img-" fn)))
+	(thebuffer (get-buffer-create (concat " *mandoku-img-" fn)))
 	)
     (with-current-buffer thebuffer 
       (let ((coding-system-for-read 'utf-8))
@@ -781,8 +781,7 @@ eds
 	 (fn (nth (- (length (split-string il "/")) 1) (split-string il "/")))
 	 (ed (or ed (ido-completing-read "Edition: " (mandoku-get-editions-from-index il) nil t))))
 
-;      (with-current-buffer (get-buffer "ZB6q0003_004.txt")
-      (with-current-buffer (get-buffer (concat "mandoku-img-" fn))
+      (with-current-buffer (get-buffer (concat " *mandoku-img-" fn))
           (goto-char (point-max))
 	  (re-search-backward (concat "^" pg "\\([0-9][0-9]\\)\t\\([^\t\n]+\\)\t\\([^\t\n]+\\)") nil t)
 	  (message (match-string 0))
