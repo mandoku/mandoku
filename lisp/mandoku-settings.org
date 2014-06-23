@@ -76,8 +76,6 @@
 (global-set-key [f7] 'mandoku-search-titles)
 (require 'mandoku)
 (define-key mandoku-view-mode-map (kbd "C-c i")  'mandoku-open-image-at-page)
-
-
 (setq org-support-shift-select 'always)
 #+END_SRC
 
