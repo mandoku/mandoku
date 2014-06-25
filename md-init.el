@@ -18,8 +18,20 @@
 (add-to-list 'load-path starter-kit-dir)
 (add-to-list 'load-path starter-kit-user-dir)
 (add-to-list 'load-path mandoku-lisp)
+
+;; proxy on windows
 (if (eq window-system 'w32)
-    (load "w32-registry"))
+(eval-after-load "url"
+  '(progn
+     (require 'w32-registry)
+     (defadvice url-retrieve (before
+                              w32-set-proxy-dynamically
+                              activate)
+       "Before retrieving a URL, query the IE Proxy settings, and use them."
+       (let ((proxy (w32reg-get-ie-proxy-config)))
+         (setq url-using-proxy proxy
+               url-proxy-services proxy))))))
+
 (require 'install-packages)
 (require 'md-kit)
 ;;; end init
