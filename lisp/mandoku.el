@@ -380,8 +380,8 @@ One character is either a character or one entity expression"
       	(search-char (string-to-char search-string))
 	(mandoku-filtered-count 0))
       (progn
-    (switch-to-buffer-other-window index-buffer t)
-;;xx      (set-buffer index-buffer)
+;;    (switch-to-buffer-other-window index-buffer t)
+      (set-buffer index-buffer)
 ;; first: sort the result (after the filename)
     (setq buffer-file-name nil)
       (sort-lines nil (point-min) (point-max))
@@ -486,7 +486,9 @@ One character is either a character or one entity expression"
 			  (mapconcat 'mandoku-active-filter mandoku-textfilter-list "")
 			  mandoku-filtered-count search-string mandoku-filtered-count cnt))
 	(if (> cnt mandoku-index-display-limit )
-	    (insert (format "Too many results: %d for %s! Displaying only overview\nCollection\tMatches\n" cnt search-string))
+	    (insert (format "Too many results!\nDisplaying only overview\n* %s (%d)\nCollection\tMatches\n" search-string cnt ))
+
+;	    (insert (format "Too many results: %d for %s! Displaying only overview\nCollection\tMatches\n" cnt search-string))
 	  (insert (format "Location\tMatch\tSource\n* %s (%d)\n"  search-string cnt))
 	)
 	)
@@ -1311,11 +1313,10 @@ eds
       (let ((hw 	(car (split-string  (org-get-heading)))))
 	(forward-line)
 	(if (looking-at "\n")
-	    (mandoku-index-insert-result (mandoku-index-get-search-string) "*temp-buffer*" (current-buffer) hw))
-	)))
-   ((and (eq major-mode 'mandoku-index-mode)
-	     (memq state '(overview folded)))
-      (hi-lock-mode 0))))
+	    (mandoku-index-insert-result (mandoku-index-get-search-string) "*temp-mandoku*" (current-buffer) hw))
+	))
+    )
+   ))
 
 ;(add-hook 'org-cycle-hook 'mandoku-index-tab-change) 
 
