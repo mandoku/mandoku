@@ -19,19 +19,37 @@
 (add-to-list 'load-path starter-kit-user-dir)
 (add-to-list 'load-path mandoku-lisp)
 
+
 ;; proxy on windows
 (if (eq window-system 'w32)
-(eval-after-load "url"
-  '(progn
-     (require 'w32-registry)
-     (defadvice url-retrieve (before
-                              w32-set-proxy-dynamically
-                              activate)
-       "Before retrieving a URL, query the IE Proxy settings, and use them."
-       (let ((proxy (w32reg-get-ie-proxy-config)))
-         (setq url-using-proxy proxy
-               url-proxy-services proxy))))))
+    (eval-after-load "url"
+      '(progn
+	 (require 'w32-registry)
+	 (defadvice url-retrieve (before
+				  w32-set-proxy-dynamically
+				  activate)
+	   "Before retrieving a URL, query the IE Proxy settings, and use them."
+	   (let ((proxy (w32reg-get-ie-proxy-config)))
+	     (setq url-using-proxy proxy
+		   url-proxy-services proxy))))))
 
+
+;; check for proxy
+(require 'timer)
+(defun mdinit-set-proxy ()
+  "Try to connect, if not, set proxy"
+  (interactive)
+  (setq url-proxy-services nil)
+  (with-timeout (5 
+		 (setq url-proxy-services '(("no_proxy" . "localhost")
+                           ("http" . "proxy.kuins.net:8080"))))
+    
+    (url-retrieve-synchronously "http://www.google.com"))
+  (message "Set proxy services. %S " url-proxy-services)
+  )
+    
+
+(mdinit-set-proxy)
 (require 'install-packages)
 (require 'md-kit)
 ;;; end init
