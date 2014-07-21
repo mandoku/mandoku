@@ -50,7 +50,19 @@
     
 
 (mdinit-set-proxy)
+
+;; install init on mac
+
+(if (eq window-system 'mac)
+    (with-current-buffer (find-file user-init-file)
+      (goto-char (point-min))
+      (if (not (search-forward "md-init" nil t))
+	  (progn
+	    (goto-char (point-max))
+	    (insert "(load \"" starter-kit-dir "md-init.el\")")))))
+	  
+
 (require 'install-packages)
 (require 'md-kit)
-;;; end init
+;;; end md-init
 
