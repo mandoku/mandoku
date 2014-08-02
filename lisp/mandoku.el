@@ -14,6 +14,8 @@
 (defvar mandoku-meta-dir (expand-file-name  (concat mandoku-base-dir "meta/")))
 (defvar mandoku-temp-dir (expand-file-name  (concat mandoku-base-dir "temp/")))
 (defvar mandoku-sys-dir (expand-file-name  (concat mandoku-base-dir "system/")))
+(defvar mandoku-work-dir (expand-file-name  (concat mandoku-base-dir "work/")))
+(defvar mandoku-filters-dir (expand-file-name  (concat mandoku-work-dir "filters/")))
 
 (defvar mandoku-string-limit 10)
 (defvar mandoku-index-display-limit 2000)
@@ -376,7 +378,7 @@ One character is either a character or one entity expression"
     cnt))
 
 (defun mandoku-index-insert-result (search-string index-buffer result-buffer  &optional filter)
-  (let ((mandoku-use-textfilter nil)
+  (let (;(mandoku-use-textfilter nil)
       	(search-char (string-to-char search-string))
 	(mandoku-filtered-count 0))
       (progn
@@ -464,7 +466,9 @@ One character is either a character or one entity expression"
 		    ))
 	    (set-buffer index-buffer)
 ;	    (setq mandoku-count (+ mandoku-count 1))
-))))))    
+	    ))))
+      mandoku-filtered-count
+      ))    
 
 (defun mandoku-read-index-buffer (index-buffer result-buffer search-string)
   (let* (
@@ -476,7 +480,7 @@ One character is either a character or one entity expression"
     (if (and (not (= 0 mandoku-index-display-limit)) (> cnt mandoku-index-display-limit))
 ;    (if nil
 	(mandoku-index-insert-tablist tab result-buffer)
-      (mandoku-index-insert-result search-string index-buffer result-buffer ""))
+      (setq mandoku-filtered-count (mandoku-index-insert-result search-string index-buffer result-buffer "")))
       (switch-to-buffer-other-window result-buffer t)
       (goto-char (point-min))
 ;      (insert (format "There were %d matches for your search of %s:\n"
@@ -603,8 +607,26 @@ One character is either a character or one entity expression"
       (eval (read (concat "(add-to-list 'mandoku-textfilter-list 'tab-" fn ")"))))))
       
 
-
-
+(defun mandoku-make-text-filter-from-search-results ()
+  "Called from a *Mandoku Index* buffer, creates a textfilter
+that includes all text ids of texts that matched here."
+  (interactive)
+  (when (eq major-mode 'mandoku-index-mode)
+    (let* ((txtids (org-prop;;Updating: ZB5erty-values "ID"))
+	  (search (save-excursion
+		    (goto-char (point-min))
+		    (search-forward "* ")
+		    (car (mandoku-get-header-item ))))
+	  (filtername  (read-string (concat "Name for this filter (default:" search "): ") search))
+	  (fn (concat mandoku-filter-dir filtername ".txt" )))
+      (with-current-buffer (find-file-noselect fn)
+	(insert ";;" (current-time-string) "\n")
+	(dolist (axx txtids)
+	  (insert axx " " (mandoku-textid-to-title axx) "\n"))
+	)
+      (message "%s %s" search fn)
+    )
+))
 
 (defun mandoku-make-textfilter ()
   "Creates a new textfilter and adds it to the list of textfilters"

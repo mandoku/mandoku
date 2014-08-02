@@ -22,8 +22,9 @@
         'magit 
 ;	'bbdb 'bbdb-ext
         'auctex 'reftex
-        'undo-tree
+;        'undo-tree
 	'diminish
+	'json
 	;'icicles
 	'org 'org-plus-contrib
 ;	'elpy

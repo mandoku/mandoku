@@ -4,7 +4,7 @@
 ;;
 ;; This is the first thing to get loaded.
 ;;
-
+(setq debug-on-error t)
 ;; remember this directory
 (defconst starter-kit-dir (file-name-directory (or load-file-name (buffer-file-name)))
     "directory where the starterkit is installed")
@@ -53,13 +53,13 @@
 
 ;; install init on mac
 
-(if (eq window-system 'mac)
+(ignore-errors (if (eq window-system 'mac)
     (with-current-buffer (find-file user-init-file)
       (goto-char (point-min))
       (if (not (search-forward "md-init" nil t))
 	  (progn
 	    (goto-char (point-max))
-	    (insert "(load \"" starter-kit-dir "md-init.el\")")))))
+	    (insert "(load \"" starter-kit-dir "md-init.el\")"))))))
 	  
 
 (require 'install-packages)
