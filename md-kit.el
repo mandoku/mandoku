@@ -27,9 +27,9 @@
 
 
 ;; sensible undo
-(require 'undo-tree)
-(global-undo-tree-mode)
-(diminish 'undo-tree-mode)
+;(require 'undo-tree)
+;(global-undo-tree-mode)
+;(diminish 'undo-tree-mode)
 
 ;; bookmarks
 (require 'bookmark)
