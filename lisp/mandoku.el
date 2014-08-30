@@ -626,7 +626,7 @@ that includes all text ids of texts that matched here."
 	)
       (message "%s %s" search fn)
     )
-))
+))))
 
 (defun mandoku-make-textfilter ()
   "Creates a new textfilter and adds it to the list of textfilters"
