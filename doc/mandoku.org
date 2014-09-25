@@ -1,4 +1,0 @@
-#+TITLE: The Mandoku Project
-
-
-* Aims
