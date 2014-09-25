@@ -1541,6 +1541,7 @@ Letters do not insert themselves; instead, they are commands.
   (interactive)
   (let* ((buf (current-buffer))
 	 (fn (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))))
+	 (ext (file-name-extension (file-name-nondirectory (buffer-file-name ))))
 ;	 (txtid (downcase (car (split-string  fn "_" ))))
 	 (tmpid (car (split-string  fn "_" )))
 	 (txtid  (if (string-match "[a-z]"  tmpid (- (length tmpid) 1))
@@ -1557,7 +1558,7 @@ Letters do not insert themselves; instead, they are commands.
     ;; [2014-06-03T16:07:55+0900] activate this as soon as the wiki on gl.kanripo is ready
     (mandoku-clone (concat targetdir txtid ".wiki")  wikiurl)
     (kill-buffer buf)
-    (find-file (concat targetdir txtid "/" fn ".txt")))
+    (find-file (concat targetdir txtid "/" fn "." ext)))
 )
 
  ; (shell-command-to-string (concat "cd " default-directory "  && " git " clone " txturl ))) 

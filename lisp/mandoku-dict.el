@@ -8,7 +8,7 @@
 (require 'mandoku)
 
 (defvar mandoku-dict-regex "<[^>]*>\\|[　-㄀＀-￯\n¶]+\\|\t[^\n]+\n")
-(defvar mandoku-dict-url "http://www.kanripo.org/zb" )
+(defvar mandoku-dict-url "http://www.kanripo.org/api/v1.0" )
 
 (defvar mandoku-dict-img-dir nil) 
 
