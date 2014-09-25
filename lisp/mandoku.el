@@ -3,7 +3,7 @@
 ;; renamed and refactored [2010-01-08T17:01:43+0900]
 (require 'org)
 ;; the root of the mandoku hierarchy
-(defvar mandoku-base-dir (expand-file-name  "~/krp/"))
+(defvar mandoku-base-dir "")
 (defvar mandoku-do-remote nil)
 (defvar mandoku-preferred-edition nil "Preselect a certain edition to avoid repeated selection")
 (defvar mandoku-lisp-dir nil)
@@ -626,7 +626,7 @@ that includes all text ids of texts that matched here."
 	)
       (message "%s %s" search fn)
     )
-))
+))))
 
 (defun mandoku-make-textfilter ()
   "Creates a new textfilter and adds it to the list of textfilters"

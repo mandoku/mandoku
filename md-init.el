@@ -4,7 +4,8 @@
 ;;
 ;; This is the first thing to get loaded.
 ;;
-(setq debug-on-error t)
+;(setq debug-on-error t)
+(prefer-coding-system 'utf-8)
 ;; remember this directory
 (defconst starter-kit-dir (file-name-directory (or load-file-name (buffer-file-name)))
     "directory where the starterkit is installed")
@@ -15,51 +16,33 @@
 (defvar mandoku-lisp (expand-file-name "lisp" starter-kit-dir)
   "directory for mandoku lisp code")
 
+(setq mandoku-base-dir (concat (mapconcat 'identity (butlast (split-string starter-kit-dir "/") 2) "/") "/"))
+
 (add-to-list 'load-path starter-kit-dir)
 (add-to-list 'load-path starter-kit-user-dir)
 (add-to-list 'load-path mandoku-lisp)
 
+;; set proxy on windows
+(ignore-errors (if (eq window-system 'w32)
 
-;; proxy on windows
-(if (eq window-system 'w32)
-    (eval-after-load "url"
-      '(progn
-	 (require 'w32-registry)
-	 (defadvice url-retrieve (before
-				  w32-set-proxy-dynamically
-				  activate)
-	   "Before retrieving a URL, query the IE Proxy settings, and use them."
-	   (let ((proxy (w32reg-get-ie-proxy-config)))
-	     (setq url-using-proxy proxy
-		   url-proxy-services proxy))))))
-
-
-;; check for proxy
-(require 'timer)
-(defun mdinit-set-proxy ()
-  "Try to connect, if not, set proxy"
-  (interactive)
-  (setq url-proxy-services nil)
-  (with-timeout (5 
-		 (setq url-proxy-services '(("no_proxy" . "localhost")
-                           ("http" . "proxy.kuins.net:8080"))))
-    
-    (url-retrieve-synchronously "http://www.google.com"))
-  (message "Set proxy services. %S " url-proxy-services)
-  )
-    
-
-(mdinit-set-proxy)
+(if (string-match "WaveLAN" (shell-command-to-string "netsh wlan show interface | find /i \" SSID\""))
+    (setq url-proxy-services '(("no_proxy" . "localhost")
+			   ("http" . "proxy.kuins.net:8080"))))
+))
 
 ;; install init on mac
 
 (ignore-errors (if (eq window-system 'mac)
-    (with-current-buffer (find-file user-init-file)
+    (with-current-buffer (find-file-noselect user-init-file)
       (goto-char (point-min))
       (if (not (search-forward "md-init" nil t))
 	  (progn
 	    (goto-char (point-max))
-	    (insert "(load \"" starter-kit-dir "md-init.el\")"))))))
+	    (insert "(load \"" starter-kit-dir "md-init.el\")")))
+      (save-buffer)
+      (kill-buffer))
+    
+))
 	  
 
 (require 'install-packages)
