@@ -77,6 +77,7 @@
  (global-set-key [f5] 'mandoku-dict-mlookup))
 (global-set-key [f6] 'mandoku-search-text)
 (global-set-key [f7] 'mandoku-search-titles)
+(global-set-key "\C-xg" 'magit-status)
 (require 'mandoku)
 (define-key mandoku-view-mode-map (kbd "C-c i")  'mandoku-open-image-at-page)
 (setq org-support-shift-select 'always)
