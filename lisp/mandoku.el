@@ -1576,8 +1576,10 @@ Letters do not insert themselves; instead, they are commands.
 	 (git       (or (executable-find "git")
 			(error "Unable to find `git'")))
 	 (status
-	  (call-process-shell-command
-	   git nil `(,buf t) t "clone" url "-v" targetdir)))
+	  (start-process-shell-command "*download*" buf
+	   (concat git  " clone " url " -v " targetdir))))
+;	  (start-process-shell-command
+;	   git nil `(,buf t) t "clone" url "-v" targetdir)))
 	(unless (zerop status)
 	  (error "Couldn't clone the remote Git repository from %s." (concat url " to " targetdir ))))
 )
