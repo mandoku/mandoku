@@ -28,7 +28,8 @@
 (ignore-errors 
   (if (string-match "WaveLAN" ssid)
       (setq url-proxy-services '(("no_proxy" . "localhost")
-			   ("http" . "proxy.kuins.net:8080"))))
+			   ("http" . "proxy.kuins.net:8080")))
+      (setq url-proxy-services nil))
 )
 
 
