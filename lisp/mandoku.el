@@ -6,8 +6,8 @@
 (defvar mandoku-base-dir nil)
 (defvar mandoku-do-remote nil)
 (defvar mandoku-preferred-edition nil "Preselect a certain edition to avoid repeated selection")
-(defvar mandoku-lisp-dir (file-name-directory (or load-file-name (buffer-file-name)))
-  "directory for mandoku lisp code")
+(defconst mandoku-lisp-dir (file-name-directory (or load-file-name (buffer-file-name)))
+  "directory of mandoku lisp code")
 (defvar mandoku-subdirs (list "text" "images" "meta" "temp" "system" "work"))
 (defvar mandoku-text-dir (expand-file-name (concat mandoku-base-dir "text/")))
 (defvar mandoku-image-dir nil)
@@ -21,6 +21,8 @@
 (defvar mandoku-string-limit 10)
 (defvar mandoku-index-display-limit 2000)
 ;; Defined somewhere in this file, but used before definition.
+;;;###autoload
+(defvar mandoku-repositories-alist)
 (defvar mandoku-md-menu)
 (defvar mandoku-catalog)
 
@@ -236,7 +238,7 @@
 		  (if (not (search-forward "mandoku-base-dir" nil t))
 		      (progn
 			(goto-char (point-max))
-			(insert "(setq mandoku-base-dir " mandoku-base-dir ")\n")
+			(insert "(setq mandoku-base-dir \"" mandoku-base-dir "\")\n")
 			(save-buffer)))
 		  (kill-buffer)))
 	      ;; create the other directories
