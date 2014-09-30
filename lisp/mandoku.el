@@ -245,16 +245,13 @@
 	      ;; create the catalog file
 	      (mandoku-update-subcoll-list)
 	      (mandoku-read-titletables) 
-	      (setq mandoku-catalog (file-exists-p (concat mandoku-meta-dir "mandoku-catalog.txt")))
-
-
-))
+	      (setq mandoku-catalog (file-exists-p (concat mandoku-meta-dir "mandoku-catalog.txt")))))
 	(require 'org)
 	(setq mandoku-local-init-file (expand-file-name "mandoku-settings.org" mduser ))
 	(if (file-exists-p (ex
-	(org-babel-load-file mandoku-local-init-file)
-	))
-    )
+			    (org-babel-load-file mandoku-local-init-file)
+			    ))
+    ))))
   (setq mandoku-initialized-p t)
 )
 
