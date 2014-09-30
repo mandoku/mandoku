@@ -67,6 +67,23 @@
     (defun replace-in-string (target old new)
       (replace-regexp-in-string old new  target)))
 
+
+;;;###autoload
+(let ((md 
+       (if (not starter-kit-user-dir )
+	   (read-string "Directory for mandoku?" )
+	 starter-kit-user-dir)))
+  (if (file-exists-p (expand-file-name "mandoku-settings.org" md ))
+      (org-babel-load-file (expand-file-name "mandoku-settings.org" md ))
+    (progn 
+      (copy-file (expand-file-name "mandoku-settings.org" (file-name-directory (or load-file-name (buffer-file-name)))) md)
+      (org-babel-load-file (expand-file-name "mandoku-settings.org" md ))
+      ))
+  )
+
+;;; ** working with catalog files, prepare the metadata
+
+
 (defun mandoku-update-subcoll-list ()
   ;; dont really need this outer loop at the moment...
   (dolist (x mandoku-repositories-alist)
