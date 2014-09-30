@@ -6,8 +6,9 @@
 (defvar mandoku-base-dir nil)
 (defvar mandoku-do-remote nil)
 (defvar mandoku-preferred-edition nil "Preselect a certain edition to avoid repeated selection")
-(defvar mandoku-lisp-dir nil)
-;(defvar mandoku-subdirs (list "text" "images" "index" "meta" "temp" "system" "work"))
+(defvar mandoku-lisp-dir (file-name-directory (or load-file-name (buffer-file-name)))
+  "directory for mandoku lisp code")
+(defvar mandoku-subdirs (list "text" "images" "meta" "temp" "system" "work"))
 (defvar mandoku-text-dir (expand-file-name (concat mandoku-base-dir "text/")))
 (defvar mandoku-image-dir nil)
 (defvar mandoku-index-dir nil)
@@ -22,7 +23,7 @@
 ;; Defined somewhere in this file, but used before definition.
 (defvar mandoku-md-menu)
 (defvar mandoku-catalog)
-;(defvar mandoku-local-init-file "~/.emacs.d/mandoku-local-init.el")
+
 
 (defvar mandoku-location-plist nil
   "Plist holds the most recent stored location with associated information.")
@@ -41,7 +42,7 @@
 ;; ** Catalogs
 (defvar mandoku-catalogs-alist nil)
 
-(defvar mandoku-initialized nil)
+(defvar mandoku-initialized-p nil)
 
 
 (defvar mandoku-file-type ".txt")
@@ -201,10 +202,64 @@
 ;;;###autoload
 (defun mandoku-show-catalog ()
   (interactive)
-  (unless mandoku-initialized
-    (org-babel-load-file mandoku-local-init-file))
+  (unless mandoku-initialized-p
+    (mandoku-initialize))
   (find-file mandoku-catalog)
+  )
+
+(defun mandoku-initialize ()
+  (let* ((md 
+	  (if (not mandoku-base-dir)
+	      (read-string "Directory for mandoku?" )
+	    mandoku-base-dir))
+	 (mduser (concat md "/user"))
+	 )
+    (if (file-exists-p (expand-file-name "mandoku-settings.org" mduser ))
+	(org-babel-load-file (expand-file-name "mandoku-settings.org" mduser ))
+      ;; looks like we have to bootstrap the krp directory structure
+      (progn 
+	(require 'org)
+	(ignore-errors  (mkdir mduser t))
+	(copy-file (expand-file-name "mandoku-settings.org" (file-name-directory (or load-file-name (buffer-file-name)))) mduser)
+	(if (not mandoku-base-dir)
+	    (progn
+	      (setq mandoku-base-dir 
+		    (if (not (string= (substring md -1) "/"))
+			 (concat md "/")
+		      md))
+	      ;; see if we have a emacs init file, store it there!
+	      (let ((init-file (if user-init-file
+				   user-init-file
+				 (expand-file-name "~/.emacs.d/init.el"))))
+		(with-current-buffer (find-file-noselect init-file)
+		  (goto-char (point-min))
+		  (if (not (search-forward "mandoku-base-dir" nil t))
+		      (progn
+			(goto-char (point-max))
+			(insert "(setq mandoku-base-dir " mandoku-base-dir ")\n")
+			(save-buffer)))
+		  (kill-buffer)))
+	      ;; create the other directories
+	      (dolist (sd mandoku-subdirs)
+		(mkdir (concat mandoku-base-dir sd) t))
+	      ;; create the catalog file
+	      (mandoku-update-subcoll-list)
+	      (mandoku-read-titletables) 
+	      (setq mandoku-catalog (file-exists-p (concat mandoku-meta-dir "mandoku-catalog.txt")))
+
+
+))
+	(require 'org)
+	(setq mandoku-local-init-file (expand-file-name "mandoku-settings.org" mduser ))
+	(if (file-exists-p (ex
+	(org-babel-load-file mandoku-local-init-file)
+	))
+    )
+  (setq mandoku-initialized-p t)
 )
+
+			
+
 
 (defun mandoku-show-local-init ()
   (interactive)
@@ -215,8 +270,8 @@
   (interactive 
    (let ((search-for (mapconcat 'char-to-string (mandoku-next-three-chars) "")))
      (list (read-string "Search for: " search-for))))
-  (unless mandoku-initialized
-    (progn (load "mandoku-init")))
+  (unless mandoku-initialized-p
+    (mandoku-initialize))
   (mandoku-grep-internal (mandoku-cut-string search-for))
   )
 
