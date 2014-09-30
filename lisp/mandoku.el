@@ -3,7 +3,7 @@
 ;; renamed and refactored [2010-01-08T17:01:43+0900]
 (require 'org)
 ;; the root of the mandoku hierarchy
-(defvar mandoku-base-dir (expand-file-name  "~/krp/"))
+(defvar mandoku-base-dir nil)
 (defvar mandoku-do-remote nil)
 (defvar mandoku-preferred-edition nil "Preselect a certain edition to avoid repeated selection")
 (defvar mandoku-lisp-dir nil)
@@ -68,18 +68,6 @@
       (replace-regexp-in-string old new  target)))
 
 
-;;;###autoload
-(let ((md 
-       (if (not starter-kit-user-dir )
-	   (read-string "Directory for mandoku?" )
-	 starter-kit-user-dir)))
-  (if (file-exists-p (expand-file-name "mandoku-settings.org" md ))
-      (org-babel-load-file (expand-file-name "mandoku-settings.org" md ))
-    (progn 
-      (copy-file (expand-file-name "mandoku-settings.org" (file-name-directory (or load-file-name (buffer-file-name)))) md)
-      (org-babel-load-file (expand-file-name "mandoku-settings.org" md ))
-      ))
-  )
 
 ;;; ** working with catalog files, prepare the metadata
 
