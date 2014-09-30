@@ -42,6 +42,7 @@
 ;; this could be a list? currently only one subcoll allowed, but it could be a regex understood by the shell ZB6[rq]
 (defvar mandoku-search-limit-to-coll nil)
 ;; ** Catalogs
+;;;###autoload
 (defvar mandoku-catalogs-alist nil)
 
 (defvar mandoku-initialized-p nil)
