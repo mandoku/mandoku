@@ -65,13 +65,14 @@
 #+BEGIN_SRC emacs-lisp
 (require 'mandoku)
 (require 'mandoku-remote)
-;(require 'org-mandoku)
 (require 'mandoku-dict)
+(if (not (string= (substring mandoku-base-dir -1) "/"))
+ (setq mandoku-base-dir (concat mandoku-base-dir "/")))
 (setq org-return-follows-link t)
 (setq mandoku-do-remote t)
 (setq mandoku-string-limit 10)
 (setq mandoku-index-display-limit 2000)
-(setq mandoku-local-init-file (expand-file-name "mandoku-settings.org" starter-kit-user-dir))
+(setq mandoku-local-init-file (expand-file-name "mandoku-settings.org" (file-name-directory (or load-file-name (buffer-file-name)))))
 (ignore-errors 
  (load "mandoku-dict" t)
  (global-set-key [f5] 'mandoku-dict-mlookup))
@@ -122,8 +123,9 @@
       (add-to-list 'mandoku-catalogs-alist 
    (cons (file-name-sans-extension file) (concat mandoku-meta-dir dir "/" file))))))
 (mandoku-read-titletables) 
-(setq mandoku-catalog (concat mandoku-meta-dir "mandoku-catalog.txt"))
+(setq mandoku-catalog (file-exists-p (concat mandoku-meta-dir "mandoku-catalog.txt")))
 (setq mandoku-initialized t)
 (message "Loading of local setup for Mandoku finished")
-(find-file mandoku-catalog)
+(if mandoku-catalog
+(find-file mandoku-catalog))
 #+END_SRC
