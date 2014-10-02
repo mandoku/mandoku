@@ -23,7 +23,7 @@
 (defvar mandoku-index-display-limit 2000)
 ;; Defined somewhere in this file, but used before definition.
 ;;;###autoload
-(defvar mandoku-repositories-alist)
+(defvar mandoku-repositories-alist '(("dummy" . "http://www.example.com")))
 (defvar mandoku-md-menu)
 (defvar mandoku-catalog)
 
@@ -76,24 +76,39 @@
 
 
 ;;; ** working with catalog files, prepare the metadata
-
+(defun mandoku-update-catalog-alist ()
+  (setq mandoku-catalog-path-list nil)
+  (add-to-list 'mandoku-catalog-path-list mandoku-meta-dir)
+  (dolist (p package-activated-list)
+    (if (string-match "mandoku-meta" (symbol-name p))
+	(add-to-list 'mandoku-catalog-path-list (symbol-value (intern (concat (symbol-name p) "-dir"))))))
+      (dolist (px mandoku-catalog-path-list )
+	(dolist (file (directory-files px nil ".*txt" ))
+	  (if (not (string-match file mandoku-catalog))
+	  (add-to-list 'mandoku-catalogs-alist 
+		       (cons (file-name-sans-extension file) (concat px "/" file))))))
+)
 
 (defun mandoku-update-subcoll-list ()
   ;; dont really need this outer loop at the moment...
-  (dolist (x mandoku-repositories-alist)
+  (message "Subcoll start ")
+;  (dolist (x mandoku-repositories-alist)
+;    (message "Processing repo %s " (car x))
     (let ((scfile (concat mandoku-sys-dir "subcolls.txt")))
       (with-current-buffer (find-file-noselect scfile t)
 	(erase-buffer)
 	(insert (format-time-string ";;[%Y-%m-%dT%T%z]\n" (current-time)))
 	(dolist (y mandoku-catalogs-alist)
+	  (message "Processing %s " (car y))
 	  (let ((tlist 
 		 (with-current-buffer (find-file-noselect (cdr y))
 		   (org-map-entries 'mandoku-get-header-item "+LEVEL<=2"))))
 	    (with-current-buffer (file-name-nondirectory scfile)
 	      (dolist (z tlist)
 		(insert (concat (car z) "\t" (car (last z)) "\n")))
-	      (save-buffer))))
-	      (kill-buffer (file-name-nondirectory scfile) )))))
+	      )))
+	      (save-buffer)
+	      (kill-buffer (file-name-nondirectory scfile) ))))
 
 	  
 (defun mandoku-update-title-lists ()
@@ -234,6 +249,7 @@ Click on a link or move the cursor to the link and then press enter
 	       (car x)
 	       (gethash (car x)  mandoku-subcolls))))
     (save-buffer)
+    (mandoku-view-mode)
     )
   )
 
@@ -270,18 +286,18 @@ Click on a link or move the cursor to the link and then press enter
       ;; create the other directories
       (dolist (sd mandoku-subdirs)
 	(mkdir (concat mandoku-base-dir sd) t))
-      ;; create the catalog file
-      (dolist (p package-activated-list)
-	(if (string-match "mandoku-meta" (symbol-name p))
-	    (add-to-list 'mandoku-catalog-path-list (symbol-value (intern (concat (symbol-name p) "-dir"))))))
-      (dolist (px mandoku-catalog-path-list )
-	(dolist (file (directory-files px nil ".*txt" ))
-	  (add-to-list 'mandoku-catalogs-alist 
-		       (cons (file-name-sans-extension file) (concat px "/" file)))))
+      (setq mandoku-text-dir (concat mandoku-base-dir "text/"))
+      (setq mandoku-meta-dir (concat mandoku-base-dir "meta/"))
+      (setq mandoku-temp-dir (concat mandoku-base-dir "temp/"))
+      (setq mandoku-sys-dir  (concat mandoku-base-dir "system/"))
+      (setq mandoku-image-dir (concat mandoku-base-dir "images/"))
+      (setq mandoku-catalog (concat mandoku-meta-dir "mandoku-catalog.txt"))
+      (mandoku-update-catalog-alist)
+      (message "Calling subcoll")
       (mandoku-update-subcoll-list)
+      (message "Calling title list")
       (mandoku-update-title-lists)
       (mandoku-read-titletables) 
-      (setq mandoku-catalog (concat mandoku-meta-dir "mandoku-catalog.txt"))
       (mandoku-update-catalog)
       (ignore-errors  (mkdir mduser t))
     (copy-file (expand-file-name "mandoku-settings.org" mandoku-lisp-dir) mduser)
