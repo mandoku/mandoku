@@ -78,10 +78,13 @@
 ;;; ** working with catalog files, prepare the metadata
 (defun mandoku-update-catalog-alist ()
   (setq mandoku-catalog-path-list nil)
+  (setq mandoku-repositories-alist nil)
   (add-to-list 'mandoku-catalog-path-list mandoku-meta-dir)
   (dolist (p package-activated-list)
     (if (string-match "mandoku-meta" (symbol-name p))
-	(add-to-list 'mandoku-catalog-path-list (symbol-value (intern (concat (symbol-name p) "-dir"))))))
+	(let (( url (symbol-value (intern (concat (symbol-name p) "-url")))))
+	  (add-to-list 'mandoku-repositories-alist '(url) )
+	  (add-to-list 'mandoku-catalog-path-list (symbol-value (intern (concat (symbol-name p) "-dir")))))))
       (dolist (px mandoku-catalog-path-list )
 	(dolist (file (directory-files px nil ".*txt" ))
 	  (if (not (string-match file mandoku-catalog))
@@ -92,8 +95,8 @@
 (defun mandoku-update-subcoll-list ()
   ;; dont really need this outer loop at the moment...
   (message "Subcoll start ")
-;  (dolist (x mandoku-repositories-alist)
-;    (message "Processing repo %s " (car x))
+  (dolist (x mandoku-repositories-alist)
+    (message "Processing repo %s " (car x))
     (let ((scfile (concat mandoku-sys-dir "subcolls.txt")))
       (with-current-buffer (find-file-noselect scfile t)
 	(erase-buffer)
@@ -108,7 +111,7 @@
 		(insert (concat (car z) "\t" (car (last z)) "\n")))
 	      )))
 	      (save-buffer)
-	      (kill-buffer (file-name-nondirectory scfile) ))))
+	      (kill-buffer (file-name-nondirectory scfile) )))))
 
 	  
 (defun mandoku-update-title-lists ()
