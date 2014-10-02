@@ -212,6 +212,31 @@
   (find-file mandoku-catalog)
   )
 
+(defun mandoku-update-catalog ()
+  (with-current-buffer (find-file-noselect mandoku-catalog)
+    (erase-buffer)
+    (insert "#-*- mode: mandoku-view; -*-
+#+DATE: " (format-time-string "%Y-%m-%d\n" (current-time))  
+"#+TITLE: 漢籍リポジトリ目録
+
+# このファイルは自動作成しますので、編集しないでください
+# This file is generated automatically, so please do not edit
+
+リンクをクリックするかカーソルをリンクの上に移動して<enter>してください
+Click on a link or move the cursor to the link and then press enter
+
+")
+
+    (dolist (x (sort mandoku-catalogs-alist (lambda (a b) (string< (car a) (car b)))))
+      (insert 
+       (format "* [[file:%s][%s %s]]\n" 
+	       (cdr x) 
+	       (car x)
+	       (gethash (car x)  mandoku-subcolls))))
+    (save-buffer)
+    )
+  )
+
 (defun mandoku-initialize ()
   (let* ((md 
 	  (if (not mandoku-base-dir)
@@ -250,13 +275,15 @@
 	(if (string-match "mandoku-meta" (symbol-name p))
 	    (add-to-list 'mandoku-catalog-path-list (symbol-value (intern (concat (symbol-name p) "-dir"))))))
       (dolist (px mandoku-catalog-path-list )
-	(dolist (file (directory-files (concat px "ZB") nil "ZB.*txt" ))
+	(dolist (file (directory-files px nil ".*txt" ))
 	  (add-to-list 'mandoku-catalogs-alist 
-		       (cons (file-name-sans-extension file) (concat px "/ZB/" file)))))
+		       (cons (file-name-sans-extension file) (concat px "/" file)))))
       (mandoku-update-subcoll-list)
+      (mandoku-update-title-lists)
       (mandoku-read-titletables) 
-      (setq mandoku-catalog (file-exists-p (concat mandoku-meta-dir "mandoku-catalog.txt")))
-    (ignore-errors  (mkdir mduser t))
+      (setq mandoku-catalog (concat mandoku-meta-dir "mandoku-catalog.txt"))
+      (mandoku-update-catalog)
+      (ignore-errors  (mkdir mduser t))
     (copy-file (expand-file-name "mandoku-settings.org" mandoku-lisp-dir) mduser)
     (setq mandoku-local-init-file (expand-file-name "mandoku-settings.org" mduser ))
     (org-babel-load-file mandoku-local-init-file)
