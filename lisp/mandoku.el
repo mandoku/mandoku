@@ -77,17 +77,22 @@
 
 ;;; ** working with catalog files, prepare the metadata
 (defun mandoku-update-catalog-alist ()
+  ;; these variables are reset from the metadata
   (setq mandoku-catalog-path-list nil)
   (setq mandoku-repositories-alist nil)
+  ;; populated anew
+  (setq mandoku-catalogs-alist nil)
   (add-to-list 'mandoku-catalog-path-list mandoku-meta-dir)
   (dolist (p package-activated-list)
     (if (string-match "mandoku-meta" (symbol-name p))
-	(let (( url (symbol-value (intern (concat (symbol-name p) "-url")))))
-	  (add-to-list 'mandoku-repositories-alist '(url) )
-	  (add-to-list 'mandoku-catalog-path-list (symbol-value (intern (concat (symbol-name p) "-dir")))))))
-      (dolist (px mandoku-catalog-path-list )
-	(dolist (file (directory-files px nil ".*txt" ))
-	  (if (not (string-match file mandoku-catalog))
+	;; get the values for url and catalog dir from the meta-packages:
+	(let (( url (symbol-value (intern (concat (symbol-name p) "-url"))))
+	      (path (symbol-value (intern (concat (symbol-name p) "-dir")))))
+	  (add-to-list 'mandoku-repositories-alist url )
+	  (add-to-list 'mandoku-catalog-path-list path))))
+  (dolist (px mandoku-catalog-path-list )
+    (dolist (file (directory-files px nil ".*txt$" ))
+      (if (not (string-match file mandoku-catalog))
 	  (add-to-list 'mandoku-catalogs-alist 
 		       (cons (file-name-sans-extension file) (concat px "/" file))))))
 )

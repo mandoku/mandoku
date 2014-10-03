@@ -117,7 +117,7 @@
 (setq mandoku-image-dir (expand-file-name  (concat mandoku-base-dir "images/")))
 (setq mandoku-catalog (concat mandoku-meta-dir "mandoku-catalog.txt"))
 (setq mandoku-dict-url "http://www.kanripo.org/api/v1.0")
-(setq mandoku-catalogs-alist nil)
+(mandoku-update-catalog-alist)
 (mandoku-read-titletables) 
 (setq mandoku-initialized t)
 (message "Loading of local setup for Mandoku finished")
