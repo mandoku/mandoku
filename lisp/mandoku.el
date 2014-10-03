@@ -294,13 +294,17 @@ Click on a link or move the cursor to the link and then press enter
 
     (dolist (x (sort mandoku-catalogs-alist (lambda (a b) (string< (car a) (car b)))))
       (insert 
-       (format "* [[file:%s][%s %s]]\n" 
+       (if (> (length (car x)) 3)
+	   "**"
+	 "*")
+       (format " [[file:%s][%s %s]]\n" 
 	       (cdr x) 
 	       (car x)
 	       (gethash (car x)  mandoku-subcolls))))
     (save-buffer)
     (mandoku-view-mode)
     )
+  (mandoku-update-catalog-alist)
   )
 
 (defun mandoku-initialize ()
@@ -601,10 +605,10 @@ One character is either a character or one entity expression"
 		    page
 		    "]]"
 		    "\t"
-		    pre
+		    (replace-regexp-in-string "[\t\s\n+]" "" pre)
 ;		    "\t"
 		    search-char
-		    post
+		    (replace-regexp-in-string "[\t\s\n+]" "" post)
 		    "  [[mandoku:meta:"
 		    txtid
 		    ":10][《" txtid " "
@@ -667,9 +671,12 @@ One character is either a character or one entity expression"
   (gethash txtid mandoku-titles))
 
 (defun mandoku-meta-textid-to-file (txtid &optional page)
-  (let ((repid (car (split-string txtid "[0-9]"))))
-;    (concat mandoku-meta-dir repid "/" (substring txtid 0 (+ (length repid) 2)) ".org")))
-    (concat mandoku-meta-dir repid "/" (substring txtid 0 (+ (length repid) 1)) ".txt")))
+  (let* ((repid (car (split-string txtid "[0-9]")))
+	(subcoll (substring txtid 0 (+ 2 (length repid))))
+	)
+    (if (assoc subcoll mandoku-catalogs-alist)
+	(cdr (assoc subcoll mandoku-catalogs-alist))
+      (cdr (assoc (substring subcoll 0 -1) mandoku-catalogs-alist)))))
 
 
 (defun mandoku-get-outline-path (&optional pnt)
