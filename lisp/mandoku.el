@@ -1,4 +1,4 @@
-;;; mandoku.el  A tool to access repositories of premodern Chinese texts 
+;;; mandoku.el --- A tool to access repositories of premodern Chinese texts 
 ;; -*- coding: utf-8 -*-
 ;; created [2001-03-13T20:32:32+0800]  (as smart.el)
 ;; renamed and refactored [2010-01-08T17:01:43+0900]
