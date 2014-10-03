@@ -1,15 +1,57 @@
-;; mandoku.el   -*- coding: utf-8 -*-
+;;; mandoku.el   -*- coding: utf-8 -*-
 ;; created [2001-03-13T20:32:32+0800]  (as smart.el)
 ;; renamed and refactored [2010-01-08T17:01:43+0900]
+
+
+;;
+;; Copyright (c) 2001-2014 Christian Wittern
+;;
+;; Author: Christian Wittern <cwittern@gmail.com>
+;; URL: http://www.mandoku.org
+;; Version: 0.05
+;; Keywords: convenience
+;; This file is not part of GNU Emacs.
+
+;;; Commentary:
+
+;; "Emacs outshines all other editing software in approximately the
+;; same way that the noonday sun does the stars. It is not just bigger
+;; and brighter; it simply makes everything else vanish."
+;; -Neal Stephenson, "In the Beginning was the Command Line"
+
+;; This package brings the power of Emacs to people working with
+;; premodern Chinese texts by extending org-mode and providing
+;; routines for helping with reading, annotating and translating of
+;; such texts.  For more information see http://www.mandoku.org
+
+;;; License
+
+;; This program is free software; you can redistribute it and/or
+;; modify it under the terms of the GNU General Public License
+;; as published by the Free Software Foundation; either version 3
+;; of the License, or (at your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with GNU Emacs; see the file COPYING. If not, write to the
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
+;;; Code:
+
 (require 'org)
-;; the root of the mandoku hierarchy
-(defvar mandoku-base-dir nil)
+
+(defvar mandoku-base-dir nil "This is the root of the mandoku hierarchy, this needs to be provided by the user in its init file")
 (defvar mandoku-do-remote nil)
 (defvar mandoku-preferred-edition nil "Preselect a certain edition to avoid repeated selection")
 ;;;###autoload
 (defconst mandoku-lisp-dir (file-name-directory (or load-file-name (buffer-file-name)))
   "directory of mandoku lisp code")
 (defvar mandoku-subdirs (list "text" "images" "meta" "temp" "system" "work"))
+;; it probably does not much sense to do this here, but anyway, this is the idea...
 (defvar mandoku-text-dir (expand-file-name (concat mandoku-base-dir "text/")))
 (defvar mandoku-image-dir nil)
 (defvar mandoku-index-dir nil)
