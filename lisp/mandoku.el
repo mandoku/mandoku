@@ -1,8 +1,7 @@
-;;; mandoku.el   -*- coding: utf-8 -*-
+;;; mandoku.el  A tool to access repositories of premodern Chinese texts 
+;; -*- coding: utf-8 -*-
 ;; created [2001-03-13T20:32:32+0800]  (as smart.el)
 ;; renamed and refactored [2010-01-08T17:01:43+0900]
-
-
 ;;
 ;; Copyright (c) 2001-2014 Christian Wittern
 ;;
@@ -10,6 +9,7 @@
 ;; URL: http://www.mandoku.org
 ;; Version: 0.05
 ;; Keywords: convenience
+;; Package-Requires: ((org "8"))
 ;; This file is not part of GNU Emacs.
 
 ;;; Commentary:
@@ -1869,4 +1869,5 @@ Letters do not insert themselves; instead, they are commands.
 
 (provide 'mandoku)
 
-;; end of file mandoku.el
+;;; mandoku.el ends here
+
