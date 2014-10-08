@@ -1,6 +1,6 @@
 (define-package "mandoku" "0.05" "A tool to access repositories of premodern Chinese texts" 
     '(
-      (org-plus-contrib "20140630")
+      (org "8.0")
       (mandoku-meta-zb "20140930")
       )
 )
