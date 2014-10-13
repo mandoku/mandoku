@@ -1,7 +1,7 @@
 #!/bin/env python -*- coding: utf-8 -*-
 # convert txt files to mandoku index format
 
-import os, sys, codecs, re, datetime
+import os, sys, codecs, re, datetime, os.path
 ch_re = re.compile(ur'(\[[^\]]*\]|&[^;]*;|&amp;[CZ][X3-7]-[A-F0-9]+|.)')
 img_re = re.compile(ur'<i[^>]*>')
 sys.stdout = codecs.getwriter('utf8')(sys.stdout)
@@ -14,12 +14,15 @@ def PrintToIdxfile(outdir, string, collection):
     except:
         code = u"gj"
     if (not code.startswith('30') and  u"()/¶*".find(string[0]) == -1 ):
+        ndir = "%s/%s/%s"%(outdir, code[0:2], code[0:4])
         try:
-            os.mkdir("%s/%s"%(outdir, code[0:2]))
+            os.makedirs(ndir)
         except:
             pass
-        ofile="%s/%s/%s.%s.idx"%(outdir, code[0:2], code, collection)
-#        ofile="%s/%s/%s.%s.idx"%(outdir, 'test', 'test', collection)
+        # this is the old style
+        ofile="%s/%s.%s.idx"%(ndir, code, collection)
+        # now we change this to only give the collection (might later be changed to text)
+        ## ofile="%s/%s.idx"%(ndir, collection)
         try:
             idx[ofile] += string[1:]
         except:
@@ -36,14 +39,17 @@ def PrintToIdxfile(outdir, string, collection):
 #             outfiles[code].write(string)
 
 def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2, length=3, collection='test', use_vol=0):
-    defs = {'line' : 0, 'noteflag': 0, 'versflag': 0, 'file': file, 'char': 0}
+    defs = {'line' : 0, 'noteflag': 0, 'versflag': 0, 'file': file, 'char': 0, 'para' : 0,
+            'txtfile' : os.path.splitext(os.path.split(file)[-1])[0] }
     def setPage(lx):
         r=lx[lx.find(':')+1:lx.find('>')].split('_')
         #r=lx[1:lx.find('>')].split('_')
         ## this changed for krp
         defs['ed']=r[1]
         defs['id']=r[0]
-        defs['page']=r[-1]
+        #[2014-10-13T17:09:51+0900]
+        # we only take the rear part of the page, the leading part is now part of txtfile
+        defs['page']=r[-1].split('-')[-1]
         if defs['line'] == 0:
             ##this means we are looking at the first page?!
             try:
@@ -52,17 +58,18 @@ def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2
                 idlog.write("%(id)s\t%(file)s\t%(ed)s\t%(page)s\t"%(defs))
 
         defs['line']=0
-        try:
-            defs['page'] = defs['page'][:-1] + tab[defs['page'][-1]]
-        except KeyError:
-            defs['page'] = re.sub(r'-', '', defs['page'])
-            #maybe there is no abcd, so we add a 'a' anyway
-            try:
-                test=int(defs['page'])
-                defs['page'] += '1'
-            except ValueError:
-                print "error, :", file, line
-                exit
+        #[2014-10-13T17:12:55+0900] commented this part, now using page as is...
+        # try:
+        #     defs['page'] = defs['page'][:-1] + tab[defs['page'][-1]]
+        # except KeyError:
+        #     defs['page'] = re.sub(r'-', '', defs['page'])
+        #     #maybe there is no abcd, so we add a 'a' anyway
+        #     try:
+        #         test=int(defs['page'])
+        #         defs['page'] += '1'
+        #     except ValueError:
+        #         print "error, :", file, line
+        #         exit
         # if there is a lb-marker at the end of the pb, we want to take it into account        
         
     # outdir = idxdir+'/'+file.split('/')[-1]
@@ -110,6 +117,8 @@ def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2
             # if there is a lb-marker at the end of the pb, we want to take it into account        
             defs['line'] += line.count(u'¶')
         elif line.startswith('#+BEGIN_VERSE'):
+            #verse also resets context?!
+            defs['para'] += 1
             defs['versflag']=1
         elif line.startswith('#+END_VERSE'):
             defs['versflag']=0
@@ -120,7 +129,7 @@ def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2
             defs['line'] += line.count(u'¶')
             defs['char'] = 0
         elif defs.has_key('page'):
-#            defs['line'] += line.count(u'¶')
+            ## here we go!
             line = re.sub(u'[~#\u00f1-\u2fff\u3000-\u30FF\uFF00-\uFFEF]', '', line)
             ##remove the footnote markers in the hist files
             line = re.sub(u'〔[一二三四五六七八九０]+〕', '', line)
@@ -155,14 +164,15 @@ def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2
                                 chars.append((a, "%d:%d:%d:%d"%(int(vol), int(defs['page']), defs['line'], defs['char'])))
                         else:
                             try:
-                                chars.append((a, "%s:%d:%d:%d"%(defs['id'], int(defs['page']), defs['line'], defs['char'])))
+                                chars.append((a, "%s:%s:%d:%d:%d"%(defs['txtfile'], defs['page'], defs['line'], defs['char'], defs['para'])))
                             except:
                                 #we have section:page pattern
                                 #just assume this is skqs
+                                # [2014-10-13T17:08:13+0900] == might want to remove all this cruft...
                                 try:
                                     chars.append((a, "%d:%s:%d:%d"%(int(defs['id'][3:]), defs['page'], defs['line'], defs['char'])))
                                 except:
-                                    chars.append((a, "%s:%s:%d:%d"%(defs['id'], defs['page'], defs['line'], defs['char'])))
+                                    chars.append((a, "%s:%s:%d:%d:%d"%(defs['txtfile'], defs['page'], defs['line'], defs['char'], defs['para'])))
                                                         
             ## need to disentangle the text now, extract notes into a separate stack if there are some
             ## notes start by '(', end by ')' and have a possible linebreak '/' within.
