@@ -482,12 +482,15 @@ One character is either a character or one entity expression"
   (let ((coding-system-for-read 'utf-8)
 	(coding-system-for-write 'utf-8)
 	(search-char (string-to-char search-string)))
+;; /tmp/index/4e/4e00/4e00.ZB6q.idx \\ 千賢人出現於世是故,成當有	ZB6q0001_001:010a:2:8:9
       (shell-command
 		    (concat "bzgrep -H " "^"
 		     (substring search-string 1 )
 		     " "
 		     mandoku-index-dir
 		     (substring (format "%04x" search-char) 0 2)
+		     "/"
+		     (format "%04x" search-char)
 		     "/"
 		     (format "%04x" search-char)
 		     (if mandoku-search-limit-to-coll
@@ -575,15 +578,14 @@ One character is either a character or one entity expression"
 	      (location (split-string (match-string 3) ":" ))
 	      (extra (match-string 8))
 	      )
-	  (let* ((txtid (concat filter (car location)))
-		 (pag (car (cdr location)))
+	  (let* ((txtid (concat filter (car (split-string (car location) "_"))))
 		 (line (car (cdr (cdr location))))
+		 (pag (car (cdr location)))
 		 (page (if (string-match "[-_]"  pag)
 			   (concat (substring pag 0 (- (length pag) 1))
 				   (mandoku-num-to-section (substring pag (- (length pag) 1))) line)
 			 (concat
-			  (format "%4.4d" (string-to-number (substring pag 0 (- (length pag) 1))))
-			  (mandoku-num-to-section (substring pag (- (length pag) 1)))
+			  pag
 			  line)))
 		 (vol (mandoku-textid-to-vol txtid))
 		 (tit (mandoku-textid-to-title txtid)))
@@ -1739,9 +1741,11 @@ Letters do not insert themselves; instead, they are commands.
 ;	 (md (ignore-errors  (mkdir targetdir t))) 
 	 (git       (or (executable-find "git")
 			(error "Unable to find `git'")))
-	 (status
+	 (sent (set-process-sentinel
 	  (start-process-shell-command "*download*" buf
-	   (concat git  " clone " url " -v " targetdir))))
+	   (concat git  " clone " url " -v " targetdir)) 
+	  
+	  )))
 ;	  (start-process-shell-command
 ;	   git nil `(,buf t) t "clone" url "-v" targetdir)))
 	(unless (zerop status)
