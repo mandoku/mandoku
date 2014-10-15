@@ -23,6 +23,7 @@ def PrintToIdxfile(outdir, string, collection):
         ofile="%s/%s.%s.idx"%(ndir, code, collection)
         # now we change this to only give the collection (might later be changed to text)
         ## ofile="%s/%s.idx"%(ndir, collection)
+#        ofile = "/tmp/debug.index"
         try:
             idx[ofile] += string[1:]
         except:
@@ -39,6 +40,7 @@ def PrintToIdxfile(outdir, string, collection):
 #             outfiles[code].write(string)
 
 def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2, length=3, collection='test', use_vol=0):
+    pcnt = 0
     defs = {'line' : 0, 'noteflag': 0, 'versflag': 0, 'file': file, 'char': 0, 'para' : 0,
             'txtfile' : os.path.splitext(os.path.split(file)[-1])[0] }
     def setPage(lx):
@@ -130,9 +132,16 @@ def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2
             defs['char'] = 0
         elif defs.has_key('page'):
             ## here we go!
+            if len(line[:-1]) < 1 and pcnt > 1:
+                defs['para'] += 1
+                pcnt = 0
+            elif line.startswith(u"　　"):
+                defs['para'] += 1
+                pcnt = 0
             line = re.sub(u'[~#\u00f1-\u2fff\u3000-\u30FF\uFF00-\uFFEF]', '', line)
             ##remove the footnote markers in the hist files
             line = re.sub(u'〔[一二三四五六七八九０]+〕', '', line)
+            line = re.sub(u'<md[^>]+>', '', line)
             ## FIXME: maybe remove punctuation as well?!
             #FIXME: need to consider cases where the lb-marker is not at the end of the line
             ## use_vol is for cases where I want to use the volume, not the id
@@ -156,6 +165,7 @@ def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2
                         defs['char'] = 0
                     else:
                         defs['char'] += 1
+                        pcnt += 1
 #                        print defs
                         if use_vol==1:
                             if collection == 'dz':
