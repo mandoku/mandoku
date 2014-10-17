@@ -1,7 +1,11 @@
 #!/bin/env python -*- coding: utf-8 -*-
-# convert txt files to mandoku index format
+# convert txt repositories to mandoku index format
+from __future__ import division
+from __future__ import absolute_import
 
-import os, sys, codecs, re, datetime, os.path
+import os, sys, codecs, re, datetime, os.path, git
+from difflib import *
+
 ch_re = re.compile(ur'(\[[^\]]*\]|&[^;]*;|&amp;[CZ][X3-7]-[A-F0-9]+|.)')
 img_re = re.compile(ur'<i[^>]*>')
 sys.stdout = codecs.getwriter('utf8')(sys.stdout)
@@ -43,6 +47,7 @@ def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2
     pcnt = 0
     defs = {'line' : 0, 'noteflag': 0, 'versflag': 0, 'file': file, 'char': 0, 'para' : 0,
             'txtfile' : os.path.splitext(os.path.split(file)[-1])[0] }
+    s=[]
     def setPage(lx):
         r=lx[lx.find(':')+1:lx.find('>')].split('_')
         #r=lx[1:lx.find('>')].split('_')
@@ -86,8 +91,12 @@ def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2
     ##the stack for inline notes.
     notes = []
     ix = 0
-    idlog = codecs.open(idlog, 'a', 'utf-8') 
-    f=codecs.open(file, 'r', 'utf-8')
+    idlog = codecs.open(idlog, 'a', 'utf-8')
+    # lets see if we can open the file
+    try:
+        f=codecs.open(file, 'r', 'utf-8')
+    except:
+        return s
     for line in f:
         if line.startswith(u'校勘記¶'):
             break
@@ -95,7 +104,6 @@ def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2
         line = re.sub(r'/', '', line)
         if "\t" in line:
             line=line.split('\t')[0] + "\n"
-        line = line.replace(' ', '')
         if line.startswith('#') or line.startswith(':'):
             if line.startswith('#+'):
                 r=line[2:-1].split()
@@ -132,6 +140,7 @@ def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2
             defs['char'] = 0
         elif defs.has_key('page'):
             ## here we go!
+            line = line.replace(' ', '')
             if len(line[:-1]) < 1 and pcnt > 1:
                 defs['para'] += 1
                 pcnt = 0
@@ -219,7 +228,8 @@ def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2
                     notes.append(u"）")
                     notes.extend([a for a in ch_re.split(u"　" * (right -1)) if len(a) > 0])
                     for i in range(1 , len(notes) - right + 1):
-                        PrintToIdxfile (outdir, u"%s,%s\t%s\tn\n"%("".join([a[0] for a in notes[0:length+right]]), "".join(npre),  notes[0][1]), collection)
+                        s.append((u"%s,%s\t%s\tn"%("".join([a[0] for a in notes[0:length+right]]), "".join(npre),  notes[0][1]), collection))
+                        #PrintToIdxfile (outdir, u"%s,%s\t%s\tn\n"%("".join([a[0] for a in notes[0:length+right]]), "".join(npre),  notes[0][1]), collection)
                         npre.append(notes.pop(0)[0])
                         npre.pop(0)
                 else:
@@ -231,8 +241,9 @@ def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2
                     extra = "\tv"
                 else:
                     extra = ""
-                PrintToIdxfile(outdir,
-                 u"%s,%s\t%s%s\n"%("".join([a[0] for a in chars[0:length+right]]), "".join(pre), chars[0][1], extra), collection)
+                s.append((u"%s,%s\t%s%s"%("".join([a[0] for a in chars[0:length+right]]), "".join(pre), chars[0][1], extra), collection))
+                #PrintToIdxfile(outdir,
+                #u"%s,%s\t%s%s\n"%("".join([a[0] for a in chars[0:length+right]]), "".join(pre), chars[0][1], extra), collection)
                 pre.append(chars.pop(0)[0])
                 pre.pop(0)
     for i in range(right+length, 0, -1):
@@ -248,34 +259,69 @@ def MandokuIndex(file, idxdir='/tmp/index', idlog='logfile.log', left=2, right=2
             l=length
         if l > 0:
             try:
-                PrintToIdxfile(outdir, 
-                               u"%s,%s\t%s\n"%("".join([a[0] for a in chars[0:l]]), "".join(pre), chars[0][1]), collection)
+                s.append((u"%s,%s\t%s"%("".join([a[0] for a in chars[0:l]]), "".join(pre), chars[0][1]), collection))
+                #PrintToIdxfile(outdir, 
+                #u"%s,%s\t%s\n"%("".join([a[0] for a in chars[0:l]]), "".join(pre), chars[0][1]), collection)
                 pre.append(chars.pop(0)[0])
                 pre.pop(0)
             except:
                 print "some error occurred: %s %s"%(line, defs), l, length
-
-    for f in outfiles.keys():
-        outfiles[f].close()
-        #    os.system('gzip '+ outdir + '/*.idx')
-#    defs['page'] = defs['page'][:-1]
-    try:
-        idlog.write("%(page)s_%(line)2.2d\t%(date)s\n"%(defs))
-    except:
-        defs['date']= datetime.datetime.now()
-        try:
-            idlog.write("%(page)s_%(line)2.2d\t%(date)s\n"%(defs))
-        except:
-            idlog.write("some error occurred\n"%(defs))
+    print "s: ", len(s)
+    return s
+#     for f in outfiles.keys():
+#         outfiles[f].close()
+#         #    os.system('gzip '+ outdir + '/*.idx')
+# #    defs['page'] = defs['page'][:-1]
+#     try:
+#         idlog.write("%(page)s_%(line)2.2d\t%(date)s\n"%(defs))
+#     except:
+#         defs['date']= datetime.datetime.now()
+#         try:
+#             idlog.write("%(page)s_%(line)2.2d\t%(date)s\n"%(defs))
+#         except:
+#             idlog.write("some error occurred\n"%(defs))
         
-    idlog.close()
+#     idlog.close()
 
-    ##need to write on a per file base.
-    for of in idx.keys():
-        outfile=codecs.open(of, 'a+', 'utf-8')
-        outfile.write(idx[of])
-        outfile.close()
+#     ##need to write on a per file base.
+#     for of in idx.keys():
+#         outfile=codecs.open(of, 'a+', 'utf-8')
+#         outfile.write(idx[of])
+#         outfile.close()
         
+def mdIndexGit(txtdir, idxdir, left, right, length):
+    repo = git.Repo(txtdir)
+    #make sure we are on master
+    for b in repo.heads:
+        if b.name == 'master':
+            #TODO: if working dir is dirty: stash the stuff and restore later
+            b.checkout()
+    revision = repo.active_branch.commit.hexsha
+    branch = repo.active_branch.name.decode('utf-8')
+    for f in os.listdir(txtdir):
+        if f.endswith('txt'):
+            m=SequenceMatcher()
+            print branch, revision
+            s = MandokuIndex("%s/%s" % (txtdir, f), idxdir=idxdir, idlog='logfile.log', left=left, right=right, length=length)
+            m.set_seq1([a[0] for a in s])
+            #now we add the other versions
+            for b in repo.heads:
+                if b.name != 'master':
+                    #TODO: if working dir is dirty: stash the stuff and restore later
+                    b.checkout()
+                else:
+                    continue
+                revision = repo.active_branch.commit.hexsha
+                branch = repo.active_branch.name.decode('utf-8')
+                print "now on branch: ", branch, revision
+                x = MandokuIndex("%s/%s" % (txtdir, f), idxdir=idxdir, idlog='logfile.log', left=left, right=right, length=length)
+                m.set_seq2([a[0] for a in x])
+                for tag, i1, i2, j1, j2 in m.get_opcodes():
+                    if tag == "replace":
+                        for i in range(j1, j2):
+#                            pass
+                            print "".join(x[i]), branch
+#                    print tag, i1, i2, j1, j2
 
 if __name__ == '__main__':
     try:
@@ -284,21 +330,9 @@ if __name__ == '__main__':
         idxdir='/Users/chris/tmp/index'
     idlog = 'index.log'
     try:
-        os.mkdir(idxdir)
+        os.makedirs(idxdir)
     except:
         pass
-
-    try:
-        collection = sys.argv[2]
-    except:
-        
-        print "Please provide the collection on the command line"
-        exit
-#    f=codecs.open(sys.argv[1], 'r', 'utf-8')
-
-    if (collection.find('cbeta') > -1 or collection == 'dz'):
-        use_vol = 1
-    else:
-        use_vol = 0
-    MandokuIndex(sys.argv[1], idxdir, idlog, 3, 3, 7, collection, use_vol)
+    mdIndexGit(sys.argv[1], idxdir, 3, 3, 7)
+#    MandokuIndex(sys.argv[1], idxdir, idlog, 3, 3, 7, collection, use_vol)
 #    MandokuIndex(sys.argv[1], idxdir, idlog, 2, 2, 5, collection, use_vol)
