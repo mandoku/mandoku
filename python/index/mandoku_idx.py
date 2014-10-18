@@ -303,7 +303,7 @@ def mdIndexGit(txtdir, idxdir, left, right, length):
             m=SequenceMatcher()
             print branch, revision
             s = MandokuIndex("%s/%s" % (txtdir, f), idxdir=idxdir, idlog='logfile.log', left=left, right=right, length=length)
-            m.set_seq1([a[0] for a in s])
+            m.set_seq1([a[0].split('\t')[0] for a in s])
             #now we add the other versions
             for b in repo.heads:
                 if b.name != 'master':
@@ -315,7 +315,7 @@ def mdIndexGit(txtdir, idxdir, left, right, length):
                 branch = repo.active_branch.name.decode('utf-8')
                 print "now on branch: ", branch, revision
                 x = MandokuIndex("%s/%s" % (txtdir, f), idxdir=idxdir, idlog='logfile.log', left=left, right=right, length=length)
-                m.set_seq2([a[0] for a in x])
+                m.set_seq2([a[0].split('\t')[0] for a in x])
                 for tag, i1, i2, j1, j2 in m.get_opcodes():
                     if tag == "replace":
                         for i in range(j1, j2):
