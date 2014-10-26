@@ -180,6 +180,7 @@ def MandokuIndex(file, idlog='logfile.log', left=2, right=2, length=3, collectio
         elif line.startswith('#+END_VERSE'):
             defs['versflag']=0
         elif "<md" in line:
+            # TODO use only md if md present!
             l1, l2 = line.split("<md", 1)
             addtostack(l1)
             setPage(l2)
@@ -273,7 +274,8 @@ def mdIndexGit(txtdir, repo, branches, left, right, length):
                     repo.git.checkout(branches[b])
                 else:
                     continue
-                print "now on branch: ", b, branches[b]
+                print "now on branch: ", b.decode('utf-8'), branches[b]
+                b=b.decode('utf-8')
                 x = MandokuIndex("%s/%s" % (txtdir, f), idlog='logfile.log', left=left, right=right, length=length)
                 m.set_seq2([a.split('\t')[0] for a in x])
                 for tag, i1, i2, j1, j2 in m.get_opcodes():
@@ -345,10 +347,10 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7):
             pass
     # now we write the new logfile
     rec = codecs.open(lg, 'w', 'utf-8')
-    rec.write("# %s\n" % (datetime.datetime.now()))
-    rec.write("para: '%s', %d, %d, %d\n" % (idxdir, left, right, length))
+    rec.write(u"# %s\n" % (datetime.datetime.now()))
+    rec.write(u"para: '%s', %d, %d, %d\n" % (idxdir, left, right, length))
     for b in repo.branches:
-        rec.write("%s\t%s\n" % (b.name, b.commit.hexsha))
+        rec.write(u"%s\t%s\n" % (b.name.decode('utf-8'), b.commit.hexsha))
     # check for identical hashes:
     if len(now) > 0:
         index = mdIndexGit(txtdir, repo, now, left, right, length)
