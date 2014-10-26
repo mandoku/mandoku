@@ -14,6 +14,7 @@ outfiles = {}
 tab={'a':'1', 'b':'2', 'c':'3', 'd': '4', 'e': '5', 'f': '6', 'g':'7', 'h':'8', 'i':'9'}
 idx={}
 pcnt = 0
+notes = []
 
 
 def PrintToIdxfile(outdir, string, collection ):
@@ -40,6 +41,7 @@ def PrintToIdxfile(outdir, string, collection ):
             
 def MandokuIndex(file, idlog='logfile.log', left=2, right=2, length=3, collection='test', use_vol=0):
     pcnt = 0
+    global notes
     defs = {'line' : 0, 'noteflag': 0, 'versflag': 0, 'file': file, 'char': 0, 'para' : 0,
             'txtfile' : os.path.splitext(os.path.split(file)[-1])[0] }
     s=[]
@@ -48,11 +50,11 @@ def MandokuIndex(file, idlog='logfile.log', left=2, right=2, length=3, collectio
     ##the stack for characters.
     chars = []
     ##the stack for inline notes.
-    notes = []
     ix = 0
 
     def addtostack(lx):
         global pcnt
+        global notes
         lx = lx.replace(' ', '')
         if len(lx[:-1]) < 1 and pcnt > 1:
             defs['para'] += 1
@@ -71,9 +73,31 @@ def MandokuIndex(file, idlog='logfile.log', left=2, right=2, length=3, collectio
                     defs['line'] +=  1
                     defs['char'] = 0
                 else:
-                    defs['char'] += 1
-                    pcnt += 1
-                    chars.append((a, "%s:%s:%d:%d:%d"%(defs['txtfile'], defs['page'], defs['line'], defs['char'], defs['para'])))
+                    if a[0] == "(":
+                        defs['noteflag'] = 1
+                    elif a[0] == ")":
+                        defs['noteflag'] = 0
+                    else:
+                        defs['char'] += 1
+                        pcnt += 1
+                        if defs['noteflag'] == 1:
+                            #if the previous character is a note, add to stack, otherwise print out, empty stack and start afres
+                            if len(notes) > 0 and  len(notes[-1]) > 2 and notes[-1][2]+1 < pcnt:
+#
+                                npre =  [tt for tt in ch_re.split(u"　" * (left - 1)) if len(tt) > 0]
+                                npre.append(u"（")
+                                notes.append(u"）")
+                                notes.extend([tt for tt in ch_re.split(u"　" * (right -1)) if len(tt) > 0])
+                                for i in range(1 , len(notes) - right + 1):
+                                    s.append((u"%s,%s\t%s\tn"%("".join([tt[0] for tt in notes[0:length+right]]), "".join(npre),  notes[0][1])))
+                                    npre.append(notes.pop(0)[0])
+                                    npre.pop(0)
+                                #procnotes
+                                notes = [(a, "%s:%s:%d:%d:%d"%(defs['txtfile'], defs['page'], defs['line'], defs['char'], defs['para']), pcnt)]
+                            else:
+                                notes.append((a, "%s:%s:%d:%d:%d"%(defs['txtfile'], defs['page'], defs['line'], defs['char'], defs['para']), pcnt))
+                        else:
+                            chars.append((a, "%s:%s:%d:%d:%d"%(defs['txtfile'], defs['page'], defs['line'], defs['char'], defs['para']), pcnt))
         ## need to disentangle the text now, extract notes into a separate stack if there are some
         ## notes start by '(', end by ')' and have a possible linebreak '/' within.
         ## we will collect the notes until we reach a note-end and then spitting them out
@@ -84,17 +108,19 @@ def MandokuIndex(file, idlog='logfile.log', left=2, right=2, length=3, collectio
         ## [2013-08-22T18:36:33+0900] a problem with this seems to be that it mangles complex gaiji expressions
         ## like [邱-丘+(夸-ㄅ+(万-一))] or maybe the code below handles this?
         ## [2014-10-24T10:55:24+0900] we are missing lines with more than one "(" here
-        if (lx.find('(') > 0):
-            for i in range(0, len(chars)-1):
-                #look for the note
-                if chars[i][0] == '(':
-                    #throw it away!
-                    chars.pop(i)
-                    defs['noteflag']=1
-                    ##make sure the stack is empty
-                    notes=[]
-                    ix = i
-                    break
+#        if (lx.find('(') > 0):
+            
+        #if (lx.find('(') > 0):
+        #    for i in range(0, len(chars)-1):
+        #        #look for the note
+        #        if chars[i][0] == '(':
+        #            #throw it away!
+        #            chars.pop(i)
+        #            defs['noteflag']=1
+        #            ##make sure the stack is empty
+        #            notes=[]
+        #            ix = i
+        #            break
     
 
     def setPage(lx):
@@ -157,7 +183,7 @@ def MandokuIndex(file, idlog='logfile.log', left=2, right=2, length=3, collectio
             l1, l2 = line.split("<md", 1)
             addtostack(l1)
             setPage(l2)
-            defs['line'] += l2.count(u'¶')
+#            defs['line'] += l2.count(u'¶')
             defs['char'] = 0
             addtostack(l2[l2.find('>')+1:])
             
@@ -170,35 +196,17 @@ def MandokuIndex(file, idlog='logfile.log', left=2, right=2, length=3, collectio
         elif defs.has_key('page'):
             ## here we go!
             addtostack(line)
-            while (len(chars) > ix + right + length and defs['noteflag'] == 1):
-                #end of note - we will output it immediately, which is not in
-                #document order, but does not matter.
-                if chars[ix][0] == ')':
-                    chars.pop(ix)
-                    ix = 0
-                    defs['noteflag']=0
-                    ##we append left and right padding and then loop through,
-                    ##take appropriate slices as we go
-                    ##we could of course also append the left and right of chars(ix) to this...
-                    npre =  [a for a in ch_re.split(u"　" * (left - 1)) if len(a) > 0]
-                    npre.append(u"（")
-                    notes.append(u"）")
-                    notes.extend([a for a in ch_re.split(u"　" * (right -1)) if len(a) > 0])
-                    for i in range(1 , len(notes) - right + 1):
-                        try:
-                            s.append((u"%s,%s\t%s\tn"%("".join([a[0] for a in notes[0:length+right]]), "".join(npre),  notes[0][1])))
-                        except:
-                            #[2014-10-24T12:37:55+0900]
-                            #maybe notest too short?
-                            print "notes: ", notes, length+right, npre
-                        #PrintToIdxfile (outdir, u"%s,%s\t%s\tn\n"%("".join([a[0] for a in notes[0:length+right]]), "".join(npre),  notes[0][1]), collection)
-                        npre.append(notes.pop(0)[0])
-                        npre.pop(0)
-                else:
-                    #we always take the ix-th character
-                    notes.append(chars.pop(ix))
             while (len(chars) > ix + right+length and defs['noteflag'] == 0):
                 # for the moment, we keep prose and verse in the same loop and only add a flag to verse outpu
+                if chars[0][0] == '(':
+                   #throw it away!
+                   chars.pop(0)
+                   defs['noteflag'] = 1
+                   print "changed noteflag to 1"
+                   ##make sure the stack is empty
+                   ix = 0
+#                   notes=[]
+                   break
                 if defs['versflag'] == 1:
                     extra = "\tv"
                 else:
@@ -208,6 +216,18 @@ def MandokuIndex(file, idlog='logfile.log', left=2, right=2, length=3, collectio
                 #u"%s,%s\t%s%s\n"%("".join([a[0] for a in chars[0:length+right]]), "".join(pre), chars[0][1], extra), collection)
                 pre.append(chars.pop(0)[0])
                 pre.pop(0)
+    #todo: check for notes, s.append if necessary
+    if len(notes) > 0:
+        npre =  [tt for tt in ch_re.split(u"　" * (left - 1)) if len(tt) > 0]
+        npre.append(u"（")
+        notes.append(u"）")
+        notes.extend([tt for tt in ch_re.split(u"　" * (right -1)) if len(tt) > 0])
+        for i in range(1 , len(notes) - right + 1):
+            s.append((u"%s,%s\t%s\tn"%("".join([tt[0] for tt in notes[0:length+right]]), "".join(npre),  notes[0][1])))
+            npre.append(notes.pop(0)[0])
+            npre.pop(0)
+        notes=[]
+    # we are now finished reading the file, need to process the rest
     for i in range(right+length, 0, -1):
         #we need to check and make sure that we have a page
         try:
@@ -228,7 +248,6 @@ def MandokuIndex(file, idlog='logfile.log', left=2, right=2, length=3, collectio
                 pre.pop(0)
             except:
                 print "some error occurred: %s %s"%(line, defs), l, length
-
     return s
 
 #produce a complete index for one set of branches, return it
@@ -341,8 +360,8 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7):
                 except:
                     pass
                 debfile = codecs.open(dpath + "/" + txtid + ".idx",  "w", "utf-8")
-            for ix in index:
-                for i in ix:
+            for ixx in index:
+                for i in ixx:
                     if debug:
                         debfile.write("%s\n" % ( i))
                     PrintToIdxfile(idxdir, i, coll)
