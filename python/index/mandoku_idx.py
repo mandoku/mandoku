@@ -40,6 +40,7 @@ def PrintToIdxfile(outdir, string, collection ):
     
             
 def MandokuIndex(file, idlog='logfile.log', left=2, right=2, length=3, collection='test', use_vol=0):
+    usepb = True
     pcnt = 0
     global notes
     defs = {'line' : 0, 'noteflag': 0, 'versflag': 0, 'file': file, 'char': 0, 'para' : 0,
@@ -180,7 +181,8 @@ def MandokuIndex(file, idlog='logfile.log', left=2, right=2, length=3, collectio
         elif line.startswith('#+END_VERSE'):
             defs['versflag']=0
         elif "<md" in line:
-            # TODO use only md if md present!
+            # use md only if md present!
+            usepb = False
             l1, l2 = line.split("<md", 1)
             addtostack(l1)
             setPage(l2)
@@ -188,7 +190,7 @@ def MandokuIndex(file, idlog='logfile.log', left=2, right=2, length=3, collectio
             defs['char'] = 0
             addtostack(l2[l2.find('>')+1:])
             
-        elif line.startswith('<pb'):
+        elif line.startswith('<pb') and usepb:
             ##this assumes a page format of
             ##<pb:SJB_SDZ0001_010002a>
             setPage(line)
