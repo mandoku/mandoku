@@ -1318,13 +1318,13 @@ eds
   (save-excursion
     (let ((cnt 0)
 	  ;; this assumes a naming convention txtid_<nnn>.txt
-	  (txtfn (car (split-string (file-name-nondirectory (buffer-file-name)) "\\.")))
+	  (txtfn (split-string (car (split-string (file-name-nondirectory (buffer-file-name)) "\\.")) "_"))
 	  (be (mandoku-get-baseedition)))
-    (goto-char (point-min))
+;    (goto-char (point-min))
     (forward-paragraph 1)
     (while (not (eobp))
       (setq cnt (+ cnt 1))
-      (insert (concat "<pb:" be "_" txtfn "-" (int-to-string cnt) "a>
+      (insert (concat "<pb:" (car txtfn) "_" be "_" (cadr txtfn) "-" (int-to-string cnt) "a>
 "))
       (forward-paragraph 1)))))
 
