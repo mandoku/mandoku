@@ -205,7 +205,7 @@ def MandokuIndex(file, idlog='logfile.log', left=2, right=2, length=3, collectio
                    #throw it away!
                    chars.pop(0)
                    defs['noteflag'] = 1
-                   print "changed noteflag to 1"
+                   #print "changed noteflag to 1"
                    ##make sure the stack is empty
                    ix = 0
 #                   notes=[]
@@ -276,7 +276,7 @@ def mdIndexGit(txtdir, repo, branches, left, right, length):
                     repo.git.checkout(branches[b])
                 else:
                     continue
-                print "now on branch: ", b.decode('utf-8'), branches[b]
+                print "now on branch: ", f,  b.decode('utf-8'), branches[b]
                 b=b.decode('utf-8')
                 x = MandokuIndex("%s/%s" % (txtdir, f), idlog='logfile.log', left=left, right=right, length=length)
                 m.set_seq2([a.split('\t')[0] for a in x])
@@ -284,11 +284,11 @@ def mdIndexGit(txtdir, repo, branches, left, right, length):
                     if tag == "replace":
                         for i in range(j1, j2):
                             nx.append(x[i])
-                    print tag, i1, i2, j1, j2
+#                    print tag, i1, i2, j1, j2
                 nxs = SequenceMatcher()
                 nxs.set_seqs([a.split('\t')[0] for a in varx], [a.split('\t')[0] for a in nx])
                 for tag, i1, i2, j1, j2 in nxs.get_opcodes():
-                    print "merge: ", tag, i1, i2, j1, j2
+#                    print "merge: ", tag, i1, i2, j1, j2
                     if tag in ("insert", "replace"):
                         for i in range(j1, j2):
 #                            print "".join(nx[i]), b
@@ -369,7 +369,7 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7):
                     if debug:
                         debfile.write("%s\n" % ( i))
                     PrintToIdxfile(idxdir, i, coll)
-                print "writing index %d keys." % (len(idx))
+#                print "writing index %d keys." % (len(idx))
                 for of in idx.keys():
                     outfile=codecs.open(of, 'a+', 'utf-8')
                     outfile.write("".join(idx[of]))
