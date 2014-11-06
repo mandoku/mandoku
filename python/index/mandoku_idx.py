@@ -369,12 +369,12 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7):
                     if debug:
                         debfile.write("%s\n" % ( i))
                     PrintToIdxfile(idxdir, i, coll)
-#                print "writing index %d keys." % (len(idx))
-                for of in idx.keys():
-                    outfile=codecs.open(of, 'a+', 'utf-8')
-                    outfile.write("".join(idx[of]))
-                    outfile.close()
-                idx={}
+            print "writing index %d keys." % (len(idx))
+            for of in idx.keys():
+                outfile=codecs.open(of, 'a+', 'utf-8')
+                outfile.write("".join(idx[of]))
+                outfile.close()
+            idx={}
         else:
             if len(oldindex) > 0:
                 t = SequenceMatcher()
