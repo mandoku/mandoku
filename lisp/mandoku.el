@@ -60,6 +60,9 @@
 (defvar mandoku-sys-dir (expand-file-name  (concat mandoku-base-dir "system/")))
 (defvar mandoku-work-dir (expand-file-name  (concat mandoku-base-dir "work/")))
 (defvar mandoku-filters-dir (expand-file-name  (concat mandoku-work-dir "filters/")))
+(defvar mandoku-log-file (concat mandoku-sys-dir "mandoku-log.txt"))
+(defvar mandoku-downloads (concat mandoku-sys-dir "mandoku-downloads.txt"))
+(defvar mandoku-index-queue (concat mandoku-sys-dir "mandoku-to-index.txt"))
 
 (defvar mandoku-string-limit 10)
 (defvar mandoku-index-display-limit 2000)
@@ -102,6 +105,8 @@
 (defvar mandoku-kanji-regex "\\([㐀-鿿𠀀-𪛟]+\\)")
 
 (defvar mandoku-regex "<[^>]*>\\|[　-㏿＀-￯\n¶]+\\|\t[^\n]+\n")
+;; that is: two uppercase characters, followed by a number and one or more upper or lowercase characters followed by 4 digits.
+(defvar mandoku-textid-regex  "[A-Z]\\{2\\}[0-9][A-z]+[0-9]\\{4\\}")
 
 ;;[2014-06-03T14:31:46+0900] better handling of git
 (defcustom mandoku-git-program (executable-find "git")
@@ -674,7 +679,7 @@ One character is either a character or one entity expression"
 
 (defun mandoku-meta-textid-to-file (txtid &optional page)
   (let* ((repid (car (split-string txtid "[0-9]")))
-	(subcoll (substring txtid 0 (+ 2 (length repid))))
+	(subcoll (mandoku-subcoll txtid ))
 	)
     (if (assoc subcoll mandoku-catalogs-alist)
 	(cdr (assoc subcoll mandoku-catalogs-alist))
@@ -1702,17 +1707,23 @@ Letters do not insert themselves; instead, they are commands.
 )
 
 
-(defun mandoku-get-remote-text ()
-  "This checks if a text is available in a repo and then clones it into the appropriate place"
+(defun mandoku-get-remote-text (&optional txtid)
+  "This checks if a text is available in a repo and then clones
+it into the appropriate place If a txtid is given, it will use
+that txtid, otherwise it tries to derive one from the current
+filename.
+We should check if the file exists before cloning!"
   (interactive)
   (let* ((buf (current-buffer))
 	 (fn (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))))
 	 (ext (file-name-extension (file-name-nondirectory (buffer-file-name ))))
 ;	 (txtid (downcase (car (split-string  fn "_" ))))
 	 (tmpid (car (split-string  fn "_" )))
-	 (txtid  (if (string-match "[a-z]"  tmpid (- (length tmpid) 1))
+	 (txtid (if txtid
+		    txtid
+	   (if (string-match "[a-z]"  tmpid (- (length tmpid) 1))
 		     (substring tmpid 0 (- (length tmpid) 1))
-		   tmpid))
+		   tmpid)))
 	 (repid (car (split-string txtid "\\([0-9]\\)")))
 	 (groupid (substring txtid 0 (+ (length repid) 2)))
 	 (clone-url (concat "git@" mandoku-user-server ":"))
@@ -1723,9 +1734,9 @@ Letters do not insert themselves; instead, they are commands.
     (mandoku-clone (concat targetdir txtid)  txturl)
     ;; [2014-06-03T16:07:55+0900] activate this as soon as the wiki on gl.kanripo is ready
     (mandoku-clone (concat targetdir txtid ".wiki")  wikiurl)
-    (kill-buffer buf)
-    (find-file (concat targetdir txtid "/" fn "." ext)))
-)
+;    (kill-buffer buf)
+;    (find-file (concat targetdir txtid "/" fn "." ext)))
+))
 
  ; (shell-command-to-string (concat "cd " default-directory "  && " git " clone " txturl ))) 
 
@@ -1737,21 +1748,47 @@ Letters do not insert themselves; instead, they are commands.
 (defun mandoku-clone (targetdir url)
   (let* ((default-directory targetdir)
 	 (process-connection-type nil)   ; pipe, no pty (--no-progress)
-	 (buf       (switch-to-buffer "*mandoku bootstrap*"))
-;	 (md (ignore-errors  (mkdir targetdir t))) 
+	 (buf       (set-buffer "*mandoku bootstrap*"))
+	 (txtid     (substring (cadr (split-string url "/")) 0 -4))
 	 (git       (or (executable-find "git")
-			(error "Unable to find `git'")))
-	 (sent (set-process-sentinel
-	  (start-process-shell-command "*download*" buf
-	   (concat git  " clone " url " -v " targetdir)) 
-	  
-	  )))
-;	  (start-process-shell-command
-;	   git nil `(,buf t) t "clone" url "-v" targetdir)))
-	(unless (zerop status)
-	  (error "Couldn't clone the remote Git repository from %s." (concat url " to " targetdir ))))
-)
+			(error "Unable to find `git'"))))
+    (with-current-buffer (find-file-noselect mandoku-log-file)
+      (goto-char (point-max))
+      (insert (format-time-string "[%Y-%m-%dT%T%z] INFO " (current-time)))
+      (insert (format "Starting to download %s %s\n" txtid (mandoku-textid-to-title txtid))))
+    (with-current-buffer buf
+      (goto-char (point-max))
+      (insert (format-time-string "[%Y-%m-%dT%T%z]\n" (current-time)))
+      (set-process-sentinel (start-process-shell-command (concat "" txtid) buf
+							 (concat git  " clone " url " -v " targetdir))
+			    'mandoku-clone-sentinel)
+      )
+  (message "Downloading %s %s" txtid (mandoku-textid-to-title txtid))
+  ))
 
+(defun mandoku-clone-sentinel (proc msg)
+    (if (string-match "finished" msg)
+      ;; TODO: check write to log, write to index queue etc.
+	(let ((txtid (format "%s" proc)))
+	  (with-current-buffer (find-file-noselect mandoku-log-file)
+	  (goto-char (point-max))
+	  (insert (format-time-string "[%Y-%m-%dT%T%z] INFO " (current-time)))
+	  (insert (format "Finished downloading %s %s\n" proc (mandoku-textid-to-title proc)))
+	  (save-buffer))
+	;; dont need to do this for the wiki repo
+	(unless (string-match "wiki" (format "%s" proc))
+	  (progn
+	    (with-current-buffer (find-file-noselect mandoku-downloads)
+	      (goto-char (point-max))
+	      (insert (format "%s %s\n" proc (mandoku-textid-to-title txtid)))
+	      (save-buffer))
+	    (with-current-buffer (find-file-noselect mandoku-index-queue)
+	      (goto-char (point-max))
+	      (insert (format "%s %s\n" proc (mandoku-textid-to-title txtid)))
+	      (save-buffer)))))
+    )
+ (message "Download %s %s" proc msg)
+)
 ;; convenience: abort when using mouse in other buffer
 ;; recommended by yasuoka-san 2013-10-22
 (defun mandoku-abort-minibuffer ()
@@ -1846,6 +1883,31 @@ Letters do not insert themselves; instead, they are commands.
   (if (org-region-active-p)
       (region-beginning)
     (point)))
+
+(defun mandoku-text-local-p (txtid)
+  "check if the text has been cloned and is available locally"
+    (file-exists-p (concat mandoku-text-dir (mandoku-subcoll txtid ) "/" txtid)))
+
+(defun mandoku-subcoll (txtid)
+  (mapconcat 'identity (butlast (split-string (replace-regexp-in-string "\\([0-9][A-z]+\\)" " \\1 " txtid ))) ""))
+
+(defun mandoku-get-textid ()
+  "looks for a textid close to the cursor"
+  (let* (
+      (begol (save-excursion (beginning-of-line) (point)))
+      (endol (save-excursion (end-of-line) (point)))
+      (wap (word-at-point)))
+  (if (string-match mandoku-textid-regex wap)
+      wap
+    (save-excursion
+      (goto-char begol)
+      (re-search-forward (concat "\\(" mandoku-textid-regex "\\)") endol t 1)
+      (match-string 1)
+    ))))
+
+(defun mandoku-split-textid (txtid)
+  "split a text id in repository id, subcoll and sequential number of the text"
+  (split-string (replace-regexp-in-string "\\([0-9][A-z]+\\)" " \\1 " txtid )))
 
 (defun mandoku-remove-markup (str)
   "removes the special characters used by mandoku from the string"
