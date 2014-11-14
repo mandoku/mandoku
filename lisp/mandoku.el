@@ -60,8 +60,10 @@
 (defvar mandoku-sys-dir (expand-file-name  (concat mandoku-base-dir "system/")))
 (defvar mandoku-work-dir (expand-file-name  (concat mandoku-base-dir "work/")))
 (defvar mandoku-filters-dir (expand-file-name  (concat mandoku-work-dir "filters/")))
+;; housekeeping files
 (defvar mandoku-log-file (concat mandoku-sys-dir "mandoku-log.txt"))
-(defvar mandoku-downloads (concat mandoku-sys-dir "mandoku-downloads.txt"))
+(defvar mandoku-local-catalog (concat mandoku-meta-dir "local-texts.txt"))
+(defvar mandoku-download-queue (concat mandoku-sys-dir "mandoku-to-download.txt"))
 (defvar mandoku-index-queue (concat mandoku-sys-dir "mandoku-to-index.txt"))
 
 (defvar mandoku-string-limit 10)
@@ -1748,6 +1750,7 @@ We should check if the file exists before cloning!"
 (defun mandoku-clone (targetdir url)
   (let* ((default-directory targetdir)
 	 (process-connection-type nil)   ; pipe, no pty (--no-progress)
+	 (curbuf    (current-buffer))
 	 (buf       (set-buffer "*mandoku bootstrap*"))
 	 (txtid     (substring (cadr (split-string url "/")) 0 -4))
 	 (git       (or (executable-find "git")
@@ -1755,40 +1758,78 @@ We should check if the file exists before cloning!"
     (with-current-buffer (find-file-noselect mandoku-log-file)
       (goto-char (point-max))
       (insert (format-time-string "[%Y-%m-%dT%T%z] INFO " (current-time)))
-      (insert (format "Starting to download %s %s\n" txtid (mandoku-textid-to-title txtid))))
+      (insert (format "Starting to download %s %s\n" url (mandoku-textid-to-title txtid))))
     (with-current-buffer buf
       (goto-char (point-max))
       (insert (format-time-string "[%Y-%m-%dT%T%z]\n" (current-time)))
-      (set-process-sentinel (start-process-shell-command (concat "" txtid) buf
+      (set-process-sentinel (start-process-shell-command (concat "" url) buf
 							 (concat git  " clone " url " -v " targetdir))
 			    'mandoku-clone-sentinel)
       )
-  (message "Downloading %s %s" txtid (mandoku-textid-to-title txtid))
+    (set-buffer curbuf)
+    (message "Downloading %s %s" txtid (mandoku-textid-to-title txtid))
   ))
 
 (defun mandoku-clone-sentinel (proc msg)
     (if (string-match "finished" msg)
       ;; TODO: check write to log, write to index queue etc.
-	(let ((txtid (format "%s" proc)))
+	(let ((txtid  (substring (cadr (split-string  (format "%s" proc) "/")) 0 -4)) )
+	  ;; make the log entry
 	  (with-current-buffer (find-file-noselect mandoku-log-file)
-	  (goto-char (point-max))
-	  (insert (format-time-string "[%Y-%m-%dT%T%z] INFO " (current-time)))
-	  (insert (format "Finished downloading %s %s\n" proc (mandoku-textid-to-title proc)))
-	  (save-buffer))
-	;; dont need to do this for the wiki repo
-	(unless (string-match "wiki" (format "%s" proc))
-	  (progn
-	    (with-current-buffer (find-file-noselect mandoku-downloads)
-	      (goto-char (point-max))
-	      (insert (format "%s %s\n" proc (mandoku-textid-to-title txtid)))
-	      (save-buffer))
-	    (with-current-buffer (find-file-noselect mandoku-index-queue)
-	      (goto-char (point-max))
-	      (insert (format "%s %s\n" proc (mandoku-textid-to-title txtid)))
-	      (save-buffer)))))
+	    (goto-char (point-max))
+	    (insert (format-time-string "[%Y-%m-%dT%T%z] INFO " (current-time)))
+	    (insert (format "Finished downloading %s %s\n" proc (mandoku-textid-to-title txtid)))
+	    (save-buffer))
+	  ;; dont need to do this for the wiki repo
+	  (unless (string-match "wiki" (format "%s" proc))
+	    (progn
+	      ;; this has to be the local catalog file
+	      (with-current-buffer (find-file-noselect mandoku-local-catalog)
+		(goto-char (point-max))
+		(insert (format "** %s %s\n" txtid (mandoku-textid-to-title txtid)))
+		(save-buffer))
+	      ;; add it to the index queue
+	      (with-current-buffer (find-file-noselect mandoku-index-queue)
+		(goto-char (point-max))
+		(insert (format "%s %s\n" txtid (mandoku-textid-to-title txtid)))
+		(save-buffer)))))
+      )
+    (message "Download %s %s" proc msg)
     )
- (message "Download %s %s" proc msg)
-)
+
+(defun mandoku-download-add-text-to-queue ()
+  "Adds the text at point or on the current line to dl queue"
+  (interactive)
+  (let ((txtid (mandoku-get-textid)))
+    (if (not txtid)
+	(setq txtid (read-string "Enter ID number of text to download: ")))
+    (if (mandoku-text-local-p txtid)
+	(message "%s %s already downloaded!" txtid (mandoku-textid-to-title txtid))
+      (with-current-buffer (find-file-noselect mandoku-download-queue)
+	(goto-char (point-max))
+	(insert (format "%s %s\n" txtid (mandoku-textid-to-title txtid)))
+	(save-buffer)
+	(message "%s %s added to download list" txtid (mandoku-textid-to-title txtid))))
+    ))
+
+(defun mandoku-download-process-queue ()
+  "Work through the queue and download the texts if necessary."
+  (let (txtid)
+    (with-current-buffer (find-file-noselect mandoku-download-queue)
+      (goto-char (point-min))
+      (while (not (eobp))
+	(setq txtid (mandoku-get-textid))
+	(if (and txtid (not (mandoku-text-local-p txtid)))
+	    (mandoku-get-remote-text txtid))
+	(delete-region (point-at-bol)
+		  (progn (forward-line) (point)))
+;	(next-line)
+	)
+      (save-buffer)
+      (message "Finished processing the texts in the download list %s" mandoku-download-queue)
+      )))
+
+
 ;; convenience: abort when using mouse in other buffer
 ;; recommended by yasuoka-san 2013-10-22
 (defun mandoku-abort-minibuffer ()
@@ -1893,17 +1934,18 @@ We should check if the file exists before cloning!"
 
 (defun mandoku-get-textid ()
   "looks for a textid close to the cursor"
-  (let* (
-      (begol (save-excursion (beginning-of-line) (point)))
-      (endol (save-excursion (end-of-line) (point)))
-      (wap (word-at-point)))
-  (if (string-match mandoku-textid-regex wap)
-      wap
-    (save-excursion
-      (goto-char begol)
-      (re-search-forward (concat "\\(" mandoku-textid-regex "\\)") endol t 1)
-      (match-string 1)
-    ))))
+  (let (
+      (begol (point-at-bol))
+      (endol (point-at-eol))
+      (wap (or (word-at-point) "")))
+      (if (string-match mandoku-textid-regex wap)
+	  wap
+	(save-excursion
+	  (goto-char begol)
+	  (if (re-search-forward (concat "\\(" mandoku-textid-regex "\\)") endol t 1)
+	      (buffer-substring-no-properties (match-beginning 1) (match-end 1))))
+	)))
+
 
 (defun mandoku-split-textid (txtid)
   "split a text id in repository id, subcoll and sequential number of the text"
