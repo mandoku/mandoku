@@ -297,6 +297,9 @@
 リンクをクリックするかカーソルをリンクの上に移動して<enter>してください
 Click on a link or move the cursor to the link and then press enter
 
+[[file:local-texts.txt][Local (downloaded) texts 個人漢籍]]
+漢籍リポジトリ
+
 ")
 
     (dolist (x (sort mandoku-catalogs-alist (lambda (a b) (string< (car a) (car b)))))
@@ -1468,10 +1471,12 @@ eds
      )
     ("Versions")
     ("Maintenance"
-     ["Download text" mandoku-get-remote-text t]
+     ["Download texts in DL list" mandoku-download-process-queue t]
+     ["Add to download list" mandoku-download-add-text-to-queue t]
+     ["Show download list" mandoku-download-process-queue t]
      ["Setup file" mandoku-show-local-init t]
-     ["Update mandoku" mandoku-update t]
-     ["Update installed texts" mandoku-update-texts nil]
+;     ["Update mandoku" mandoku-update t]
+;     ["Update installed texts" mandoku-update-texts nil]
      
      ["Add repository" mandoku-setting nil]
      )
@@ -1811,6 +1816,11 @@ We should check if the file exists before cloning!"
 	(save-buffer)
 	(message "%s %s added to download list" txtid (mandoku-textid-to-title txtid))))
     ))
+
+(defun mandoku-download-show-queue ()
+  (interactive)
+  (find-file mandoku-download-queue)
+  (goto-char (point-min)))
 
 (defun mandoku-download-process-queue ()
   "Work through the queue and download the texts if necessary."
