@@ -65,6 +65,7 @@
 (defvar mandoku-local-catalog (concat mandoku-meta-dir "local-texts.txt"))
 (defvar mandoku-download-queue (concat mandoku-sys-dir "mandoku-to-download.txt"))
 (defvar mandoku-index-queue (concat mandoku-sys-dir "mandoku-to-index.txt"))
+(defvar mandoku-indexed-texts (concat mandoku-sys-dir "indexed-texts.txt"))
 
 (defvar mandoku-string-limit 10)
 (defvar mandoku-index-display-limit 2000)
@@ -73,7 +74,7 @@
 (defvar mandoku-repositories-alist '(("dummy" . "http://www.example.com")))
 (defvar mandoku-md-menu)
 (defvar mandoku-catalog)
-
+(defvar mandoku-local-index-list nil)
 
 (defvar mandoku-location-plist nil
   "Plist holds the most recent stored location with associated information.")
@@ -113,6 +114,11 @@
 ;;[2014-06-03T14:31:46+0900] better handling of git
 (defcustom mandoku-git-program (executable-find "git")
   "Name of the git executable used by mandoku."
+  :type '(string)
+  :group 'mandoku)
+
+(defcustom mandoku-python-program (executable-find "python")
+  "Name of the python executable used by mandoku."
   :type '(string)
   :group 'mandoku)
 
@@ -230,6 +236,18 @@
           (while (re-search-forward "^\\([a-z0-9]+\\)	\\([^	
 ]+\\)" nil t)
 	     (puthash (match-string 1) (match-string 2) mandoku-lookup)))))))
+
+(defun mandoku-read-indexed-texts()
+  "read the list of indexed texts into the variable."
+    (when (file-exists-p  mandoku-indexed-texts))
+    (with-temp-buffer
+      (let ((coding-system-for-read 'utf-8)
+	    textid)
+	(insert-file-contents mandoku-indexed-texts)
+	(goto-char (point-min))
+	(while (re-search-forward mandoku-textid-regex nil t)
+	  (add-to-list 'mandoku-local-index-list (match-string 0))))
+      ))
 
 
 (defun mandoku-read-titletables () 
@@ -362,6 +380,7 @@ Click on a link or move the cursor to the link and then press enter
       (message "Calling title list")
       (mandoku-update-title-lists)
       (mandoku-read-titletables) 
+      (mandoku-read-indexed-texts) 
       (mandoku-update-catalog)
       (ignore-errors  (mkdir mduser t))
     (copy-file (expand-file-name "mandoku-settings.org" mandoku-lisp-dir) mduser)
@@ -482,10 +501,28 @@ One character is either a character or one entity expression"
       )))
 
 (defun mandoku-search-internal (search-string index-buffer)
-  (if mandoku-do-remote 
-      (mandoku-search-remote search-string index-buffer)
-    (mandoku-search-local search-string index-buffer)
-))
+  (if mandoku-do-remote
+      (progn
+	(mandoku-search-remote search-string index-buffer)
+	(let ((search-upper-case t))
+	  (dolist (txtid  mandoku-local-index-list)
+	    (with-current-buffer index-buffer
+	      (goto-char (point-min))
+	      (delete-matching-lines txtid))
+	    ))
+	(if mandoku-local-index-list
+	    (let ((local-buffer (get-buffer-create "*local-mandoku*"))
+		  tmpstr)
+	      (mandoku-search-local search-string local-buffer)
+	      (with-current-buffer local-buffer
+		(setq tmpstr (buffer-string))
+		)
+	      (with-current-buffer index-buffer
+		(insert tmpstr))
+    
+	)))
+    (mandoku-search-local search-string index-buffer))
+)
 
 (defun mandoku-search-local (search-string index-buffer)
 ;; find /tmp/index/SDZ0001.txt -name "97.idx.*" | xargs zgrep "^靈寳"
@@ -1474,6 +1511,7 @@ eds
      ["Download texts in DL list" mandoku-download-process-queue t]
      ["Add to download list" mandoku-download-add-text-to-queue t]
      ["Show download list" mandoku-download-process-queue t]
+     ["Update search index" mandoku-update-index t]
      ["Setup file" mandoku-show-local-init t]
 ;     ["Update mandoku" mandoku-update t]
 ;     ["Update installed texts" mandoku-update-texts nil]
@@ -1676,6 +1714,14 @@ Letters do not insert themselves; instead, they are commands.
 
 
 ;; maintenance
+
+
+
+(defun mandoku-update-index ()
+  "Updates the index for local files"
+  (start-process-shell-command "*index*" nil
+			       (concat mandoku-python-program " " mandoku-sys-dir "python/updateindex.py " mandoku-base-dir))
+  )
 
 (defun mandoku-update()
   (interactive)
