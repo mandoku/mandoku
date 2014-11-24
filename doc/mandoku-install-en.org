@@ -32,30 +32,26 @@
       files. If you want to use =git= outside of =Mandoku=, it is
       recommended to download and install the =git= software from the
       [[http://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git][msysgit software repository]]; the current version is
-      [[http://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git][Git-1.8.4-preview]].
-   2. Download the =Mandoku= installation package [[file:data/mandoku-preview-2014-01-13.zip][mandoku-preview-2014-01-13.zip]] (165MB).
+      [[http://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git][Git-1.9.4-preview]].
+   2. Download the =Mandoku= installation package
+      [[file:data/mandoku-preview-2014-09-25.zip][mandoku-preview-2014-09-25.zip]]
+      (165MB).
    3. Doubleclick on the package and move the folder =krp=, which is
       found inside the package to a destination on a root directory of
-      your computer.  It is highly recommended to use the system drive
-      =C:= as a destination.
-   4. Within the folder =krp=, find the file "Emacs" and move it to
-      the Desktop (this will work only if you put the folder on drive
-      =C:=.  Alternatively, you can locate the file =(Your drive
-      letter):\krp\bin\emacs-24.3\bin\runemacs.exe=, right-click
-      on this file and create a shortcut on a destination of your
-      liking.  On Windows 8 you can also start the application by
-      clicking on the file and then "pin" it to the taskbar, where you
-      will easily find it the next time.
+      your computer, such as =C:=, =D:= and so on as a destination.
+   4. Within the folder =krp=, click on the file "start-mandoku",
+      which is a batchfile that sets up the environment and then
+      starts Emacs. This file can also be accessed through a shortcut
+      placed on the the Desktop, so you can easily find it next time.
 
       
 
 ** Installing a package for Macintosh
 
-   The package for Macintosh has been tested on OS X 10.8 (Mountain
-   Lion) and OS X 10.6 (Snow Leopard).  It might also work on other
-   versions.
+   The package for Macintosh has been tested on OS X 10.9 (Mavericks).
+   It might also work on other versions.
 
-   The Emacs binary available in the package below has been modified
+   The Emacs binary available in the package below is the version 24.3 from one ahas been modified
    by applying a patch from Yamamoto Mitsuharu and by placing a
    startup file in the =site-lisp= directory.
 

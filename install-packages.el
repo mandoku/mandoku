@@ -12,6 +12,8 @@
 ;	("marmalade"   . "http://marmalade-repo.org/packages/")
 	))
 
+(add-to-list 'package-archives '("sandbox" . "/Users/chris/Dropbox/netwalker/packages") t)
+
 (setq package-user-dir (expand-file-name "elpa"  starter-kit-dir))
 
 (package-initialize)
@@ -21,7 +23,7 @@
         'yasnippet
         'magit 
 ;	'bbdb 'bbdb-ext
-        'auctex 'reftex
+;        'auctex 'reftex
 ;        'undo-tree
 	'diminish
 	'json

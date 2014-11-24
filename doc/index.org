@@ -37,6 +37,8 @@
 
   [2014-01-13] [[file:mandoku-install-en.html][updated Installation instructions]] for a preview version.
 
+  [2014-09-27] a new preview version is available, see [[file:mandoku-install-en.html][Installation instructions]]
+
 
 * Software
   The software for using Mandoku texts falls in two broad categories:
