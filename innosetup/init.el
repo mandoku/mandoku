@@ -9,7 +9,15 @@
   (goto-char (point-min))
   (re-search-forward "^basedir=\\(.*\\)" nil t)
   (setq mandoku-base-dir (concat (match-string 1) "\\"))
+  (goto-char (point-min))
+  (re-search-forward "^appdir=\\(.*\\)" nil t)
+  (setq mandoku-app-dir (concat (match-string 1) "\\"))
   )
+(add-to-list 'exec-path (expand-file-name (concat mandoku-app-dir "bin\\git\\bin")))
+(add-to-list 'exec-path (expand-file-name (concat mandoku-app-dir "bin\\emacs-24.3\\bin")))
+(add-to-list 'exec-path (expand-file-name (concat mandoku-app-dir "python\\App")))
+(setq mandoku-git-program (expand-file-name (concat mandoku-app-dir "bin\\git\\bin\\git.exe")))
+(setq mandoku-python-program (expand-file-name (concat mandoku-app-dir "python\\App\\python.exe")))
 
 (load (expand-file-name "~/.emacs.d/md-init.el"))
 

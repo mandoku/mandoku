@@ -385,7 +385,8 @@ Click on a link or move the cursor to the link and then press enter
       (mandoku-read-indexed-texts) 
       (mandoku-update-catalog)
       (ignore-errors  (mkdir mduser t))
-    (copy-file (expand-file-name "mandoku-settings.org" mandoku-lisp-dir) mduser)
+      (ignore-errors
+	(copy-file (expand-file-name "mandoku-settings.org" mandoku-lisp-dir) mduser))
     (setq mandoku-local-init-file (expand-file-name "mandoku-settings.org" mduser ))
     (org-babel-load-file mandoku-local-init-file)
     )))
