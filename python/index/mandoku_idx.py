@@ -6,7 +6,7 @@ from __future__ import absolute_import
 import os, sys, codecs, re, datetime, os.path, git
 from difflib import *
 
-debug = True
+debug = False
 ch_re = re.compile(ur'(\[[^\]]*\]|&[^;]*;|&amp;[CZ][X3-7]-[A-F0-9]+|.)')
 img_re = re.compile(ur'<i[^>]*>')
 sys.stdout = codecs.getwriter('utf8')(sys.stdout)
@@ -276,7 +276,8 @@ def mdIndexGit(txtdir, repo, branches, left, right, length):
                     repo.git.checkout(branches[b])
                 else:
                     continue
-                print "now on branch: ", f,  b.decode('utf-8'), branches[b]
+                if debug:
+                    print "now on branch: ", f,  b.decode('utf-8'), branches[b]
                 b=b.decode('utf-8')
                 x = MandokuIndex("%s/%s" % (txtdir, f), idlog='logfile.log', left=left, right=right, length=length)
                 m.set_seq2([a.split('\t')[0] for a in x])
@@ -319,28 +320,35 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7):
     lg = '%s/meta/%s/%s.log' % (idxdir, coll, txtid)
     # if we have a log file, this is an update
     update = os.path.isfile(lg)
-    changed = False
+    if debug:
+        print lg, update
+    changed = True
     if update:
+#        changed = False
         for l in codecs.open(lg, 'r', 'utf-8'):
             if l.startswith('para:'):
-                print "INFO: overwriting parameters from old run: %s" % (l[5:-1])  
+                if debug:
+                    print "INFO: overwriting parameters from old run: %s" % (l[5:-1])  
                 idxdir, left, right, length = eval(l[5:-1])
             elif l.startswith('#'):
                 continue
             else:
                 branch, version = l[:-1].split('\t', 1)
                 old[branch] = version
+                if debug:
+                    print "Branch check: ", branch, version, now[branch], now[branch] != version
                 try:
                     #if a branch exists and has a different version, we need to remake all
-                    if now[branch] != version:
-                        changed = True
+                    changed = now[branch] != version
                 except:
                     #if we have a new version, we need to do it anyway
                     changed = True
         #if we have a different number of versions, proceed
         if not changed:
-            changed = len(old) == len(now)
+            changed = len(old) != len(now)
         if changed:
+            if debug:
+                print "INFO: Something changed, re-indexing."
             oldindex = mdIndexGit(txtdir, repo, old, left, right, length)
     else:
         try:
@@ -349,12 +357,15 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7):
             pass
     # now we write the new logfile
     rec = codecs.open(lg, 'w', 'utf-8')
-    rec.write(u"# %s\n" % (datetime.datetime.now()))
+    if changed:
+        rec.write(u"# updating index at: %s\n" % (datetime.datetime.now()))
+    else:
+        rec.write(u"# creating index at %s\n" % (datetime.datetime.now()))
     rec.write(u"para: '%s', %d, %d, %d\n" % (idxdir, left, right, length))
     for b in repo.branches:
         rec.write(u"%s\t%s\n" % (b.name.decode('utf-8'), b.commit.hexsha))
     # check for identical hashes:
-    if len(now) > 0:
+    if  len(now) > 0 and changed:
         index = mdIndexGit(txtdir, repo, now, left, right, length)
         if not update:
             if debug:
@@ -369,7 +380,8 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7):
                     if debug:
                         debfile.write("%s\n" % ( i))
                     PrintToIdxfile(idxdir, i, coll)
-            print "writing index %d keys." % (len(idx))
+            if debug:
+                print "writing index %d keys." % (len(idx))
             for of in idx.keys():
                 outfile=codecs.open(of, 'a+', 'utf-8')
                 outfile.write("".join(idx[of]))

@@ -61,10 +61,10 @@
 (defvar mandoku-work-dir (expand-file-name  (concat mandoku-base-dir "work/")))
 (defvar mandoku-filters-dir (expand-file-name  (concat mandoku-work-dir "filters/")))
 ;; housekeeping files
-(defvar mandoku-log-file (concat mandoku-sys-dir "mandoku-log.txt"))
+(defvar mandoku-log-file (concat mandoku-sys-dir "mandoku.log"))
 (defvar mandoku-local-catalog (concat mandoku-meta-dir "local-texts.txt"))
-(defvar mandoku-download-queue (concat mandoku-sys-dir "mandoku-to-download.txt"))
-(defvar mandoku-index-queue (concat mandoku-sys-dir "mandoku-to-index.txt"))
+(defvar mandoku-download-queue (concat mandoku-sys-dir "mandoku-to-download.queue"))
+(defvar mandoku-index-queue (concat mandoku-sys-dir "mandoku-to-index.queue"))
 (defvar mandoku-indexed-texts (concat mandoku-sys-dir "indexed-texts.txt"))
 
 (defvar mandoku-string-limit 10)
@@ -1510,7 +1510,7 @@ eds
     ("Maintenance"
      ["Download texts in DL list" mandoku-download-process-queue t]
      ["Add to download list" mandoku-download-add-text-to-queue t]
-     ["Show download list" mandoku-download-process-queue t]
+     ["Show download list" mandoku-download-show-queue t]
      ["Update search index" mandoku-update-index t]
      ["Setup file" mandoku-show-local-init t]
 ;     ["Update mandoku" mandoku-update t]
@@ -1719,8 +1719,15 @@ Letters do not insert themselves; instead, they are commands.
 
 (defun mandoku-update-index ()
   "Updates the index for local files"
-  (start-process-shell-command "*index*" nil
-			       (concat mandoku-python-program " " mandoku-sys-dir "python/updateindex.py " mandoku-base-dir))
+  (interactive)
+  (set-process-sentinel (start-process-shell-command "*index*" nil
+			       (concat mandoku-python-program " " mandoku-sys-dir "python/updateindex.py " mandoku-base-dir)) 'mandoku-index-sentinel)
+  (message "Started indexing.")
+  )
+
+(defun mandoku-index-sentinel (proc msg)
+;  (if (string-match "finished" msg))
+  (message "Index %s %s" proc msg)
   )
 
 (defun mandoku-update()
@@ -1837,7 +1844,7 @@ We should check if the file exists before cloning!"
 	      ;; this has to be the local catalog file
 	      (with-current-buffer (find-file-noselect mandoku-local-catalog)
 		(goto-char (point-max))
-		(insert (format "** %s %s\n" txtid (mandoku-textid-to-title txtid)))
+		(insert (format "*** %s %s\n" txtid (mandoku-textid-to-title txtid)))
 		(save-buffer))
 	      ;; add it to the index queue
 	      (with-current-buffer (find-file-noselect mandoku-index-queue)
@@ -1870,6 +1877,7 @@ We should check if the file exists before cloning!"
 
 (defun mandoku-download-process-queue ()
   "Work through the queue and download the texts if necessary."
+  (interactive)
   (let (txtid)
     (with-current-buffer (find-file-noselect mandoku-download-queue)
       (goto-char (point-min))

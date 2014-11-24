@@ -3,10 +3,10 @@
 import sys, os.path, re
 reload(sys)
 sys.setdefaultencoding('utf-8')
+idxpath=os.path.split(os.path.realpath(__file__))[0]
 
-sys.path.insert(0, '/tmp/mdidx/lib/python2.7/site-packages')
-sys.path.insert(0, '/Users/chris/.pyenv/versions/mdindex/lib/python2.7/site-packages')
-sys.path.insert(0, '/Users/chris/krp/mandoku/python/index')
+sys.path.insert(0, idxpath)
+sys.path.insert(0, '/Users/chris/krp/system/python')
 
 import mandoku_idx as md
 
@@ -20,8 +20,8 @@ except:
     else:
         mdbase = "/Users/chris/krpnew"
 # todo: look at mandoku-index-queue
-print mdbase
-mdtext = "%s/text" % (mdbase)
+# print mdbase
+mdtext = "%s/test" % (mdbase)
 mdidx =  "%s/index" % (mdbase)
 try:
     os.makedirs(mdidx)
@@ -38,10 +38,9 @@ def textwalk(arg, dirname, names):
             
 
 
-# check for  
+# check for index-queue
 
-
-
+# just update
 os.path.walk(mdtext, textwalk, '')
 
 #for path, dirlist, filelist in os.walk(mdtext):
