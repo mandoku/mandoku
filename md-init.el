@@ -12,15 +12,13 @@
 (defvar starter-kit-user-dir (expand-file-name "user" starter-kit-dir)
   "user directory for personal code")
 
-(defvar mandoku-lisp (expand-file-name "lisp" starter-kit-dir)
+(defvar starter-kit-lisp (expand-file-name "lisp" starter-kit-dir)
   "directory for mandoku lisp code")
 
-(setq mandoku-base-dir (concat (mapconcat 'identity (butlast (split-string starter-kit-dir "/") 2) "/") "/"))
-
-(add-to-list 'load-path starter-kit-dir)
+(add-to-list 'load-path starter-kit-lisp)
 (add-to-list 'load-path starter-kit-user-dir)
-(add-to-list 'load-path mandoku-lisp)
-
+;(add-to-list 'load-path mandoku-lisp)
+;; try to set proxy
 (setq ssid (if (eq window-system 'w32)
 		      (shell-command-to-string "netsh wlan show interface | find /i \" SSID\"")
 	     (shell-command-to-string "/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I | awk '/ SSID/ {print substr($0, index($0, $2))}'")))

@@ -24,9 +24,9 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName=krp
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
-LicenseFile=C:\Program Files (x86)\Inno Setup 5\Examples\ISPPExample1License.txt
-InfoBeforeFile=C:\Program Files (x86)\Inno Setup 5\Examples\Readme.txt
-InfoAfterFile=C:\Program Files (x86)\Inno Setup 5\Examples\Readme-Dutch.txt
+LicenseFile=license.txt
+InfoBeforeFile=readme.txt
+;InfoAfterFile=C:\Program Files (x86)\Inno Setup 5\Examples\Readme-Dutch.txt
 OutputBaseFilename=mandoku-setup
 Compression=lzma
 SolidCompression=yes
@@ -39,60 +39,78 @@ Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
 ;Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Dirs]
-Name: "{app}\images"
-Name: "{app}\index"
-Name: "{app}\mandoku"
-Name: "{app}\meta"
-Name: "{app}\system"
-Name: "{app}\temp"
-Name: "{app}\text"
-Name: "{app}\user"
-Name: "{app}\work"
-Name: "{app}\bin"
-
+Name: "{code:GetDataDir}\images"
+Name: "{code:GetDataDir}\index"
+Name: "{code:GetDataDir}\meta"
+Name: "{code:GetDataDir}\system"
+Name: "{code:GetDataDir}\temp"
+Name: "{code:GetDataDir}\text"
+Name: "{code:GetDataDir}\user"
+Name: "{code:GetDataDir}\work"
+Name: "{%HOMEPATH}\.emacs.d\user"
 
 
 
 [Files]
-;#include "e:\py\out.txt"
-; NOTE: Don't use "Flags: ignoreversion" on any shared system files
+#include "e:\py\out.txt"
+; NOTE: Don't use "Flags: ignoreversion" on any shared system files'
 ;; try this!
 ;Source: "..\*"; DestDir: "{app}\"; Flags: recursesubdirs; Excludes: "*.pyc,installer"
-
-;[Icons]
+;Source: "README.TXT"; DestDir: "{app}"; Flags: isreadme
+Source:"addsshkey.bat"; DestDir: "{app}"; 
+Source:"init.el"; DestDir: "{%HOMEPATH}\.emacs.d\"; Flags: ignoreversion
+;onlyifdoesntexist
+Source: "..\md-kit.el"; DestDir: "{%HOMEPATH}\.emacs.d\lisp"; Flags: ignoreversion
+Source: "..\md-init.el"; DestDir: "{%HOMEPATH}\.emacs.d\"; Flags: ignoreversion
+Source: "..\install-packages.el"; DestDir: "{%HOMEPATH}\.emacs.d\lisp"; Flags: ignoreversion
+Source: "addsshkey.py"; DestDir: "{code:GetDataDir}\system\python"; Flags: ignoreversion
+[Icons]
 ;Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
-;Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+;Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\bin\{#MyAppExeName}"; Tasks: desktopicon
 
 [INI]
-Filename:"{app}\user\mandoku-settings.cfg"; Section: "Mandoku"; Key: "Basedir"; String: "{app}"
-Filename:"{app}\user\mandoku-settings.cfg"; Section: "Gitlab"; Key: "Private Token"; String: "{code:GetUser|Token}"
-Filename:"{app}\user\mandoku-settings.cfg"; Section: "Gitlab"; Key: "Username"; String: "{code:GetUser|Name}"
+Filename:"{%HOMEPATH}\.emacs.d\mandoku.cfg"; Section: "Mandoku"; Key: "basedir"; String: "{code:GetDataDir}"
+Filename:"{%HOMEPATH}\.emacs.d\mandoku.cfg"; Section: "Mandoku"; Key: "appdir"; String: "{app}"
+Filename:"{code:GetDataDir}\user\mandoku-settings.cfg"; Section: "Gitlab"; Key: "Private Token"; String: "{code:GetUser|Token}"
+Filename:"{code:GetDataDir}\user\mandoku-settings.cfg"; Section: "Gitlab"; Key: "Username"; String: "{code:GetUser|Name}"
+Filename:"{code:GetDataDir}\user\mandoku-settings.cfg"; Section: "Gitlab"; Key: "Email"; String: "{code:GetUser|Email}"
 ;Filename: "MyProg.ini"; Section: "InstallSettings"; Key: "InstallPath"; String: "{app}"
 
 
 [Run]
 ;optional
-Filename: "{app}\bin\addsshkeytogitlab.bat"; 
+Filename:"{app}\addsshkey.bat"; Parameters: "{code:GetDataDir}"
 ;Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [Code]
 var
   UserPage: TInputQueryWizardPage;
+  DataDirPage: TInputDirWizardPage;
   
 procedure InitializeWizard;
 begin
   { Create the pages }
-  
-  UserPage := CreateInputQueryPage(wpWelcome,
+{wpWelcome, wpLicense, wpPassword, wpInfoBefore, wpUserInfo, wpSelectDir, wpSelectComponents, wpSelectProgramGroup, wpSelectTasks, wpReady, wpPreparing, wpInstalling, wpInfoAfter, wpFinished}   
+  UserPage := CreateInputQueryPage(wpInfoBefore,
     'Gitlab Token', 'Enter the Gitlab token and username?',
-    'The token is available on your Gitlab profile page. Please past it, then click Next.');
+    'The token is available on your Gitlab profile page. Please enter the necessary information, then click Next.');
   UserPage.Add('Gitlab Private token:', False);
   UserPage.Add('Gitlab Username:     ', False); 
+  UserPage.Add('Gitlab Email:     ', False); 
 
+  DataDirPage := CreateInputDirPage(wpSelectDir,
+    'Select Personal Data Directory', 'Where should personal data files be installed?',
+    'Select the folder in which Setup should install personal data files, then click Next.',
+    False, '');
+  DataDirPage.Add('');
+
+   
   { Set default values, using settings that were stored last time if possible }
 
   UserPage.Values[0] := GetPreviousData('Token', '');
   UserPage.Values[1] := GetPreviousData('Name', ''); 
+  UserPage.Values[2] := GetPreviousData('Email', ''); 
+  DataDirPage.Values[0] := GetPreviousData('DataDir', '');
 
 end;
 
@@ -103,6 +121,8 @@ begin
   { Store the settings so we can restore them next time }
   SetPreviousData(PreviousDataKey, 'Token', UserPage.Values[0]);
   SetPreviousData(PreviousDataKey, 'Name', UserPage.Values[1]); 
+  SetPreviousData(PreviousDataKey, 'Email', UserPage.Values[2]); 
+  SetPreviousData(PreviousDataKey, 'DataDir', DataDirPage.Values[0]);
 end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
@@ -147,3 +167,13 @@ begin
 end;
 
 
+function GetDataDir(Param: String): String;
+begin
+  { Return the selected DataDir }
+  Result := DataDirPage.Values[0];
+end;
+
+{ procedure WriteBatch(Param : String ); }
+{ begin }
+{    SaveStringToFile('c:\filename.txt', #13#10 + 'the string' + #13#10, True); }
+{ end; }

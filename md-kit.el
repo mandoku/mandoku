@@ -82,9 +82,6 @@
 ;;;;;;; personal preferences
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; add this directory to the path for loading lisp files
-(add-to-list 'load-path starter-kit-dir)
-
 (setq abbrev-file-name (expand-file-name "user/abbrev_defs" starter-kit-dir))
 (setq save-abbrevs t) 
 (setq-default abbrev-mode t)
@@ -224,17 +221,6 @@
 ; (load-file (expand-file-name "jmax-org.el" starter-kit-dir))
 
 (require 'org)
-
-;; Mandoku [2014-05-26T17:57:33+0900]
-(when (file-exists-p mandoku-lisp)
-  (mapc 'load (directory-files mandoku-lisp 't "^[^#].*el$")))
-;(ignore-errors
-(if (file-exists-p (expand-file-name "mandoku-settings.org" starter-kit-user-dir ))
-    (org-babel-load-file (expand-file-name "mandoku-settings.org" starter-kit-user-dir ))
-  (progn 
-    (copy-file (expand-file-name "mandoku-settings.org" mandoku-lisp) starter-kit-user-dir)
-    (org-babel-load-file (expand-file-name "mandoku-settings.org" starter-kit-user-dir ))
-))
 
 ;;; sane values for encoding
 (prefer-coding-system 'utf-8)

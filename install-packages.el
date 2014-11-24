@@ -29,6 +29,7 @@
 	'json
 	;'icicles
 	'org 'org-plus-contrib
+	'mandoku 'mandoku-meta-zb
 ;	'elpy
         'rainbow-mode)
   "Libraries that should be installed by default.")
