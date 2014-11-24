@@ -239,7 +239,7 @@
 
 (defun mandoku-read-indexed-texts()
   "read the list of indexed texts into the variable."
-    (when (file-exists-p  mandoku-indexed-texts))
+    (when (file-exists-p  mandoku-indexed-texts)
     (with-temp-buffer
       (let ((coding-system-for-read 'utf-8)
 	    textid)
@@ -248,7 +248,7 @@
 	(while (re-search-forward mandoku-textid-regex nil t)
 	  (add-to-list 'mandoku-local-index-list (match-string 0))))
       ))
-
+)
 
 (defun mandoku-read-titletables () 
   "read the titles table"
@@ -342,7 +342,9 @@ Click on a link or move the cursor to the link and then press enter
 	    mandoku-base-dir))
 	 (mduser (concat md "/user"))
 	 )
-    (if (file-exists-p (expand-file-name "mandoku-settings.org" mduser ))
+    (if (and
+	 (file-exists-p (expand-file-name "mandoku-catatlog.txt" (concat md "/meta")))
+	 (file-exists-p (expand-file-name "mandoku-settings.org" mduser )))
 	(org-babel-load-file (expand-file-name "mandoku-settings.org" mduser ))
       ;; looks like we have to bootstrap the krp directory structure
       (progn
