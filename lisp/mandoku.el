@@ -54,7 +54,7 @@
 ;; it probably does not much sense to do this here, but anyway, this is the idea...
 (defvar mandoku-text-dir (expand-file-name (concat mandoku-base-dir "text/")))
 (defvar mandoku-image-dir nil)
-(defvar mandoku-index-dir nil)
+(defvar mandoku-index-dir (expand-file-name  (concat mandoku-base-dir "index/")))
 (defvar mandoku-meta-dir (expand-file-name  (concat mandoku-base-dir "meta/")))
 (defvar mandoku-temp-dir (expand-file-name  (concat mandoku-base-dir "temp/")))
 (defvar mandoku-sys-dir (expand-file-name  (concat mandoku-base-dir "system/")))
@@ -518,6 +518,9 @@ One character is either a character or one entity expression"
 		  tmpstr)
 	      (mandoku-search-local search-string local-buffer)
 	      (with-current-buffer local-buffer
+		(goto-char (point-min))
+		(while (re-search-forward "_\\([0-9]\\{3\\}\\):" nil t)
+		  (replace-match ":\\1-"))
 		(setq tmpstr (buffer-string))
 		)
 	      (with-current-buffer index-buffer
@@ -630,7 +633,7 @@ One character is either a character or one entity expression"
 	      )
 	  (let* ((txtid (concat filter (car (split-string (car location) "_"))))
 		 (line (car (cdr (cdr location))))
-		 (pag (car (cdr location)))
+		 (pag (car (cdr location)) ) 
 		 (page (if (string-match "[-_]"  pag)
 			   (concat (substring pag 0 (- (length pag) 1))
 				   (mandoku-num-to-section (substring pag (- (length pag) 1))) line)
@@ -1730,6 +1733,7 @@ Letters do not insert themselves; instead, they are commands.
 
 (defun mandoku-index-sentinel (proc msg)
 ;  (if (string-match "finished" msg))
+  (mandoku-read-indexed-texts) 
   (message "Index %s %s" proc msg)
   )
 
@@ -1812,7 +1816,7 @@ We should check if the file exists before cloning!"
   (let* ((default-directory targetdir)
 	 (process-connection-type nil)   ; pipe, no pty (--no-progress)
 	 (curbuf    (current-buffer))
-	 (buf       (set-buffer "*mandoku bootstrap*"))
+	 (buf       (get-buffer-create "*mandoku bootstrap*"))
 	 (txtid     (substring (cadr (split-string url "/")) 0 -4))
 	 (git       (or (executable-find "git")
 			(error "Unable to find `git'"))))

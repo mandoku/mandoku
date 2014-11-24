@@ -21,8 +21,10 @@ except:
         mdbase = "/Users/chris/krpnew"
 # todo: look at mandoku-index-queue
 # print mdbase
-mdtext = "%s/test" % (mdbase)
+mdtext = "%s/text" % (mdbase)
 mdidx =  "%s/index" % (mdbase)
+mdsys = "%s/system" % (mdbase)
+idxtxt = open("%s/indexed-texts.txt" % (mdsys), "w")
 try:
     os.makedirs(mdidx)
 except:
@@ -34,6 +36,7 @@ def textwalk(arg, dirname, names):
         if txtid_re.match(f):
             p = "%s/%s" % (dirname, f)
             print p
+            idxtxt.write("%s\n" % (f))
             md.StartIndex(p, mdidx)
             
 
@@ -42,7 +45,7 @@ def textwalk(arg, dirname, names):
 
 # just update
 os.path.walk(mdtext, textwalk, '')
-
+idxtxt.close()
 #for path, dirlist, filelist in os.walk(mdtext):
     
         
