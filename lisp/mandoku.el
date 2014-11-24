@@ -343,7 +343,7 @@ Click on a link or move the cursor to the link and then press enter
 	 (mduser (concat md "/user"))
 	 )
     (if (and
-	 (file-exists-p (expand-file-name "mandoku-catatlog.txt" (concat md "/meta")))
+	 (file-exists-p (expand-file-name "mandoku-catalog.txt" (concat md "/meta")))
 	 (file-exists-p (expand-file-name "mandoku-settings.org" mduser )))
 	(org-babel-load-file (expand-file-name "mandoku-settings.org" mduser ))
       ;; looks like we have to bootstrap the krp directory structure
