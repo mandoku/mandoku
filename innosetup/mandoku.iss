@@ -48,7 +48,7 @@ Name: "{code:GetDataDir}\temp"
 Name: "{code:GetDataDir}\text"
 Name: "{code:GetDataDir}\user"
 Name: "{code:GetDataDir}\work"
-Name: "{%HOMEPATH}\.emacs.d\user"
+Name: "{userappdata}\.emacs.d\user"
 
 
 
@@ -60,19 +60,19 @@ Source: "c:\python"; DestDir: "{code:GetDataDir}\system\python"; Flags: recurses
 Source: "c:\krp\bin\*"; DestDir: "{app}\bin"; Flags: recursesubdirs; Excludes: "*.pyc,installer,installdirs"
 ;Source: "README.TXT"; DestDir: "{app}"; Flags: isreadme
 Source:"addsshkey.bat"; DestDir: "{app}"; 
-Source:"init.el"; DestDir: "{%HOMEPATH}\.emacs.d\"; Flags: ignoreversion
+Source:"init.el"; DestDir: "{userappdata}\.emacs.d\"; Flags: ignoreversion
 ;onlyifdoesntexist
-Source: "..\md-kit.el"; DestDir: "{%HOMEPATH}\.emacs.d\lisp"; Flags: ignoreversion
-Source: "..\md-init.el"; DestDir: "{%HOMEPATH}\.emacs.d\"; Flags: ignoreversion
-Source: "..\install-packages.el"; DestDir: "{%HOMEPATH}\.emacs.d\lisp"; Flags: ignoreversion
+Source: "..\md-kit.el"; DestDir: "{userappdata}\.emacs.d\lisp"; Flags: ignoreversion
+Source: "..\md-init.el"; DestDir: "{userappdata}\.emacs.d\"; Flags: ignoreversion
+Source: "..\install-packages.el"; DestDir: "{userappdata}\.emacs.d\lisp"; Flags: ignoreversion
 Source: "addsshkey.py"; DestDir: "{code:GetDataDir}\system\python"; Flags: ignoreversion
 [Icons]
 ;Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name:"{commondesktop}\{#MyAppName}"; Filename: "{app}\bin\emacs-24.3\bin\{#MyAppExeName}"; Tasks: desktopicon
 
 [INI]
-Filename:"{%HOMEPATH}\.emacs.d\mandoku.cfg"; Section: "Mandoku"; Key: "basedir"; String: "{code:GetDataDir}"
-Filename:"{%HOMEPATH}\.emacs.d\mandoku.cfg"; Section: "Mandoku"; Key: "appdir"; String: "{app}"
+Filename:"{userappdata}\.emacs.d\mandoku.cfg"; Section: "Mandoku"; Key: "basedir"; String: "{code:GetDataDir}"
+Filename:"{userappdata}\.emacs.d\mandoku.cfg"; Section: "Mandoku"; Key: "appdir"; String: "{app}"
 Filename:"{code:GetDataDir}\user\mandoku-settings.cfg"; Section: "Gitlab"; Key: "Private Token"; String: "{code:GetUser|Token}"
 Filename:"{code:GetDataDir}\user\mandoku-settings.cfg"; Section: "Gitlab"; Key: "Username"; String: "{code:GetUser|Name}"
 Filename:"{code:GetDataDir}\user\mandoku-settings.cfg"; Section: "Gitlab"; Key: "Email"; String: "{code:GetUser|Email}"
