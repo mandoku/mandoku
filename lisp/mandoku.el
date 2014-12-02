@@ -1526,7 +1526,7 @@ eds
 ;     ["Update mandoku" mandoku-update t]
 ;     ["Update installed texts" mandoku-update-texts nil]
      
-     ["Add repository" mandoku-setting nil]
+     ["Add repository" mandoku-gitlab-create-project (not (member mandoku-gitlab-remote-name (mandoku-get-remotes)))]
      )
 ))     
 
@@ -1814,15 +1814,18 @@ We should check if the file exists before cloning!"
 ;; this will be implemented once the gitlab API change is in place
 (defun mandoku-gitlab-create-project ()
   "Create a gitlab project for the current text"
+  (interactive)
   (let*  ((tit (mandoku-get-title))
 	  (txtid (mandoku-get-textid))
 	  (branch (mandoku-get-current-branch))
-	  (url "False") rem)
-    (if (and (equal branch "master")
-	(y-or-n-p "You are still on the master branch. It is recommended to create a different branch first. Do you want to continue?"))
-      (if (y-or-n-p "This will create a project on gitlab and push a copy there. Do you want to continue?")
-	  (setq url (substring (shell-command-to-string (concat mandoku-python-program " " mandoku-sys-dir "python/makerep.py " txtid " " tit )) 0 -1))))
-    (if (not (equal url "False"))
+	  (url "False") rem cont)
+    (if (equal branch "master")
+	(setq cont (y-or-n-p "You are still on the master branch. It is recommended to create a different branch first. Do you want to continue?"))
+      (setq cont t)
+      )
+    (if (and cont (y-or-n-p "This will create a project on gitlab and push a copy there. Do you want to continue?"))
+	  (setq url (substring (shell-command-to-string (concat mandoku-python-program " " mandoku-sys-dir "python/makerep.py " txtid " " tit )) 0 -1)))
+    (if (equal (substring url 0 4) "git@")
 	(progn
 	  ; we create a remote for this repository
 	  (shell-command-to-string (concat mandoku-git-program " remote add " mandoku-gitlab-remote-name " " url))
@@ -1961,6 +1964,12 @@ We should check if the file exists before cloning!"
   (setq branch (or branch (read-string "Create and switch to new branch: ")))
   (mandoku-shell-command "git" (format " checkout -b %s" branch)))
 
+(defun mandoku-get-remotes ()
+  (let* ( (git       (or (executable-find "git")
+			(error "Unable to find `git'")))
+	  (default-directory (file-name-directory (buffer-file-name )))
+	  (res (shell-command-to-string (concat git " remote"))) )
+    (split-string res "\n")))
   
 (defun mandoku-get-branches ()
   (let* ( (git       (or (executable-find "git")
@@ -1970,11 +1979,8 @@ We should check if the file exists before cloning!"
     (split-string res "\n")))
 
 (defun mandoku-get-current-branch ()
-  (let ( (git       (or (executable-find "git")
-			(error "Unable to find `git'"))))
-	  
     (with-temp-buffer 
-      (if (not (zerop (call-process git nil t nil 
+      (if (not (zerop (call-process mandoku-git-program nil t nil 
 				   "--no-pager"  "symbolic-ref" "-q" "HEAD")))
 	  "edition not known"
 	(progn
@@ -1983,7 +1989,7 @@ We should check if the file exists before cloning!"
 	  (goto-char (point-min))
 	  (if (looking-at "^refs/heads/")
 	      (buffer-substring 12 (1- (point-max)))))))
-))
+)
 
 ;; routines to work with settings when loading settings.org
 ;;[2014-01-07T11:21:05+0900]
