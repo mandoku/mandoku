@@ -122,7 +122,11 @@
   :type '(string)
   :group 'mandoku)
 
-
+(defcustom mandoku-gitlab-remote-name "private"
+  "Name of the remote used at the gitlab site."
+  :type '(string)
+  :group 'mandoku)
+  
 ;; Add this since it appears to miss in emacs-2x
 (or (fboundp 'replace-in-string)
     (defun replace-in-string (target old new)
@@ -1808,7 +1812,25 @@ We should check if the file exists before cloning!"
  ; (shell-command-to-string (concat "cd " default-directory "  && " git " clone " txturl ))) 
 
 ;; this will be implemented once the gitlab API change is in place
-(defun mandoku-fork-and-clone ())
+(defun mandoku-gitlab-create-project ()
+  "Create a gitlab project for the current text"
+  (let*  ((tit (mandoku-get-title))
+	  (txtid (mandoku-get-textid))
+	  (branch (mandoku-get-current-branch))
+	  (url "False") rem)
+    (if (and (equal branch "master")
+	(y-or-n-p "You are still on the master branch. It is recommended to create a different branch first. Do you want to continue?"))
+      (if (y-or-n-p "This will create a project on gitlab and push a copy there. Do you want to continue?")
+	  (setq url (substring (shell-command-to-string (concat mandoku-python-program " " mandoku-sys-dir "python/makerep.py " txtid " " tit )) 0 -1))))
+    (if (not (equal url "False"))
+	(progn
+	  ; we create a remote for this repository
+	  (shell-command-to-string (concat mandoku-git-program " remote add " mandoku-gitlab-remote-name " " url))
+	  ; and now push to the repository .. maybe do this asyncroneosly..
+	  (shell-command-to-string (concat mandoku-git-program " push -u " mandoku-gitlab-remote-name " " branch))
+	  ))
+;  (message "%s" url)
+  ))
 
 (defun mandoku-fork ())
 
@@ -2005,17 +2027,19 @@ We should check if the file exists before cloning!"
 
 (defun mandoku-get-textid ()
   "looks for a textid close to the cursor"
-  (let (
+  (let ((fn (car (split-string (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))) "_")))
       (begol (point-at-bol))
       (endol (point-at-eol))
       (wap (or (word-at-point) "")))
+    (if (string-match mandoku-textid-regex fn)
+	fn
       (if (string-match mandoku-textid-regex wap)
 	  wap
 	(save-excursion
 	  (goto-char begol)
 	  (if (re-search-forward (concat "\\(" mandoku-textid-regex "\\)") endol t 1)
 	      (buffer-substring-no-properties (match-beginning 1) (match-end 1))))
-	)))
+	))))
 
 
 (defun mandoku-split-textid (txtid)
