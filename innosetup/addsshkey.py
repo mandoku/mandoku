@@ -3,16 +3,19 @@ import gitlab,sys, os, os.path, getpass, ConfigParser
 from os.path import expanduser, join
 from datetime import datetime
 
-home = expanduser("~")
-sshpubkey = join(home, ".ssh/id_rsa.pub")
+#home = expanduser("~")
+#sshpubkey = join(home, ".ssh/id_rsa.pub")
 glurl="http://gl.kanripo.org"
 
 #get the token
 config = ConfigParser.ConfigParser()
 sp = os.path.split(os.path.split(os.path.split(os.path.realpath(__file__))[0])[0])[0]
-cfgfile = join(sp, "user/mandoku-settings.cfg")
+cfgfile = os.path.join(sp, "user/mandoku-settings.cfg")
 config.readfp(open(cfgfile))
 gltok = config.get("Gitlab", "Private Token")
+
+#get the key path
+sshpubkey = config.get("Git", "Public Key") #join(home, ".ssh/id_rsa.pub")
 
 # Connect to get the current user    
 gl = gitlab.Gitlab(glurl, gltok)
