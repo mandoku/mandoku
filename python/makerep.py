@@ -31,5 +31,15 @@ n=gl.createproject(text, None, description=desc)
 if n:
     print n['ssh_url_to_repo']
 else:
-    print n
-    
+    #lets see if it already exists!
+    p = gl.getprojects()
+    rep = {}
+    for a in p:
+        if a['name'] == text:
+            rep=a
+#            x = a['ssh_url_to_repo']
+    if len(rep) > 0:
+        print rep['default_branch'], rep['ssh_url_to_repo']
+    else:
+        print False
+        

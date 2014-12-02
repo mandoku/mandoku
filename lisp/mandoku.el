@@ -1831,7 +1831,24 @@ We should check if the file exists before cloning!"
 	  (shell-command-to-string (concat mandoku-git-program " remote add " mandoku-gitlab-remote-name " " url))
 	  ; and now push to the repository .. maybe do this asyncroneosly..
 	  (shell-command-to-string (concat mandoku-git-program " push -u " mandoku-gitlab-remote-name " " branch))
-	  ))
+	  )
+      (if (and cont (not (equal url "False")))
+	  ; the remote dir already exists, still need to add it as remote here:
+	  (progn
+	    (shell-command-to-string
+	     (concat mandoku-git-program " remote add " mandoku-gitlab-remote-name " "
+		     (cadr (split-string url " "))))
+					; now we add the remote default branch to this .git/config
+	    (shell-command-to-string
+	     (concat mandoku-git-program " config branch." (car (split-string url " ")) ".remote " mandoku-gitlab-remote-name))
+	    (shell-command-to-string
+	     (concat mandoku-git-program " config branch." (car (split-string url " ")) ".merge refs/head/" (car (split-string url " "))))
+	    ;; we still need to set the remote to upstream , but how?  pull equivalent of push -u ??
+	    (shell-command-to-string
+	     (concat mandoku-git-program " fetch " mandoku-gitlab-remote-name " " (car (split-string url " ")) ))
+	    )
+      ))
+    
 ;  (message "%s" url)
   ))
 
