@@ -37,13 +37,19 @@ if os.path.isfile(emacsinit):
 if not emacsinitOK:
     initfile=codecs.open(emacsinit, 'a', 'utf-8')
     initfile.write(""";; [%s] added by Mandoku Installer
-(setq mandoku-base-dir "%s")
-(setq mandoku-git-program "%s")
-(setq mandoku-python-program "%s")
+(setq mandoku-base-dir (concat (expand-file-name "%s") "/"))
+(setq mandoku-git-program (expand-file-name "%s"))
+(setq mandoku-python-program (expand-file-name "%s"))
 (load (expand-file-name "~/.emacs.d/md/md-init.el"))
-    
+(add-to-list 'exec-path (expand-file-name "%s"  ))
+(add-to-list 'exec-path (expand-file-name "%s"  ))
+(require 'mandoku)
+(require 'mandoku-link)
+(mandoku-initialize)    
 """ % ((datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
-                   krp, gitpath, pypath
+       krp.replace('\\', '/'), gitpath.replace('\\', '/'), pypath.replace('\\', '/'),
+       os.path.split(gitpath)[0].replace('\\', '/'),
+       os.path.split(pypath)[0].replace('\\', '/')
                    ))
     initfile.close()
         

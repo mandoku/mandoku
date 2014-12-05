@@ -2,15 +2,17 @@
 import sys, os, os.path, getpass, ConfigParser, codecs
 reload(sys)
 sys.setdefaultencoding('utf-8')
+
 from os.path import expanduser, join
 from datetime import datetime
 p = os.path.split(os.path.realpath(__file__))[0]
+print p
 sys.path.insert(0, p)
 import gitlab
-
 sp = os.path.split(os.path.split(os.path.split(os.path.realpath(__file__))[0])[0])[0]
 
 home = expanduser("~")
+#sshpubkey = join(home, ".ssh/id_rsa.pub")
 glurl="http://gl.kanripo.org"
 
 #get the token
@@ -24,7 +26,7 @@ sshpubkey = os.path.join(home, ".ssh/glkanripo.pub")
 
 
 # Connect to get the current user    
-#proxies = { "http" : "http://proxy.kuins.net:8080"}
+proxies = { "http" : "http://proxy.kuins.net:8080"}
 
 gl = gitlab.Gitlab(glurl, gltok)
 #print gl.getsshkeys()
@@ -34,7 +36,7 @@ fn = codecs.open(sshpubkey, 'r', 'utf-8')
 key = fn.read()
 print "key length", len(key), key
 print sshpubkey
-title = u"%s %s" % ("dummy", datetime.now().strftime("%Y-%m-%d %H:%M:%S") )
+title = u"%s %s" % ("mandoku-key", datetime.now().strftime("%Y-%m-%d %H:%M:%S") )
 print "title", title
 if gl.addsshkey(title, key):
     print "200 Success: Successfully uploaded the key."
