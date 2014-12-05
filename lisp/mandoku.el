@@ -1752,15 +1752,13 @@ Letters do not insert themselves; instead, they are commands.
 (defun mandoku-update-internal (package)
   (let* (
 	 (buf       (switch-to-buffer "*mandoku bootstrap*"))
-	 (git       (or (executable-find "git")
-			(error "Unable to find `git'")))
 	 (default-directory (concat mandoku-base-dir package))
 	 (process-connection-type nil)   ; pipe, no pty (--no-progress)
 
 	   ;; First update mandoku
 	 (status
 	  (call-process
-	   git nil `(,buf t) t "pull" "origin" "-v" )))
+	   mandoku-git-program nil `(,buf t) t "pull" "origin" "-v" )))
 
 	(unless (zerop status)
 	  (error "Couldn't update %s from the remote Git repository." (concat mandoku-base-dir package)))
@@ -1859,9 +1857,7 @@ We should check if the file exists before cloning!"
 	 (process-connection-type nil)   ; pipe, no pty (--no-progress)
 	 (curbuf    (current-buffer))
 	 (buf       (get-buffer-create "*mandoku bootstrap*"))
-	 (txtid     (substring (cadr (split-string url "/")) 0 -4))
-	 (git       (or (executable-find "git")
-			(error "Unable to find `git'"))))
+	 (txtid     (substring (cadr (split-string url "/")) 0 -4)))
     (with-current-buffer (find-file-noselect mandoku-log-file)
       (goto-char (point-max))
       (insert (format-time-string "[%Y-%m-%dT%T%z] INFO " (current-time)))
@@ -1870,7 +1866,7 @@ We should check if the file exists before cloning!"
       (goto-char (point-max))
       (insert (format-time-string "[%Y-%m-%dT%T%z]\n" (current-time)))
       (set-process-sentinel (start-process-shell-command (concat "" url) buf
-							 (concat git  " clone " url " -v " targetdir))
+							 (concat mandoku-git-program  " clone " url " -v " targetdir))
 			    'mandoku-clone-sentinel)
       )
     (set-buffer curbuf)
@@ -1974,25 +1970,21 @@ We should check if the file exists before cloning!"
 
 (defun mandoku-switch-version (branch)
 ;  (gd-shell-command (format "git checkout %s" branch)))
-  (mandoku-shell-command "git" (format " checkout %s" branch)))
+  (mandoku-shell-command mandoku-git-program (format " checkout %s" branch)))
 
 (defun mandoku-new-version (&optional branch)
   (interactive)
   (setq branch (or branch (read-string "Create and switch to new branch: ")))
-  (mandoku-shell-command "git" (format " checkout -b %s" branch)))
+  (mandoku-shell-command mandoku-git-program (format " checkout -b %s" branch)))
 
 (defun mandoku-get-remotes ()
-  (let* ( (git       (or (executable-find "git")
-			(error "Unable to find `git'")))
-	  (default-directory (file-name-directory (buffer-file-name )))
-	  (res (shell-command-to-string (concat git " remote"))) )
+  (let* ( (default-directory (file-name-directory (buffer-file-name )))
+	  (res (shell-command-to-string (concat mandoku-git-program " remote"))) )
     (split-string res "\n")))
   
 (defun mandoku-get-branches ()
-  (let* ( (git       (or (executable-find "git")
-			(error "Unable to find `git'")))
-	  (default-directory (file-name-directory (buffer-file-name )))
-	  (res (shell-command-to-string (concat git " branch"))) )
+  (let* ( (default-directory (file-name-directory (buffer-file-name )))
+	  (res (shell-command-to-string (concat mandoku-git-program " branch"))) )
     (split-string res "\n")))
 
 (defun mandoku-get-current-branch ()
