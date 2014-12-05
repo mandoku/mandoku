@@ -5,19 +5,20 @@
 ;; This is the first thing to get loaded.
 ;;
 ;(setq debug-on-error t)
-;; remember this directory
-(defconst starter-kit-dir (file-name-directory (or load-file-name (buffer-file-name)))
+;; remember the directory below this
+(defconst starter-kit-dir (file-name-directory (substring (file-name-directory (or load-file-name (buffer-file-name))) 0 -1))
     "directory where the starterkit is installed")
 
-(defvar starter-kit-user-dir (expand-file-name "user" starter-kit-dir)
+(defvar starter-kit-user-dir (file-name-directory (expand-file-name "user" starter-kit-dir))
   "user directory for personal code")
 
-(defvar starter-kit-lisp (expand-file-name "lisp" starter-kit-dir)
-  "directory for mandoku lisp code")
+(defvar starter-kit-lisp (file-name-directory  (expand-file-name "md" starter-kit-dir))
+  "directory for starter-kit lisp code")
+
 
 (add-to-list 'load-path starter-kit-lisp)
 (add-to-list 'load-path starter-kit-user-dir)
-;(add-to-list 'load-path mandoku-lisp)
+
 ;; try to set proxy
 (setq ssid (if (eq window-system 'w32)
 		      (shell-command-to-string "netsh wlan show interface | find /i \" SSID\"")
@@ -42,7 +43,7 @@
       (if (not (search-forward "md-init" nil t))
 	  (progn
 	    (goto-char (point-max))
-	    (insert "(load \"" starter-kit-dir "md-init.el\")")))
+	    (insert "(load \"" starter-kit-lisp "md-init.el\")")))
       (save-buffer)
       (kill-buffer))
 )))
