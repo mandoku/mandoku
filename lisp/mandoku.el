@@ -325,6 +325,8 @@ Click on a link or move the cursor to the link and then press enter
 ")
 
     (dolist (x (sort mandoku-catalogs-alist (lambda (a b) (string< (car a) (car b)))))
+;; need to ignore local texts here...
+(if (not (string-match (car x ) mandoku-local-catalog))
       (insert 
        (if (> (length (car x)) 3)
 	   "**"
@@ -335,7 +337,7 @@ Click on a link or move the cursor to the link and then press enter
 	       (gethash (car x)  mandoku-subcolls))))
     (save-buffer)
     (mandoku-view-mode)
-    )
+    ))
   (mandoku-update-catalog-alist)
   )
 
@@ -390,7 +392,7 @@ Click on a link or move the cursor to the link and then press enter
       (mandoku-update-catalog)
       (ignore-errors  (mkdir mduser t))
       (ignore-errors
-	(copy-file (expand-file-name "mandoku-settings.org" mandoku-lisp-dir) mduser))
+	(copy-file (expand-file-name "mandoku-settings.org" mandoku-lisp-dir) mduser t))
     (setq mandoku-local-init-file (expand-file-name "mandoku-settings.org" mduser ))
     (org-babel-load-file mandoku-local-init-file)
     )))
@@ -1840,12 +1842,10 @@ We should check if the file exists before cloning!"
 		     (cadr (split-string url " "))))
 					; now we add the remote default branch to this .git/config
 	    (shell-command-to-string
-	     (concat mandoku-git-program " config branch." (car (split-string url " ")) ".remote " mandoku-gitlab-remote-name))
+	     (concat mandoku-git-program " fetch " mandoku-gitlab-remote-name  ))
 	    (shell-command-to-string
-	     (concat mandoku-git-program " config branch." (car (split-string url " ")) ".merge refs/head/" (car (split-string url " "))))
-	    ;; we still need to set the remote to upstream , but how?  pull equivalent of push -u ??
-	    (shell-command-to-string
-	     (concat mandoku-git-program " fetch " mandoku-gitlab-remote-name " " (car (split-string url " ")) ))
+	     (concat mandoku-git-program " checkout " (car (split-string url " ")) ))
+	    
 	    )
       ))
     
