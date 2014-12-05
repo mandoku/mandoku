@@ -13,6 +13,7 @@
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
+PrivilegesRequired=none
 AppId={{5B73A9B3-976F-4074-83AD-9A3B74C7D60E}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
@@ -21,13 +22,14 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-   ;DefaultDirName=krp
-   ;DefaultGroupName={#MyAppName}
+DisableDirPage=yes
+DefaultDirName=krp
+DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 LicenseFile=license.txt
 InfoBeforeFile=readme.txt
-;InfoAfterFile=C:\Program Files (x86)\Inno Setup 5\Examples\Readme-Dutch.txt
-OutputBaseFilename=mandoku-setup
+   ;InfoAfterFile={%HOME}\.emacs.d\md\myfiles.txt
+OutputBaseFilename=mandoku-setup-compact
 Compression=lzma
 SolidCompression=yes
 
@@ -35,8 +37,8 @@ SolidCompression=yes
 Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
 
-[Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+;[Tasks]
+;Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 
 [Dirs]
@@ -56,11 +58,11 @@ Name: "{%HOME}\.emacs.d\user"
 ;#include "e:\py\out.txt"
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files'
 ;; try this!
-Source: "c:\python"; DestDir: "{code:GetDataDir}\system\python"; Flags: recursesubdirs; 
+Source: "c:\python\*"; DestDir: "{code:GetDataDir}\system\python"; Flags: recursesubdirs; 
 ;Source: "c:\krp\bin\*"; DestDir: "{app}\bin"; Flags: recursesubdirs; Excludes: "*.pyc,installer,installdirs"
 ;Source: "README.TXT"; DestDir: "{app}"; Flags: isreadme
-Source:"addsshkey.bat"; DestDir: "{app}"; 
-Source:"init.el"; DestDir: "{%HOME}\.emacs.d\"; Flags: ignoreversion
+;Source:"addsshkey.bat"; DestDir: "{app}"; 
+;Source:"init.el"; DestDir: "{%HOME}\.emacs.d\"; Flags: ignoreversion
 ;onlyifdoesntexist
 Source: "..\md\md-kit.el"; DestDir: "{%HOME}\.emacs.d\md"; Flags: ignoreversion
 Source: "..\md\md-init.el"; DestDir: "{%HOME}\.emacs.d\md"; Flags: ignoreversion
@@ -88,7 +90,7 @@ Filename:"{code:GetDataDir}\user\mandoku-settings.cfg"; Section: "Gitlab"; Key: 
 
 [Run]
 ;optional
-Filename:"{app}\ffm.bat"; Parameters: "{code:GetDataDir}"
+Filename:"{%HOME}\.emacs.d\md\ffm.bat"; Parameters: "{code:GetDataDir}"
 ;Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 ;{pf}, {pf32}, {pf64} = program directories
@@ -111,8 +113,8 @@ begin
   UserPage.Add('Gitlab Email:     ', False); 
 
   DataDirPage := CreateInputDirPage(wpSelectDir,
-    'Select Personal Data Directory', 'Where should personal data files be installed?',
-    'Select the folder in which Setup should install personal data files, then click Next.',
+    'Select the Mandoku Base Directory', 'Where should the Mandoku data files be installed?',
+    'Select the folder in which Setup should install the Mandoku data files, then click Next.',
     False, '');
   DataDirPage.Add('');
 
@@ -159,10 +161,12 @@ var
 begin
   { Fill the 'Ready Memo' with the normal settings and the custom settings }
   S := '';
-  S := S + 'Information:' + NewLine;
+  S := S + 'Information you provided for Installation:' + NewLine;
   S := S + Space + UserPage.Values[0] + NewLine;
   if UserPage.Values[1] <> '' then
     S := S + Space + UserPage.Values[1] + NewLine;
+  if UserPage.Values[2] <> '' then
+    S := S + Space + UserPage.Values[2] + NewLine;
   S := S + NewLine;
 
   Result := S;

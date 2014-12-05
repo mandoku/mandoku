@@ -9,10 +9,10 @@
 (defconst starter-kit-dir (file-name-directory (substring (file-name-directory (or load-file-name (buffer-file-name))) 0 -1))
     "directory where the starterkit is installed")
 
-(defvar starter-kit-user-dir (file-name-directory (expand-file-name "user" starter-kit-dir))
+(defvar starter-kit-user-dir (expand-file-name "user" starter-kit-dir)
   "user directory for personal code")
 
-(defvar starter-kit-lisp (file-name-directory  (expand-file-name "md" starter-kit-dir))
+(defvar starter-kit-lisp (expand-file-name "md" starter-kit-dir)
   "directory for starter-kit lisp code")
 
 
@@ -31,23 +31,6 @@
       (setq url-proxy-services nil))
 )
 
-
-;; install init on mac
-
-(ignore-errors (if (eq window-system 'mac)
-		   (let ((init-file (if user-init-file
-					user-init-file
-				      (expand-file-name "~/.emacs.d/init.el"))))
-    (with-current-buffer (find-file-noselect init-file)
-      (goto-char (point-min))
-      (if (not (search-forward "md-init" nil t))
-	  (progn
-	    (goto-char (point-max))
-	    (insert "(load \"" starter-kit-lisp "md-init.el\")")))
-      (save-buffer)
-      (kill-buffer))
-)))
-	  
 
 (require 'install-packages)
 (require 'md-kit)
