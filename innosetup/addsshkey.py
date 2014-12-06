@@ -1,28 +1,37 @@
 # -*- coding: utf-8 -*-
-import sys, os, os.path, getpass, ConfigParser, codecs
+import sys, os, os.path, getpass, ConfigParser, codecs, subprocess, time
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
 from os.path import expanduser, join
 from datetime import datetime
-p = os.path.split(os.path.realpath(__file__))[0]
+home = expanduser("~")
+mdconfig = ConfigParser.ConfigParser()
+mdcfgfile = os.path.join(home, ".emacs.d/md/mandoku.cfg")
+mdconfig.readfp(open(mdcfgfile))
+mdbase = mdconfig.get("Mandoku", "basedir")
+print os.path.realpath(mdbase)
+gitpath = mdconfig.get("Paths", "Git")
+p= "%s%s" % (mdbase, "\system\python") 
+#p = os.path.split(os.path.realpath(__file__))[0]
 print p
 sys.path.insert(0, p)
 import gitlab
 sp = os.path.split(os.path.split(os.path.split(os.path.realpath(__file__))[0])[0])[0]
 
-home = expanduser("~")
+
 #sshpubkey = join(home, ".ssh/id_rsa.pub")
 glurl="http://gl.kanripo.org"
 
 #get the token
 config = ConfigParser.ConfigParser()
-cfgfile = os.path.join(sp, "user/mandoku-settings.cfg")
+cfgfile = "%s%s" % (mdbase, "/user/mandoku-settings.cfg")
 config.readfp(open(cfgfile))
 gltok = config.get("Gitlab", "Private Token")
 
 #get the key path
 sshpubkey = os.path.join(home, ".ssh/glkanripo.pub")
+sshprivkey = os.path.join(home, ".ssh/glkanripo")
 
 
 # Connect to get the current user    
@@ -40,9 +49,13 @@ title = u"%s %s" % ("mandoku-key", datetime.now().strftime("%Y-%m-%d %H:%M:%S") 
 print "title", title
 if gl.addsshkey(title, key):
     print "200 Success: Successfully uploaded the key."
-    sys.exit(0)
 else:
     print "400 Failed: Could not upload the key. Something went wrong. Maybe the key exists already?"
-    sys.exit(256)
+
+
+time.sleep(2)
+ssh=os.path.join(gitpath, "ssh.exe")
+subprocess.call([ssh, "-l", "git",  "-i", sshprivkey,  "gl.kanripo.org"]) 
+
 
 

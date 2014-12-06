@@ -69,7 +69,7 @@ Source: "..\md\md-init.el"; DestDir: "{%HOME}\.emacs.d\md"; Flags: ignoreversion
 Source: "..\md\install-packages.el"; DestDir: "{%HOME}\.emacs.d\md"; Flags: ignoreversion
 Source:"postflight.py"; DestDir: "{%HOME}\.emacs.d\md"; Flags: ignoreversion
 Source:"ffm.bat"; DestDir: "{%HOME}\.emacs.d\md"; Flags: ignoreversion
-Source: "addsshkey.py"; DestDir: "{code:GetDataDir}\system\python"; Flags: ignoreversion
+Source: "addsshkey.py"; DestDir: "{%HOME}\.emacs.d\md" ; Flags: ignoreversion
 ;[Icons]
 ;Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 ;Name:"{commondesktop}\{#MyAppName}"; Filename: "{app}\bin\emacs-24.3\bin\{#MyAppExeName}"; Tasks: desktopicon

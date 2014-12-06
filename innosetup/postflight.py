@@ -9,12 +9,13 @@ pypath=sys.executable
 emacsinitOK = False
 
 home = expanduser("~")
-krp = sys.argv[1]
+#krp = sys.argv[1]
 sshpubkey = os.path.join(home, ".ssh/glkanripo.pub")
 
-
-#get the token
 config = ConfigParser.ConfigParser()
+config.read(os.path.join(home, ".emacs.d/md/mandoku.cfg"))
+krp = config.get("Mandoku", "basedir")
+
 sp = os.path.split(os.path.split(os.path.split(os.path.realpath(__file__))[0])[0])[0]
 
 #read the files, set up emacs init file
@@ -28,6 +29,17 @@ for line in open(myfiles, 'r'):
     if gitpath == "" and "git" in line.lower() and "bin" in line.lower():
         gitpath=line[:-1]
 
+#write the ini file
+try:
+    config.add_section('Paths')
+except:
+    pass
+config.set("Paths", "Python",  os.path.split(pypath)[0])
+config.set("Paths", "Git",  os.path.split(gitpath)[0])
+with open(os.path.join(home, ".emacs.d/md/mandoku.cfg"), 'w') as configfile:    # save
+    config.write(configfile)
+
+    
 emacsinit = os.path.join(home, ".emacs.d/init.el")
 
 if os.path.isfile(emacsinit):
@@ -47,12 +59,15 @@ if not emacsinitOK:
 (require 'mandoku-link)
 (mandoku-initialize)    
 """ % ((datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
-       krp.replace('\\', '/'), gitpath.replace('\\', '/'), pypath.replace('\\', '/'),
+       krp.replace('\\', '/'),
+       gitpath.replace('\\', '/'), pypath.replace('\\', '/'),
        os.path.split(gitpath)[0].replace('\\', '/'),
        os.path.split(pypath)[0].replace('\\', '/')
                    ))
     initfile.close()
-        
+
+
+
 if not os.path.isfile(sshpubkey):
 #check for windows environment!
     if "win" in sys.platform:
