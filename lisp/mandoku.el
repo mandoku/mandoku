@@ -58,6 +58,7 @@
 (defvar mandoku-meta-dir (expand-file-name  (concat mandoku-base-dir "meta/")))
 (defvar mandoku-temp-dir (expand-file-name  (concat mandoku-base-dir "temp/")))
 (defvar mandoku-sys-dir (expand-file-name  (concat mandoku-base-dir "system/")))
+(defvar mandoku-user-dir (expand-file-name  (concat mandoku-base-dir "user/")))
 (defvar mandoku-work-dir (expand-file-name  (concat mandoku-base-dir "work/")))
 (defvar mandoku-filters-dir (expand-file-name  (concat mandoku-work-dir "filters/")))
 ;; housekeeping files
@@ -66,7 +67,11 @@
 (defvar mandoku-download-queue (concat mandoku-sys-dir "mandoku-to-download.queue"))
 (defvar mandoku-index-queue (concat mandoku-sys-dir "mandoku-to-index.queue"))
 (defvar mandoku-indexed-texts (concat mandoku-sys-dir "indexed-texts.txt"))
-
+(defvar mandoku-local-init-file nil)
+(defvar mandoku-config-cfg (concat mandoku-user-dir "mandoku-settings.cfg"))
+;; we store the http password for gitlab in memory for one session
+;; todo: make this a per server setting!
+(defvar mandoku-user-password nil)
 (defvar mandoku-string-limit 10)
 (defvar mandoku-index-display-limit 2000)
 ;; Defined somewhere in this file, but used before definition.
@@ -94,6 +99,7 @@
 ;;;###autoload
 (defvar mandoku-catalogs-alist nil)
 (defvar mandoku-catalog-path-list nil)
+(defvar mandoku-git-use-http nil)
 
 (defvar mandoku-initialized-p nil)
 
@@ -1797,7 +1803,9 @@ We should check if the file exists before cloning!"
 		   tmpid)))
 	 (repid (car (split-string txtid "\\([0-9]\\)")))
 	 (groupid (substring txtid 0 (+ (length repid) 2)))
-	 (clone-url (concat "git@" mandoku-user-server ":"))
+	 (clone-url (if mandoku-git-use-http
+			(concat "http://" (mandoku-get-user) ":" (mandoku-get-password) "@" mandoku-user-server "/")
+		      (concat "git@" mandoku-user-server ":")))
 	 (txturl (concat clone-url groupid "/" txtid ".git"))
 	 (wikiurl (concat clone-url groupid "/" txtid ".wiki.git"))
 	 (targetdir (concat mandoku-text-dir groupid "/")))
@@ -1852,20 +1860,29 @@ We should check if the file exists before cloning!"
 
 (defun mandoku-fork ())
 
+(defun mandoku-url-to-txtid (url)
+  (if mandoku-git-use-http
+      (substring (car (last (split-string url "/"))) 0 -4)
+  (substring (cadr (split-string url "/")) 0 -4))
+  )
+
 (defun mandoku-clone (targetdir url)
   (let* ((default-directory targetdir)
 	 (process-connection-type nil)   ; pipe, no pty (--no-progress)
 	 (curbuf    (current-buffer))
 	 (buf       (get-buffer-create "*mandoku bootstrap*"))
-	 (txtid     (substring (cadr (split-string url "/")) 0 -4)))
+	 (txtid     (mandoku-url-to-txtid url)))
     (with-current-buffer (find-file-noselect mandoku-log-file)
       (goto-char (point-max))
       (insert (format-time-string "[%Y-%m-%dT%T%z] INFO " (current-time)))
-      (insert (format "Starting to download %s %s\n" url (mandoku-textid-to-title txtid))))
+      (insert (format "Starting to download %s %s\n"
+		      (replace-regexp-in-string "http://[^@]+@" "http://" url)
+		      (mandoku-textid-to-title txtid))))
     (with-current-buffer buf
       (goto-char (point-max))
       (insert (format-time-string "[%Y-%m-%dT%T%z]\n" (current-time)))
-      (set-process-sentinel (start-process-shell-command (concat "" url) buf
+      (set-process-sentinel (start-process-shell-command (concat ""
+								 (replace-regexp-in-string "http://[^@]+@" "http://" url)) buf
 							 (concat mandoku-git-program  " clone " url " -v " targetdir))
 			    'mandoku-clone-sentinel)
       )
@@ -1876,7 +1893,7 @@ We should check if the file exists before cloning!"
 (defun mandoku-clone-sentinel (proc msg)
     (if (string-match "finished" msg)
       ;; TODO: check write to log, write to index queue etc.
-	(let ((txtid  (substring (cadr (split-string  (format "%s" proc) "/")) 0 -4)) )
+	(let ((txtid  (mandoku-url-to-txtid))) 
 	  ;; make the log entry
 	  (with-current-buffer (find-file-noselect mandoku-log-file)
 	    (goto-char (point-max))
@@ -1912,6 +1929,7 @@ We should check if the file exists before cloning!"
 	(goto-char (point-max))
 	(insert (format "%s %s\n" txtid (mandoku-textid-to-title txtid)))
 	(save-buffer)
+	(kill-buffer)
 	(message "%s %s added to download list" txtid (mandoku-textid-to-title txtid))))
     ))
 
@@ -2020,6 +2038,16 @@ We should check if the file exists before cloning!"
 	    (setq mandoku-base-dir (concat mandoku-base-dir "/"))))
     )
 ))
+;; need to expand this to check the cfg file if user not yet in mandoku-settings.org
+(defun mandoku-get-user ()
+  (or mandoku-user-account))
+
+(defun mandoku-get-password ()
+  (or mandoku-user-password
+      (setq mandoku-user-password
+	    (read-passwd "Please enter your GitLab password: "))))
+
+
 
 (defun mandoku-set-repos (uval)
   (setq mandoku-repositories-alist uval))
