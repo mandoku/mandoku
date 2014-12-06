@@ -66,6 +66,7 @@
 (require 'mandoku)
 (require 'mandoku-remote)
 (require 'mandoku-dict)
+(require 'mandoku-link)
 (if (not (string= (substring mandoku-base-dir -1) "/"))
  (setq mandoku-base-dir (concat mandoku-base-dir "/")))
 (setq org-return-follows-link t)
@@ -79,7 +80,7 @@
 (global-set-key [f6] 'mandoku-search-text)
 (global-set-key [f7] 'mandoku-search-titles)
 (global-set-key "\C-xg" 'magit-status)
-(require 'mandoku)
+(global-set-key (kbd "C-c d")  'mandoku-download-add-text-to-queue)
 (define-key mandoku-view-mode-map (kbd "C-c i")  'mandoku-open-image-at-page)
 (setq org-support-shift-select 'always)
 #+END_SRC
