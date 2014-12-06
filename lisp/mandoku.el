@@ -1877,7 +1877,9 @@ We should check if the file exists before cloning!"
       (insert (format-time-string "[%Y-%m-%dT%T%z] INFO " (current-time)))
       (insert (format "Starting to download %s %s\n"
 		      (replace-regexp-in-string "http://[^@]+@" "http://" url)
-		      (mandoku-textid-to-title txtid))))
+		      (mandoku-textid-to-title txtid)))
+      (save-buffer)
+      )
     (with-current-buffer buf
       (goto-char (point-max))
       (insert (format-time-string "[%Y-%m-%dT%T%z]\n" (current-time)))
