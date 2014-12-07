@@ -8,7 +8,8 @@ gitpath=""
 pypath=sys.executable
 emacsinitOK = False
 
-home = expanduser("~")
+#home = expanduser("~")
+home = os.environ['HOME']
 #krp = sys.argv[1]
 sshpubkey = os.path.join(home, ".ssh/glkanripo.pub")
 
@@ -66,15 +67,30 @@ if not emacsinitOK:
                    ))
     initfile.close()
 
-
-
+#add to config file
+sshcfpath=os.path.join(home, ".ssh/config")
+ssh_have_config = False
+if os.path.isfile(sshcfpath):
+    sshcf = codecs.open(sshcfpath, 'r', 'utf-8')
+    for line in sshcf:
+        if "gl.kanripo.org" in line:
+            ssh_have_config = True
+        
+if not ssh_have_config:
+    sshcf = codecs.open(sshcfpath, 'a', 'utf-8')
+    sshcf.write ("""Host gl.kanripo.org
+   User git
+   IdentityFile ~/.ssh/glkanripo
+""")
+    sshcf.close()
+    
 if not os.path.isfile(sshpubkey):
 #check for windows environment!
     if "win" in sys.platform:
-        sshpath="/%s/%s" % (home, ".ssh/glkanripo")
+        sshpath= "/" + os.path.join(home, ".ssh/glkanripo")
         sshpath=sshpath.replace('\\', '/').replace(':', '')
+        print "Generating key in: ", sshpath
         keygen=os.path.join(os.path.split(gitpath)[0], "ssh-keygen.exe")
-        p = '"%s" -f "%s"' % (keygen, sshpath)
         subprocess.call([keygen, "-f", sshpath]) 
     else:
         os.system('ssh-keygen -f %s/.ssh/glkanripo' % (home))

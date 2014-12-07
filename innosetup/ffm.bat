@@ -18,6 +18,6 @@ set http_proxy=proxy.kuins.net:8080
 echo proxy
 :dontsetproxy
 
-%pydrive%:\Python27\python.exe %krp%\system\python\addsshkey.py %1 
+%pydrive%:\Python27\python.exe "%HOME%\.emacs.d\md\addsshkey.py" %1 
 
-rem need to try a connection now..
+

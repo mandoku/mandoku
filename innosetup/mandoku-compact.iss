@@ -75,7 +75,7 @@ Source: "addsshkey.py"; DestDir: "{%HOME}\.emacs.d\md" ; Flags: ignoreversion
 ;Name:"{commondesktop}\{#MyAppName}"; Filename: "{app}\bin\emacs-24.3\bin\{#MyAppExeName}"; Tasks: desktopicon
 
 [REGISTRY]
-Root: HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "HOME"; ValueData: "{%USERPROFILE}"
+Root:HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "HOME"; ValueData: "{%USERPROFILE}"; Flags: createvalueifdoesntexist
 Root: HKCU; Subkey: "Environment"; ValueType: string; ValueName: "MDTEMP"; ValueData: "{code:GetDataDir}\temp"
 ;Root: HKCU; Subkey: "Environment"; ValueType expandsz; ValueName "TMP"; ValueData "{code:GetDataDir}\tmp"
 
@@ -188,9 +188,4 @@ begin
   { Return the selected DataDir }
   Result := DataDirPage.Values[0];
 end;
-
-{ procedure WriteBatch(Param : String ); }
-{ begin }
-{    SaveStringToFile('c:\filename.txt', #13#10 + 'the string' + #13#10, True); }
-{ end; }
 
