@@ -1861,9 +1861,9 @@ We should check if the file exists before cloning!"
 (defun mandoku-fork ())
 
 (defun mandoku-url-to-txtid (url)
-  (if mandoku-git-use-http
+;  (if mandoku-git-use-http
       (substring (car (last (split-string url "/"))) 0 -4)
-  (substring (cadr (split-string url "/")) 0 -4))
+;  (substring (cadr (split-string url "/")) 0 -4))
   )
 
 (defun mandoku-clone (targetdir url)
@@ -1895,7 +1895,7 @@ We should check if the file exists before cloning!"
 (defun mandoku-clone-sentinel (proc msg)
     (if (string-match "finished" msg)
       ;; TODO: check write to log, write to index queue etc.
-	(let ((txtid  (mandoku-url-to-txtid))) 
+	(let ((txtid  (mandoku-url-to-txtid (format "%s" proc)))) 
 	  ;; make the log entry
 	  (with-current-buffer (find-file-noselect mandoku-log-file)
 	    (goto-char (point-max))
