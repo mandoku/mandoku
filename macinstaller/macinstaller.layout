@@ -1,0 +1,615 @@
+total 0
+drwxr-xr-x@ 3 chris  staff  102 Nov 22 13:05 Emacs.app
+drwxr-xr-x@ 3 chris  staff  102 Dec  8 10:39 MandokuInstaller.app
+drwxr-xr-x+ 9 chris  staff  306 Dec  8 10:49 macinstaller
+-rw-r--r--+ 1 chris  staff    0 Dec  8 10:51 macinstaller.layout
+
+
+./macinstaller:
+total 24
+-rwxr-xr-x+  1 chris  staff  1656 Dec  7 13:46 addsshkey.py
+-rwxr-xr-x+  1 chris  staff  1106 Dec  8 10:22 ffm.sh
+drwxr-xr-x+  5 chris  staff   170 Dec  7 12:57 md
+-rw-r--r--+  1 chris  staff  2106 Dec  7 13:07 postflight.py
+drwxr-xr-x+ 12 chris  staff   408 Dec  7 13:51 python
+
+./macinstaller/md:
+total 40
+-rw-r--r--+ 1 chris  staff  1331 Nov 24 16:39 install-packages.el
+-rw-r--r--+ 1 chris  staff  1296 Dec  5 21:46 md-init.el
+-rw-r--r--+ 1 chris  staff  8903 Nov 24 16:34 md-kit.el
+
+./macinstaller/python:
+total 56
+drwxr-xr-x+ 23 chris  staff    782 Dec  7 13:11 async
+drwxr-xr-x+ 26 chris  staff    884 Dec  7 13:11 git
+drwxr-xr-x+ 21 chris  staff    714 Dec  7 13:11 gitdb
+drwxr-xr-x+  6 chris  staff    204 Dec  2 13:49 gitlab
+-rw-r--r--+  1 chris  staff   1228 Dec  7 12:50 makerep.py
+-rwxr-xr-x+  1 chris  staff  17751 Nov 24 11:31 mandoku_idx.py
+drwxr-xr-x+ 28 chris  staff    952 Dec  7 13:11 markdown
+drwxr-xr-x+ 33 chris  staff   1122 Dec  7 13:11 requests
+drwxr-xr-x+ 14 chris  staff    476 Dec  7 13:11 smmap
+-rw-r--r--+  1 chris  staff   1319 Nov 25 05:31 updateindex.py
+
+./macinstaller/python/async:
+total 320
+-rw-r--r--+  1 chris  staff     25 Oct 18 13:30 AUTHORS
+-rw-r--r--+  1 chris  staff   1018 Oct 18 13:30 README
+-rw-r--r--+  1 chris  staff   1053 Oct 18 13:30 __init__.py
+-rw-r--r--+  1 chris  staff   1605 Oct 18 13:30 __init__.pyc
+-rw-r--r--+  1 chris  staff  11099 Oct 18 13:30 channel.py
+-rw-r--r--+  1 chris  staff  15353 Oct 18 13:30 channel.pyc
+-rw-r--r--+  1 chris  staff   3120 Oct 18 13:30 graph.py
+-rw-r--r--+  1 chris  staff   4428 Oct 18 13:30 graph.pyc
+drwxr-xr-x+  5 chris  staff    170 Oct 18 13:30 mod
+-rw-r--r--+  1 chris  staff  17789 Oct 18 13:30 pool.py
+-rw-r--r--+  1 chris  staff  12410 Oct 18 13:30 pool.pyc
+-rw-r--r--+  1 chris  staff   2906 Oct 18 13:30 setup.py
+-rw-r--r--+  1 chris  staff   3252 Oct 18 13:30 setup.pyc
+-rw-r--r--+  1 chris  staff   8225 Oct 18 13:30 task.py
+-rw-r--r--+  1 chris  staff   8657 Oct 18 13:30 task.pyc
+drwxr-xr-x+ 23 chris  staff    782 Oct 18 13:30 test
+-rw-r--r--+  1 chris  staff   6229 Oct 18 13:30 thread.py
+-rw-r--r--+  1 chris  staff   7317 Oct 18 13:30 thread.pyc
+-rw-r--r--+  1 chris  staff   7004 Oct 18 13:30 util.py
+-rw-r--r--+  1 chris  staff   9090 Oct 18 13:30 util.pyc
+
+./macinstaller/python/async/mod:
+total 64
+-rw-r--r--+ 1 chris  staff      0 Oct 18 13:30 __init__.py
+-rw-r--r--+ 1 chris  staff    168 Oct 18 13:30 __init__.pyc
+-rwxr-xr-x+ 1 chris  staff  26764 Oct 18 13:30 zlib.so
+
+./macinstaller/python/async/test:
+total 216
+-rw-r--r--+ 1 chris  staff      0 Oct 18 13:30 __init__.py
+-rw-r--r--+ 1 chris  staff    169 Oct 18 13:30 __init__.pyc
+-rw-r--r--+ 1 chris  staff    129 Oct 18 13:30 lib.py
+-rw-r--r--+ 1 chris  staff    535 Oct 18 13:30 lib.pyc
+drwxr-xr-x+ 6 chris  staff    204 Oct 18 13:30 mod
+-rw-r--r--+ 1 chris  staff   6147 Oct 18 13:30 task.py
+-rw-r--r--+ 1 chris  staff   8268 Oct 18 13:30 task.pyc
+-rw-r--r--+ 1 chris  staff   2497 Oct 18 13:30 test_channel.py
+-rw-r--r--+ 1 chris  staff   3095 Oct 18 13:30 test_channel.pyc
+-rw-r--r--+ 1 chris  staff   1083 Oct 18 13:30 test_example.py
+-rw-r--r--+ 1 chris  staff   1990 Oct 18 13:30 test_example.pyc
+-rw-r--r--+ 1 chris  staff   2205 Oct 18 13:30 test_graph.py
+-rw-r--r--+ 1 chris  staff   2230 Oct 18 13:30 test_graph.pyc
+-rw-r--r--+ 1 chris  staff   1538 Oct 18 13:30 test_performance.py
+-rw-r--r--+ 1 chris  staff   1960 Oct 18 13:30 test_performance.pyc
+-rw-r--r--+ 1 chris  staff  15671 Oct 18 13:30 test_pool.py
+-rw-r--r--+ 1 chris  staff   9774 Oct 18 13:30 test_pool.pyc
+-rw-r--r--+ 1 chris  staff    227 Oct 18 13:30 test_task.py
+-rw-r--r--+ 1 chris  staff    801 Oct 18 13:30 test_task.pyc
+-rw-r--r--+ 1 chris  staff    978 Oct 18 13:30 test_thread.py
+-rw-r--r--+ 1 chris  staff   2573 Oct 18 13:30 test_thread.pyc
+
+./macinstaller/python/async/test/mod:
+total 24
+-rw-r--r--+ 1 chris  staff     0 Oct 18 13:30 __init__.py
+-rw-r--r--+ 1 chris  staff   173 Oct 18 13:30 __init__.pyc
+-rw-r--r--+ 1 chris  staff  1891 Oct 18 13:30 test_zlib.py
+-rw-r--r--+ 1 chris  staff  2283 Oct 18 13:30 test_zlib.pyc
+
+./macinstaller/python/git:
+total 648
+-rw-r--r--+  1 chris  staff   1175 Oct 18 13:30 __init__.py
+-rw-r--r--+  1 chris  staff   1424 Oct 18 13:30 __init__.pyc
+-rw-r--r--+  1 chris  staff  16919 Oct 18 13:30 cmd.py
+-rw-r--r--+  1 chris  staff  18819 Oct 18 13:30 cmd.pyc
+-rw-r--r--+  1 chris  staff  13447 Oct 18 13:30 config.py
+-rw-r--r--+  1 chris  staff  15145 Oct 18 13:30 config.pyc
+-rw-r--r--+  1 chris  staff   1837 Oct 18 13:30 db.py
+-rw-r--r--+  1 chris  staff   2721 Oct 18 13:30 db.pyc
+-rw-r--r--+  1 chris  staff  10364 Oct 18 13:30 diff.py
+-rw-r--r--+  1 chris  staff  11531 Oct 18 13:30 diff.pyc
+-rw-r--r--+  1 chris  staff   2004 Oct 18 13:30 exc.py
+-rw-r--r--+  1 chris  staff   3774 Oct 18 13:30 exc.pyc
+drwxr-xr-x+ 12 chris  staff    408 Oct 18 13:30 index
+drwxr-xr-x+ 19 chris  staff    646 Oct 18 13:30 objects
+-rw-r--r--+  1 chris  staff  46544 Oct 18 13:30 odict.py
+-rw-r--r--+  1 chris  staff  56018 Oct 18 13:30 odict.pyc
+drwxr-xr-x+ 16 chris  staff    544 Oct 18 13:30 refs
+-rw-r--r--+  1 chris  staff  23603 Oct 18 13:30 remote.py
+-rw-r--r--+  1 chris  staff  23779 Oct 18 13:30 remote.pyc
+drwxr-xr-x+  8 chris  staff    272 Oct 18 13:30 repo
+drwxr-xr-x+ 42 chris  staff   1428 Oct 18 13:30 test
+-rw-r--r--+  1 chris  staff  20643 Oct 18 13:30 util.py
+-rw-r--r--+  1 chris  staff  26288 Oct 18 13:30 util.pyc
+
+./macinstaller/python/git/index:
+total 280
+-rw-r--r--+ 1 chris  staff     72 Oct 18 13:30 __init__.py
+-rw-r--r--+ 1 chris  staff    276 Oct 18 13:30 __init__.pyc
+-rw-r--r--+ 1 chris  staff  40087 Oct 18 13:30 base.py
+-rw-r--r--+ 1 chris  staff  39757 Oct 18 13:30 base.pyc
+-rw-r--r--+ 1 chris  staff  10630 Oct 18 13:30 fun.py
+-rw-r--r--+ 1 chris  staff   8993 Oct 18 13:30 fun.pyc
+-rw-r--r--+ 1 chris  staff   4394 Oct 18 13:30 typ.py
+-rw-r--r--+ 1 chris  staff   8194 Oct 18 13:30 typ.pyc
+-rw-r--r--+ 1 chris  staff   2656 Oct 18 13:30 util.py
+-rw-r--r--+ 1 chris  staff   4011 Oct 18 13:30 util.pyc
+
+./macinstaller/python/git/objects:
+total 288
+-rw-r--r--+  1 chris  staff    611 Oct 18 13:30 __init__.py
+-rw-r--r--+  1 chris  staff    731 Oct 18 13:30 __init__.pyc
+-rw-r--r--+  1 chris  staff   5878 Oct 18 13:30 base.py
+-rw-r--r--+  1 chris  staff   8577 Oct 18 13:30 base.pyc
+-rw-r--r--+  1 chris  staff    847 Oct 18 13:30 blob.py
+-rw-r--r--+  1 chris  staff   1245 Oct 18 13:30 blob.pyc
+-rw-r--r--+  1 chris  staff  15283 Oct 18 13:30 commit.py
+-rw-r--r--+  1 chris  staff  14463 Oct 18 13:30 commit.pyc
+-rw-r--r--+  1 chris  staff   6353 Oct 18 13:30 fun.py
+-rw-r--r--+  1 chris  staff   5650 Oct 18 13:30 fun.pyc
+drwxr-xr-x+ 10 chris  staff    340 Oct 18 13:30 submodule
+-rw-r--r--+  1 chris  staff   2696 Oct 18 13:30 tag.py
+-rw-r--r--+  1 chris  staff   2873 Oct 18 13:30 tag.pyc
+-rw-r--r--+  1 chris  staff   8589 Oct 18 13:30 tree.py
+-rw-r--r--+  1 chris  staff  11878 Oct 18 13:30 tree.pyc
+-rw-r--r--+  1 chris  staff   9897 Oct 18 13:30 util.py
+-rw-r--r--+  1 chris  staff  12759 Oct 18 13:30 util.pyc
+
+./macinstaller/python/git/objects/submodule:
+total 224
+-rw-r--r--+ 1 chris  staff     93 Oct 18 13:30 __init__.py
+-rw-r--r--+ 1 chris  staff    180 Oct 18 13:30 __init__.pyc
+-rw-r--r--+ 1 chris  staff  34129 Oct 18 13:30 base.py
+-rw-r--r--+ 1 chris  staff  29568 Oct 18 13:30 base.pyc
+-rw-r--r--+ 1 chris  staff  12276 Oct 18 13:30 root.py
+-rw-r--r--+ 1 chris  staff   8219 Oct 18 13:30 root.pyc
+-rw-r--r--+ 1 chris  staff   2902 Oct 18 13:30 util.py
+-rw-r--r--+ 1 chris  staff   4729 Oct 18 13:30 util.pyc
+
+./macinstaller/python/git/refs:
+total 248
+-rw-r--r--+ 1 chris  staff    418 Oct 18 13:30 __init__.py
+-rw-r--r--+ 1 chris  staff    548 Oct 18 13:30 __init__.pyc
+-rw-r--r--+ 1 chris  staff   7322 Oct 18 13:30 head.py
+-rw-r--r--+ 1 chris  staff   8677 Oct 18 13:30 head.pyc
+-rw-r--r--+ 1 chris  staff   8419 Oct 18 13:30 log.py
+-rw-r--r--+ 1 chris  staff  11108 Oct 18 13:30 log.pyc
+-rw-r--r--+ 1 chris  staff   3987 Oct 18 13:30 reference.py
+-rw-r--r--+ 1 chris  staff   4752 Oct 18 13:30 reference.pyc
+-rw-r--r--+ 1 chris  staff   1368 Oct 18 13:30 remote.py
+-rw-r--r--+ 1 chris  staff   2068 Oct 18 13:30 remote.pyc
+-rw-r--r--+ 1 chris  staff  20334 Oct 18 13:30 symbolic.py
+-rw-r--r--+ 1 chris  staff  21537 Oct 18 13:30 symbolic.pyc
+-rw-r--r--+ 1 chris  staff   2467 Oct 18 13:30 tag.py
+-rw-r--r--+ 1 chris  staff   3265 Oct 18 13:30 tag.pyc
+
+./macinstaller/python/git/repo:
+total 160
+-rw-r--r--+ 1 chris  staff     53 Oct 18 13:30 __init__.py
+-rw-r--r--+ 1 chris  staff    254 Oct 18 13:30 __init__.pyc
+-rw-r--r--+ 1 chris  staff  24695 Oct 18 13:30 base.py
+-rw-r--r--+ 1 chris  staff  28211 Oct 18 13:30 base.pyc
+-rw-r--r--+ 1 chris  staff   7713 Oct 18 13:30 fun.py
+-rw-r--r--+ 1 chris  staff   6875 Oct 18 13:30 fun.pyc
+
+./macinstaller/python/git/test:
+total 712
+-rw-r--r--+  1 chris  staff    220 Oct 18 13:30 __init__.py
+-rw-r--r--+  1 chris  staff    167 Oct 18 13:30 __init__.pyc
+drwxr-xr-x+ 42 chris  staff   1428 Oct 18 13:30 fixtures
+drwxr-xr-x+  8 chris  staff    272 Oct 18 13:30 lib
+-rw-r--r--+  1 chris  staff   1244 Oct 18 13:30 test_actor.py
+-rw-r--r--+  1 chris  staff   2084 Oct 18 13:30 test_actor.pyc
+-rw-r--r--+  1 chris  staff   3348 Oct 18 13:30 test_base.py
+-rw-r--r--+  1 chris  staff   4523 Oct 18 13:30 test_base.pyc
+-rw-r--r--+  1 chris  staff    844 Oct 18 13:30 test_blob.py
+-rw-r--r--+  1 chris  staff   1610 Oct 18 13:30 test_blob.pyc
+-rw-r--r--+  1 chris  staff   9164 Oct 18 13:30 test_commit.py
+-rw-r--r--+  1 chris  staff  11425 Oct 18 13:30 test_commit.pyc
+-rw-r--r--+  1 chris  staff   4182 Oct 18 13:30 test_config.py
+-rw-r--r--+  1 chris  staff   3509 Oct 18 13:30 test_config.pyc
+-rw-r--r--+  1 chris  staff    864 Oct 18 13:30 test_db.py
+-rw-r--r--+  1 chris  staff   1259 Oct 18 13:30 test_db.pyc
+-rw-r--r--+  1 chris  staff   3651 Oct 18 13:30 test_diff.py
+-rw-r--r--+  1 chris  staff   3911 Oct 18 13:30 test_diff.pyc
+-rw-r--r--+  1 chris  staff   7612 Oct 18 13:30 test_fun.py
+-rw-r--r--+  1 chris  staff   7938 Oct 18 13:30 test_fun.pyc
+-rw-r--r--+  1 chris  staff   3690 Oct 18 13:30 test_git.py
+-rw-r--r--+  1 chris  staff   5258 Oct 18 13:30 test_git.pyc
+-rw-r--r--+  1 chris  staff  23204 Oct 18 13:30 test_index.py
+-rw-r--r--+  1 chris  staff  20209 Oct 18 13:30 test_index.pyc
+-rw-r--r--+  1 chris  staff   2934 Oct 18 13:30 test_reflog.py
+-rw-r--r--+  1 chris  staff   3296 Oct 18 13:30 test_reflog.pyc
+-rw-r--r--+  1 chris  staff  19240 Oct 18 13:30 test_refs.py
+-rw-r--r--+  1 chris  staff  13850 Oct 18 13:30 test_refs.pyc
+-rw-r--r--+  1 chris  staff  16842 Oct 18 13:30 test_remote.py
+-rw-r--r--+  1 chris  staff  14020 Oct 18 13:30 test_remote.pyc
+-rw-r--r--+  1 chris  staff  18395 Oct 18 13:30 test_repo.py
+-rw-r--r--+  1 chris  staff  20858 Oct 18 13:30 test_repo.pyc
+-rw-r--r--+  1 chris  staff    904 Oct 18 13:30 test_stats.py
+-rw-r--r--+  1 chris  staff   1130 Oct 18 13:30 test_stats.pyc
+-rw-r--r--+  1 chris  staff  20323 Oct 18 13:30 test_submodule.py
+-rw-r--r--+  1 chris  staff  12001 Oct 18 13:30 test_submodule.pyc
+-rw-r--r--+  1 chris  staff   4472 Oct 18 13:30 test_tree.py
+-rw-r--r--+  1 chris  staff   4625 Oct 18 13:30 test_tree.pyc
+-rw-r--r--+  1 chris  staff   4601 Oct 18 13:30 test_util.py
+-rw-r--r--+  1 chris  staff   6130 Oct 18 13:30 test_util.pyc
+
+./macinstaller/python/git/test/fixtures:
+total 1096
+-rw-r--r--+ 1 chris  staff    3663 Oct 18 13:30 blame
+-rw-r--r--+ 1 chris  staff      11 Oct 18 13:30 cat_file_blob
+-rw-r--r--+ 1 chris  staff      12 Oct 18 13:30 cat_file_blob_nl
+-rw-r--r--+ 1 chris  staff       3 Oct 18 13:30 cat_file_blob_size
+-rw-r--r--+ 1 chris  staff    1994 Oct 18 13:30 diff_2
+-rw-r--r--+ 1 chris  staff     732 Oct 18 13:30 diff_2f
+-rw-r--r--+ 1 chris  staff     504 Oct 18 13:30 diff_f
+-rw-r--r--+ 1 chris  staff    5705 Oct 18 13:30 diff_i
+-rw-r--r--+ 1 chris  staff   46005 Oct 18 13:30 diff_mode_only
+-rw-r--r--+ 1 chris  staff     546 Oct 18 13:30 diff_new_mode
+-rw-r--r--+ 1 chris  staff      22 Oct 18 13:30 diff_numstat
+-rw-r--r--+ 1 chris  staff   19273 Oct 18 13:30 diff_p
+-rw-r--r--+ 1 chris  staff     419 Oct 18 13:30 diff_rename
+-rw-r--r--+ 1 chris  staff      63 Oct 18 13:30 diff_tree_numstat_root
+-rw-r--r--+ 1 chris  staff      84 Oct 18 13:30 for_each_ref_with_path_component
+-rw-r--r--+ 1 chris  staff     935 Oct 18 13:30 git_config
+-rw-r--r--+ 1 chris  staff     349 Oct 18 13:30 git_config_global
+-rw-r--r--+ 1 chris  staff  163616 Oct 18 13:30 index
+-rw-r--r--+ 1 chris  staff    9192 Oct 18 13:30 index_merge
+-rw-r--r--+ 1 chris  staff     429 Oct 18 13:30 ls_tree_a
+-rw-r--r--+ 1 chris  staff     119 Oct 18 13:30 ls_tree_b
+-rw-r--r--+ 1 chris  staff     173 Oct 18 13:30 ls_tree_commit
+-rw-r--r--+ 1 chris  staff  114210 Oct 18 13:30 reflog_HEAD
+-rw-r--r--+ 1 chris  staff     409 Oct 18 13:30 reflog_invalid_date
+-rw-r--r--+ 1 chris  staff     411 Oct 18 13:30 reflog_invalid_email
+-rw-r--r--+ 1 chris  staff     404 Oct 18 13:30 reflog_invalid_newsha
+-rw-r--r--+ 1 chris  staff     398 Oct 18 13:30 reflog_invalid_oldsha
+-rw-r--r--+ 1 chris  staff     415 Oct 18 13:30 reflog_invalid_sep
+-rw-r--r--+ 1 chris  staff   31286 Oct 18 13:30 reflog_master
+-rw-r--r--+ 1 chris  staff     123 Oct 18 13:30 rev_list
+-rw-r--r--+ 1 chris  staff    2172 Oct 18 13:30 rev_list_bisect_all
+-rw-r--r--+ 1 chris  staff     306 Oct 18 13:30 rev_list_commit_diffs
+-rw-r--r--+ 1 chris  staff     271 Oct 18 13:30 rev_list_commit_idabbrev
+-rw-r--r--+ 1 chris  staff     244 Oct 18 13:30 rev_list_commit_stats
+-rw-r--r--+ 1 chris  staff   26855 Oct 18 13:30 rev_list_count
+-rw-r--r--+ 1 chris  staff     328 Oct 18 13:30 rev_list_delta_a
+-rw-r--r--+ 1 chris  staff     451 Oct 18 13:30 rev_list_delta_b
+-rw-r--r--+ 1 chris  staff     293 Oct 18 13:30 rev_list_single
+-rw-r--r--+ 1 chris  staff       8 Oct 18 13:30 rev_parse
+-rw-r--r--+ 1 chris  staff     252 Oct 18 13:30 show_empty_commit
+
+./macinstaller/python/git/test/lib:
+total 72
+-rw-r--r--+ 1 chris  staff   419 Oct 18 13:30 __init__.py
+-rw-r--r--+ 1 chris  staff   437 Oct 18 13:30 __init__.pyc
+-rw-r--r--+ 1 chris  staff  1847 Oct 18 13:30 asserts.py
+-rw-r--r--+ 1 chris  staff  2964 Oct 18 13:30 asserts.pyc
+-rw-r--r--+ 1 chris  staff  7834 Oct 18 13:30 helper.py
+-rw-r--r--+ 1 chris  staff  9808 Oct 18 13:30 helper.pyc
+
+./macinstaller/python/gitdb:
+total 528
+-rw-r--r--+  1 chris  staff   1019 Oct 18 13:30 __init__.py
+-rw-r--r--+  1 chris  staff   1425 Oct 18 13:30 __init__.pyc
+-rwxr-xr-x+  1 chris  staff  22260 Oct 18 13:30 _perf.so
+-rw-r--r--+  1 chris  staff   7398 Oct 18 13:30 base.py
+-rw-r--r--+  1 chris  staff  14874 Oct 18 13:30 base.pyc
+drwxr-xr-x+ 16 chris  staff    544 Oct 18 13:30 db
+-rw-r--r--+  1 chris  staff   1086 Oct 18 13:30 exc.py
+-rw-r--r--+  1 chris  staff   2531 Oct 18 13:30 exc.pyc
+-rw-r--r--+  1 chris  staff  19345 Oct 18 13:30 fun.py
+-rw-r--r--+  1 chris  staff  20483 Oct 18 13:30 fun.pyc
+-rw-r--r--+  1 chris  staff  33421 Oct 18 13:30 pack.py
+-rw-r--r--+  1 chris  staff  34652 Oct 18 13:30 pack.pyc
+-rw-r--r--+  1 chris  staff  23007 Oct 18 13:30 stream.py
+-rw-r--r--+  1 chris  staff  21700 Oct 18 13:30 stream.pyc
+-rw-r--r--+  1 chris  staff    414 Oct 18 13:30 typ.py
+-rw-r--r--+  1 chris  staff    387 Oct 18 13:30 typ.pyc
+-rw-r--r--+  1 chris  staff  10945 Oct 18 13:30 util.py
+-rw-r--r--+  1 chris  staff  12813 Oct 18 13:30 util.pyc
+
+./macinstaller/python/gitdb/db:
+total 192
+-rw-r--r--+ 1 chris  staff    324 Oct 18 13:30 __init__.py
+-rw-r--r--+ 1 chris  staff    305 Oct 18 13:30 __init__.pyc
+-rw-r--r--+ 1 chris  staff  10202 Oct 18 13:30 base.py
+-rw-r--r--+ 1 chris  staff  15164 Oct 18 13:30 base.pyc
+-rw-r--r--+ 1 chris  staff   2223 Oct 18 13:30 git.py
+-rw-r--r--+ 1 chris  staff   2918 Oct 18 13:30 git.pyc
+-rw-r--r--+ 1 chris  staff   6795 Oct 18 13:30 loose.py
+-rw-r--r--+ 1 chris  staff   7211 Oct 18 13:30 loose.pyc
+-rw-r--r--+ 1 chris  staff   3273 Oct 18 13:30 mem.py
+-rw-r--r--+ 1 chris  staff   4555 Oct 18 13:30 mem.pyc
+-rw-r--r--+ 1 chris  staff   6475 Oct 18 13:30 pack.py
+-rw-r--r--+ 1 chris  staff   7610 Oct 18 13:30 pack.pyc
+-rw-r--r--+ 1 chris  staff   2185 Oct 18 13:30 ref.py
+-rw-r--r--+ 1 chris  staff   2790 Oct 18 13:30 ref.pyc
+
+./macinstaller/python/gitlab:
+total 264
+-rwxr-xr-x+ 1 chris  staff  64404 Dec  2 13:49 __init__.py
+-rw-r--r--+ 1 chris  staff  59266 Dec  2 13:49 __init__.pyc
+-rwxr-xr-x+ 1 chris  staff     80 Oct 10 15:06 exceptions.py
+-rwxr-xr-x+ 1 chris  staff    413 Oct 10 18:54 exceptions.pyc
+
+./macinstaller/python/markdown:
+total 568
+-rwxr-xr-x+  1 chris  staff  20518 Oct 10 15:06 __init__.py
+-rwxr-xr-x+  1 chris  staff  16967 Oct 10 18:54 __init__.pyc
+-rwxr-xr-x+  1 chris  staff   4640 Oct 10 15:06 __main__.py
+-rwxr-xr-x+  1 chris  staff   4103 Oct 10 15:06 __main__.pyc
+-rwxr-xr-x+  1 chris  staff    879 Oct 10 15:06 __version__.py
+-rwxr-xr-x+  1 chris  staff    966 Oct 10 18:54 __version__.pyc
+-rwxr-xr-x+  1 chris  staff   3566 Oct 10 15:06 blockparser.py
+-rwxr-xr-x+  1 chris  staff   4828 Oct 10 18:54 blockparser.pyc
+-rwxr-xr-x+  1 chris  staff  22485 Oct 10 15:06 blockprocessors.py
+-rwxr-xr-x+  1 chris  staff  19242 Oct 10 18:54 blockprocessors.pyc
+drwxr-xr-x+ 38 chris  staff   1292 Oct 10 18:53 extensions
+-rwxr-xr-x+  1 chris  staff  17055 Oct 10 15:06 inlinepatterns.py
+-rwxr-xr-x+  1 chris  staff  20396 Oct 10 18:54 inlinepatterns.pyc
+-rwxr-xr-x+  1 chris  staff   6022 Oct 10 15:06 odict.py
+-rwxr-xr-x+  1 chris  staff   8027 Oct 10 18:54 odict.pyc
+-rwxr-xr-x+  1 chris  staff   3398 Oct 10 15:06 postprocessors.py
+-rwxr-xr-x+  1 chris  staff   4952 Oct 10 18:54 postprocessors.pyc
+-rwxr-xr-x+  1 chris  staff  14129 Oct 10 15:06 preprocessors.py
+-rwxr-xr-x+  1 chris  staff  11085 Oct 10 18:54 preprocessors.pyc
+-rwxr-xr-x+  1 chris  staff   9792 Oct 10 15:06 serializers.py
+-rwxr-xr-x+  1 chris  staff   7181 Oct 10 18:54 serializers.pyc
+-rwxr-xr-x+  1 chris  staff  13048 Oct 10 15:06 treeprocessors.py
+-rwxr-xr-x+  1 chris  staff  11849 Oct 10 18:54 treeprocessors.pyc
+-rwxr-xr-x+  1 chris  staff   5815 Oct 10 15:06 util.py
+-rwxr-xr-x+  1 chris  staff   5609 Oct 10 18:54 util.pyc
+
+./macinstaller/python/markdown/extensions:
+total 480
+-rwxr-xr-x+ 1 chris  staff   3693 Oct 10 15:06 __init__.py
+-rwxr-xr-x+ 1 chris  staff   4111 Oct 10 18:54 __init__.pyc
+-rwxr-xr-x+ 1 chris  staff   2786 Oct 10 15:06 abbr.py
+-rwxr-xr-x+ 1 chris  staff   4036 Oct 10 15:06 abbr.pyc
+-rwxr-xr-x+ 1 chris  staff   3132 Oct 10 15:06 admonition.py
+-rwxr-xr-x+ 1 chris  staff   3545 Oct 10 15:06 admonition.pyc
+-rwxr-xr-x+ 1 chris  staff   6205 Oct 10 15:06 attr_list.py
+-rwxr-xr-x+ 1 chris  staff   6014 Oct 10 15:06 attr_list.pyc
+-rwxr-xr-x+ 1 chris  staff   9296 Oct 10 15:06 codehilite.py
+-rwxr-xr-x+ 1 chris  staff   9209 Oct 10 15:06 codehilite.pyc
+-rwxr-xr-x+ 1 chris  staff   3727 Oct 10 15:06 def_list.py
+-rwxr-xr-x+ 1 chris  staff   4199 Oct 10 15:06 def_list.pyc
+-rwxr-xr-x+ 1 chris  staff   5554 Oct 10 15:06 extra.py
+-rwxr-xr-x+ 1 chris  staff   5502 Oct 10 15:06 extra.pyc
+-rwxr-xr-x+ 1 chris  staff   3895 Oct 10 15:06 fenced_code.py
+-rwxr-xr-x+ 1 chris  staff   4313 Oct 10 15:06 fenced_code.pyc
+-rwxr-xr-x+ 1 chris  staff  10577 Oct 10 15:06 footnotes.py
+-rwxr-xr-x+ 1 chris  staff  10968 Oct 10 15:06 footnotes.pyc
+-rwxr-xr-x+ 1 chris  staff   4783 Oct 10 15:06 headerid.py
+-rwxr-xr-x+ 1 chris  staff   6091 Oct 10 15:06 headerid.pyc
+-rwxr-xr-x+ 1 chris  staff   2099 Oct 10 15:06 meta.py
+-rwxr-xr-x+ 1 chris  staff   2628 Oct 10 15:06 meta.pyc
+-rwxr-xr-x+ 1 chris  staff    861 Oct 10 15:06 nl2br.py
+-rwxr-xr-x+ 1 chris  staff   1562 Oct 10 15:06 nl2br.pyc
+-rwxr-xr-x+ 1 chris  staff   1295 Oct 10 15:06 sane_lists.py
+-rwxr-xr-x+ 1 chris  staff   2298 Oct 10 15:06 sane_lists.pyc
+-rwxr-xr-x+ 1 chris  staff   1151 Oct 10 15:06 smart_strong.py
+-rwxr-xr-x+ 1 chris  staff   1754 Oct 10 15:06 smart_strong.pyc
+-rwxr-xr-x+ 1 chris  staff  10111 Oct 10 15:06 smarty.py
+-rwxr-xr-x+ 1 chris  staff  10077 Oct 10 15:06 smarty.pyc
+-rwxr-xr-x+ 1 chris  staff   3325 Oct 10 15:06 tables.py
+-rwxr-xr-x+ 1 chris  staff   3953 Oct 10 15:06 tables.pyc
+-rwxr-xr-x+ 1 chris  staff   9297 Oct 10 15:06 toc.py
+-rwxr-xr-x+ 1 chris  staff   7538 Oct 10 15:06 toc.pyc
+-rwxr-xr-x+ 1 chris  staff   2901 Oct 10 15:06 wikilinks.py
+-rwxr-xr-x+ 1 chris  staff   4088 Oct 10 15:06 wikilinks.pyc
+
+./macinstaller/python/requests:
+total 1232
+-rwxr-xr-x+ 1 chris  staff    1861 Oct 10 15:06 __init__.py
+-rwxr-xr-x+ 1 chris  staff    2521 Oct 10 18:53 __init__.pyc
+-rwxr-xr-x+ 1 chris  staff   16246 Oct 10 15:06 adapters.py
+-rwxr-xr-x+ 1 chris  staff   15296 Oct 10 18:53 adapters.pyc
+-rwxr-xr-x+ 1 chris  staff    4718 Oct 10 15:06 api.py
+-rwxr-xr-x+ 1 chris  staff    5665 Oct 10 18:53 api.pyc
+-rwxr-xr-x+ 1 chris  staff    6179 Oct 10 15:06 auth.py
+-rwxr-xr-x+ 1 chris  staff    7215 Oct 10 18:53 auth.pyc
+-rwxr-xr-x+ 1 chris  staff  308434 Oct 10 15:06 cacert.pem
+-rwxr-xr-x+ 1 chris  staff     613 Oct 10 15:06 certs.py
+-rwxr-xr-x+ 1 chris  staff     875 Oct 10 18:53 certs.pyc
+-rwxr-xr-x+ 1 chris  staff    2600 Oct 10 15:06 compat.py
+-rwxr-xr-x+ 1 chris  staff    2508 Oct 10 18:53 compat.pyc
+-rwxr-xr-x+ 1 chris  staff   16686 Oct 10 15:06 cookies.py
+-rwxr-xr-x+ 1 chris  staff   20269 Oct 10 18:53 cookies.pyc
+-rwxr-xr-x+ 1 chris  staff    2440 Oct 10 15:06 exceptions.py
+-rwxr-xr-x+ 1 chris  staff    5092 Oct 10 18:53 exceptions.pyc
+-rwxr-xr-x+ 1 chris  staff     820 Oct 10 15:06 hooks.py
+-rwxr-xr-x+ 1 chris  staff    1061 Oct 10 18:53 hooks.pyc
+-rwxr-xr-x+ 1 chris  staff   27864 Oct 10 15:06 models.py
+-rwxr-xr-x+ 1 chris  staff   24804 Oct 10 18:53 models.pyc
+drwxr-xr-x+ 6 chris  staff     204 Oct 10 18:52 packages
+-rwxr-xr-x+ 1 chris  staff   23791 Oct 10 15:06 sessions.py
+-rwxr-xr-x+ 1 chris  staff   19673 Oct 10 18:53 sessions.pyc
+-rwxr-xr-x+ 1 chris  staff    3200 Oct 10 15:06 status_codes.py
+-rwxr-xr-x+ 1 chris  staff    4591 Oct 10 18:53 status_codes.pyc
+-rwxr-xr-x+ 1 chris  staff    2977 Oct 10 15:06 structures.py
+-rwxr-xr-x+ 1 chris  staff    5176 Oct 10 18:53 structures.pyc
+-rwxr-xr-x+ 1 chris  staff   20329 Oct 10 15:06 utils.py
+-rwxr-xr-x+ 1 chris  staff   19910 Oct 10 18:53 utils.pyc
+
+./macinstaller/python/requests/packages:
+total 16
+-rwxr-xr-x+  1 chris  staff    62 Oct 10 15:06 __init__.py
+-rwxr-xr-x+  1 chris  staff   267 Oct 10 18:53 __init__.pyc
+drwxr-xr-x+ 78 chris  staff  2652 Oct 10 18:52 chardet
+drwxr-xr-x+ 25 chris  staff   850 Oct 10 18:53 urllib3
+
+./macinstaller/python/requests/packages/chardet:
+total 2520
+-rwxr-xr-x+ 1 chris  staff    1295 Oct 10 15:06 __init__.py
+-rwxr-xr-x+ 1 chris  staff     837 Oct 10 18:53 __init__.pyc
+-rwxr-xr-x+ 1 chris  staff   82594 Oct 10 15:06 big5freq.py
+-rwxr-xr-x+ 1 chris  staff  113839 Oct 10 15:06 big5freq.pyc
+-rwxr-xr-x+ 1 chris  staff    1684 Oct 10 15:06 big5prober.py
+-rwxr-xr-x+ 1 chris  staff    1328 Oct 10 15:06 big5prober.pyc
+-rwxr-xr-x+ 1 chris  staff    1141 Oct 10 15:06 chardetect.py
+-rwxr-xr-x+ 1 chris  staff    1672 Oct 10 15:06 chardetect.pyc
+-rwxr-xr-x+ 1 chris  staff    9226 Oct 10 15:06 chardistribution.py
+-rwxr-xr-x+ 1 chris  staff    9059 Oct 10 15:06 chardistribution.pyc
+-rwxr-xr-x+ 1 chris  staff    3791 Oct 10 15:06 charsetgroupprober.py
+-rwxr-xr-x+ 1 chris  staff    2953 Oct 10 15:06 charsetgroupprober.pyc
+-rwxr-xr-x+ 1 chris  staff    1902 Oct 10 15:06 charsetprober.py
+-rwxr-xr-x+ 1 chris  staff    2776 Oct 10 15:06 charsetprober.pyc
+-rwxr-xr-x+ 1 chris  staff    2318 Oct 10 15:06 codingstatemachine.py
+-rwxr-xr-x+ 1 chris  staff    2198 Oct 10 15:06 codingstatemachine.pyc
+-rwxr-xr-x+ 1 chris  staff    1157 Oct 10 15:06 compat.py
+-rwxr-xr-x+ 1 chris  staff     677 Oct 10 15:06 compat.pyc
+-rwxr-xr-x+ 1 chris  staff    1335 Oct 10 15:06 constants.py
+-rwxr-xr-x+ 1 chris  staff     391 Oct 10 15:06 constants.pyc
+-rwxr-xr-x+ 1 chris  staff    1782 Oct 10 15:06 cp949prober.py
+-rwxr-xr-x+ 1 chris  staff    1336 Oct 10 15:06 cp949prober.pyc
+-rwxr-xr-x+ 1 chris  staff    3187 Oct 10 15:06 escprober.py
+-rwxr-xr-x+ 1 chris  staff    2782 Oct 10 15:06 escprober.pyc
+-rwxr-xr-x+ 1 chris  staff    7839 Oct 10 15:06 escsm.py
+-rwxr-xr-x+ 1 chris  staff    7363 Oct 10 15:06 escsm.pyc
+-rwxr-xr-x+ 1 chris  staff    3678 Oct 10 15:06 eucjpprober.py
+-rwxr-xr-x+ 1 chris  staff    3191 Oct 10 15:06 eucjpprober.pyc
+-rwxr-xr-x+ 1 chris  staff   45978 Oct 10 15:06 euckrfreq.py
+-rwxr-xr-x+ 1 chris  staff   88830 Oct 10 15:06 euckrfreq.pyc
+-rwxr-xr-x+ 1 chris  staff    1675 Oct 10 15:06 euckrprober.py
+-rwxr-xr-x+ 1 chris  staff    1337 Oct 10 15:06 euckrprober.pyc
+-rwxr-xr-x+ 1 chris  staff   34872 Oct 10 15:06 euctwfreq.py
+-rwxr-xr-x+ 1 chris  staff   61228 Oct 10 15:06 euctwfreq.pyc
+-rwxr-xr-x+ 1 chris  staff    1676 Oct 10 15:06 euctwprober.py
+-rwxr-xr-x+ 1 chris  staff    1337 Oct 10 15:06 euctwprober.pyc
+-rwxr-xr-x+ 1 chris  staff   36011 Oct 10 15:06 gb2312freq.py
+-rwxr-xr-x+ 1 chris  staff   68846 Oct 10 15:06 gb2312freq.pyc
+-rwxr-xr-x+ 1 chris  staff    1681 Oct 10 15:06 gb2312prober.py
+-rwxr-xr-x+ 1 chris  staff    1344 Oct 10 15:06 gb2312prober.pyc
+-rwxr-xr-x+ 1 chris  staff   13359 Oct 10 15:06 hebrewprober.py
+-rwxr-xr-x+ 1 chris  staff    3994 Oct 10 15:06 hebrewprober.pyc
+-rwxr-xr-x+ 1 chris  staff   47315 Oct 10 15:06 jisfreq.py
+-rwxr-xr-x+ 1 chris  staff   84062 Oct 10 15:06 jisfreq.pyc
+-rwxr-xr-x+ 1 chris  staff   19104 Oct 10 15:06 jpcntx.py
+-rwxr-xr-x+ 1 chris  staff   25330 Oct 10 15:06 jpcntx.pyc
+-rwxr-xr-x+ 1 chris  staff   12784 Oct 10 15:06 langbulgarianmodel.py
+-rwxr-xr-x+ 1 chris  staff   24944 Oct 10 15:06 langbulgarianmodel.pyc
+-rwxr-xr-x+ 1 chris  staff   17725 Oct 10 15:06 langcyrillicmodel.py
+-rwxr-xr-x+ 1 chris  staff   30626 Oct 10 15:06 langcyrillicmodel.pyc
+-rwxr-xr-x+ 1 chris  staff   12628 Oct 10 15:06 langgreekmodel.py
+-rwxr-xr-x+ 1 chris  staff   24631 Oct 10 15:06 langgreekmodel.pyc
+-rwxr-xr-x+ 1 chris  staff   11318 Oct 10 15:06 langhebrewmodel.py
+-rwxr-xr-x+ 1 chris  staff   23451 Oct 10 15:06 langhebrewmodel.pyc
+-rwxr-xr-x+ 1 chris  staff   12536 Oct 10 15:06 langhungarianmodel.py
+-rwxr-xr-x+ 1 chris  staff   24928 Oct 10 15:06 langhungarianmodel.pyc
+-rwxr-xr-x+ 1 chris  staff   11275 Oct 10 15:06 langthaimodel.py
+-rwxr-xr-x+ 1 chris  staff   23437 Oct 10 15:06 langthaimodel.pyc
+-rwxr-xr-x+ 1 chris  staff    5241 Oct 10 15:06 latin1prober.py
+-rwxr-xr-x+ 1 chris  staff    3867 Oct 10 15:06 latin1prober.pyc
+-rwxr-xr-x+ 1 chris  staff    3268 Oct 10 15:06 mbcharsetprober.py
+-rwxr-xr-x+ 1 chris  staff    2825 Oct 10 15:06 mbcharsetprober.pyc
+-rwxr-xr-x+ 1 chris  staff    1967 Oct 10 15:06 mbcsgroupprober.py
+-rwxr-xr-x+ 1 chris  staff    1423 Oct 10 15:06 mbcsgroupprober.pyc
+-rwxr-xr-x+ 1 chris  staff   19608 Oct 10 15:06 mbcssm.py
+-rwxr-xr-x+ 1 chris  staff   17720 Oct 10 15:06 mbcssm.pyc
+-rwxr-xr-x+ 1 chris  staff    4793 Oct 10 15:06 sbcharsetprober.py
+-rwxr-xr-x+ 1 chris  staff    3710 Oct 10 15:06 sbcharsetprober.pyc
+-rwxr-xr-x+ 1 chris  staff    3291 Oct 10 15:06 sbcsgroupprober.py
+-rwxr-xr-x+ 1 chris  staff    2108 Oct 10 15:06 sbcsgroupprober.pyc
+-rwxr-xr-x+ 1 chris  staff    3734 Oct 10 15:06 sjisprober.py
+-rwxr-xr-x+ 1 chris  staff    3213 Oct 10 15:06 sjisprober.pyc
+-rwxr-xr-x+ 1 chris  staff    6831 Oct 10 15:06 universaldetector.py
+-rwxr-xr-x+ 1 chris  staff    4475 Oct 10 15:06 universaldetector.pyc
+-rwxr-xr-x+ 1 chris  staff    2652 Oct 10 15:06 utf8prober.py
+-rwxr-xr-x+ 1 chris  staff    2608 Oct 10 15:06 utf8prober.pyc
+
+./macinstaller/python/requests/packages/urllib3:
+total 416
+-rwxr-xr-x+  1 chris  staff   1864 Oct 10 15:06 __init__.py
+-rwxr-xr-x+  1 chris  staff   2686 Oct 10 18:53 __init__.pyc
+-rwxr-xr-x+  1 chris  staff   6327 Oct 10 15:06 _collections.py
+-rwxr-xr-x+  1 chris  staff   9787 Oct 10 18:53 _collections.pyc
+-rwxr-xr-x+  1 chris  staff   8298 Oct 10 15:06 connection.py
+-rwxr-xr-x+  1 chris  staff   7659 Oct 10 18:53 connection.pyc
+-rwxr-xr-x+  1 chris  staff  29117 Oct 10 15:06 connectionpool.py
+-rwxr-xr-x+  1 chris  staff  23036 Oct 10 18:53 connectionpool.pyc
+drwxr-xr-x+  8 chris  staff    272 Oct 10 18:53 contrib
+-rwxr-xr-x+  1 chris  staff   3983 Oct 10 15:06 exceptions.py
+-rwxr-xr-x+  1 chris  staff   8369 Oct 10 18:53 exceptions.pyc
+-rwxr-xr-x+  1 chris  staff   5833 Oct 10 15:06 fields.py
+-rwxr-xr-x+  1 chris  staff   6775 Oct 10 18:53 fields.pyc
+-rwxr-xr-x+  1 chris  staff   2281 Oct 10 15:06 filepost.py
+-rwxr-xr-x+  1 chris  staff   3319 Oct 10 18:53 filepost.pyc
+drwxr-xr-x+  9 chris  staff    306 Oct 10 18:53 packages
+-rwxr-xr-x+  1 chris  staff   9008 Oct 10 15:06 poolmanager.py
+-rwxr-xr-x+  1 chris  staff   9670 Oct 10 18:53 poolmanager.pyc
+-rwxr-xr-x+  1 chris  staff   5557 Oct 10 15:06 request.py
+-rwxr-xr-x+  1 chris  staff   5900 Oct 10 18:53 request.pyc
+-rwxr-xr-x+  1 chris  staff  11686 Oct 10 15:06 response.py
+-rwxr-xr-x+  1 chris  staff  11702 Oct 10 18:53 response.pyc
+drwxr-xr-x+ 18 chris  staff    612 Oct 10 18:53 util
+
+./macinstaller/python/requests/packages/urllib3/contrib:
+total 88
+-rwxr-xr-x+ 1 chris  staff      0 Oct 10 15:06 __init__.py
+-rwxr-xr-x+ 1 chris  staff    167 Oct 10 18:53 __init__.pyc
+-rwxr-xr-x+ 1 chris  staff   4507 Oct 10 15:06 ntlmpool.py
+-rwxr-xr-x+ 1 chris  staff   4190 Oct 10 15:06 ntlmpool.pyc
+-rwxr-xr-x+ 1 chris  staff   9289 Oct 10 15:06 pyopenssl.py
+-rwxr-xr-x+ 1 chris  staff  10106 Oct 10 18:53 pyopenssl.pyc
+
+./macinstaller/python/requests/packages/urllib3/packages:
+total 120
+-rwxr-xr-x+ 1 chris  staff     74 Oct 10 15:06 __init__.py
+-rwxr-xr-x+ 1 chris  staff    295 Oct 10 18:53 __init__.pyc
+-rwxr-xr-x+ 1 chris  staff   8935 Oct 10 15:06 ordered_dict.py
+-rwxr-xr-x+ 1 chris  staff  10489 Oct 10 18:53 ordered_dict.pyc
+-rwxr-xr-x+ 1 chris  staff  11628 Oct 10 15:06 six.py
+-rwxr-xr-x+ 1 chris  staff  14321 Oct 10 18:53 six.pyc
+drwxr-xr-x+ 6 chris  staff    204 Oct 10 18:53 ssl_match_hostname
+
+./macinstaller/python/requests/packages/urllib3/packages/ssl_match_hostname:
+total 32
+-rwxr-xr-x+ 1 chris  staff   460 Oct 10 15:06 __init__.py
+-rwxr-xr-x+ 1 chris  staff   530 Oct 10 18:53 __init__.pyc
+-rwxr-xr-x+ 1 chris  staff  3778 Oct 10 15:06 _implementation.py
+-rwxr-xr-x+ 1 chris  staff  2991 Oct 10 18:53 _implementation.pyc
+
+./macinstaller/python/requests/packages/urllib3/util:
+total 216
+-rwxr-xr-x+ 1 chris  staff   486 Oct 10 15:06 __init__.py
+-rwxr-xr-x+ 1 chris  staff   807 Oct 10 18:53 __init__.pyc
+-rwxr-xr-x+ 1 chris  staff  3265 Oct 10 15:06 connection.py
+-rwxr-xr-x+ 1 chris  staff  3013 Oct 10 18:53 connection.pyc
+-rwxr-xr-x+ 1 chris  staff  2089 Oct 10 15:06 request.py
+-rwxr-xr-x+ 1 chris  staff  2180 Oct 10 18:53 request.pyc
+-rwxr-xr-x+ 1 chris  staff   566 Oct 10 15:06 response.py
+-rwxr-xr-x+ 1 chris  staff   672 Oct 10 18:53 response.pyc
+-rwxr-xr-x+ 1 chris  staff  9548 Oct 10 15:06 retry.py
+-rwxr-xr-x+ 1 chris  staff  9786 Oct 10 18:53 retry.pyc
+-rwxr-xr-x+ 1 chris  staff  4232 Oct 10 15:06 ssl_.py
+-rwxr-xr-x+ 1 chris  staff  4005 Oct 10 18:53 ssl_.pyc
+-rwxr-xr-x+ 1 chris  staff  9544 Oct 10 15:06 timeout.py
+-rwxr-xr-x+ 1 chris  staff  9785 Oct 10 18:53 timeout.pyc
+-rwxr-xr-x+ 1 chris  staff  4402 Oct 10 15:06 url.py
+-rwxr-xr-x+ 1 chris  staff  4680 Oct 10 18:53 url.pyc
+
+./macinstaller/python/smmap:
+total 200
+-rw-r--r--+  1 chris  staff    325 Oct 18 13:30 __init__.py
+-rw-r--r--+  1 chris  staff    742 Oct 18 13:30 __init__.pyc
+-rw-r--r--+  1 chris  staff   4540 Oct 18 13:30 buf.py
+-rw-r--r--+  1 chris  staff   5404 Oct 18 13:30 buf.pyc
+-rw-r--r--+  1 chris  staff    290 Oct 18 13:30 exc.py
+-rw-r--r--+  1 chris  staff    846 Oct 18 13:30 exc.pyc
+-rw-r--r--+  1 chris  staff  20902 Oct 18 13:30 mman.py
+-rw-r--r--+  1 chris  staff  21535 Oct 18 13:30 mman.pyc
+drwxr-xr-x+ 14 chris  staff    476 Oct 18 13:30 test
+-rw-r--r--+  1 chris  staff   8145 Oct 18 13:30 util.py
+-rw-r--r--+  1 chris  staff  11364 Oct 18 13:30 util.pyc
+
+./macinstaller/python/smmap/test:
+total 104
+-rw-r--r--+ 1 chris  staff     0 Oct 18 13:30 __init__.py
+-rw-r--r--+ 1 chris  staff   169 Oct 18 13:30 __init__.pyc
+-rw-r--r--+ 1 chris  staff  1187 Oct 18 13:30 lib.py
+-rw-r--r--+ 1 chris  staff  2544 Oct 18 13:30 lib.pyc
+-rw-r--r--+ 1 chris  staff  3996 Oct 18 13:30 test_buf.py
+-rw-r--r--+ 1 chris  staff  3449 Oct 18 13:30 test_buf.pyc
+-rw-r--r--+ 1 chris  staff  7862 Oct 18 13:30 test_mman.py
+-rw-r--r--+ 1 chris  staff  5979 Oct 18 13:30 test_mman.pyc
+-rw-r--r--+ 1 chris  staff  2982 Oct 18 13:30 test_tutorial.py
+-rw-r--r--+ 1 chris  staff  1757 Oct 18 13:30 test_tutorial.pyc
+-rw-r--r--+ 1 chris  staff  3367 Oct 18 13:30 test_util.py
+-rw-r--r--+ 1 chris  staff  3842 Oct 18 13:30 test_util.pyc

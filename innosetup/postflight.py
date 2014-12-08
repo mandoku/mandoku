@@ -9,8 +9,11 @@ pypath=sys.executable
 emacsinitOK = False
 
 #home = expanduser("~")
-home = os.environ['HOME']
-#krp = sys.argv[1]
+try:
+    home=os.getenv('HOME')
+except:
+    home = sys.argv[1]
+#krp = 
 sshpubkey = os.path.join(home, ".ssh/glkanripo.pub")
 
 config = ConfigParser.ConfigParser()
@@ -58,6 +61,7 @@ if not emacsinitOK:
 (add-to-list 'exec-path (expand-file-name "%s"  ))
 (require 'mandoku)
 (require 'mandoku-link)
+(setq org-startup-folded 'showeverything)
 (mandoku-initialize)    
 """ % ((datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
        krp.replace('\\', '/'),

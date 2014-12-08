@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Emacs Mandoku"
-#define MyAppVersion "0.1"
+#define MyAppVersion "0.2"
 #define MyAppPublisher "Christian Wittern"
 #define MyAppURL "http://www.mandoku.org/"
 #define MyAppExeName "runemacs.exe"
@@ -22,6 +22,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
+ChangesEnvironment=yes
 DisableDirPage=yes
 DefaultDirName=krp
 DefaultGroupName={#MyAppName}
@@ -29,7 +30,7 @@ AllowNoIcons=yes
 LicenseFile=license.txt
 InfoBeforeFile=readme.txt
    ;InfoAfterFile={%HOME}\.emacs.d\md\myfiles.txt
-OutputBaseFilename=mandoku-setup-compact
+OutputBaseFilename=mandoku-setup-compact-{#MyAppVersion}
 Compression=lzma
 SolidCompression=yes
 
@@ -68,7 +69,7 @@ Source: "..\md\md-kit.el"; DestDir: "{%HOME}\.emacs.d\md"; Flags: ignoreversion
 Source: "..\md\md-init.el"; DestDir: "{%HOME}\.emacs.d\md"; Flags: ignoreversion
 Source: "..\md\install-packages.el"; DestDir: "{%HOME}\.emacs.d\md"; Flags: ignoreversion
 Source:"postflight.py"; DestDir: "{%HOME}\.emacs.d\md"; Flags: ignoreversion
-Source:"ffm.bat"; DestDir: "{%HOME}\.emacs.d\md"; Flags: ignoreversion
+Source:"ffm-compact.bat"; DestDir: "{%HOME}\.emacs.d\md"; Flags: ignoreversion
 Source: "addsshkey.py"; DestDir: "{%HOME}\.emacs.d\md" ; Flags: ignoreversion
 ;[Icons]
 ;Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
@@ -90,7 +91,7 @@ Filename:"{code:GetDataDir}\user\mandoku-settings.cfg"; Section: "Gitlab"; Key: 
 
 [Run]
 ;optional
-Filename:"{%HOME}\.emacs.d\md\ffm.bat"; Parameters: "{code:GetDataDir}"
+Filename:"{%HOME}\.emacs.d\md\ffm-compact.bat"; Parameters: "{code:GetDataDir} {%HOME}"
 ;Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 ;{pf}, {pf32}, {pf64} = program directories

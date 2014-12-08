@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Emacs Mandoku"
-#define MyAppVersion "0.1"
+#define MyAppVersion "0.2"
 #define MyAppPublisher "Christian Wittern"
 #define MyAppURL "http://www.mandoku.org/"
 #define MyAppExeName "runemacs.exe"
@@ -22,6 +22,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
+ChangesEnvironment=yes
 DisableDirPage=yes
 DefaultDirName=krp
 DefaultGroupName={#MyAppName}
@@ -29,7 +30,7 @@ AllowNoIcons=yes
 LicenseFile=license.txt
 InfoBeforeFile=readme.txt
    ;InfoAfterFile={%HOME}\.emacs.d\md\myfiles.txt
-OutputBaseFilename=mandoku-setup-full
+OutputBaseFilename=mandoku-setup-full-{#MyAppVersion}
 Compression=lzma
 SolidCompression=yes
 
@@ -37,8 +38,8 @@ SolidCompression=yes
 Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
 
-;[Tasks]
-;Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+[Tasks]
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 
 [Dirs]
@@ -50,7 +51,7 @@ Name: "{code:GetDataDir}\temp"
 Name: "{code:GetDataDir}\text"
 Name: "{code:GetDataDir}\user"
 Name: "{code:GetDataDir}\work"
-Name: "{%HOME}\.emacs.d\user"
+Name: "{code:GetHomeOrDataDir}\.emacs.d\user"
 
 
 
@@ -59,20 +60,20 @@ Name: "{%HOME}\.emacs.d\user"
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files'
 ;; try this!
 Source: "c:\python\*"; DestDir: "{code:GetDataDir}\system\python"; Flags: recursesubdirs; 
-Source: "c:\em244\*"; DestDir: "{app}\bin"; Flags: recursesubdirs; Excludes: "*.pyc,installer,installdirs"
+Source: "c:\em244\*"; DestDir: "{code:GetDataDir}\bin"; Flags: recursesubdirs; Excludes: "*.pyc,installer,installdirs"
 ;Source: "README.TXT"; DestDir: "{app}"; Flags: isreadme
 ;Source:"addsshkey.bat"; DestDir: "{app}"; 
-;Source:"init.el"; DestDir: "{%HOME}\.emacs.d\"; Flags: ignoreversion
+;Source:"init.el"; DestDir: "{code:GetHomeOrDataDir}\.emacs.d\"; Flags: ignoreversion
 ;onlyifdoesntexist
-Source: "..\md\md-kit.el"; DestDir: "{%HOME}\.emacs.d\md"; Flags: ignoreversion
-Source: "..\md\md-init.el"; DestDir: "{%HOME}\.emacs.d\md"; Flags: ignoreversion
-Source: "..\md\install-packages.el"; DestDir: "{%HOME}\.emacs.d\md"; Flags: ignoreversion
-Source:"postflight.py"; DestDir: "{%HOME}\.emacs.d\md"; Flags: ignoreversion
-Source:"ffm.bat"; DestDir: "{%HOME}\.emacs.d\md"; Flags: ignoreversion
-Source: "addsshkey.py"; DestDir: "{%HOME}\.emacs.d\md" ; Flags: ignoreversion
-;[Icons]
+Source: "..\md\md-kit.el"; DestDir: "{code:GetHomeOrDataDir}\.emacs.d\md"; Flags: ignoreversion
+Source: "..\md\md-init.el"; DestDir: "{code:GetHomeOrDataDir}\.emacs.d\md"; Flags: ignoreversion
+Source: "..\md\install-packages.el"; DestDir: "{code:GetHomeOrDataDir}\.emacs.d\md"; Flags: ignoreversion
+Source:"postflight.py"; DestDir: "{code:GetHomeOrDataDir}\.emacs.d\md"; Flags: ignoreversion
+Source:"ffm.bat"; DestDir: "{code:GetHomeOrDataDir}\.emacs.d\md"; Flags: ignoreversion
+Source: "addsshkey.py"; DestDir: "{code:GetHomeOrDataDir}\.emacs.d\md" ; Flags: ignoreversion
+[Icons]
 ;Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
-Name:"{commondesktop}\{#MyAppName}"; Filename: "{code:GetDataDir}\bin\emacs-24.4\bin\{#MyAppExeName}"; Tasks: desktopicon
+Name:"{commondesktop}\{#MyAppName}"; Filename: "{code:GetDataDir}\bin\emacs-24.4\bin\{#MyAppExeName}"; WorkingDir: "{code:GetDataDir}"; Tasks: desktopicon
 
 [REGISTRY]
 Root:HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "HOME"; ValueData: "{code:GetDataDir}"; Flags: createvalueifdoesntexist
@@ -80,8 +81,8 @@ Root: HKCU; Subkey: "Environment"; ValueType: string; ValueName: "MDTEMP"; Value
 ;Root: HKCU; Subkey: "Environment"; ValueType expandsz; ValueName "TMP"; ValueData "{code:GetDataDir}\tmp"
 
 [INI]
-Filename:"{%HOME}\.emacs.d\md\mandoku.cfg"; Section: "Mandoku"; Key: "basedir"; String: "{code:GetDataDir}"
-Filename:"{%HOME}\.emacs.d\md\mandoku.cfg"; Section: "Mandoku"; Key: "appdir"; String: "{app}"
+Filename:"{code:GetHomeOrDataDir}\.emacs.d\md\mandoku.cfg"; Section: "Mandoku"; Key: "basedir"; String: "{code:GetDataDir}"
+Filename:"{code:GetHomeOrDataDir}\.emacs.d\md\mandoku.cfg"; Section: "Mandoku"; Key: "appdir"; String: "{app}"
 Filename:"{code:GetDataDir}\user\mandoku-settings.cfg"; Section: "Gitlab"; Key: "Private Token"; String: "{code:GetUser|Token}"
 Filename:"{code:GetDataDir}\user\mandoku-settings.cfg"; Section: "Gitlab"; Key: "Username"; String: "{code:GetUser|Name}"
 ;Filename:"{code:GetDataDir}\user\mandoku-settings.cfg"; Section: "Gitlab"; Key: "Email"; String: "{code:GetUser|Email}"
@@ -90,7 +91,7 @@ Filename:"{code:GetDataDir}\user\mandoku-settings.cfg"; Section: "Gitlab"; Key: 
 
 [Run]
 ;optional
-Filename:"{%HOME}\.emacs.d\md\ffm.bat"; Parameters: "{code:GetDataDir}"
+Filename:"{code:GetHomeOrDataDir}\.emacs.d\md\ffm.bat"; Parameters: "{code:GetDataDir}"
 ;Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 ;{pf}, {pf32}, {pf64} = program directories
@@ -189,3 +190,10 @@ begin
   Result := DataDirPage.Values[0];
 end;
 
+function GetHomeOrDataDir(Param	: String): String;
+begin
+   if GetEnv('HOME') = '' then
+      Result := DataDirPage.Values[0]
+     else
+      Result := GetEnv('HOME')
+end;
