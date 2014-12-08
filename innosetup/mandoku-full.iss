@@ -29,7 +29,7 @@ AllowNoIcons=yes
 LicenseFile=license.txt
 InfoBeforeFile=readme.txt
    ;InfoAfterFile={%HOME}\.emacs.d\md\myfiles.txt
-OutputBaseFilename=mandoku-setup-compact
+OutputBaseFilename=mandoku-setup-full
 Compression=lzma
 SolidCompression=yes
 
@@ -59,7 +59,7 @@ Name: "{%HOME}\.emacs.d\user"
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files'
 ;; try this!
 Source: "c:\python\*"; DestDir: "{code:GetDataDir}\system\python"; Flags: recursesubdirs; 
-;Source: "c:\krp\bin\*"; DestDir: "{app}\bin"; Flags: recursesubdirs; Excludes: "*.pyc,installer,installdirs"
+Source: "c:\em244\*"; DestDir: "{app}\bin"; Flags: recursesubdirs; Excludes: "*.pyc,installer,installdirs"
 ;Source: "README.TXT"; DestDir: "{app}"; Flags: isreadme
 ;Source:"addsshkey.bat"; DestDir: "{app}"; 
 ;Source:"init.el"; DestDir: "{%HOME}\.emacs.d\"; Flags: ignoreversion
@@ -72,10 +72,10 @@ Source:"ffm.bat"; DestDir: "{%HOME}\.emacs.d\md"; Flags: ignoreversion
 Source: "addsshkey.py"; DestDir: "{%HOME}\.emacs.d\md" ; Flags: ignoreversion
 ;[Icons]
 ;Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
-;Name:"{commondesktop}\{#MyAppName}"; Filename: "{app}\bin\emacs-24.3\bin\{#MyAppExeName}"; Tasks: desktopicon
+Name:"{commondesktop}\{#MyAppName}"; Filename: "{code:GetDataDir}\bin\emacs-24.4\bin\{#MyAppExeName}"; Tasks: desktopicon
 
 [REGISTRY]
-Root:HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "HOME"; ValueData: "{%USERPROFILE}"; Flags: createvalueifdoesntexist
+Root:HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "HOME"; ValueData: "{code:GetDataDir}"; Flags: createvalueifdoesntexist
 Root: HKCU; Subkey: "Environment"; ValueType: string; ValueName: "MDTEMP"; ValueData: "{code:GetDataDir}\temp"
 ;Root: HKCU; Subkey: "Environment"; ValueType expandsz; ValueName "TMP"; ValueData "{code:GetDataDir}\tmp"
 
@@ -85,7 +85,7 @@ Filename:"{%HOME}\.emacs.d\md\mandoku.cfg"; Section: "Mandoku"; Key: "appdir"; S
 Filename:"{code:GetDataDir}\user\mandoku-settings.cfg"; Section: "Gitlab"; Key: "Private Token"; String: "{code:GetUser|Token}"
 Filename:"{code:GetDataDir}\user\mandoku-settings.cfg"; Section: "Gitlab"; Key: "Username"; String: "{code:GetUser|Name}"
 ;Filename:"{code:GetDataDir}\user\mandoku-settings.cfg"; Section: "Gitlab"; Key: "Email"; String: "{code:GetUser|Email}"
-;Filename: "MyProg.ini"; Section: "InstallSettings"; Key: "InstallPath"; String: "{app}"
+
 
 
 [Run]
