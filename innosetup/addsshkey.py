@@ -33,8 +33,6 @@ sshprivkey = os.path.join(home, ".ssh/glkanripo")
 
 
 # Connect to get the current user    
-proxies = { "http" : "http://proxy.kuins.net:8080"}
-
 gl = gitlab.Gitlab(glurl, gltok)
 #print gl.getsshkeys()
 user=getpass.getuser()
@@ -50,9 +48,9 @@ else:
     print "400 Failed: Could not upload the key. Something went wrong. Maybe the key exists already?"
 
 
-time.sleep(2)
 ssh=os.path.join(gitpath, "ssh.exe")
 subprocess.call([ssh, "-l", "git",  "-i", sshprivkey,  "gl.kanripo.org"]) 
+time.sleep(2)
 
 
 
