@@ -892,11 +892,14 @@ that includes all text ids of texts that matched here."
   (when (or (eq major-mode 'mandoku-view-mode) (eq major-mode 'org-mode))
     (let* (
 	   (page
+	    (if (equal (string-to-char s) ?#)
+	       (concat "^[ \t]*:CUSTOM_ID:[ \t]+"
+		       (regexp-quote (substring s 1)) "[ \t]*$")
 	    (if (posix-string-match "[a-h]" s)
 		     (substring s 0 (+ 1 (length (car (split-string s "[a-o]")))))
 	      (if (posix-string-match "l" s)
 		   (car (split-string s "l"))
-		s)))
+		s))))
 	   (line (if (posix-string-match "[a-o]" s)
 		     (string-to-int (car (cdr  (split-string (car (split-string s "::")) "[a-o]"))))
 		 0))
@@ -909,7 +912,9 @@ that includes all text ids of texts that matched here."
       (re-search-forward "¶" nil t)
       (+ (point) 1)
       (setq line (- line 1)))
-    (beginning-of-line-text)
+    (if (equal (string-to-char s) ?#)
+	(org-back-to-heading t)
+      (beginning-of-line-text))
     (if search
 	(progn
 	  (hi-lock-mode t)
