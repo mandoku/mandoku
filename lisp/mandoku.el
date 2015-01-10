@@ -427,7 +427,7 @@ Click on a link or move the cursor to the link and then press enter
 		     (substring (format "%04x" search-char) 0 2)
 
   
-  (rgrep search-for "*.txt" mandoku-work-dir nil))
+  (rgrep search-for "*.txt" mandoku-work-dir nil))))))
 
 
 
