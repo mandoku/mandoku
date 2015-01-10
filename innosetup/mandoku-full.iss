@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Emacs Mandoku"
-#define MyAppVersion "0.2"
+#define MyAppVersion "0.3"
 #define MyAppPublisher "Christian Wittern"
 #define MyAppURL "http://www.mandoku.org/"
 #define MyAppExeName "runemacs.exe"
@@ -70,14 +70,15 @@ Source: "..\md\md-init.el"; DestDir: "{code:GetHomeOrDataDir}\.emacs.d\md"; Flag
 Source: "..\md\install-packages.el"; DestDir: "{code:GetHomeOrDataDir}\.emacs.d\md"; Flags: ignoreversion
 Source:"postflight.py"; DestDir: "{code:GetHomeOrDataDir}\.emacs.d\md"; Flags: ignoreversion
 Source:"ffm.bat"; DestDir: "{code:GetHomeOrDataDir}\.emacs.d\md"; Flags: ignoreversion
+Source:"start-mandoku.bat"; DestDir: "{code:GetDataDir}\bin"; Flags: ignoreversion
 Source: "addsshkey.py"; DestDir: "{code:GetHomeOrDataDir}\.emacs.d\md" ; Flags: ignoreversion
 [Icons]
 ;Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
-Name:"{commondesktop}\{#MyAppName}"; Filename: "{code:GetDataDir}\bin\emacs-24.4\bin\{#MyAppExeName}"; WorkingDir: "{code:GetDataDir}"; Tasks: desktopicon
+Name:"{commondesktop}\{#MyAppName}"; Filename: "{code:GetDataDir}\bin\start-mandoku.bat"; WorkingDir: "{code:GetDataDir}"; Tasks: desktopicon
 
-[REGISTRY]
-Root:HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "HOME"; ValueData: "{code:GetDataDir}"; Flags: createvalueifdoesntexist
-Root: HKCU; Subkey: "Environment"; ValueType: string; ValueName: "MDTEMP"; ValueData: "{code:GetDataDir}\temp"
+;[REGISTRY]
+;Root:HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "HOME"; ValueData: "{code:GetDataDir}"; Flags: createvalueifdoesntexist
+;Root: HKCU; Subkey: "Environment"; ValueType: string; ValueName: "MDTEMP"; ValueData: "{code:GetDataDir}\temp"
 ;Root: HKCU; Subkey: "Environment"; ValueType expandsz; ValueName "TMP"; ValueData "{code:GetDataDir}\tmp"
 
 [INI]

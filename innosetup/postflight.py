@@ -9,17 +9,20 @@ pypath=sys.executable
 emacsinitOK = False
 
 #home = expanduser("~")
-try:
-    home=os.getenv('HOME')
-except:
-    home = sys.argv[1]
-#krp = 
+home=os.getenv('HOME', sys.argv[1])
+
 sshpubkey = os.path.join(home, ".ssh/glkanripo.pub")
 
 config = ConfigParser.ConfigParser()
 config.read(os.path.join(home, ".emacs.d/md/mandoku.cfg"))
 krp = config.get("Mandoku", "basedir")
-
+#basedir might be wrong or not set.
+if not os.path.exists(krp):
+    #we fall back to home
+    print "Basedir wrong!"
+    krp=home
+    config.set("Mandoku", "basedir", krp)
+#??:
 sp = os.path.split(os.path.split(os.path.split(os.path.realpath(__file__))[0])[0])[0]
 
 #read the files, set up emacs init file

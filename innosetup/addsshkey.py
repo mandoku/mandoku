@@ -5,10 +5,9 @@ sys.setdefaultencoding('utf-8')
 
 from os.path import expanduser, join
 from datetime import datetime
-try:
-    home=os.getenv('HOME')
-except:
-    home = sys.argv[1]
+
+home=os.getenv('HOME', sys.argv[1])
+
 mdconfig = ConfigParser.ConfigParser()
 mdcfgfile = os.path.join(home, ".emacs.d/md/mandoku.cfg")
 mdconfig.readfp(open(mdcfgfile))

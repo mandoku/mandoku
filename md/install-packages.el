@@ -31,7 +31,8 @@
 	'org 'org-plus-contrib
 	'mandoku 'mandoku-meta-zb
 ;	'elpy
-        'rainbow-mode)
+;        'rainbow-mode
+	)
   "Libraries that should be installed by default.")
 
 (unless (every #'package-installed-p starter-kit-packages)

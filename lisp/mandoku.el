@@ -3,11 +3,11 @@
 ;; created [2001-03-13T20:32:32+0800]  (as smart.el)
 ;; renamed and refactored [2010-01-08T17:01:43+0900]
 ;;
-;; Copyright (c) 2001-2014 Christian Wittern
+;; Copyright (c) 2001-2015 Christian Wittern
 ;;
 ;; Author: Christian Wittern <cwittern@gmail.com>
 ;; URL: http://www.mandoku.org
-;; Version: 0.05
+;; Version: 0.3
 ;; Keywords: convenience
 ;; Package-Requires: ((org "8"))
 ;; This file is not part of GNU Emacs.
@@ -67,6 +67,7 @@
 (defvar mandoku-download-queue (concat mandoku-sys-dir "mandoku-to-download.queue"))
 (defvar mandoku-index-queue (concat mandoku-sys-dir "mandoku-to-index.queue"))
 (defvar mandoku-indexed-texts (concat mandoku-sys-dir "indexed-texts.txt"))
+(defvar mandoku-grep-command "bzgrep" "The command used for mandoku's internal search function. On Windows, needs to be 'grep'.")
 (defvar mandoku-local-init-file nil)
 (defvar mandoku-config-cfg (concat mandoku-user-dir "mandoku-settings.cfg"))
 ;; we store the http password for gitlab in memory for one session
@@ -411,6 +412,26 @@ Click on a link or move the cursor to the link and then press enter
   (find-file mandoku-local-init-file))
 
 ;;;###autoload
+(defun mandoku-search-user-text (search-for)
+  "This command searches through the texts located in `mandoku-work-dir'."
+  (interactive 
+   (let ((search-for (mapconcat 'char-to-string (mandoku-next-three-chars) "")))
+     (list (read-string "Search for: " search-for))))
+  (let ((coding-system-for-read 'utf-8)
+	(coding-system-for-write 'utf-8)
+      (shell-command
+		    (concat " -H " "^"
+		     (substring search-string 1 )
+		     " "
+		     mandoku-index-dir
+		     (substring (format "%04x" search-char) 0 2)
+
+  
+  (rgrep search-for "*.txt" mandoku-work-dir nil))
+
+
+
+;;;###autoload
 (defun mandoku-search-text (search-for)
   (interactive 
    (let ((search-for (mapconcat 'char-to-string (mandoku-next-three-chars) "")))
@@ -549,7 +570,7 @@ One character is either a character or one entity expression"
 	(search-char (string-to-char search-string)))
 ;; /tmp/index/4e/4e00/4e00.ZB6q.idx \\ 千賢人出現於世是故,成當有	ZB6q0001_001:010a:2:8:9
       (shell-command
-		    (concat "bzgrep -H " "^"
+		    (concat mandoku-grep-command " -H " "^"
 		     (substring search-string 1 )
 		     " "
 		     mandoku-index-dir
@@ -1013,7 +1034,7 @@ the character at point, ignoring non-Kanji characters"
 	(goto-char (point-min))
 	(if (looking-at "\n")
 	    (delete-char 1))
-	(setq buffer-file-coding-system nil)
+	(setq buffer-file-coding-system 'raw-text)
 	(save-buffer)
 	(kill-buffer)
 	(find-file-other-window (concat mandoku-image-dir path))

@@ -25,7 +25,7 @@ LINK will consist of a <textid> recognized by mandoku."
 			  coll)))
 	 (filename (concat  "/" 
 			    (if (equal coll "krp")
-				(concat (substring textid 0 4) "/" textid "/" fname)
+				(concat (substring textid 0 4) "/" (substring textid 0 8) "/" fname)
 			      (if (> (length textid ) 0 )
 				  (funcall (intern (concat "mandoku-" coll "-textid-to-file")) textid page)
 				(concat (substring coll 0 4) "/" (substring coll 0 8) "/" coll)))
@@ -37,10 +37,10 @@ LINK will consist of a <textid> recognized by mandoku."
 					;      (message (format "%s" (concat mandoku-meta-dir  textid ".org" )))
       (if (file-exists-p (concat mandoku-text-dir "/" filename))
 	  (org-open-file (concat mandoku-text-dir "/" filename) t nil 
-			 (or src page))
-			 ;; (if src 
-			 ;;     (concat page "::" src)
-			 ;;   page))
+			 ;;(or src page))
+			  (if src 
+			      (concat page "::" src)
+			    page))
 	(if (file-exists-p (concat mandoku-temp-dir fname))
 	    (org-open-file (concat mandoku-temp-dir fname) t nil 
 			   (if src 
