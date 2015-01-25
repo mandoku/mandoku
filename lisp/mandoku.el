@@ -411,6 +411,37 @@ Click on a link or move the cursor to the link and then press enter
   (interactive)
   (find-file mandoku-local-init-file))
 
+;;; prepare user text
+(defun mandoku-find-files-to-convert ()
+  (interactive)
+  (dired mandoku-work-dir "-alR")
+  (dired-unmark-all-marks)
+  (dired-mark-files-regexp "\\.txt")
+  (define-key dired-mode-map "c" 'mandoku-operate-on-marked-files)
+  (message "Please review the selected files.  If everything is correct, press C to continue")
+  )  
+
+(defun mandoku-operate-on-marked-files ()
+  (interactive)
+  (let ((files (dired-get-marked-files)))
+    (mapc
+     (lambda (ff) (mandoku-convert-file ff))
+     files))
+;  (define-key dired-mode-map "c" nil)
+  (message "Concersion done! Press q to close this buffer.")
+)
+    
+(defun mandoku-convert-file(file &optional encoding)
+  (let ((enc (or encoding 'utf-8)))
+    (with-current-buffer     (find-file-noselect file)
+      (unless (memq buffer-file-coding-system (append (coding-system-eol-type 'raw-text) nil))
+	(set-buffer-file-coding-system enc)
+	(save-buffer))
+    (kill-buffer)
+  )))
+
+
+
 ;;;###autoload
 (defun mandoku-search-user-text (search-for)
   "This command searches through the texts located in `mandoku-work-dir'."
@@ -1319,27 +1350,6 @@ eds
              (car pair) (cadr pair))
          (car pair))))
 
-(defun mandoku-move-templink-to-next-line ()
-  "moves links containing dates, names etc. to the following line"
-  (interactive)
-  (let (m1 m3 beg end)
-    (while (re-search-forward org-bracket-link-regexp nil t)
-      (if (match-end 3)
-	  (progn
-	    (setq m1 (buffer-substring-no-properties (match-beginning 1) (match-end 1)))
-	    (setq beg (match-beginning 0))
-	    (setq m3 (buffer-substring-no-properties (match-beginning 3) (match-end 3)))
-	    (setq end (+ beg (length m3)))
-	    (unless
-		(save-match-data 
-		  ;; TODO: process nested :zhu: here!
-		  (string-match ":zhu:\n\\(.*?\\)\n:END:\n" m3))
-	      (replace-match m3)
-	      (mandoku-annotate beg end t)
-	      (end-of-line)
-	      (insert " " m1)
-	      (goto-char end))
-	    )))))  
 
 (defun mandoku-format-on-punc ( rep)
   "Formats the text from point to the end, splitting at punctuation and other splitting points."
@@ -1419,35 +1429,6 @@ eds
 "))
       (forward-paragraph 1)))))
 
-(defun mandoku-annotate (beg end &optional skip-pinyin)
-  (interactive "r")
-;  (save-excursion
-  (let* ((term (mandoku-remove-markup (buffer-substring-no-properties beg end)))
-	 (pinyin (if skip-pinyin 
-		     ""
-		   (concat " [" (chw-text-get-pinyin term) "] ")))
-	 )
-    (forward-line)
-    (beginning-of-line)
-
-    (if (looking-at ":zhu:")
-	(progn
-	  (re-search-forward ":END:")
-	  (beginning-of-line)
-	  (insert term 
-		  pinyin
-		  "\n" )
-	  (previous-line))
-      (progn
-	(insert ":zhu:\n \n:END:\n")
-	(previous-line 2)
-	(beginning-of-line)
-	(insert term pinyin)))
-
-    (beginning-of-line)
-    (deactivate-mark)
-;    (lookup-word)
-))
 
 (defun mandoku-string-remove-all-properties (string)
 ;  (set-text-properties 0 (length string) nil string))
