@@ -5,6 +5,8 @@
 ;; This is the first thing to get loaded.
 ;;
 ;(setq debug-on-error t)
+;; hopefully this will solve the problem with *temp* buffer
+(prefer-coding-system 'utf-8)
 ;; remember the directory below this
 (defconst starter-kit-dir (file-name-directory (substring (file-name-directory (or load-file-name (buffer-file-name))) 0 -1))
     "directory where the starterkit is installed")
