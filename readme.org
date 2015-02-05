@@ -3,6 +3,8 @@
 
 * About mandoku
 
+  [[http://melpa.org/#/mandoku][file:http://melpa.org/packages/mandoku-badge.svg]]
+
   Mandoku is a framework for supporting research on premodern Chinese
   texts. This includes the tasks of 
 
