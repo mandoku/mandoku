@@ -894,7 +894,7 @@ One character is either a character or one entity expression"
 that includes all text ids of texts that matched here."
   (interactive)
   (when (eq major-mode 'mandoku-index-mode)
-    (let* ((txtids (org-prop;;Updating: ZB5erty-values "ID"))
+    (let* ((txtids (org-property-values "ID"))
 	  (search (save-excursion
 		    (goto-char (point-min))
 		    (search-forward "* ")
@@ -908,7 +908,7 @@ that includes all text ids of texts that matched here."
 	)
       (message "%s %s" search fn)
     )
-))))
+))
 
 (defun mandoku-make-textfilter ()
   "Creates a new textfilter and adds it to the list of textfilters"
