@@ -447,18 +447,17 @@ Click on a link or move the cursor to the link and then press enter
   "This command searches through the texts located in `mandoku-work-dir'."
   (interactive 
    (let ((search-for (mapconcat 'char-to-string (mandoku-next-three-chars) "")))
-     (list (read-string "Search for: " search-for))))
+     (list (read-string "Search in user files for: " search-for))))
   (let ((coding-system-for-read 'utf-8)
-	(coding-system-for-write 'utf-8)
-      (shell-command
-		    (concat " -H " "^"
-		     (substring search-string 1 )
-		     " "
-		     mandoku-index-dir
-		     (substring (format "%04x" search-char) 0 2)
+	(coding-system-for-write 'utf-8))
+      ;; (shell-command
+      ;; 		    (concat " -H " "^"
+      ;; 		     (substring search-for 1 )
+      ;; 		     " "
+      ;; 		     mandoku-index-dir
+      ;; 		     (substring (format "%04x" search-char) 0 2)
 
-  
-  (rgrep search-for "*.txt" mandoku-work-dir nil))))))
+  (rgrep search-for "*.txt" mandoku-work-dir nil)))
 
 
 
@@ -1528,16 +1527,18 @@ eds
      )
     ("Search"
      ["Texts" mandoku-search-text t]
-     ["Titles" mandoku-search-titles t]
+;     ["Titles" mandoku-search-titles t]
      ["Dictionary" mandoku-dict-mlookup t]
+     ["My Files" mandoku-search-user-text t]
      )
-    ("Versions")
+    ;("Versions")
     ("Maintenance"
      ["Download texts in DL list" mandoku-download-process-queue t]
      ["Add to download list" mandoku-download-add-text-to-queue t]
      ["Show download list" mandoku-download-show-queue t]
      ["Update search index" mandoku-update-index t]
      ["Setup file" mandoku-show-local-init t]
+     ["Convert my work files" mandoku-find-files-to-convert t]
 ;     ["Update mandoku" mandoku-update t]
 ;     ["Update installed texts" mandoku-update-texts nil]
      
