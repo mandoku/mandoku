@@ -449,15 +449,11 @@ Click on a link or move the cursor to the link and then press enter
    (let ((search-for (mapconcat 'char-to-string (mandoku-next-three-chars) "")))
      (list (read-string "Search in user files for: " search-for))))
   (let ((coding-system-for-read 'utf-8)
-	(coding-system-for-write 'utf-8))
-      ;; (shell-command
-      ;; 		    (concat " -H " "^"
-      ;; 		     (substring search-for 1 )
-      ;; 		     " "
-      ;; 		     mandoku-index-dir
-      ;; 		     (substring (format "%04x" search-char) 0 2)
-
-  (rgrep search-for "*.txt" mandoku-work-dir nil)))
+	(coding-system-for-write 'utf-8)
+	(grep-find-ignored-files nil)
+	(grep-find-ignored-directories nil)
+	)
+    (rgrep search-for "*.txt" mandoku-work-dir nil)))
 
 
 
