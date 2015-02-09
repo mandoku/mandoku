@@ -13,6 +13,8 @@
 
 (defvar starter-kit-user-dir (expand-file-name "user" starter-kit-dir)
   "user directory for personal code")
+(unless (file-exists-p starter-kit-user-dir)
+  (make-directory starter-kit-user-dir))
 
 (defvar starter-kit-lisp (expand-file-name "md" starter-kit-dir)
   "directory for starter-kit lisp code")
