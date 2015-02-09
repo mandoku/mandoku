@@ -244,7 +244,7 @@
               textid)
           (insert-file-contents (concat mandoku-sys-dir (car (split-string (car x))) "-lookup.txt"))
           (goto-char (point-min))
-          (while (re-search-forward "^\\([a-z0-9]+\\)	\\([^	
+          (while (re-search-forward "^\\([A-z0-9]+\\)	\\([^	
 ]+\\)" nil t)
 	     (puthash (match-string 1) (match-string 2) mandoku-lookup)))))))
 
@@ -270,7 +270,7 @@
 	    textid)
 	(insert-file-contents (concat mandoku-sys-dir "subcolls.txt"))
 	(goto-char (point-min))
-	(while (re-search-forward "^\\([a-z0-9]+\\)	\\([^	
+	(while (re-search-forward "^\\([A-z0-9]+\\)	\\([^	
 ]+\\)" nil t)
 	  (puthash (match-string 1) (match-string 2) mandoku-subcolls)))))
 
@@ -282,7 +282,7 @@
               textid)
           (insert-file-contents (concat mandoku-sys-dir (car (split-string (car x))) "-titles.txt"))
           (goto-char (point-min))
-          (while (re-search-forward "^\\([a-z0-9]+\\)	\\([^	
+          (while (re-search-forward "^\\([A-z0-9]+\\)	\\([^	
 ]+\\)" nil t)
 	     (puthash (match-string 1) (match-string 2) mandoku-titles)))))))
 
@@ -880,7 +880,7 @@ One character is either a character or one entity expression"
               textid)
           (insert-file-contents filename)
           (goto-char (point-min))
-          (while (re-search-forward "^\\([a-z0-9]+\\)\s+\\([^\s\n]+\\)" nil t)
+          (while (re-search-forward "^\\([A-z0-9]+\\)\s+\\([^\s\n]+\\)" nil t)
 	    (eval (read (concat "(puthash (match-string 1) (match-string 2) tab-" fn ")"))))))
       (eval (read (concat "(add-to-list 'mandoku-textfilter-list 'tab-" fn ")"))))))
       
