@@ -141,6 +141,8 @@ class MandokuText(object):
         "optionally replaces the md before writing out the file, but only if there had not been pbs originally"
         if replace and self.pbcnt == 0:
             ofile.write(str.replace('<md:', '<pb:'))
+        else:
+            ofile.write(str)
             
     def read(self):
         self.seq = []
