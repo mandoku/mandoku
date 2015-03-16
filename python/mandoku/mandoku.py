@@ -46,7 +46,7 @@ import sys, codecs, os ,re, operator, collections, git, time, datetime
 from difflib import *
 from itertools import *
 from sparsedict import *
-#removed: \uFE30-\uFE4F
+#removed: \uFE30-\uFE4F  
 kanji=Ur'\u3000\u3400-\u4DFF\u4e00-\u9FFF\uF900-\uFAFF\U00020000-\U0002A6DF\U0002A700-\U0002B73F\U0002B740-\U0002B81F\U0002B820-\U0002F7FF'
 pua=Ur'\uE000-\uF8FF\U000F0000-\U000FFFFD\U00100000-\U0010FFFD'
 ##this will recognize image links like [[./img]] as 1 kanji --> clear this out later?!
@@ -192,6 +192,7 @@ function with access to a database."""
                     else:
                         for j in range(0, len(e)):
                             if e[j] in (u'〈', u'《', u'「', u'『', u'【', u'〖', u'〘', u'〚', u'\u3000', '(', '*', '.', ' '):
+#                            if e[j] in (u'〈', u'《', u'「', u'『', u'【', u'〖', u'〘', u'〚',  '(', '*', '.', ' '):
                                 p += e[j]
                             elif re.search(r"[0-9A-Za-z]", e[j]):
                                 p += e[j]
@@ -1120,7 +1121,7 @@ class MandokuComp(object):
                 
 
 
-    def move_pg_and_xb6tot2(self, i):
+    def move_pg_and_xb6tot2(self, i=0):
         """update text2 with layout markers from text1"""
         ##TODO: what I really want is a separation of target of the action and the action itself,
         ## then I could define various actions that move some features of t1 to t2 etc.
@@ -1143,18 +1144,46 @@ class MandokuComp(object):
             #i.e. equal or replace
             if li == lj:
                 for i in range(i1, i2):
-                    t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] + (t2.seq[i+dx][t2.mpos]+t1.seq[i][t1.mpos].replace('\n', '').replace('<pb:', '<md:'), )+ t2.seq[i+dx][t2.mpos+1:]
-            elif tag == 'replace':
-#                print dx, i1, i2
-                l = min(li, lj)
-                for i in range(i1, i1+l):
-                    t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] + (t2.seq[i+dx][t2.mpos]+t1.seq[i][t1.mpos].replace('\n', '').replace('<pb:', '<md:'), ) + t2.seq[i+dx][t2.mpos+1:]
-                #only if text1 is longer, we add the rest of 1 add the last char
-                if li > lj:
-                    t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] +(t2.seq[i+dx][t2.mpos] + t1.seq[i][t1.mpos].replace('\n', '').replace('<pb:', '<md:') + "".join([a[t1.mpos].replace('\n', '').replace('<pb:', '<md:') for  a in t1.seq[i:i2]]), ) + t2.seq[i+dx][t2.mpos+1:]
-            elif tag == 'delete':
-                t2.seq[j1-1] = t2.seq[j1-1][:t2.mpos] + (t2.seq[j1-1][t2.mpos] + "".join([a[t1.mpos].replace('\n', '').replace('<pb:', '<md:') for  a in t1.seq[i:i2]]), ) + t2.seq[i+dx][t2.mpos+1:]
-
+                    if "md" in t2.seq[i+dx][t2.mpos]:
+                        pass
+                        #print "y", tag, i+dx, t2.seq[i+dx][t2.mpos], " / ", t1.seq[i]
+                    else:
+                        t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] + (t1.seq[i][t1.mpos].replace('\n', '').replace('<pb:', '<md:') + t2.seq[i+dx][t2.mpos], )+ t2.seq[i+dx][t2.mpos+1:]
+                    # if "md" in "".join(t2.seq[i+dx]):
+                    #     print t2.seq[i+dx]
+            else:
+                if tag == 'replace':
+    #                print dx, i1, i2
+                    l = min(li, lj)
+                    for i in range(i1, i1+l):
+                        t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] + (t1.seq[i][t1.mpos].replace('\n', '').replace('<pb:', '<md:') + t2.seq[i+dx][t2.mpos], ) + t2.seq[i+dx][t2.mpos+1:]
+                    #only if text1 is longer, we add the rest of 1 add the last char
+                    if li > lj:
+                        #skip punc before  \u3000 
+                        inp=""
+                        c = t1.seq[i:i2]
+                        for z1, a in enumerate(c):
+                            try:
+                                if c[z1+1][t1.cpos] != u"\u3000":
+                                    inp += a[t1.mpos].replace('\n', '').replace('<pb:', '<md:')
+                                    #print "delz", t2.seq[j1-1], "/", inp
+                            except:
+                                inp += a[t1.mpos].replace('\n', '').replace('<pb:', '<md:')
+                        #t1.seq[i][t1.mpos].replace('\n', '').replace('<pb:', '<md:') + "".join([a[t1.mpos].replace('\n', '').replace('<pb:', '<md:') for  a in t1.seq[i:i2]])
+                        t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] +(inp + t2.seq[i+dx][t2.mpos] , ) + t2.seq[i+dx][t2.mpos+1:]
+                elif tag == 'delete':
+                    #skip punc before  \u3000 
+                    inp=""
+                    c = t1.seq[i:i2]
+                    for z1, a in enumerate(c):
+                        try:
+                            if c[z1+1][t1.cpos] != u"\u3000":
+                                inp += a[t1.mpos].replace('\n', '').replace('<pb:', '<md:')
+                                #print "dely", t2.seq[j1-1], "/", inp
+                        except:
+                            inp += a[t1.mpos].replace('\n', '').replace('<pb:', '<md:')
+                    t2.seq[j1-1] = t2.seq[j1-1][:t2.mpos] + (inp + t2.seq[j1-1][t2.mpos], ) + t2.seq[i+dx][t2.mpos+1:]
+                    #print "x", j1-1, tag, "".join(t2.seq[j1-1]), "/", "$".join(["#".join(a) for  a in t1.seq[i:i2]])
             
     def mergepunc(self, i=0):
         """update text1 with punctuation from text2"""
