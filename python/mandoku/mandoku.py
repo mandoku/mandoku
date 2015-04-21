@@ -376,7 +376,10 @@ function with access to a database."""
             except:
                 extra = ''
             self.pbcnt += len(re.findall(ur"<pb:", line))
-            if line.startswith('*') and not(self.starlines):
+            #this is basically a hack for the YP-C files of DZJY
+            if line.startswith('#<md'):
+                pass
+            elif line.startswith('*') and not(self.starlines):
                 ## we add the line always to the last string of the last tuple
                 self.seq[-1] = (self.seq[-1][:-1] + (self.seq[-1][-1] + line,))
             ## parse the zhu annotations
