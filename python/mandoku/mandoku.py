@@ -194,7 +194,7 @@ function with access to a database."""
                             if e[j] in (u'〈', u'《', u'「', u'『', u'【', u'〖', u'〘', u'〚', u'\u3000', '(', '*', '.', ' '):
 #                            if e[j] in (u'〈', u'《', u'「', u'『', u'【', u'〖', u'〘', u'〚',  '(', '*', '.', ' '):
                                 p += e[j]
-                            elif re.search(r"[0-9A-Za-z]", e[j]):
+                            elif re.search(r"[@0-9A-Za-z]", e[j]):
                                 p += e[j]
 #                                print "p", i, p
                             else:
