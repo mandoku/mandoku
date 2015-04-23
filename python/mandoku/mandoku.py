@@ -378,7 +378,7 @@ function with access to a database."""
             self.pbcnt += len(re.findall(ur"<pb:", line))
             #this is basically a hack for the YP-C files of DZJY
             if line.startswith('#<md'):
-                pass
+                continue
             elif line.startswith('*') and not(self.starlines):
                 ## we add the line always to the last string of the last tuple
                 self.seq[-1] = (self.seq[-1][:-1] + (self.seq[-1][-1] + line,))
@@ -465,8 +465,30 @@ function with access to a database."""
         """write the text out in the supplied file object"""
         self.write(outfile, "".join( ["".join(a) for a in self.seq]))
 
+    def alignpb(self):
+        #print "before: ", self.sections
+        for i in range(0, len(self.sections)):
+            start = self.sections[i][0]+5
+            try:
+                limit = self.sections[i-1][0]
+            except:
+                limit = 0
+            tmp = start
+            while tmp > limit:
+                tmp -= 1
+                if self.seq[tmp][self.mpos].find('<pb') > 0:
+                    self.sections[i] = (tmp+1, self.sections[i][1])
+                    #print tmp+1, "".join(self.seq[tmp+1])
+                    break
+
+        #print "after: ", self.sections
+        
+            
     def write_to_sections(self, path, header=False, alignpb=True):
         """write the text to path using the filename(s) in the sections array."""
+        # if we got the sections from a different file, we might need to align them to a pb
+        if alignpb:
+            self.alignpb()
         try:
             os.mkdir(path)
         except:
@@ -484,16 +506,20 @@ function with access to a database."""
             outfile=codecs.open(of, 'w', self.encoding)
             if header:
                 self.writeheader(outfile, i)
+                ## [2015-04-23T16:16:39+0900] we now use the above alignpb handling to split the sections more 
                 #lastpb only if cpos > 0?
-                tmp = start
-                while tmp > 0:
-                    tmp -= 1
-                    if self.seq[tmp][self.mpos].find('<') > 0:
-                        pb=self.seq[tmp][self.mpos]
-                        self.write(outfile, u"#+PROPERTY: LASTPB  %s\n" % (pb[pb.find('<'):pb.find('>')+1]))
-                        self.write(outfile, u"%s¶\n" % (pb[pb.find('<'):pb.find('>')+1]))
-                        break
-            if header and alignpb:
+                # tmp = start
+                # while tmp > 0:
+                #     tmp -= 1
+                #     if self.seq[tmp][self.mpos].find('<pb') > 0:
+                #         pb=self.seq[tmp][self.mpos]
+                #         #self.write(outfile, u"#+PROPERTY: LASTPB  %s\n" % (pb[pb.find('<'):pb.find('>')+1]))
+                #         #self.write(outfile, u"%s¶\n" % (pb[pb.find('<'):pb.find('>')+1]))
+                #         break
+                #     #else:
+                #         #print tmp, "".join(self.seq[tmp])
+            # this is also switched off now, handled elsewhere. 
+            if header and alignpb and False:
                 ##for the first section, we keep the position at 1
                 if tmp > 1:
                     tmp += 1
@@ -504,9 +530,11 @@ function with access to a database."""
                 #next file
                 try:
                     if len(self.seq[start - 1]) > self.cpos + 2:
-                        self.write(outfile, "".join(self.seq[start - 1][self.cpos + 2 :]))
+                        tow = "".join(self.seq[start - 1][self.cpos + 2 :])
+                        self.write(outfile, "%s\n" % (tow.replace("\n", "")))
                 except:
                     pass
+                #self.write(outfile, "\n-- break --\n")
                 self.write(outfile, "".join(["".join(a) for a in self.seq[start:limit - 1]]))
                 try:
                     self.write(outfile, "".join(["".join(a) for a in self.seq[limit - 1 :limit][0][: self.cpos + 2]]))
