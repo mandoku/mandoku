@@ -79,6 +79,7 @@ class MandokuText(object):
         #this allows me to lookup by character position
         # the number of pb in the input file.
         self.pbcnt = 0
+        self.mdcnt = 0
         self.pages = SparseDict()
         #page per sections
         self.pps = {}
@@ -376,6 +377,7 @@ function with access to a database."""
             except:
                 extra = ''
             self.pbcnt += len(re.findall(ur"<pb:", line))
+            self.mdcnt += len(re.findall(ur"<md:", line))
             #this is basically a hack for the YP-C files of DZJY
             if line.startswith('#<md'):
                 continue
@@ -560,6 +562,16 @@ function with access to a database."""
                 continue
             if not 'mode: ' in self.defs[dx]:
                 out.write("#+PROPERTY: %s %s\n" % (dx.upper(), self.defs[dx]))
+        #write lastpb property for md files!
+        if self.mdcnt > 0 and section > 0:
+            start = self.sections[section][0]
+            tmp = start - 1
+            while tmp > 0:
+                tmp -= 1
+                if self.seq[tmp][self.mpos].find('<md') > 0:
+                    pb=self.seq[tmp][self.mpos]
+                    out.write(u"#+PROPERTY: LASTPB  %s\n" % (pb[pb.find('<'):pb.find('>')+1]))
+                    break
         out.write("#+PROPERTY: JUAN %d\n" % (section ))
 
     def printNgram(self, sx, sec, pos, extra=None):
