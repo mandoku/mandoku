@@ -100,7 +100,7 @@
 ;;;###autoload
 (defvar mandoku-catalogs-alist nil)
 (defvar mandoku-catalog-path-list nil)
-(defvar mandoku-git-use-http nil)
+(defvar mandoku-git-use-http t)
 
 (defvar mandoku-initialized-p nil)
 
@@ -1808,15 +1808,14 @@ We should check if the file exists before cloning!"
 	 (repid (car (split-string txtid "\\([0-9]\\)")))
 	 (groupid (substring txtid 0 (+ (length repid) 2)))
 	 (clone-url (if mandoku-git-use-http
-			(concat "http://" (mandoku-get-user) ":" (mandoku-get-password) "@" mandoku-user-server "/")
+			(concat "https://" mandoku-user-server "/")
+			;(concat "http://" (mandoku-get-user) ":" (mandoku-get-password) "@" mandoku-user-server "/")
 		      (concat "git@" mandoku-user-server ":")))
-	 (txturl (concat clone-url groupid "/" txtid ".git"))
-	 (wikiurl (concat clone-url groupid "/" txtid ".wiki.git"))
+	 ;; org is hardcoded here...
+	 (txturl (concat clone-url "kanripo/" txtid ".git"))
 	 (targetdir (concat mandoku-text-dir groupid "/")))
     (mkdir targetdir t)
     (mandoku-clone (concat targetdir txtid)  txturl)
-    ;; [2014-06-03T16:07:55+0900] activate this as soon as the wiki on gl.kanripo is ready
-    (mandoku-clone (concat targetdir txtid ".wiki")  wikiurl)
 ;    (kill-buffer buf)
 ;    (find-file (concat targetdir txtid "/" fn "." ext)))
 ))
