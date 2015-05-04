@@ -705,7 +705,7 @@ One character is either a character or one entity expression"
 	    (set-buffer result-buffer)
 	    (unless (mandoku-apply-filter txtid)
 	    (setq mandoku-filtered-count (+ mandoku-filtered-count 1))
-	    (insert "** [[mandoku:krp:" 
+	    (insert "** [[mandoku:" 
 		    txtf
 		    ":"
 		    page
@@ -731,7 +731,7 @@ One character is either a character or one entity expression"
 		    "》]]\n"
 		    )
 ;; additional properties
-	    (insert ":PROPERTIES:\n:COLL: krp"
+	    (insert ":PROPERTIES:"
 		    "\n:ID: " txtid
 		    "\n:PAGE: " txtid ":" page
 		    "\n:PRE: "  (concat (nreverse (string-to-list pre)))
@@ -1180,10 +1180,6 @@ eds
 	  (message pb)
 	  (search-forward (concat "<pb:" pb))))
 
-(defun mandoku-get-coll (filename)
-"find the collection of the file"
-(car (cdr (cdr (cdr (cdr (cdr (split-string filename "/")))))))
-)
 
 (defun mandoku-cit-format (location)
 ;; FIXME imlement citation formats for mandoku
@@ -1191,9 +1187,9 @@ eds
 )
 
 
-(defun mandoku-textid-to-filename (coll textid page)
-"given a textid, a collection id and a page, return the file that contains this page"
-(funcall (intern (concat "mandoku-" coll "-textid-to-file")) textid page))
+;; (defun mandoku-textid-to-filename (coll textid page)
+;; "given a textid, a collection id and a page, return the file that contains this page"
+;; (funcall (intern (concat "mandoku-" coll "-textid-to-file")) textid page))
 
 
 

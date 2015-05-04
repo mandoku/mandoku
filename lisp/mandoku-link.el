@@ -15,21 +15,19 @@
 LINK will consist of a <textid> recognized by mandoku."
   ;; need to get the file name and then call mandoku-execute-file-search
   (let* ((coll (car (split-string link ":")))
-	 (textid (car (cdr (split-string link ":"))))
+	 (textid (if (equal coll "meta")
+		     (car (cdr (split-string link ":")))
+		   (car (split-string link ":"))))
 	 (page (concat (if textid 
-			   (replace-in-string (car (cdr (cdr (split-string link ":")))) "_" ":" )
+			   (replace-in-string (car  (cdr (split-string link ":"))) "_" ":" )
 			 "")))
 	 (src (car (cdr (split-string link "::"))))
 	 (fname (concat (if (> (length textid ) 0 )
 			    (concat textid ".txt")
 			  coll)))
-	 (filename (concat  "/" 
-			    (if (equal coll "krp")
-				(concat (substring textid 0 4) "/" (substring textid 0 8) "/" fname)
-			      (if (> (length textid ) 0 )
-				  (funcall (intern (concat "mandoku-" coll "-textid-to-file")) textid page)
-				(concat (substring coll 0 4) "/" (substring coll 0 8) "/" coll)))
-		   )))
+	 (filename  (if (equal coll "meta")
+			(mandoku-meta-textid-to-file textid)
+		      (concat "/"  (substring textid 0 4) "/" (substring textid 0 8) "/" fname))))
 ;    (message (format "%s" page))
     (if (equal coll "meta")
 	  ;; this does a headline only search in meta; we need to have the ID on the headline for this to work
