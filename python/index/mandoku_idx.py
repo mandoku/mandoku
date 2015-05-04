@@ -68,6 +68,7 @@ def MandokuIndex(file, idlog='logfile.log', left=2, right=2, length=3, collectio
         lx = re.sub(u'〔[一二三四五六七八九０]+〕', '', lx)
         lx = re.sub(u'<md[^>]+>', '', lx)
         lx = re.sub(u'<pb[^>]+>', '', lx)
+        lx = re.sub(u'@[a-z]+[0-9]?', '', lx)
         for a in ch_re.split(lx[:-1]):
             if len(a) > 0:
                 if a == u'¶':
@@ -98,7 +99,11 @@ def MandokuIndex(file, idlog='logfile.log', left=2, right=2, length=3, collectio
                             else:
                                 notes.append((a, "%s:%s:%d:%d:%d"%(defs['txtfile'], defs['page'], defs['line'], defs['char'], defs['para']), pcnt))
                         else:
-                            chars.append((a, "%s:%s:%d:%d:%d"%(defs['txtfile'], defs['page'], defs['line'], defs['char'], defs['para']), pcnt))
+                            try:
+                                chars.append((a, "%s:%s:%d:%d:%d"%(defs['txtfile'], defs['page'], defs['line'], defs['char'], defs['para']), pcnt))
+                            except:
+                                print "error!", defs, lx
+                                return
         ## need to disentangle the text now, extract notes into a separate stack if there are some
         ## notes start by '(', end by ')' and have a possible linebreak '/' within.
         ## we will collect the notes until we reach a note-end and then spitting them out
@@ -139,6 +144,7 @@ def MandokuIndex(file, idlog='logfile.log', left=2, right=2, length=3, collectio
         #         idlog.write("%(id)s\t%(file)s\t%(ed)s\t%(page)s\t"%(defs))
 
         defs['line']=0
+        
     idlog = codecs.open(idlog, 'a', 'utf-8')
     # lets see if we can open the file
     try:
@@ -260,6 +266,8 @@ def mdIndexGit(txtdir, repo, branches, left, right, length):
     alls=[]
     repo.git.checkout(branches['master'])
     for f in os.listdir(txtdir):
+        if debug:
+            print f
         if f.endswith('txt'):
             #extra 
             varx = []
@@ -303,6 +311,8 @@ def mdIndexGit(txtdir, repo, branches, left, right, length):
             alls.append(s)
 #                print "varx: ", " - ".join(varx)
     repo.git.checkout(branches['master'])
+    if debug:
+        print len(alls)
     return alls
     
 
@@ -423,6 +433,7 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7):
 
     
 if __name__ == '__main__':
+    debug=True
     try:
         idxdir=sys.argv[3]
     except:
