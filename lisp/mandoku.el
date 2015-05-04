@@ -681,16 +681,17 @@ One character is either a character or one entity expression"
 	       ;; the following are optional:
 	       ;; match-string 6: dummy
 	       ;; match-string 7: addinfo
-	       (concat "^\\([^,]*\\),\\([^\t]*\\)\t" filter  "\\([^\t \n]*\\)\\(\t[^\n\t ]*\\)?$")
+	       (concat "^\\([^,]*\\),\\([^\t]*\\)\t" filter  "\\([^\t \n]*\\)\t\\([^\n\t]*\\)$")
 	) nil t )
 	(let* (
 	       ;;if no subcoll, need to switch the match assignments.
 	      (pre (match-string 2))
 	      (post (match-string 1))
+	      (extra (match-string 4))
 	      (location (split-string (match-string 3) ":" ))
-	      (extra (match-string 8))
 	      )
-	  (let* ((txtid (concat filter  (car location)))
+	  (let* ((txtf (concat filter  (car location)))
+		 (txtid (concat filter (car (split-string (car location) "_"))))
 		 (line (car (cdr (cdr location))))
 		 (pag (car (cdr location)) ) 
 		 (page (if (string-match "[-_]"  pag)
@@ -705,7 +706,7 @@ One character is either a character or one entity expression"
 	    (unless (mandoku-apply-filter txtid)
 	    (setq mandoku-filtered-count (+ mandoku-filtered-count 1))
 	    (insert "** [[mandoku:krp:" 
-		    txtid
+		    txtf
 		    ":"
 		    page
 		    "::"
@@ -715,8 +716,8 @@ One character is either a character or one entity expression"
 ;		    " "
 		    (if vol
 			(concat vol ", ")
-		      (concat (number-to-string (string-to-number (cadr (split-string (car location) "_")))) "-"))
-		    page
+		      (concat (number-to-string (string-to-number (cadr (split-string (car location) "_")))) ","))
+		    (replace-regexp-in-string "^0+" "" page)
 		    "]]"
 		    "\t"
 		    (replace-regexp-in-string "[\t\s\n+]" "" pre)
@@ -736,7 +737,7 @@ One character is either a character or one entity expression"
 		    "\n:PRE: "  (concat (nreverse (string-to-list pre)))
 		    "\n:POST: "
 		    search-char
-		    post
+		    (replace-regexp-in-string "[\t\s\n+]" "" post)
 		    "\n:END:\n"
 		    ))
 	    (set-buffer index-buffer)
