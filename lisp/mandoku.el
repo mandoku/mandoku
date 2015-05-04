@@ -690,7 +690,7 @@ One character is either a character or one entity expression"
 	      (location (split-string (match-string 3) ":" ))
 	      (extra (match-string 8))
 	      )
-	  (let* ((txtid (concat filter (car (split-string (car location) "_"))))
+	  (let* ((txtid (concat filter  (car location)))
 		 (line (car (cdr (cdr location))))
 		 (pag (car (cdr location)) ) 
 		 (page (if (string-match "[-_]"  pag)
@@ -715,7 +715,7 @@ One character is either a character or one entity expression"
 ;		    " "
 		    (if vol
 			(concat vol ", ")
-		      "")
+		      (concat (number-to-string (string-to-number (cadr (split-string (car location) "_")))) "-"))
 		    page
 		    "]]"
 		    "\t"

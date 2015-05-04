@@ -21,7 +21,7 @@ LINK will consist of a <textid> recognized by mandoku."
 			 "")))
 	 (src (car (cdr (split-string link "::"))))
 	 (fname (concat (if (> (length textid ) 0 )
-			    (concat textid "_" (car (split-string page "-")) ".txt")
+			    (concat textid ".txt")
 			  coll)))
 	 (filename (concat  "/" 
 			    (if (equal coll "krp")
