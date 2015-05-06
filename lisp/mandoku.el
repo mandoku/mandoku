@@ -681,7 +681,7 @@ One character is either a character or one entity expression"
 	       ;; the following are optional:
 	       ;; match-string 6: dummy
 	       ;; match-string 7: addinfo
-	       (concat "^\\([^,]*\\),\\([^\t]*\\)\t" filter  "\\([^\t \n]*\\)\t\\([^\n\t]*\\)$")
+	       (concat "^\\([^,]*\\),\\([^\t]*\\)\t" filter  "\\([^\t \n]*\\)\t?\\([^\n\t]*\\)?$")
 	) nil t )
 	(let* (
 	       ;;if no subcoll, need to switch the match assignments.
@@ -716,7 +716,8 @@ One character is either a character or one entity expression"
 ;		    " "
 		    (if vol
 			(concat vol ", ")
-		      (concat (number-to-string (string-to-number (cadr (split-string (car location) "_")))) ","))
+		      (or (ignore-errors (concat (number-to-string (string-to-number (cadr (split-string (car location) "_")))) ","))
+			  ""))
 		    (replace-regexp-in-string "^0+" "" page)
 		    "]]"
 		    "\t"

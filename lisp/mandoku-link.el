@@ -23,7 +23,11 @@ LINK will consist of a <textid> recognized by mandoku."
 			 "")))
 	 (src (car (cdr (split-string link "::"))))
 	 (fname (concat (if (> (length textid ) 0 )
-			    (concat textid ".txt")
+			    (concat textid
+				    (if (string-match "-" page)
+					(concat "_" (car (split-string page "-")))
+				      "")
+				    ".txt")
 			  coll)))
 	 (filename  (if (equal coll "meta")
 			(mandoku-meta-textid-to-file textid)
