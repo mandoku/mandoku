@@ -1227,7 +1227,9 @@ class MandokuComp(object):
                             inp += a[t1.mpos].replace('\n', '').replace('<pb:', '<md:')
                     t2.seq[j1-1] = t2.seq[j1-1][:t2.mpos] + (inp + t2.seq[j1-1][t2.mpos], ) + t2.seq[i+dx][t2.mpos+1:]
                     #print "x", j1-1, tag, "".join(t2.seq[j1-1]), "/", "$".join(["#".join(a) for  a in t1.seq[i:i2]])
-            
+        for lz in range(0, len(t2.seq)):
+            if t2.seq[lz][t2.mpos].find('<md') > 0:
+                t2.mdcnt += 1
     def mergepunc(self, i=0):
         """update text1 with punctuation from text2"""
         t1 = self.maintext
