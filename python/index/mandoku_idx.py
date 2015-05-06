@@ -102,8 +102,8 @@ def MandokuIndex(file, idlog='logfile.log', left=2, right=2, length=3, collectio
                             try:
                                 chars.append((a, "%s:%s:%d:%d:%d"%(defs['txtfile'], defs['page'], defs['line'], defs['char'], defs['para']), pcnt))
                             except:
-                                print "error!", defs, lx
-                                return
+                                print "error:", defs
+                                sys.exit()
         ## need to disentangle the text now, extract notes into a separate stack if there are some
         ## notes start by '(', end by ')' and have a possible linebreak '/' within.
         ## we will collect the notes until we reach a note-end and then spitting them out
