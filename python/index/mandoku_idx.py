@@ -389,7 +389,7 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7):
                 for i in ixx:
                     if debug:
                         debfile.write("%s\n" % ( i))
-                    PrintToIdxfile(idxdir, i, coll)
+                    PrintToIdxfile(idxdir, i, txtid[0:8])
             if debug:
                 print "writing index %d keys." % (len(idx))
             for of in idx.keys():
