@@ -4,17 +4,21 @@
 
 * Installing the preview version of Mandoku
 
-  As of January 2014, a second preview version of =Mandoku= is
-  available, replacing the one of September 2013.  This implements a
-  not yet complete new version of =Mandoku=.  This preview version can
-  be installed by either downloading a package for Mac or for Windows,
-  or by downloading the Mandoku library and manually installing it.
-  The latter is only recommended for experienced Emacs users and does
-  not work (well?) on Windows.
+  As of December 2013, a new preview version of =Mandoku= is
+  available.  This now is much more complete than the previous
+  versions (but there still remains a lot to be done:-).  Much work
+  has been invested in making the installation procedure more smooth,
+  so as to enable more people to use it.  
+
+  Again there are different installers, for Windows and Macintosh
+  operating systems which can be downloaded from the links provided
+  below.
+
 
   Requirements:
-  - On all platforms, =git= is required for the installation process
-    and software updates.
+  - On all platforms, =git= and =python= are required for the
+    installation process and software updates, to run the program of
+    course Emacs is also needed.
   - A working network connection
   - About 400 MB of free space on the system harddisk
 

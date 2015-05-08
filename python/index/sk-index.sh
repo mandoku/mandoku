@@ -4,13 +4,13 @@ idxdir=/tmp/index
 mkdir -p $idxdir
 coll=krp
 #src=/Users/chris/krp/text
-src=/tmp/text
+src=/Users/chris/00scratch/KR
 cd $src
-for subcoll in ZB*
+for subcoll in KR*
 do
     cd $subcoll
     rm index.log
-    for file in */*.txt
+    for file in KR*
     do
 	echo $file $subcoll.$coll
 	python $mandokudir/mandoku_idx.py $file $subcoll $idxdir
