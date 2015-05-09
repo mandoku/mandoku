@@ -100,7 +100,7 @@
 ;;;###autoload
 (defvar mandoku-catalogs-alist nil)
 (defvar mandoku-catalog-path-list nil)
-(defvar mandoku-git-use-http nil)
+(defvar mandoku-git-use-http t)
 
 (defvar mandoku-initialized-p nil)
 
@@ -687,10 +687,11 @@ One character is either a character or one entity expression"
 	       ;;if no subcoll, need to switch the match assignments.
 	      (pre (match-string 2))
 	      (post (match-string 1))
+	      (extra (match-string 4))
 	      (location (split-string (match-string 3) ":" ))
-	      (extra (match-string 8))
 	      )
-	  (let* ((txtid (concat filter (car (split-string (car location) "_"))))
+	  (let* ((txtf (concat filter  (car location)))
+		 (txtid (concat filter (car (split-string (car location) "_"))))
 		 (line (car (cdr (cdr location))))
 		 (pag (car (cdr location)) ) 
 		 (page (if (string-match "[-_]"  pag)
@@ -704,8 +705,8 @@ One character is either a character or one entity expression"
 	    (set-buffer result-buffer)
 	    (unless (mandoku-apply-filter txtid)
 	    (setq mandoku-filtered-count (+ mandoku-filtered-count 1))
-	    (insert "** [[mandoku:krp:" 
-		    txtid
+	    (insert "** [[mandoku:" 
+		    txtf
 		    ":"
 		    page
 		    "::"
@@ -731,13 +732,13 @@ One character is either a character or one entity expression"
 		    "》]]\n"
 		    )
 ;; additional properties
-	    (insert ":PROPERTIES:\n:COLL: krp"
+	    (insert ":PROPERTIES:"
 		    "\n:ID: " txtid
 		    "\n:PAGE: " txtid ":" page
 		    "\n:PRE: "  (concat (nreverse (string-to-list pre)))
 		    "\n:POST: "
 		    search-char
-		    post
+		    (replace-regexp-in-string "[\t\s\n+]" "" post)
 		    "\n:END:\n"
 		    ))
 	    (set-buffer index-buffer)
@@ -1180,10 +1181,6 @@ eds
 	  (message pb)
 	  (search-forward (concat "<pb:" pb))))
 
-(defun mandoku-get-coll (filename)
-"find the collection of the file"
-(car (cdr (cdr (cdr (cdr (cdr (split-string filename "/")))))))
-)
 
 (defun mandoku-cit-format (location)
 ;; FIXME imlement citation formats for mandoku
@@ -1191,9 +1188,9 @@ eds
 )
 
 
-(defun mandoku-textid-to-filename (coll textid page)
-"given a textid, a collection id and a page, return the file that contains this page"
-(funcall (intern (concat "mandoku-" coll "-textid-to-file")) textid page))
+;; (defun mandoku-textid-to-filename (coll textid page)
+;; "given a textid, a collection id and a page, return the file that contains this page"
+;; (funcall (intern (concat "mandoku-" coll "-textid-to-file")) textid page))
 
 
 
@@ -1809,15 +1806,14 @@ We should check if the file exists before cloning!"
 	 (repid (car (split-string txtid "\\([0-9]\\)")))
 	 (groupid (substring txtid 0 (+ (length repid) 2)))
 	 (clone-url (if mandoku-git-use-http
-			(concat "http://" (mandoku-get-user) ":" (mandoku-get-password) "@" mandoku-user-server "/")
+			(concat "https://" mandoku-user-server "/")
+			;(concat "http://" (mandoku-get-user) ":" (mandoku-get-password) "@" mandoku-user-server "/")
 		      (concat "git@" mandoku-user-server ":")))
-	 (txturl (concat clone-url groupid "/" txtid ".git"))
-	 (wikiurl (concat clone-url groupid "/" txtid ".wiki.git"))
+	 ;; org is hardcoded here...
+	 (txturl (concat clone-url "kanripo/" txtid ".git"))
 	 (targetdir (concat mandoku-text-dir groupid "/")))
     (mkdir targetdir t)
     (mandoku-clone (concat targetdir txtid)  txturl)
-    ;; [2014-06-03T16:07:55+0900] activate this as soon as the wiki on gl.kanripo is ready
-    (mandoku-clone (concat targetdir txtid ".wiki")  wikiurl)
 ;    (kill-buffer buf)
 ;    (find-file (concat targetdir txtid "/" fn "." ext)))
 ))
