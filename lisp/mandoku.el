@@ -50,7 +50,7 @@
 ;;;###autoload
 (defconst mandoku-lisp-dir (file-name-directory (or load-file-name (buffer-file-name)))
   "directory of mandoku lisp code")
-(defvar mandoku-subdirs (list "text" "images" "meta" "temp" "system" "work"))
+(defvar mandoku-subdirs (list "text" "images" "meta" "temp" "temp/imglist" "system" "work"))
 ;; it probably does not much sense to do this here, but anyway, this is the idea...
 (defvar mandoku-text-dir (expand-file-name (concat mandoku-base-dir "text/")))
 (defvar mandoku-image-dir nil)
@@ -1067,18 +1067,27 @@ the character at point, ignoring non-Kanji characters"
 	(kill-buffer)
 	(find-file-other-window (concat mandoku-image-dir path))
 )))
-
+(defun mandoku-get-imglist (f)
+  (let ((imglist (format "https://raw.githubusercontent.com/kanripo/%s/_data/imglist/%s.txt" (car (split-string f "_")) f))
+	(ifile (format "%simglist/%s.txt" mandoku-temp-dir f)))
+    (unless (file-exists-p ifile)
+      (with-current-buffer (find-file-noselect ifile)
+	(url-insert-file-contents imglist)
+	(save-buffer)))
+      ifile))
 
 (defun mandoku-open-image-at-page (arg &optional il)
   "this will first look for a function for this edition, then browse the image index"
   (interactive "P")
   (let* ((f  (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))
 	 (rep (car (split-string f "[0-9]")))
-	 (imglist (or il (concat (substring (file-name-directory (buffer-file-name)) 0 -1) ".wiki/imglist/" f ".txt")))
+	 ;https://raw.githubusercontent.com/kanripo/KR5a0001/_data/imglist/KR5a0001_002.txt
+	 ;; hardcoded --
+	 (imglist (or il (mandoku-get-imglist f)))
 	 (p (mandoku-position-at-point-internal (point) ))
 	 ;; if function exists, use that, otherwise look for image in imglist, if not available: nil
 	 (path  (if (file-exists-p imglist)
-		    (mandoku-get-image-path-from-index p)
+		    (mandoku-get-image-path-from-index p imglist)
 		  (ignore-errors  
 		    (funcall (intern (concat "mandoku-" (downcase (nth 1 p))  "-page-to-image")) p )))))
     (if path
@@ -1105,13 +1114,12 @@ the character at point, ignoring non-Kanji characters"
 eds
 ))
 
-(defun mandoku-get-image-path-from-index (loc &optional ed)
+(defun mandoku-get-image-path-from-index (loc il &optional ed)
   "Read the image index for this file if necessary and return a path to the requested image"
   (let* ((f  (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))
 	 (lastpg "99")
 	 (pg (nth 2 loc))
 	 (line (nth 3 loc))
-	 (il (concat (substring (file-name-directory (buffer-file-name)) 0 -1) ".wiki/imglist/" f ".txt"))
 	 (fn (nth (- (length (split-string il "/")) 1) (split-string il "/")))
 	 (eds (mandoku-get-editions-from-index il))
 	 ;; no need to ask if there is only one edition
