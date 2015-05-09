@@ -1806,6 +1806,8 @@ We should check if the file exists before cloning!"
 	 (ext (file-name-extension (file-name-nondirectory (buffer-file-name ))))
 ;	 (txtid (downcase (car (split-string  fn "_" ))))
 	 (tmpid (car (split-string  fn "_" )))
+	 (mandoku-gh-user "kanripo")
+	 (mandoku-user-server "github.com")
 	 (txtid (if txtid
 		    txtid
 	   (if (string-match "[a-z]"  tmpid (- (length tmpid) 1))
@@ -1815,10 +1817,9 @@ We should check if the file exists before cloning!"
 	 (groupid (substring txtid 0 (+ (length repid) 2)))
 	 (clone-url (if mandoku-git-use-http
 			(concat "https://" mandoku-user-server "/")
-			;(concat "http://" (mandoku-get-user) ":" (mandoku-get-password) "@" mandoku-user-server "/")
 		      (concat "git@" mandoku-user-server ":")))
 	 ;; org is hardcoded here...
-	 (txturl (concat clone-url "kanripo/" txtid ".git"))
+	 (txturl (concat clone-url mandoku-gh-user "/" txtid ".git"))
 	 (targetdir (concat mandoku-text-dir groupid "/")))
     (mkdir targetdir t)
     (mandoku-clone (concat targetdir txtid)  txturl)
