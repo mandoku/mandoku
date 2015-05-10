@@ -9,7 +9,6 @@
 (defvar mandoku-store-link-plist nil
   "Plist with info about the most recent link created with `mandoku-store-link'.")
 
-
 (defun mandoku-link-open (link)
   "Open the text (and optionally go to indicated  position) in LINK.
 LINK will consist of a <textid> recognized by mandoku."
@@ -17,17 +16,19 @@ LINK will consist of a <textid> recognized by mandoku."
   (let* ((coll (car (split-string link ":")))
 	 (textid (if (equal coll "meta")
 		     (car (cdr (split-string link ":")))
-		   (car (split-string link ":"))))
-	 (page (concat (if textid 
-			   (replace-in-string (car  (cdr (split-string link ":"))) "_" ":" )
-			 "")))
+		   (car (split-string link "[.:]"))))
+	 (page (concat (or
+			(ignore-errors (replace-in-string  (car  (cdr (split-string link ":"))) "_" ":" ))
+			"")))
 	 (src (car (cdr (split-string link "::"))))
 	 (fname (concat (if (> (length textid ) 0 )
 			    (concat textid
 				    (if (string-match "-" page)
 					(concat "_" (car (split-string page "-")))
 				      "")
-				    ".txt")
+				    (if (string-match "org" link)
+					".org"
+				    ".txt"))
 			  coll)))
 	 (filename  (if (equal coll "meta")
 			(mandoku-meta-textid-to-file textid)
