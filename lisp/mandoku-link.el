@@ -24,11 +24,13 @@ LINK will consist of a <textid> recognized by mandoku."
 	 (fname (concat (if (> (length textid ) 0 )
 			    (concat textid
 				    (if (string-match "-" page)
-					(concat "_" (car (split-string page "-")))
-				      "")
-				    (if (string-match "org" link)
-					".org"
-				    ".txt"))
+					"_" (car (split-string page "-"))
+					(if (string-match "org" link)
+					    ".org"
+					;(if (string-match "txt" link)
+					   ".txt"
+					;"/Readme.org")
+					  )))
 			  coll)))
 	 (filename  (if (equal coll "meta")
 			(mandoku-meta-textid-to-file textid)
@@ -38,7 +40,8 @@ LINK will consist of a <textid> recognized by mandoku."
 	  ;; this does a headline only search in meta; we need to have the ID on the headline for this to work
 	  (org-open-file filename  t nil (concat "#" textid)) 
 					;      (message (format "%s" (concat mandoku-meta-dir  textid ".org" )))
-      (if (file-exists-p (concat mandoku-text-dir "/" filename))
+      (if (or (file-exists-p (concat mandoku-text-dir filename))
+	      (file-exists-p (concat mandoku-text-dir (replace-in-string filename (concat textid ".txt") "Readme.org" ))))
 	  (org-open-file (concat mandoku-text-dir "/" filename) t nil 
 			 ;;(or src page))
 			  (if src 
