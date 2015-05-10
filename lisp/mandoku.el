@@ -100,6 +100,7 @@
 ;;;###autoload
 (defvar mandoku-catalogs-alist nil)
 (defvar mandoku-catalog-path-list nil)
+(defvar mandoku-catalog-user-path-list nil)
 (defvar mandoku-git-use-http t)
 
 (defvar mandoku-initialized-p nil)
@@ -156,6 +157,8 @@
 	      (path (symbol-value (intern (concat (symbol-name p) "-dir")))))
 	  (add-to-list 'mandoku-repositories-alist url )
 	  (add-to-list 'mandoku-catalog-path-list path))))
+  (dolist (e mandoku-catalog-user-path-list)
+    (add-to-list 'mandoku-catalog-path-list (expand-file-name (concat mandoku-meta-dir e))))
   (dolist (px mandoku-catalog-path-list )
     (dolist (file (directory-files px nil ".*txt$" ))
       (if (not (string-match file mandoku-catalog))
@@ -346,7 +349,22 @@ Click on a link or move the cursor to the link and then press enter
     (mandoku-view-mode)
     ))
   (mandoku-update-catalog-alist)
-  )
+)
+
+(defun mandoku-catalog-no-update-needed-p () 
+  "Check for updates that might be necessary for catalog"
+  (let ((update-needed nil))
+    (mandoku-update-catalog-alist)
+    (with-current-buffer (find-file-noselect mandoku-catalog)
+      (dolist (y mandoku-catalogs-alist)
+	(unless update-needed
+	  (goto-char (point-min))
+	  (unless (search-forward (car y) nil t)
+	    (setq update-needed t)))))
+    (not update-needed)))
+
+		   
+      
 
 (defun mandoku-initialize ()
   (let* ((md 
@@ -357,6 +375,7 @@ Click on a link or move the cursor to the link and then press enter
 	 )
     (if (and
 	 (file-exists-p (expand-file-name "mandoku-catalog.txt" (concat md "/meta")))
+	 (mandoku-catalog-no-update-needed-p) 
 	 (file-exists-p (expand-file-name "mandoku-settings.org" mduser )))
 	(org-babel-load-file (expand-file-name "mandoku-settings.org" mduser ))
       ;; looks like we have to bootstrap the krp directory structure
