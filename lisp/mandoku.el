@@ -79,7 +79,7 @@
 ;;;###autoload
 (defvar mandoku-repositories-alist '(("dummy" . "http://www.example.com")))
 (defvar mandoku-md-menu)
-(defvar mandoku-catalog)
+(defvar mandoku-catalog nil)
 (defvar mandoku-local-index-list nil)
 
 (defvar mandoku-location-plist nil
@@ -353,7 +353,9 @@ Click on a link or move the cursor to the link and then press enter
 
 (defun mandoku-catalog-no-update-needed-p () 
   "Check for updates that might be necessary for catalog"
-  (let ((update-needed nil))
+  (let ((update-needed nil)
+	(mandoku-catalog (or mandoku-catalog
+			   (expand-file-name "mandoku-catalog.txt" (concat mandoku-base-dir "/meta")))))
     (mandoku-update-catalog-alist)
     (with-current-buffer (find-file-noselect mandoku-catalog)
       (dolist (y mandoku-catalogs-alist)
