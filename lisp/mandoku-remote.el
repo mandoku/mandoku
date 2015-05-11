@@ -30,6 +30,10 @@
     (goto-char (point-min))
     (if (looking-at "\n")
 	(delete-char 1))
+    (unless (search-forward "mandoku-view" nil t)
+      (insert "# -*- mode: mandoku-view; -*-\n"))
+    (while (search-forward "[file:" nil t)
+      (replace-match "[mandoku:"))
     (save-buffer)
     (mandoku-view-mode)
     (mandoku-execute-file-search 
