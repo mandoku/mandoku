@@ -24,7 +24,7 @@ LINK will consist of a <textid> recognized by mandoku."
 	 (fname (concat (if (> (length textid ) 0 )
 			    (concat textid
 				    (if (string-match "-" page)
-					"_" (car (split-string page "-"))
+					(concat "_" (car (split-string page "-")) ".txt")
 					(if (string-match "org" link)
 					    ".org"
 					;(if (string-match "txt" link)
