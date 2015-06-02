@@ -72,6 +72,8 @@
 (defvar mandoku-config-cfg (concat mandoku-user-dir "mandoku-settings.cfg"))
 ;; we store the http password for gitlab in memory for one session
 ;; todo: make this a per server setting!
+(defvar mandoku-gh-user "kanripo")
+(defvar mandoku-user-server "github.com")
 (defvar mandoku-user-password nil)
 (defvar mandoku-string-limit 10)
 (defvar mandoku-index-display-limit 2000)
@@ -1089,7 +1091,7 @@ the character at point, ignoring non-Kanji characters"
 	(find-file-other-window (concat mandoku-image-dir path))
 )))
 (defun mandoku-get-imglist (f)
-  (let ((imglist (format "https://raw.githubusercontent.com/kanripo/%s/_data/imglist/%s.txt" (car (split-string f "_")) f))
+  (let ((imglist (format "https://raw.githubusercontent.com/%s/%s/_data/imglist/%s.txt" mandoku-gh-user (car (split-string f "_")) f))
 	(ifile (format "%simglist/%s.txt" mandoku-temp-dir f)))
     (unless (file-exists-p ifile)
       (with-current-buffer (find-file-noselect ifile)
@@ -1889,7 +1891,17 @@ We should check if the file exists before cloning!"
 ;  (message "%s" url)
   ))
 
-(defun mandoku-fork ())
+(defun mandoku-fork (txtid)
+  "Fork a repository to the current user. At the moment, this requires curl"
+  (shell-command-to-string
+   (concat "curl -u "
+	   mandoku-user-token
+	   ":x-oauth-basic -X POST https://api.github.com/repos/"
+	   mandoku-gh-user
+	   "/"
+	   txtid
+	   "/forks"))
+  )
 
 (defun mandoku-url-to-txtid (url)
 ;  (if mandoku-git-use-http
@@ -1960,6 +1972,10 @@ We should check if the file exists before cloning!"
 	(message "%s %s already downloaded!" txtid (mandoku-textid-to-title txtid))
       (with-current-buffer (find-file-noselect mandoku-download-queue)
 	(goto-char (point-max))
+	;; we first clone the text if we have a user token
+	;; this assumes we have internet and can acccess github...
+	(if (< 0 (length mandoku-user-token))
+	    (mandoku-fork txtid))
 	(insert (format "%s %s\n" txtid (mandoku-textid-to-title txtid)))
 	(save-buffer)
 	(kill-buffer)
