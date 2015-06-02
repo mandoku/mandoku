@@ -73,7 +73,7 @@
 ;; we store the http password for gitlab in memory for one session
 ;; todo: make this a per server setting!
 (defvar mandoku-gh-user "kanripo")
-(defvar mandoku-user-server "github.com")
+(defvar mandoku-gh-server "github.com")
 (defvar mandoku-user-password nil)
 (defvar mandoku-string-limit 10)
 (defvar mandoku-index-display-limit 2000)
@@ -1091,6 +1091,7 @@ the character at point, ignoring non-Kanji characters"
 	(find-file-other-window (concat mandoku-image-dir path))
 )))
 (defun mandoku-get-imglist (f)
+  ;; this will always get the imglist from the kanripo repo.  Do we want that???
   (let ((imglist (format "https://raw.githubusercontent.com/%s/%s/_data/imglist/%s.txt" mandoku-gh-user (car (split-string f "_")) f))
 	(ifile (format "%simglist/%s.txt" mandoku-temp-dir f)))
     (unless (file-exists-p ifile)
@@ -1830,7 +1831,7 @@ We should check if the file exists before cloning!"
 ;	 (txtid (downcase (car (split-string  fn "_" ))))
 	 (tmpid (car (split-string  fn "_" )))
 	 (mandoku-gh-user "kanripo")
-	 (mandoku-user-server "github.com")
+	 (mandoku-gh-server "github.com")
 	 (txtid (if txtid
 		    txtid
 	   (if (string-match "[a-z]"  tmpid (- (length tmpid) 1))
@@ -1839,10 +1840,9 @@ We should check if the file exists before cloning!"
 	 (repid (car (split-string txtid "\\([0-9]\\)")))
 	 (groupid (substring txtid 0 (+ (length repid) 2)))
 	 (clone-url (if mandoku-git-use-http
-			(concat "https://" mandoku-user-server "/")
-		      (concat "git@" mandoku-user-server ":")))
-	 ;; org is hardcoded here...
-	 (txturl (concat clone-url mandoku-gh-user "/" txtid ".git"))
+			(concat "https://" mandoku-gh-server "/")
+		      (concat "git@" mandoku-gh-server ":")))
+	 (txturl (concat clone-url (mandoku-get-user) "/" txtid ".git"))
 	 (targetdir (concat mandoku-text-dir groupid "/")))
     (mkdir targetdir t)
     (mandoku-clone (concat targetdir txtid)  txturl)
@@ -1893,14 +1893,23 @@ We should check if the file exists before cloning!"
 
 (defun mandoku-fork (txtid)
   "Fork a repository to the current user. At the moment, this requires curl"
+  (let ((res
   (shell-command-to-string
-   (concat "curl -u "
+   (concat "curl -s -u "
 	   mandoku-user-token
-	   ":x-oauth-basic -X POST https://api.github.com/repos/"
+	   ":x-oauth-basic -X POST https://api."
+	   ;; unlikely this will work for a different server, but hey..
+	   mandoku-gh-server
+	   "/repos/"
+	   ;; this is the gh user of the org, usually kanripo!
 	   mandoku-gh-user
 	   "/"
 	   txtid
-	   "/forks"))
+	   "/forks"))))
+    (if (string-match (concat (mandoku-get-user) "/" txtid) res)
+	(message (concat txtid " has been cloned successfully"))
+    )
+  )
   )
 
 (defun mandoku-url-to-txtid (url)
@@ -2079,7 +2088,7 @@ We should check if the file exists before cloning!"
     (setq mandoku-user-email (car (cdr (assoc "email" lcval ))))
     (setq mandoku-user-account (car (cdr (assoc "account" lcval ))))
     (setq mandoku-user-token (car (cdr (assoc "token" lcval ))))
-    (setq mandoku-user-server (car (cdr (assoc "server" lcval ))))
+    (setq mandoku-gh-server (car (cdr (assoc "server" lcval ))))
     (if (car (cdr (assoc "basedir" lcval )))
 	(progn
 	  (setq mandoku-base-dir  (expand-file-name (car (cdr (assoc "basedir" lcval )))))
@@ -2089,7 +2098,11 @@ We should check if the file exists before cloning!"
 ))
 ;; need to expand this to check the cfg file if user not yet in mandoku-settings.org
 (defun mandoku-get-user ()
-  (or mandoku-user-account))
+  "Get the user.  Only if no user is set do we use the default."
+  (or (if (< 0 (length mandoku-user-account))
+	  mandoku-user-account)
+      mandoku-gh-user))
+
 
 (defun mandoku-get-password ()
   (or mandoku-user-password
