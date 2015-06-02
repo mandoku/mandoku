@@ -33,24 +33,60 @@
    extensions and additional conventions.  For more information, see
    [[mandoku-format.org]].
 
-** This repository
+   
+** Installation
 
-   Cloning this repository will give you a functioning setup for using
-   mandoku with Emacs.
+   Mandoku and related repositories needed are now on melpa, the
+   archive for emacs packages.  The easiest way to get up and running
+   is to get a working Emacs (for OS X, I recommend
+   https://github.com/railwaycat/homebrew-emacsmacport/releases ),
+   start it up, copy and paste the follwing code into the =Emacs=
+   *scratch* buffer, go to the end and press =C-x= =C-e=.
+   
+   For advanced users: The second line sets the base directory for the
+   folder hierarchy used by =Mandoku=. If it does not suit you, change
+   it as needed.
+#+begin_src elisp
+(unless (require 'mandoku nil t)
+(setq mandoku-base-dir "~/krp")
+(require 'cl)
+(load "package")
+;;we need the melpa repository for mandoku
+(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
+(package-initialize)
 
-*** Installation
-    To install this, clone the git repository, change into the mdkit
-    directory, and run this command:
-#+begin_src sh
-emacs -q -l md-init.el
+
+(defvar mandoku-starter-packages
+  (list 
+  'magit 
+	'json
+	'org 'org-plus-contrib
+	'mandoku 'mandoku-meta-kr 'mandoku-meta-zb
+	)
+  "Libraries that should be installed by default.")
+
+(unless (every #'package-installed-p mandoku-starter-packages)
+  (package-refresh-contents)
+  (dolist (package mandoku-starter-packages)
+    (unless (package-installed-p package)
+      (message "installing %s" package)
+      (package-install package))))
+
+
+(require 'mandoku)
+;; (require 'mandoku-link)
+(mandoku-initialize)
+(unless (< 0 (length mandoku-user-account))
+  (find-file (expand-file-name "mandoku-settings.org" mandoku-user-dir ))
+  (search-forward "uservalues"))
+)
 #+end_src
 
-    This will load the emacs on your path, without using whatever you
-    have defined in .emacs.d.
 
     The first time you run this, a lot of packages will be downloaded
-    into the elpa folder. This takes a few minutes. You might have to
-    restart emacs.
+    into the elpa folder. This takes a few minutes. You will then be
+    asked for some additional information and might have to restart
+    emacs.
 
 
 
