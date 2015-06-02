@@ -1091,6 +1091,9 @@ the character at point, ignoring non-Kanji characters"
 	(find-file-other-window (concat mandoku-image-dir path))
 )))
 (defun mandoku-get-imglist (f)
+  ;; stopgap workaround, the ZB files are not supported...
+  (if (equal "ZB" (substring f 0 2))
+      "/tmp/noimg.txt"
   ;; this will always get the imglist from the kanripo repo.  Do we want that???
   (let ((imglist (format "https://raw.githubusercontent.com/%s/%s/_data/imglist/%s.txt" mandoku-gh-user (car (split-string f "_")) f))
 	(ifile (format "%simglist/%s.txt" mandoku-temp-dir f)))
@@ -1098,7 +1101,8 @@ the character at point, ignoring non-Kanji characters"
       (with-current-buffer (find-file-noselect ifile)
 	(url-insert-file-contents imglist)
 	(save-buffer)))
-      ifile))
+    ifile))
+  )
 
 (defun mandoku-open-image-at-page (arg &optional il)
   "this will first look for a function for this edition, then browse the image index"
