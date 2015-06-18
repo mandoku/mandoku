@@ -32,6 +32,7 @@
 	(delete-char 1))
     (unless (search-forward "mandoku-view" nil t)
       (insert "# -*- mode: mandoku-view; -*-\n"))
+    (insert "# Don't edit this file.  If you want to edit, press C-c d to download\n")
     (while (search-forward "[file:" nil t)
       (replace-match "[mandoku:"))
     (save-buffer)

@@ -1563,6 +1563,7 @@ eds
      )
     ;("Versions")
     ("Maintenance"
+     ["Download this text now!" mandoku-get-remote-text (string-match "fatal" (car (mandoku-get-branches)))]
      ["Download texts in DL list" mandoku-download-process-queue t]
      ["Add to download list" mandoku-download-add-text-to-queue t]
      ["Show download list" mandoku-download-show-queue t]
@@ -1572,7 +1573,7 @@ eds
 ;     ["Update mandoku" mandoku-update t]
 ;     ["Update installed texts" mandoku-update-texts nil]
      
-     ["Add repository" mandoku-gitlab-create-project (not (member mandoku-gitlab-remote-name (mandoku-get-remotes)))]
+;     ["Add repository" mandoku-gitlab-create-project (not (member mandoku-gitlab-remote-name (mandoku-get-remotes)))]
      )
 ))     
 
@@ -1964,7 +1965,7 @@ We should check if the file exists before cloning!"
 	      ;; this has to be the local catalog file
 	      (with-current-buffer (find-file-noselect mandoku-local-catalog)
 		(goto-char (point-max))
-		(insert (format "*** %s %s\n" txtid (mandoku-textid-to-title txtid)))
+		(insert (format "*** [[mandoku:%s][%s]] %s\n" txtid txtid (mandoku-textid-to-title txtid)))
 		(save-buffer))
 	      ;; add it to the index queue
 	      (with-current-buffer (find-file-noselect mandoku-index-queue)
