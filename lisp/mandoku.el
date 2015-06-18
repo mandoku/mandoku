@@ -1261,7 +1261,7 @@ eds
   (local-unset-key [menu-bar Org])
   (local-unset-key [menu-bar Tbl])
   (easy-menu-add mandoku-md-menu mandoku-view-mode-map)
-  (mandoku-install-version-files-menu)
+;  (mandoku-install-version-files-menu)
 ;  (view-mode)
 )
 
@@ -1576,7 +1576,7 @@ eds
      )
 ))     
 
-
+;; disabled this [2015-06-18T11:50:07+0900]
 (defun mandoku-install-version-files-menu ()
   (let ((bl (buffer-list)))
     (save-excursion
