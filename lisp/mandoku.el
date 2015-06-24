@@ -1617,7 +1617,7 @@ eds
     )
    ))
 
-;(add-hook 'org-cycle-hook 'mandoku-index-tab-change) 
+(add-hook 'org-cycle-hook 'mandoku-index-tab-change) 
 
 
 
