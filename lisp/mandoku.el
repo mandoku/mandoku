@@ -1294,6 +1294,9 @@ eds
      '(:eval  (mapconcat 'identity (mandoku-get-outline-path) " / "))
      " "
      '(:eval (mandoku-position-at-point-formatted))
+     " BR: "
+     '(:eval (mandoku-get-current-branch))
+     " "
      )
      ))
 
