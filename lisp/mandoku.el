@@ -163,7 +163,9 @@
     (add-to-list 'mandoku-catalog-path-list (expand-file-name (concat mandoku-meta-dir e))))
   (dolist (px mandoku-catalog-path-list )
     (dolist (file (directory-files px nil ".*txt$" ))
-      (if (not (string-match file mandoku-catalog))
+      (if (not (or (string-match file mandoku-catalog)
+	       (string-match file mandoku-local-catalog)
+	       ))
 	  (add-to-list 'mandoku-catalogs-alist 
 		       (cons (file-name-sans-extension file) (concat px "/" file))))))
 )
@@ -1072,24 +1074,25 @@ the character at point, ignoring non-Kanji characters"
 	(find-file-other-window (concat mandoku-image-dir path))
     ;; need to retrieve the file and store it there to open it
       (let* ((rep-url (car (cdr (assoc rep mandoku-repositories-alist ))))
-	     (buffer (concat mandoku-image-dir path)))
-	(with-current-buffer (get-buffer-create buffer)
-;	  (url-insert-file-contents "http://www.google.co.jp/intl/en_com/images/srpr/logo1w.png"))
-;	  (url-insert-file-contents (concat "http://127.0.0.1:5000/getimage?filename=" path )))
-	  (url-insert-file-contents (concat rep-url "/getimage?filename=" path )))
-	(switch-to-buffer buffer)
-	(setq buffer-file-name buffer)
-;	(setq buffer-file-name (car  (last (split-string path "/"))))
+	     (buffer (concat mandoku-image-dir path))
+	     (imgbuffer (url-retrieve-synchronously (concat rep-url "/getimage?filename=" path ))))
 	(unless (file-directory-p (file-name-directory buffer))
 	  (make-directory (file-name-directory buffer) t))
-	(goto-char (point-min))
-	(if (looking-at "\n")
-	    (delete-char 1))
-	(setq buffer-file-coding-system 'raw-text)
-	(save-buffer)
-	(kill-buffer)
+	(with-current-buffer (get-buffer-create buffer)
+	  (setq buffer-file-name buffer)
+	  (unwind-protect
+	      (let ((data (with-current-buffer imgbuffer
+			    (goto-char (point-min))
+			    (search-forward "\n\n")
+			    (buffer-substring (point) (point-max)))))
+					;(insert-image (create-image data nil t))
+		(insert data)
+		(save-buffer))
+	    (kill-buffer imgbuffer))
+	  (kill-buffer)))
 	(find-file-other-window (concat mandoku-image-dir path))
-)))
+	))
+
 (defun mandoku-get-imglist (f)
   ;; stopgap workaround, the ZB files are not supported...
   (if (equal "ZB" (substring f 0 2))
@@ -1256,12 +1259,13 @@ eds
   (mandoku-add-comment-face-markers)
   (mandoku-hide-p-markers)
   (add-to-invisibility-spec 'mandoku)
-;  (easy-menu-remove-item org-mode-map (list "Org") org-org-menu)
-;  (easy-menu-remove org-tbl-menu)
   (local-unset-key [menu-bar Org])
   (local-unset-key [menu-bar Tbl])
   (easy-menu-add mandoku-md-menu mandoku-view-mode-map)
-  (mandoku-install-version-files-menu)
+  ;;;; this affects all windows in the frame, do not want this..
+  ;; (if (string-match "/temp/" (buffer-file-name) )
+  ;;     (set-background-color "honeydew"))
+;  (mandoku-install-version-files-menu)
 ;  (view-mode)
 )
 
@@ -1563,6 +1567,7 @@ eds
      )
     ;("Versions")
     ("Maintenance"
+     ["Download this text now!" mandoku-get-remote-text (string-match "fatal" (car (mandoku-get-branches)))]
      ["Download texts in DL list" mandoku-download-process-queue t]
      ["Add to download list" mandoku-download-add-text-to-queue t]
      ["Show download list" mandoku-download-show-queue t]
@@ -1572,11 +1577,11 @@ eds
 ;     ["Update mandoku" mandoku-update t]
 ;     ["Update installed texts" mandoku-update-texts nil]
      
-     ["Add repository" mandoku-gitlab-create-project (not (member mandoku-gitlab-remote-name (mandoku-get-remotes)))]
+;     ["Add repository" mandoku-gitlab-create-project (not (member mandoku-gitlab-remote-name (mandoku-get-remotes)))]
      )
 ))     
 
-
+;; disabled this [2015-06-18T11:50:07+0900]
 (defun mandoku-install-version-files-menu ()
   (let ((bl (buffer-list)))
     (save-excursion
@@ -1612,7 +1617,7 @@ eds
     )
    ))
 
-;(add-hook 'org-cycle-hook 'mandoku-index-tab-change) 
+(add-hook 'org-cycle-hook 'mandoku-index-tab-change) 
 
 
 
@@ -1964,7 +1969,7 @@ We should check if the file exists before cloning!"
 	      ;; this has to be the local catalog file
 	      (with-current-buffer (find-file-noselect mandoku-local-catalog)
 		(goto-char (point-max))
-		(insert (format "*** %s %s\n" txtid (mandoku-textid-to-title txtid)))
+		(insert (format "*** [[mandoku:%s][%s]] %s\n" txtid txtid (mandoku-textid-to-title txtid)))
 		(save-buffer))
 	      ;; add it to the index queue
 	      (with-current-buffer (find-file-noselect mandoku-index-queue)
