@@ -378,7 +378,14 @@ function with access to a database."""
     def setbaseedition(self, be):
         self.baseedition = be
 
-                
+    def charstat(self):
+        self.charcnt = collections.defaultdict(int)
+        for cx in self.seq:
+            c=cx[self.cpos]
+            if c== u"　" or len(c) < 1:
+                continue
+            self.charcnt[c] += 1
+    
     def parse(self, infile):
         ##we add an empty seq at the beginning of each file
         zhu_buf = ""
@@ -826,7 +833,7 @@ function with access to a database."""
             except:
                 end = len(self.seq)
             sseq[fi] = (si, [a[self.cpos].replace(u'\u3000', '') for a in self.seq[start:end]])
-        for b in repo.heads:
+        for b in [a for a in repo.heads if a.name == a.name.upper()]:
             if b.name != self.version:
                 print b.name
                 b.checkout()
