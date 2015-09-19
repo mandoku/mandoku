@@ -336,10 +336,12 @@ function with access to a database."""
     def add_metadata(self, per_section=False):
         l=0
         page="first"
+        self.secstart={}
         self.lines[page] = []
         for i in range(1, len(self.sections)+1):
             s, f = self.sections[i-1]
             fx = f[0:f.find('.')]
+            self.secstart[fx] = s
             if per_section:
                 self.pps[fx] = SparseDict()
             try:
@@ -356,10 +358,11 @@ function with access to a database."""
                 if m:
                     page = m.groups()[0]
                     if per_section:
-                        self.pps[fx][j - s] = page
+                        #the pb is attached to the last character on the previous page...
+                        self.pps[fx][j - s +1] = page
                     else:
-                        self.pages[j] = page
-                    self.lines[page] = []
+                        self.pages[j+1] = page
+                    self.lines[page] = [j+1]
 
     def getpl(self, pos, fx=False):
         "if fx (a section name) is passed, pos is relative, otherwise absolute."
@@ -369,10 +372,21 @@ function with access to a database."""
             pg = self.pps[fx][pos]
         else:
             pg = self.pages[pos]
-        for i in range(1, len(self.lines[pg])+1):
-            l=self.lines[pg][i-1]
-            if l > pos:
-                return "%s%d" % (pg[1:-1].split('_')[-1], i)
+        if pg:
+            for i in range(1, len(self.lines[pg])+1):
+                l=self.lines[pg][i-1] - self.secstart[fx]
+                if l > pos:
+                    try:
+                        ld = self.lines[pg][max(0,i-2)] - self.secstart[fx]
+                        #if ld > pos + 2:
+                        #    ld = 0
+                    except:
+                        ld = 0
+                    try:
+                        db=self.lines[pg][i-2] - self.secstart[fx]
+                    except:
+                        db=0
+                    return "%s%d,%d,%d,l:%d" % (pg[1:-1].split('_')[-1], i-1, pos - ld + 1, db, l)
         return None
 
     def setbaseedition(self, be):
@@ -614,7 +628,7 @@ function with access to a database."""
         if extra:
             print sx, sec, pos, extra
         else:
-            print sx, sec, pos
+            print "".join(sx), sec, pos, self.getpl(pos, sec )
 
     def addNgram(self, action='add', n=3):
         ##currently no other action is implemented
@@ -637,7 +651,7 @@ function with access to a database."""
                 try:
                     #the note-marker is on the character preceding the start of
                     #the note!
-                    check="".join(self.seq[j+1][self[self.mpos:]])
+                    check="".join(self.seq[j+1][self.mpos:])
                 except:
                     check=''
                 if '(' in check:
@@ -647,7 +661,7 @@ function with access to a database."""
                     while not found and noteend <= cnt:
                         noteend += 1
                         try:
-                            check2 = "".join(self.seq[j+1][self[self.mpos:]])
+                            check2 = "".join(self.seq[j+1][self.mpos:])
                         except:
                             check2 = ''
                         found = ')' in check2
@@ -665,7 +679,8 @@ function with access to a database."""
                         if not val == u'\u3000':
                             outseq.append(val)
                         dxn += 1
-                    self.printNgram(outseq, fx, j - s)
+                    if not self.seq[j][self.cpos] == u'\u3000':
+                        self.printNgram(outseq, fx, j - s)
                 elif notestart+1 > j:
                     dxn = j
                     ## we need to first build the sequence before the note, then the part after the note
@@ -685,12 +700,13 @@ function with access to a database."""
                         if not val == u'\u3000':
                             outseq.append(val)
                         dxn += 1
-                    self.printNgram(outseq, fx, j - s)
+                    if not self.seq[j][self.cpos] == u'\u3000':
+                        self.printNgram(outseq, fx, j - s)
                 elif notestart < j and j < noteend+1:
                     e = min(j+n, noteend+1)
                     dxn = j
 #                    print dxn, self.seq[dxn]
-                    while len(outseq)  < n or dxn >= e:
+                    while len(outseq)  < n or dxn <= e:
                         try:
                             val = self.seq[dxn][self.cpos]
                         except IndexError:
@@ -698,7 +714,10 @@ function with access to a database."""
                         if not val == u'\u3000':
                             outseq.append(val)
                         dxn += 1
-                    self.printNgram(outseq, fx, j - s)
+                        print val, dxn, notestart, n, len(outseq), e
+
+                    if not self.seq[j][self.cpos] == u'\u3000':
+                        self.printNgram(outseq, fx, j - s)
                 else:
                     dxn = j
                     while len(outseq) < n or n >= cnt:
@@ -709,7 +728,8 @@ function with access to a database."""
                         if not val == u'\u3000':
                             outseq.append(val)
                         dxn += 1
-                    self.printNgram(outseq, fx, j - s)
+                    if not self.seq[j][self.cpos] == u'\u3000':
+                        self.printNgram(outseq, fx, j - s)
 
     def _processopcodes(self, s, t2, s1start, s2start, res, bname, add_var_punctuation):
                 d=0
