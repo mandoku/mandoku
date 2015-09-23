@@ -798,6 +798,38 @@ function with access to a database."""
                 max=tmp
                 ret=i
         return buckets[ret][0][0]
+
+    def recheck_newsections(self):
+        """Looks at the md values to determine better borders for the sections and updates the sections list.
+        Potentially dangerous!"""
+        df = collections.defaultdict(list)
+        if self.mdcnt > 0:
+            for i, c in enumerate (self.seq):
+                t1 = "".join(c[self.mpos:])
+                if "<md" in t1:
+                    l=re.split("(<..[^>]+>)", t1)
+                    [df[a[1:-1].split("_")[-1].split("-")[0]].append((a[1:-1].split("_")[-1], i)) for a in l if "<md" in a]
+            if self.cpos == 0:
+                self.punc_reorder()
+            self.newsections = []
+            for i, s in self.sections:
+                k=s.split("_")[1].split(".")[0]
+                if df.has_key(k):
+                    l = df[k]
+                    l=sorted(l, key=lambda x : x[1])
+                    newi=l[0][1]
+                    if newi != i:
+                        self.newsections.append((newi+1, s))
+                    else:
+                        self.newsections.append((newi, s))
+                    #move mdmark to the following char, since it belongs to the beginning
+                    if newi != i:
+                        self.seq[newi+1] = (self.seq[newi][self.mpos] + self.seq[newi+1][0], ) + self.seq[newi+1][self.cpos:]
+                        self.seq[newi] = self.seq[newi][:-1] + ('',)
+            if len(self.newsections) == len(self.sections):
+                self.sections = self.newsections
+            else:
+                print "Recheck failed. Section lengths do not match."
     
     def getneworder(self, othertext, enc="utf-8"):
         """Othertext is a MandokuText object, already parsed"""
@@ -1049,6 +1081,8 @@ class MandokuComp(object):
                 text2.newsections=text2.sections
                 return
         text2.newsections= sorted(text2.newsections, key=lambda x: x[1][0])
+        if text2.mdcnt > 0:
+            text2.recheck_newsections()
         ##now we copy over the in the new order text 
         newseq = [('', '')]
         ##this holds files that do not participate in the text (those with -1 as start position)
