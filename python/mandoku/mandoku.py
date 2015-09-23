@@ -824,13 +824,19 @@ function with access to a database."""
                         self.newsections.append((newi, s))
                     #move mdmark to the following char, since it belongs to the beginning
                     if newi != i:
-                        self.seq[newi+1] = (self.seq[newi][self.mpos] + self.seq[newi+1][0], ) + self.seq[newi+1][self.cpos:]
-                        self.seq[newi] = self.seq[newi][:-1] + ('',)
+                        try:
+                            self.seq[newi+1] = (self.seq[newi][self.mpos] + self.seq[newi+1][0], ) + self.seq[newi+1][self.cpos:]
+                            self.seq[newi] = self.seq[newi][:-1] + ('',)
+                        except:
+                            print "Index error in seq, aborting."
+                            return
             if len(self.newsections) == len(self.sections):
                 self.sections = self.newsections
             else:
                 print "Recheck failed. Section lengths do not match."
-    
+        else:
+            print "No md markers found."
+
     def getneworder(self, othertext, enc="utf-8"):
         """Othertext is a MandokuText object, already parsed"""
         repdict={u"】" : ")", u"【" : "(", u"　" : ""}

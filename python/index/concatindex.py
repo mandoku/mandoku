@@ -25,7 +25,11 @@ for d in os.listdir(kridx):
             if os.path.isdir(sd2):
                 os.makedirs("%s/%s/%s" % (ccidx, d, d2))
                 files = [a for a in os.listdir(sd2) if not a.startswith(".")]
-                c = files[0].split(".")[0]
+                try:
+                    c = files[0].split(".")[0]
+                except:
+                    print "Error:", files
+                    continue
                 df = defaultdict(list)
                 [df[a.split(".")[1][0:4]].append(a) for a in files]
                 for o in df:
@@ -33,5 +37,5 @@ for d in os.listdir(kridx):
                     print "Opening", nf
                     with codecs.open(nf,  "w", "utf-8") as outfile:
                         for f in df[o]:
-                            print o, f
+                            #print o, f
                             shutil.copyfileobj(codecs.open("%s/%s" % (sd2 , f), "r", "utf-8"), outfile)
