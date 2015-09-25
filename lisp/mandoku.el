@@ -132,8 +132,8 @@
   :type '(string)
   :group 'mandoku)
 
-(defcustom mandoku-gitlab-remote-name "private"
-  "Name of the remote used at the gitlab site."
+(defcustom mandoku-github-remote-name "kanripo"
+  "Name of the remote used for the github site."
   :type '(string)
   :group 'mandoku)
   
