@@ -247,6 +247,7 @@ def MandokuIndex(file, idlogfile='logfile.log', left=2, right=2, length=3, colle
             npre.pop(0)
         notes=[]
     # we are now finished reading the file, need to process the rest
+    f.close()
     for i in range(right+length, 0, -1):
         #we need to check and make sure that we have a page
         try:
