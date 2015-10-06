@@ -155,6 +155,7 @@ def MandokuIndex(file, idlogfile='logfile.log', left=2, right=2, length=3, colle
     try:
         f=codecs.open(file, 'r', 'utf-8')
     except:
+        idlog.close()
         return s
     for line in f:
         if line.startswith(u'校勘記¶'):
@@ -247,6 +248,7 @@ def MandokuIndex(file, idlogfile='logfile.log', left=2, right=2, length=3, colle
             npre.pop(0)
         notes=[]
     # we are now finished reading the file, need to process the rest
+    idlog.close()
     f.close()
     for i in range(right+length, 0, -1):
         #we need to check and make sure that we have a page
