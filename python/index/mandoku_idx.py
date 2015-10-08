@@ -277,7 +277,10 @@ def mdIndexGit(txtdir, repo, branches, left, right, length):
     # branches is a dictionary with branchname and sha value or HEAD
     #TODO: what if no master exists?
     alls=[]
-    repo.git.checkout(branches['master'])
+    try:
+        repo.git.checkout(branches['master'])
+    except:
+        pass
     for f in os.listdir(txtdir):
         if debug:
             print f
@@ -322,8 +325,11 @@ def mdIndexGit(txtdir, repo, branches, left, right, length):
                             varx[i] += " " + b
             s.extend(varx)
             alls.append(s)
-#                print "varx: ", " - ".join(varx)
-    repo.git.checkout(branches['master'])
+            #                print "varx: ", " - ".join(varx)
+    try:
+        repo.git.checkout(branches['master'])
+    except:
+        pass
     if debug:
         print len(alls)
     return alls
