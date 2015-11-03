@@ -72,8 +72,10 @@
 (defvar mandoku-config-cfg (concat mandoku-user-dir "mandoku-settings.cfg"))
 ;; we store the http password for gitlab in memory for one session
 ;; todo: make this a per server setting!
-(defvar mandoku-gh-user "kanripo")
+(defvar mandoku-gh-rep "kanripo")
+(defvar mandoku-gh-user nil)
 (defvar mandoku-gh-server "github.com")
+(defvar mandoku-gh-imglist-template "https://raw.githubusercontent.com/%s/%s/_data/imglist/%s.%s")
 (defvar mandoku-user-password nil)
 (defvar mandoku-string-limit 10)
 (defvar mandoku-index-display-limit 2000)
@@ -1070,12 +1072,12 @@ the character at point, ignoring non-Kanji characters"
 
 (defun mandoku-find-image (path rep)
   "open the file referenced through image path. Check if available locally, otherwise get from remote image server"
-    (if (file-exists-p (concat mandoku-image-dir path))
-	(find-file-other-window (concat mandoku-image-dir path))
+    (if (file-exists-p (concat mandoku-image-dir (cadr path)))
+	(find-file-other-window (concat mandoku-image-dir (cadr path)))
     ;; need to retrieve the file and store it there to open it
-      (let* ((rep-url (car (cdr (assoc rep mandoku-repositories-alist ))))
-	     (buffer (concat mandoku-image-dir path))
-	     (imgbuffer (url-retrieve-synchronously (concat rep-url "/getimage?filename=" path ))))
+      (let* (
+	     (buffer (concat mandoku-image-dir (cadr path)))
+	     (imgbuffer (url-retrieve-synchronously (concat (car path) (cadr path )))))
 	(unless (file-directory-p (file-name-directory buffer))
 	  (make-directory (file-name-directory buffer) t))
 	(with-current-buffer (get-buffer-create buffer)
@@ -1090,7 +1092,7 @@ the character at point, ignoring non-Kanji characters"
 		(save-buffer))
 	    (kill-buffer imgbuffer))
 	  (kill-buffer)))
-	(find-file-other-window (concat mandoku-image-dir path))
+	(find-file-other-window (concat mandoku-image-dir (cadr path)))
 	))
 
 (defun mandoku-get-imglist (f)
@@ -1098,14 +1100,26 @@ the character at point, ignoring non-Kanji characters"
   (if (equal "ZB" (substring f 0 2))
       "/tmp/noimg.txt"
   ;; this will always get the imglist from the kanripo repo.  Do we want that???
-  (let ((imglist (format "https://raw.githubusercontent.com/%s/%s/_data/imglist/%s.txt" mandoku-gh-user (car (split-string f "_")) f))
-	(ifile (format "%simglist/%s.txt" mandoku-temp-dir f)))
+    (let ((imglist-rep (format mandoku-gh-imglist-template mandoku-gh-rep (car (split-string f "_")) f "txt"))
+	  (imglist-user (format mandoku-gh-imglist-template mandoku-gh-user (car (split-string f "_")) f "txt"))
+	  (imgcfg-rep (format mandoku-gh-imglist-template mandoku-gh-rep (car (split-string f "_")) "imginfo" "cfg"))
+	  (imgcfg-user (format mandoku-gh-imglist-template mandoku-gh-user (car (split-string f "_")) "imginfo" "cfg"))
+	  (ifile (format "%simglist/%s.txt" mandoku-temp-dir f))
+	  (imgcfg (format "%simglist/%s-img.cfg" mandoku-temp-dir (car (split-string f "_")))))
     (unless (file-exists-p ifile)
       (with-current-buffer (find-file-noselect ifile)
-	(url-insert-file-contents imglist)
+	(if (url-file-exists-p imglist-user)
+	    (url-insert-file-contents imglist-user)
+	  (url-insert-file-contents imglist-rep))
 	(save-buffer)))
-    ifile))
-  )
+    (unless (file-exists-p imgcfg)
+      (with-current-buffer (find-file-noselect imgcfg)
+	(if (url-file-exists-p imgcfg-user)
+	    (url-insert-file-contents imgcfg-user)
+	  (url-insert-file-contents imgcfg-rep))
+	(save-buffer)))
+    (list ifile imgcfg))
+  ))
 
 (defun mandoku-open-image-at-page (arg &optional il)
   "this will first look for a function for this edition, then browse the image index"
@@ -1117,7 +1131,7 @@ the character at point, ignoring non-Kanji characters"
 	 (imglist (or il (mandoku-get-imglist f)))
 	 (p (mandoku-position-at-point-internal (point) ))
 	 ;; if function exists, use that, otherwise look for image in imglist, if not available: nil
-	 (path  (if (file-exists-p imglist)
+	 (path  (if (file-exists-p (car imglist))
 		    (mandoku-get-image-path-from-index p imglist)
 		  (ignore-errors  
 		    (funcall (intern (concat "mandoku-" (downcase (nth 1 p))  "-page-to-image")) p )))))
@@ -1131,19 +1145,39 @@ the character at point, ignoring non-Kanji characters"
 
 (defun mandoku-get-editions-from-index (il)
   (let* ((eds (list))
-	(fn (nth (- (length (split-string il "/")) 1) (split-string il "/")))
+	(fn (nth (- (length (split-string (cadr il) "/")) 1) (split-string (cadr il) "/")))
 	(thebuffer (get-buffer-create (concat " *mandoku-img-" fn)))
 	)
     (with-current-buffer thebuffer 
       (let ((coding-system-for-read 'utf-8))
 	(erase-buffer)
-	(insert-file-contents il)
-	(sort-lines nil (point-min) (point-max))
+	(insert-file-contents (cadr il))
 	(goto-char (point-min))
-	  (while (re-search-forward "^\\([^\t]+\\)\t\\([^ ]+\\) " nil t)
-	    (add-to-list 'eds (match-string 2))) ))
+	  (while (re-search-forward "^\\([^=
+]+\\)=" nil t)
+	    (add-to-list 'eds (match-string 1))) ))
 eds
 ))
+
+(defun mandoku-imglist-get-prefix (il ed)
+  "Get the prefix path for the edition ed out of the imagelist in the cadr of il"
+  (let* (
+	(fn (nth (- (length (split-string (cadr il) "/")) 1) (split-string (cadr il) "/")))
+	(thebuffer (get-buffer-create (concat " *mandoku-img-" fn)))
+	eds
+	)
+    (with-current-buffer thebuffer 
+      (let ((coding-system-for-read 'utf-8))
+	(erase-buffer)
+	(insert-file-contents (cadr il))
+	(goto-char (point-min))
+	  (while (re-search-forward "^\\([^=
+]+\\)=\\([^
+]+\\)" nil t)
+	    (add-to-list 'eds `(,(match-string 1) . ,(match-string 2) )) )))
+   (cdr (assoc ed eds))
+))
+
 
 (defun mandoku-get-image-path-from-index (loc il &optional ed)
   "Read the image index for this file if necessary and return a path to the requested image"
@@ -1151,27 +1185,33 @@ eds
 	 (lastpg "99")
 	 (pg (nth 2 loc))
 	 (line (nth 3 loc))
-	 (fn (nth (- (length (split-string il "/")) 1) (split-string il "/")))
+	 (fn (nth (- (length (split-string (car il) "/")) 1) (split-string (car il) "/")))
 	 (eds (mandoku-get-editions-from-index il))
 	 ;; no need to ask if there is only one edition
 	 (ed (or ed
 		 mandoku-preferred-edition
 		 (if (= (length eds) 1) 
 			(car eds)
-		      (ido-completing-read "Edition: " (mandoku-get-editions-from-index il) nil t)))))
+		   (ido-completing-read "Edition: " (mandoku-get-editions-from-index il) nil t))))
+	 (pref (mandoku-imglist-get-prefix il ed))
+	 )
 
-      (with-current-buffer (get-buffer (concat " *mandoku-img-" fn))
-          (goto-char (point-max))
-	  (re-search-backward (concat "^" pg "\\([0-9][0-9]\\)\t\\([^\t\n]+\\)\t\\([^\t\n]+\\)") nil t)
-	  (message (match-string 0))
-	  (setq lastpg (string-to-number (match-string 1)))
-          (while (and (< (nth 3 loc) lastpg)  
-		      (re-search-backward (concat "^" pg "\\([0-9][0-9]\\)\t\\([^\t\n]+\\)\t\\([^\t\n]+\\)") nil t))
-	    (setq lastpg (string-to-number (match-string 1))))
-	  (next-line)
-	  (re-search-backward (concat "\t" ed " [^\t]+\t\\(.*\\)$") nil t)
-	  (match-string 1)
-	  )))
+      (with-current-buffer (get-buffer-create (concat " *mandoku-img-" fn))
+      (let ((coding-system-for-read 'utf-8))
+	(erase-buffer)
+	(insert-file-contents (car il))
+	(sort-numeric-fields 1 (point-min) (point-max))
+	(goto-char (point-max))
+	(re-search-backward (concat "^" pg "\\([0-9][0-9]\\)\t\\([^\t\n]+\\)\t\\([^\t\n]+\\)") nil t)
+	(message (match-string 0))
+	(setq lastpg (string-to-number (match-string 1)))
+	(while (and (< (nth 3 loc) lastpg)  
+		    (re-search-backward (concat "^" pg "\\([0-9][0-9]\\)\t\\([^\t\n]+\\)\t\\([^\t\n]+\\)") nil t))
+	  (setq lastpg (string-to-number (match-string 1))))
+	(next-line)
+	(re-search-backward (concat "\t" ed " [^\t]+\t\\(.*\\)$") nil t)
+	(list pref (match-string 1))
+	))))
 
 
 
