@@ -9,7 +9,7 @@
 ;; URL: http://www.mandoku.org
 ;; Version: 0.3
 ;; Keywords: convenience
-;; Package-Requires: ((org "8"))
+;; Package-Requires: ((org "8") (github-clone "20150705.1705"))
 ;; This file is not part of GNU Emacs.
 
 ;;; Commentary:
@@ -43,37 +43,25 @@
 ;;; Code:
 
 (require 'org)
-
+(require 'github-clone)
+(require 'mandoku-remote)
+(require 'mandoku-link)
 (defvar mandoku-base-dir nil "This is the root of the mandoku hierarchy, this needs to be provided by the user in its init file")
 (defvar mandoku-do-remote nil)
 (defvar mandoku-preferred-edition nil "Preselect a certain edition to avoid repeated selection")
 ;;;###autoload
 (defconst mandoku-lisp-dir (file-name-directory (or load-file-name (buffer-file-name)))
   "directory of mandoku lisp code")
-(defvar mandoku-subdirs (list "text" "images" "meta" "temp" "temp/imglist" "system" "work"))
+(defvar mandoku-subdirs (list "text" "images" "meta" "temp" "temp/imglist" "system" "work" "index" "user"))
 ;; it probably does not much sense to do this here, but anyway, this is the idea...
-(defvar mandoku-text-dir (expand-file-name (concat mandoku-base-dir "text/")))
-(defvar mandoku-image-dir nil)
-(defvar mandoku-index-dir (expand-file-name  (concat mandoku-base-dir "index/")))
-(defvar mandoku-meta-dir (expand-file-name  (concat mandoku-base-dir "meta/")))
-(defvar mandoku-temp-dir (expand-file-name  (concat mandoku-base-dir "temp/")))
-(defvar mandoku-sys-dir (expand-file-name  (concat mandoku-base-dir "system/")))
-(defvar mandoku-user-dir (expand-file-name  (concat mandoku-base-dir "user/")))
-(defvar mandoku-work-dir (expand-file-name  (concat mandoku-base-dir "work/")))
-(defvar mandoku-filters-dir (expand-file-name  (concat mandoku-work-dir "filters/")))
-;; housekeeping files
-(defvar mandoku-log-file (concat mandoku-sys-dir "mandoku.log"))
-(defvar mandoku-local-catalog (concat mandoku-meta-dir "local-texts.txt"))
-(defvar mandoku-download-queue (concat mandoku-sys-dir "mandoku-to-download.queue"))
-(defvar mandoku-index-queue (concat mandoku-sys-dir "mandoku-to-index.queue"))
-(defvar mandoku-indexed-texts (concat mandoku-sys-dir "indexed-texts.txt"))
 (defvar mandoku-grep-command "bzgrep" "The command used for mandoku's internal search function. On Windows, needs to be 'grep'.")
 (defvar mandoku-local-init-file nil)
-(defvar mandoku-config-cfg (concat mandoku-user-dir "mandoku-settings.cfg"))
 ;; we store the http password for gitlab in memory for one session
 ;; todo: make this a per server setting!
-(defvar mandoku-gh-user "kanripo")
+(defvar mandoku-gh-rep "kanripo")
+(defvar mandoku-gh-user nil)
 (defvar mandoku-gh-server "github.com")
+(defvar mandoku-gh-imglist-template "https://raw.githubusercontent.com/%s/%s/_data/imglist/%s.%s")
 (defvar mandoku-user-password nil)
 (defvar mandoku-string-limit 10)
 (defvar mandoku-index-display-limit 2000)
@@ -100,9 +88,10 @@
 (defvar mandoku-search-limit-to-coll nil)
 ;; ** Catalogs
 ;;;###autoload
-(defvar mandoku-catalogs-alist nil)
-(defvar mandoku-catalog-path-list nil)
-(defvar mandoku-catalog-user-path-list nil)
+;; (defvar mandoku-catalogs-alist nil)
+;; (defvar mandoku-catalog-path-list nil)
+;; (defvar mandoku-catalog-user-path-list nil)
+(defvar mandoku-titles-by-date nil)
 (defvar mandoku-git-use-http t)
 
 (defvar mandoku-initialized-p nil)
@@ -132,8 +121,8 @@
   :type '(string)
   :group 'mandoku)
 
-(defcustom mandoku-gitlab-remote-name "private"
-  "Name of the remote used at the gitlab site."
+(defcustom mandoku-github-remote-name "kanripo"
+  "Name of the remote used for the github site."
   :type '(string)
   :group 'mandoku)
   
@@ -142,6 +131,25 @@
     (defun replace-in-string (target old new)
       (replace-regexp-in-string old new  target)))
 
+
+(defun mandoku-setup-dirvars ()
+  (defvar mandoku-text-dir (expand-file-name (concat mandoku-base-dir "text/")))
+  (defvar mandoku-image-dir (expand-file-name (concat mandoku-base-dir "images/")))
+  (defvar mandoku-index-dir (expand-file-name  (concat mandoku-base-dir "index/")))
+  (defvar mandoku-meta-dir (expand-file-name  (concat mandoku-base-dir "meta/")))
+  (defvar mandoku-temp-dir (expand-file-name  (concat mandoku-base-dir "temp/")))
+  (defvar mandoku-sys-dir (expand-file-name  (concat mandoku-base-dir "system/")))
+  (defvar mandoku-user-dir (expand-file-name  (concat mandoku-base-dir "user/")))
+  (defvar mandoku-work-dir (expand-file-name  (concat mandoku-base-dir "work/")))
+  (defvar mandoku-filters-dir (expand-file-name  (concat mandoku-work-dir "filters/")))
+;;housekeeping files
+  (defvar mandoku-log-file (concat mandoku-sys-dir "mandoku.log"))
+  (defvar mandoku-local-catalog (concat mandoku-meta-dir "local-texts.txt"))
+  (defvar mandoku-download-queue (concat mandoku-sys-dir "mandoku-to-download.queue"))
+  (defvar mandoku-index-queue (concat mandoku-sys-dir "mandoku-to-index.queue"))
+  (defvar mandoku-indexed-texts (concat mandoku-sys-dir "indexed-texts.txt"))
+  (defvar mandoku-config-cfg (concat mandoku-user-dir "mandoku-settings.cfg"))
+)  
 
 
 ;;; ** working with catalog files, prepare the metadata
@@ -270,30 +278,29 @@
 
 (defun mandoku-read-titletables () 
   "read the titles table"
-  (setq mandoku-subcolls (make-hash-table :test 'equal))
-  (when (file-exists-p (concat mandoku-sys-dir  "subcolls.txt"))
+;;   (setq mandoku-subcolls (make-hash-table :test 'equal))
+;;   (when (file-exists-p (concat mandoku-sys-dir  "subcolls.txt"))
+;;     (with-temp-buffer
+;;       (let ((coding-system-for-read 'utf-8)
+;; 	    textid)
+;; 	(insert-file-contents (concat mandoku-sys-dir "subcolls.txt"))
+;; 	(goto-char (point-min))
+;; 	(while (re-search-forward "^\\([A-z0-9]+\\)	\\([^	
+;; ]+\\)" nil t)
+;; 	  (puthash (match-string 1) (match-string 2) mandoku-subcolls)))))
+
+  (setq mandoku-titles (make-hash-table :test 'equal))
+  (when (file-exists-p mandoku-titles-by-date)
     (with-temp-buffer
       (let ((coding-system-for-read 'utf-8)
 	    textid)
-	(insert-file-contents (concat mandoku-sys-dir "subcolls.txt"))
+	(insert-file-contents mandoku-titles-by-date)
 	(goto-char (point-min))
-	(while (re-search-forward "^\\([A-z0-9]+\\)	\\([^	
+	(while (re-search-forward "^\\([A-z0-9]+\\)	\\([^	]+\\)	\\([^	
 ]+\\)" nil t)
-	  (puthash (match-string 1) (match-string 2) mandoku-subcolls)))))
+	     (puthash (match-string 1) (match-string 3) mandoku-titles))))))
 
-  (setq mandoku-titles (make-hash-table :test 'equal))
-  (dolist (x mandoku-catalogs-alist)
-    (when (file-exists-p (concat mandoku-sys-dir (car (split-string (car x))) "-titles.txt"))
-      (with-temp-buffer
-        (let ((coding-system-for-read 'utf-8)
-              textid)
-          (insert-file-contents (concat mandoku-sys-dir (car (split-string (car x))) "-titles.txt"))
-          (goto-char (point-min))
-          (while (re-search-forward "^\\([A-z0-9]+\\)	\\([^	
-]+\\)" nil t)
-	     (puthash (match-string 1) (match-string 2) mandoku-titles)))))))
-
-
+;; catalog / title handling
 
 (defun char-to-ucs (char)
   char
@@ -355,19 +362,19 @@ Click on a link or move the cursor to the link and then press enter
   (mandoku-update-catalog-alist)
 )
 
-(defun mandoku-catalog-no-update-needed-p () 
-  "Check for updates that might be necessary for catalog"
-  (let ((update-needed nil)
-	(mandoku-catalog (or mandoku-catalog
-			   (expand-file-name "mandoku-catalog.txt" (concat mandoku-base-dir "/meta")))))
-    (mandoku-update-catalog-alist)
-    (with-current-buffer (find-file-noselect mandoku-catalog)
-      (dolist (y mandoku-catalogs-alist)
-	(unless update-needed
-	  (goto-char (point-min))
-	  (unless (search-forward (car y) nil t)
-	    (setq update-needed t)))))
-    (not update-needed)))
+;; (defun mandoku-catalog-no-update-needed-p () 
+;;   "Check for updates that might be necessary for catalog"
+;;   (let ((update-needed nil)
+;; 	(mandoku-catalog (or mandoku-catalog
+;; 			   (expand-file-name "mandoku-catalog.txt" (concat mandoku-base-dir "/meta")))))
+;;     (mandoku-update-catalog-alist)
+;;     (with-current-buffer (find-file-noselect mandoku-catalog)
+;;       (dolist (y mandoku-catalogs-alist)
+;; 	(unless update-needed
+;; 	  (goto-char (point-min))
+;; 	  (unless (search-forward (car y) nil t)
+;; 	    (setq update-needed t)))))
+;;     (not update-needed)))
 
 		   
       
@@ -379,11 +386,13 @@ Click on a link or move the cursor to the link and then press enter
 	    mandoku-base-dir))
 	 (mduser (concat md "/user"))
 	 )
-    (if (and
-	 (file-exists-p (expand-file-name "mandoku-catalog.txt" (concat md "/meta")))
-	 (mandoku-catalog-no-update-needed-p) 
-	 (file-exists-p (expand-file-name "mandoku-settings.org" mduser )))
-	(org-babel-load-file (expand-file-name "mandoku-settings.org" mduser ))
+    (setq mandoku-titles-by-date
+	  (if (file-exists-p (expand-file-name "krp-by-date.txt" (concat md "/KR-Workspace/Settings")))
+	      (expand-file-name "krp-by-date.txt" (concat md "/KR-Workspace/Settings"))
+	      (expand-file-name "krp-by-date.txt" (concat md "/system"))))
+
+    (if (not (file-exists-p mandoku-titles-by-date))
+	(url-copy-file "https://raw.githubusercontent.com/kanripo/KR-Workspace/master/Settings/krp-by-date.txt"  (expand-file-name "krp-by-date.txt" (concat md "/system"))))
       ;; looks like we have to bootstrap the krp directory structure
       (progn
 	(if (not mandoku-base-dir)
@@ -408,26 +417,17 @@ Click on a link or move the cursor to the link and then press enter
       ;; create the other directories
       (dolist (sd mandoku-subdirs)
 	(mkdir (concat mandoku-base-dir sd) t))
-      (setq mandoku-text-dir (concat mandoku-base-dir "text/"))
-      (setq mandoku-meta-dir (concat mandoku-base-dir "meta/"))
-      (setq mandoku-temp-dir (concat mandoku-base-dir "temp/"))
-      (setq mandoku-sys-dir  (concat mandoku-base-dir "system/"))
-      (setq mandoku-image-dir (concat mandoku-base-dir "images/"))
+      (mandoku-setup-dirvars)
+      ;; (setq mandoku-text-dir (concat mandoku-base-dir "text/"))
+      ;; (setq mandoku-work-dir (concat mandoku-base-dir "work/"))
+      ;; (setq mandoku-user-dir (concat mandoku-base-dir "user/"))
+      ;; (setq mandoku-meta-dir (concat mandoku-base-dir "meta/"))
+      ;; (setq mandoku-temp-dir (concat mandoku-base-dir "temp/"))
+      ;; (setq mandoku-sys-dir  (concat mandoku-base-dir "system/"))
+      ;; (setq mandoku-image-dir (concat mandoku-base-dir "images/"))
       (setq mandoku-catalog (concat mandoku-meta-dir "mandoku-catalog.txt"))
-      (mandoku-update-catalog-alist)
-      (message "Calling subcoll")
-      (mandoku-update-subcoll-list)
-      (message "Calling title list")
-      (mandoku-update-title-lists)
-      (mandoku-read-titletables) 
-      (mandoku-read-indexed-texts) 
-      (mandoku-update-catalog)
-      (ignore-errors  (mkdir mduser t))
-      (ignore-errors
-	(copy-file (expand-file-name "mandoku-settings.org" mandoku-lisp-dir) mduser t))
-    (setq mandoku-local-init-file (expand-file-name "mandoku-settings.org" mduser ))
-    (org-babel-load-file mandoku-local-init-file)
-    )))
+    (mandoku-read-titletables)
+    ))
   (setq mandoku-initialized-p t)
 )
 
@@ -812,12 +812,15 @@ One character is either a character or one entity expression"
   (gethash txtid mandoku-titles))
 
 (defun mandoku-meta-textid-to-file (txtid &optional page)
-  (let* ((repid (car (split-string txtid "[0-9]")))
-	(subcoll (mandoku-subcoll txtid ))
-	)
-    (if (assoc subcoll mandoku-catalogs-alist)
-	(cdr (assoc subcoll mandoku-catalogs-alist))
-      (cdr (assoc (substring subcoll 0 -1) mandoku-catalogs-alist)))))
+  (if mandoku-catalogs-alist
+      (let* ((repid (car (split-string txtid "[0-9]")))
+	     (subcoll (mandoku-subcoll txtid ))
+	     )
+	(if (assoc subcoll mandoku-catalogs-alist)
+	    (cdr (assoc subcoll mandoku-catalogs-alist))
+	  (cdr (assoc (substring subcoll 0 -1) mandoku-catalogs-alist))))
+    (user-error "No catalog file found.  Please clone KR-Catalog from the Kanseki repository")))
+      
 
 
 (defun mandoku-get-outline-path (&optional pnt)
@@ -1070,12 +1073,12 @@ the character at point, ignoring non-Kanji characters"
 
 (defun mandoku-find-image (path rep)
   "open the file referenced through image path. Check if available locally, otherwise get from remote image server"
-    (if (file-exists-p (concat mandoku-image-dir path))
-	(find-file-other-window (concat mandoku-image-dir path))
+    (if (file-exists-p (concat mandoku-image-dir (cadr path)))
+	(find-file-other-window (concat mandoku-image-dir (cadr path)))
     ;; need to retrieve the file and store it there to open it
-      (let* ((rep-url (car (cdr (assoc rep mandoku-repositories-alist ))))
-	     (buffer (concat mandoku-image-dir path))
-	     (imgbuffer (url-retrieve-synchronously (concat rep-url "/getimage?filename=" path ))))
+      (let* (
+	     (buffer (concat mandoku-image-dir (cadr path)))
+	     (imgbuffer (url-retrieve-synchronously (concat (car path) (cadr path )))))
 	(unless (file-directory-p (file-name-directory buffer))
 	  (make-directory (file-name-directory buffer) t))
 	(with-current-buffer (get-buffer-create buffer)
@@ -1090,7 +1093,7 @@ the character at point, ignoring non-Kanji characters"
 		(save-buffer))
 	    (kill-buffer imgbuffer))
 	  (kill-buffer)))
-	(find-file-other-window (concat mandoku-image-dir path))
+	(find-file-other-window (concat mandoku-image-dir (cadr path)))
 	))
 
 (defun mandoku-get-imglist (f)
@@ -1098,14 +1101,26 @@ the character at point, ignoring non-Kanji characters"
   (if (equal "ZB" (substring f 0 2))
       "/tmp/noimg.txt"
   ;; this will always get the imglist from the kanripo repo.  Do we want that???
-  (let ((imglist (format "https://raw.githubusercontent.com/%s/%s/_data/imglist/%s.txt" mandoku-gh-user (car (split-string f "_")) f))
-	(ifile (format "%simglist/%s.txt" mandoku-temp-dir f)))
+    (let ((imglist-rep (format mandoku-gh-imglist-template mandoku-gh-rep (car (split-string f "_")) f "txt"))
+	  (imglist-user (format mandoku-gh-imglist-template mandoku-gh-user (car (split-string f "_")) f "txt"))
+	  (imgcfg-rep (format mandoku-gh-imglist-template mandoku-gh-rep (car (split-string f "_")) "imginfo" "cfg"))
+	  (imgcfg-user (format mandoku-gh-imglist-template mandoku-gh-user (car (split-string f "_")) "imginfo" "cfg"))
+	  (ifile (format "%simglist/%s.txt" mandoku-temp-dir f))
+	  (imgcfg (format "%simglist/%s-img.cfg" mandoku-temp-dir (car (split-string f "_")))))
     (unless (file-exists-p ifile)
       (with-current-buffer (find-file-noselect ifile)
-	(url-insert-file-contents imglist)
+	(if (url-file-exists-p imglist-user)
+	    (url-insert-file-contents imglist-user)
+	  (url-insert-file-contents imglist-rep))
 	(save-buffer)))
-    ifile))
-  )
+    (unless (file-exists-p imgcfg)
+      (with-current-buffer (find-file-noselect imgcfg)
+	(if (url-file-exists-p imgcfg-user)
+	    (url-insert-file-contents imgcfg-user)
+	  (url-insert-file-contents imgcfg-rep))
+	(save-buffer)))
+    (list ifile imgcfg))
+  ))
 
 (defun mandoku-open-image-at-page (arg &optional il)
   "this will first look for a function for this edition, then browse the image index"
@@ -1117,7 +1132,7 @@ the character at point, ignoring non-Kanji characters"
 	 (imglist (or il (mandoku-get-imglist f)))
 	 (p (mandoku-position-at-point-internal (point) ))
 	 ;; if function exists, use that, otherwise look for image in imglist, if not available: nil
-	 (path  (if (file-exists-p imglist)
+	 (path  (if (file-exists-p (car imglist))
 		    (mandoku-get-image-path-from-index p imglist)
 		  (ignore-errors  
 		    (funcall (intern (concat "mandoku-" (downcase (nth 1 p))  "-page-to-image")) p )))))
@@ -1131,19 +1146,39 @@ the character at point, ignoring non-Kanji characters"
 
 (defun mandoku-get-editions-from-index (il)
   (let* ((eds (list))
-	(fn (nth (- (length (split-string il "/")) 1) (split-string il "/")))
+	(fn (nth (- (length (split-string (cadr il) "/")) 1) (split-string (cadr il) "/")))
 	(thebuffer (get-buffer-create (concat " *mandoku-img-" fn)))
 	)
     (with-current-buffer thebuffer 
       (let ((coding-system-for-read 'utf-8))
 	(erase-buffer)
-	(insert-file-contents il)
-	(sort-lines nil (point-min) (point-max))
+	(insert-file-contents (cadr il))
 	(goto-char (point-min))
-	  (while (re-search-forward "^\\([^\t]+\\)\t\\([^ ]+\\) " nil t)
-	    (add-to-list 'eds (match-string 2))) ))
+	  (while (re-search-forward "^\\([^=
+]+\\)=" nil t)
+	    (add-to-list 'eds (match-string 1))) ))
 eds
 ))
+
+(defun mandoku-imglist-get-prefix (il ed)
+  "Get the prefix path for the edition ed out of the imagelist in the cadr of il"
+  (let* (
+	(fn (nth (- (length (split-string (cadr il) "/")) 1) (split-string (cadr il) "/")))
+	(thebuffer (get-buffer-create (concat " *mandoku-img-" fn)))
+	eds
+	)
+    (with-current-buffer thebuffer 
+      (let ((coding-system-for-read 'utf-8))
+	(erase-buffer)
+	(insert-file-contents (cadr il))
+	(goto-char (point-min))
+	  (while (re-search-forward "^\\([^=
+]+\\)=\\([^
+]+\\)" nil t)
+	    (add-to-list 'eds `(,(match-string 1) . ,(match-string 2) )) )))
+   (cdr (assoc ed eds))
+))
+
 
 (defun mandoku-get-image-path-from-index (loc il &optional ed)
   "Read the image index for this file if necessary and return a path to the requested image"
@@ -1151,27 +1186,33 @@ eds
 	 (lastpg "99")
 	 (pg (nth 2 loc))
 	 (line (nth 3 loc))
-	 (fn (nth (- (length (split-string il "/")) 1) (split-string il "/")))
+	 (fn (nth (- (length (split-string (car il) "/")) 1) (split-string (car il) "/")))
 	 (eds (mandoku-get-editions-from-index il))
 	 ;; no need to ask if there is only one edition
 	 (ed (or ed
 		 mandoku-preferred-edition
 		 (if (= (length eds) 1) 
 			(car eds)
-		      (ido-completing-read "Edition: " (mandoku-get-editions-from-index il) nil t)))))
+		   (ido-completing-read "Edition: " (mandoku-get-editions-from-index il) nil t))))
+	 (pref (mandoku-imglist-get-prefix il ed))
+	 )
 
-      (with-current-buffer (get-buffer (concat " *mandoku-img-" fn))
-          (goto-char (point-max))
-	  (re-search-backward (concat "^" pg "\\([0-9][0-9]\\)\t\\([^\t\n]+\\)\t\\([^\t\n]+\\)") nil t)
-	  (message (match-string 0))
-	  (setq lastpg (string-to-number (match-string 1)))
-          (while (and (< (nth 3 loc) lastpg)  
-		      (re-search-backward (concat "^" pg "\\([0-9][0-9]\\)\t\\([^\t\n]+\\)\t\\([^\t\n]+\\)") nil t))
-	    (setq lastpg (string-to-number (match-string 1))))
-	  (next-line)
-	  (re-search-backward (concat "\t" ed " [^\t]+\t\\(.*\\)$") nil t)
-	  (match-string 1)
-	  )))
+      (with-current-buffer (get-buffer-create (concat " *mandoku-img-" fn))
+      (let ((coding-system-for-read 'utf-8))
+	(erase-buffer)
+	(insert-file-contents (car il))
+	(sort-numeric-fields 1 (point-min) (point-max))
+	(goto-char (point-max))
+	(re-search-backward (concat "^" pg "\\([0-9][0-9]\\)\t\\([^\t\n]+\\)\t\\([^\t\n]+\\)") nil t)
+	(message (match-string 0))
+	(setq lastpg (string-to-number (match-string 1)))
+	(while (and (< (nth 3 loc) lastpg)  
+		    (re-search-backward (concat "^" pg "\\([0-9][0-9]\\)\t\\([^\t\n]+\\)\t\\([^\t\n]+\\)") nil t))
+	  (setq lastpg (string-to-number (match-string 1))))
+	(next-line)
+	(re-search-backward (concat "\t" ed " [^\t]+\t\\(.*\\)$") nil t)
+	(list pref (match-string 1))
+	))))
 
 
 
@@ -1851,13 +1892,14 @@ We should check if the file exists before cloning!"
 		   tmpid)))
 	 (repid (car (split-string txtid "\\([0-9]\\)")))
 	 (groupid (substring txtid 0 (+ (length repid) 2)))
-	 (clone-url (if mandoku-git-use-http
-			(concat "https://" mandoku-gh-server "/")
-		      (concat "git@" mandoku-gh-server ":")))
-	 (txturl (concat clone-url (mandoku-get-user) "/" txtid ".git"))
+	 ;; (clone-url (if mandoku-git-use-http
+	 ;; 		(concat "https://" mandoku-gh-server "/")
+	 ;; 	      (concat "git@" mandoku-gh-server ":")))
+	 ;; (txturl (concat clone-url (mandoku-get-user) "/" txtid ".git"))
 	 (targetdir (concat mandoku-text-dir groupid "/")))
     (mkdir targetdir t)
-    (mandoku-clone (concat targetdir txtid)  txturl)
+    (github-clone (concat mandoku-gh-rep "/" txtid) targetdir)
+;    (mandoku-clone (concat targetdir txtid)  txturl)
 ;    (kill-buffer buf)
 ;    (find-file (concat targetdir txtid "/" fn "." ext)))
 ))
