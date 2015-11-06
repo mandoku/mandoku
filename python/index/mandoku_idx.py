@@ -347,8 +347,9 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7):
         print lg, update
     changed = True
     if update:
-#        changed = False
-        for l in codecs.open(lg, 'r', 'utf-8'):
+        #        changed = False
+        lgf = codecs.open(lg, 'r', 'utf-8')
+        for l in lgf:
             if l.startswith('para:'):
                 if debug:
                     print "INFO: overwriting parameters from old run: %s" % (l[5:-1])  
@@ -367,6 +368,7 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7):
                     #if we have a new version, we need to do it anyway
                     changed = True
         #if we have a different number of versions, proceed
+        lgf.close()
         if not changed:
             changed = len(old) != len(now)
         if changed:
@@ -388,6 +390,7 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7):
     for b in [a for a in repo.branches if a.name == a.name.upper() or a.name=="master"]:
         rec.write(u"%s\t%s\n" % (b.name.decode('utf-8'), b.commit.hexsha))
     # check for identical hashes:
+    rec.close()
     if  len(now) > 0 and changed:
         index = mdIndexGit(txtdir, repo, now, left, right, length)
         if not update:
@@ -438,7 +441,6 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7):
     
     ## do sth with the index... : either write out new or write patch
 #    rec.write("hash: \n")
-    rec.close()
     repo.git.checkout('master')
     
 
