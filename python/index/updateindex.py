@@ -9,7 +9,7 @@ idxpath=os.path.split(os.path.realpath(__file__))[0]
 sys.path.insert(0, idxpath)
 #sys.path.insert(0, '/Users/chris/krp/system/python')
 
-resource.setrlimit(resource.RLIMIT_NOFILE, (1000, -1))
+#resource.setrlimit(resource.RLIMIT_NOFILE, (1000, -1))
 
 import mandoku_idx as md
 

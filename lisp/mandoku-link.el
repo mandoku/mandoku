@@ -1,8 +1,6 @@
 ;; linking for mandoku files
 ;; cwittern@gmail.com [2014-05-20T19:57:42+0900]
 
-(require 'mandoku)
-
 (org-add-link-type "mandoku" 'mandoku-link-open)
 (add-hook 'org-store-link-functions 'mandoku-link-store-link)
 

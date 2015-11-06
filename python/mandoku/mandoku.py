@@ -47,18 +47,23 @@ from difflib import *
 from itertools import *
 from sparsedict import *
 #removed: \uFE30-\uFE4F  
-kanji=Ur'\u3000\u3400-\u4DFF\u4e00-\u9FFF\uF900-\uFAFF\U00020000-\U0002A6DF\U0002A700-\U0002B73F\U0002B740-\U0002B81F\U0002B820-\U0002F7FF'
-pua=Ur'\uE000-\uF8FF\U000F0000-\U000FFFFD\U00100000-\U0010FFFD'
+kanji=Ur'\u3000\u3400-\u4DFF\u4e00-\u9FFF\uF900-\uFAFF'
+astkanji = Ur'\U00020000-\U0002A6DF\U0002A700-\U0002B73F\U0002B740-\U0002B81F\U0002B820-\U0002F7FF'
+pua=Ur'\uE000-\uF8FF'
+astpua = Ur'\U000F0000-\U000FFFFD\U00100000-\U0010FFFD'
 ##this will recognize image links like [[./img]] as 1 kanji --> clear this out later?!
 ent=r'\[\[.*?\]\]|\[[^\]]*\]|&[^;]*;|&amp;[CZ][X3-7]-[A-F0-9]+'
 #now
 #kp_re = re.compile(u"(%s|[%s%s])" % (ent, kanji, pua))
-kp_re = re.compile(u"(%s|{[%s%s]+:[^}]*}|[%s%s])" % (ent, kanji, pua, kanji, pua))
+# astpua = ""
+# astkanji = ""
+kp_re = re.compile(u"(%s|{[%s%s]+:[^}]*}|[%s%s])" % (ent, kanji+astkanji, pua+astpua, kanji+astkanji, pua+astpua))
 ch_re = re.compile(ur'(\[[^\]]*\]|&[^;]*;|&amp;C[X3-7]-[A-F0-9]+|.)')
 img_re = re.compile(ur'<i[^>]*>')
 punc_re = re.compile(ur"[\u3001-\u33FF\uFE00-\uFF7F]")
 meta_re = re.compile(ur'(<[^>]*>|\xb6|\n)')
 sys.stdout = codecs.getwriter('utf8')(sys.stdout)
+puamagic = 1060864
 
 
 class MandokuText(object):
@@ -72,7 +77,11 @@ class MandokuText(object):
         self.in_note = False
         self.in_zhu = False
         self.flags = {}
+        self.baseedition = ""
+        #cutoff for some operations.
+        self.bigfile = 1500000
         self.sections = []
+        self.neworder = []
         #a dictionary of sparsedicts:
         #a note for example is registered as follows: self.markup['note']
         self.markup = collections.defaultdict(SparseDict)
@@ -327,10 +336,12 @@ function with access to a database."""
     def add_metadata(self, per_section=False):
         l=0
         page="first"
+        self.secstart={}
         self.lines[page] = []
         for i in range(1, len(self.sections)+1):
             s, f = self.sections[i-1]
             fx = f[0:f.find('.')]
+            self.secstart[fx] = s
             if per_section:
                 self.pps[fx] = SparseDict()
             try:
@@ -347,10 +358,11 @@ function with access to a database."""
                 if m:
                     page = m.groups()[0]
                     if per_section:
-                        self.pps[fx][j - s] = page
+                        #the pb is attached to the last character on the previous page...
+                        self.pps[fx][j - s +1] = page
                     else:
-                        self.pages[j] = page
-                    self.lines[page] = []
+                        self.pages[j+1] = page
+                    self.lines[page] = [j+1]
 
     def getpl(self, pos, fx=False):
         "if fx (a section name) is passed, pos is relative, otherwise absolute."
@@ -360,13 +372,34 @@ function with access to a database."""
             pg = self.pps[fx][pos]
         else:
             pg = self.pages[pos]
-        for i in range(1, len(self.lines[pg])+1):
-            l=self.lines[pg][i-1]
-            if l > pos:
-                return "%s%d" % (pg[1:-1].split('_')[-1], i)
+        if pg:
+            for i in range(1, len(self.lines[pg])+1):
+                l=self.lines[pg][i-1] - self.secstart[fx]
+                if l > pos:
+                    try:
+                        ld = self.lines[pg][max(0,i-2)] - self.secstart[fx]
+                        #if ld > pos + 2:
+                        #    ld = 0
+                    except:
+                        ld = 0
+                    try:
+                        db=self.lines[pg][i-2] - self.secstart[fx]
+                    except:
+                        db=0
+                    return "%s%d,%d,%d,l:%d" % (pg[1:-1].split('_')[-1], i-1, pos - ld + 1, db, l)
         return None
 
-                
+    def setbaseedition(self, be):
+        self.baseedition = be
+
+    def charstat(self):
+        self.charcnt = collections.defaultdict(int)
+        for cx in self.seq:
+            c=cx[self.cpos]
+            if c== u"　" or len(c) < 1:
+                continue
+            self.charcnt[c] += 1
+    
     def parse(self, infile):
         ##we add an empty seq at the beginning of each file
         zhu_buf = ""
@@ -478,7 +511,7 @@ function with access to a database."""
             tmp = start
             while tmp > limit:
                 tmp -= 1
-                if self.seq[tmp][self.mpos].find('<pb') > 0:
+                if (self.seq[tmp][self.mpos].find('<pb') > 0) or (self.seq[tmp][self.mpos].find('<md') > 0 ):
                     self.sections[i] = (tmp+1, self.sections[i][1])
                     #print tmp+1, "".join(self.seq[tmp+1])
                     break
@@ -542,13 +575,15 @@ function with access to a database."""
                     self.write(outfile, "".join(["".join(a) for a in self.seq[limit - 1 :limit][0][: self.cpos + 2]]))
                 except:
                     self.write(outfile, "".join(["".join(a) for a in self.seq[limit - 1 :limit]]))
-
+            outfile.write("\n")    
             outfile.close()
 
     def write_xml(self, outfile):
         """write the text out as xml in the supplied file object"""
         pass
     def writeheader(self, out, section):
+        be=False
+        jnx = False
         """writes the metadata for the section to the file"""
         out.write("# -*- mode: mandoku-view -*-\n")
         if self.defs.has_key('title'):
@@ -558,10 +593,24 @@ function with access to a database."""
         for dx in self.defs.keys():
             if dx.startswith('#<pb'):
                 continue
-            if dx in ('lastpb', 'date', 'sec', 'juan'):
+            if dx in ('lastpb', 'date', 'sec', 'title', 'source'):
                 continue
+            if dx == "juan":
+                try:
+                    jx = int(self.defs[dx])
+                    out.write("#+PROPERTY: JUAN %d\n" % (section ))
+                except:
+                    out.write("#+PROPERTY: JUAN %s\n" % (defs[dx]))
+                jnx = True
+            if dx == "baseedition" and len(self.baseedition) > 0:
+                out.write("#+PROPERTY: %s %s\n" % (dx.upper(), self.baseedition))
+                out.write("#+PROPERTY: WITNESS %s\n" % ( self.version))
+                be=True
             if not 'mode: ' in self.defs[dx]:
                 out.write("#+PROPERTY: %s %s\n" % (dx.upper(), self.defs[dx]))
+        if not be and len(self.baseedition) > 0:
+            out.write("#+PROPERTY: BASEEDITION %s\n" % (self.baseedition))
+            out.write("#+PROPERTY: WITNESS %s\n" % ( self.version))
         #write lastpb property for md files!
         if self.mdcnt > 0 and section > 0:
             start = self.sections[section][0]
@@ -572,13 +621,14 @@ function with access to a database."""
                     pb=self.seq[tmp][self.mpos]
                     out.write(u"#+PROPERTY: LASTPB  %s\n" % (pb[pb.find('<'):pb.find('>')+1]))
                     break
-        out.write("#+PROPERTY: JUAN %d\n" % (section ))
+        if not jnx:
+            out.write("#+PROPERTY: JUAN %d\n" % (section ))
 
     def printNgram(self, sx, sec, pos, extra=None):
         if extra:
             print sx, sec, pos, extra
         else:
-            print sx, sec, pos
+            print "".join(sx), sec, pos, self.getpl(pos, sec )
 
     def addNgram(self, action='add', n=3):
         ##currently no other action is implemented
@@ -601,7 +651,7 @@ function with access to a database."""
                 try:
                     #the note-marker is on the character preceding the start of
                     #the note!
-                    check="".join(self.seq[j+1][self[self.mpos:]])
+                    check="".join(self.seq[j+1][self.mpos:])
                 except:
                     check=''
                 if '(' in check:
@@ -611,7 +661,7 @@ function with access to a database."""
                     while not found and noteend <= cnt:
                         noteend += 1
                         try:
-                            check2 = "".join(self.seq[j+1][self[self.mpos:]])
+                            check2 = "".join(self.seq[j+1][self.mpos:])
                         except:
                             check2 = ''
                         found = ')' in check2
@@ -629,7 +679,8 @@ function with access to a database."""
                         if not val == u'\u3000':
                             outseq.append(val)
                         dxn += 1
-                    self.printNgram(outseq, fx, j - s)
+                    if not self.seq[j][self.cpos] == u'\u3000':
+                        self.printNgram(outseq, fx, j - s)
                 elif notestart+1 > j:
                     dxn = j
                     ## we need to first build the sequence before the note, then the part after the note
@@ -649,12 +700,13 @@ function with access to a database."""
                         if not val == u'\u3000':
                             outseq.append(val)
                         dxn += 1
-                    self.printNgram(outseq, fx, j - s)
+                    if not self.seq[j][self.cpos] == u'\u3000':
+                        self.printNgram(outseq, fx, j - s)
                 elif notestart < j and j < noteend+1:
                     e = min(j+n, noteend+1)
                     dxn = j
 #                    print dxn, self.seq[dxn]
-                    while len(outseq)  < n or dxn >= e:
+                    while len(outseq)  < n or dxn <= e:
                         try:
                             val = self.seq[dxn][self.cpos]
                         except IndexError:
@@ -662,7 +714,10 @@ function with access to a database."""
                         if not val == u'\u3000':
                             outseq.append(val)
                         dxn += 1
-                    self.printNgram(outseq, fx, j - s)
+                        print val, dxn, notestart, n, len(outseq), e
+
+                    if not self.seq[j][self.cpos] == u'\u3000':
+                        self.printNgram(outseq, fx, j - s)
                 else:
                     dxn = j
                     while len(outseq) < n or n >= cnt:
@@ -673,7 +728,8 @@ function with access to a database."""
                         if not val == u'\u3000':
                             outseq.append(val)
                         dxn += 1
-                    self.printNgram(outseq, fx, j - s)
+                    if not self.seq[j][self.cpos] == u'\u3000':
+                        self.printNgram(outseq, fx, j - s)
 
     def _processopcodes(self, s, t2, s1start, s2start, res, bname, add_var_punctuation):
                 d=0
@@ -723,6 +779,92 @@ function with access to a database."""
                         res[s1start+i1+d] = ""
 
 
+    def _getfirstbestmatch(self, s, lmin=20):
+        buckets=[[]]
+        prev=0
+        max=0
+        ret=0
+        for tag, i1, i2, j1, j2 in s.get_opcodes():
+            if tag == "equal":
+                if i1 - prev < 30:
+                    buckets[-1].append((i1, i2-i1))
+                else:
+                    buckets.append([(i1, i2-i1)])
+                prev = i2
+        for i, b in enumerate(buckets):
+            tmp=sum([a[1] for a in b])
+            #print b, tmp
+            if tmp > max:
+                max=tmp
+                ret=i
+        return buckets[ret][0][0]
+
+    def recheck_newsections(self):
+        """Looks at the md values to determine better borders for the sections and updates the sections list.
+        Potentially dangerous!"""
+        df = collections.defaultdict(list)
+        if self.mdcnt > 0:
+            for i, c in enumerate (self.seq):
+                t1 = "".join(c[self.mpos:])
+                if "<md" in t1:
+                    l=re.split("(<..[^>]+>)", t1)
+                    [df[a[1:-1].split("_")[-1].split("-")[0]].append((a[1:-1].split("_")[-1], i)) for a in l if "<md" in a]
+            if self.cpos == 0:
+                self.punc_reorder()
+            self.newsections = []
+            for i, s in self.sections:
+                k=s.split("_")[1].split(".")[0]
+                if df.has_key(k):
+                    l = df[k]
+                    l=sorted(l, key=lambda x : x[1])
+                    newi=l[0][1]
+                    if newi != i:
+                        self.newsections.append((newi+1, s))
+                    else:
+                        self.newsections.append((newi, s))
+                    #move mdmark to the following char, since it belongs to the beginning
+                    if newi != i:
+                        try:
+                            self.seq[newi+1] = (self.seq[newi][self.mpos] + self.seq[newi+1][0], ) + self.seq[newi+1][self.cpos:]
+                            self.seq[newi] = self.seq[newi][:-1] + ('',)
+                        except:
+                            print "Index error in seq, aborting."
+                            return
+            if len(self.newsections) == len(self.sections):
+                self.sections = self.newsections
+            else:
+                print "Recheck failed. Section lengths do not match."
+        else:
+            print "No md markers found."
+
+    def getneworder(self, othertext, enc="utf-8"):
+        """Othertext is a MandokuText object, already parsed"""
+        repdict={u"】" : ")", u"【" : "(", u"　" : ""}
+        otherseq = [('', '')]
+        s=SequenceMatcher()
+        for line in codecs.open(othertext, "r", enc):
+            if line.startswith("#"):
+                continue
+            line = re.sub("([%s])" % (pua), lambda x : "&ZX-%4.4x;" % (ord(x.group(1)) + puamagic ), line)
+            line = re.sub(u"([】【　])", lambda x : repdict[x.group(1)], line)
+            ex = self.re.split(line)
+            cs=[a for a in zip(*[iter(ex[1:])]*2)]
+            #otherseq[-1] = (otherseq[-1][:-1] + (otherseq[-1][-1] + ex[0],))
+            otherseq.extend(cs)
+        s.set_seq1([a[0] for a in otherseq])
+        for i in range(0, len(self.sections)):
+            tn, f = self.sections[i]
+            secid=f[0:f.find('.')]
+            start = tn
+            try:
+                end = self.sections[i+1][0]
+            except:
+                end = len(self.seq)
+            s.set_seq2([a[self.cpos].replace(u'\u3000', '') for a in self.seq[start:end]])
+            m=self._getfirstbestmatch(s)
+            print m, i, f
+            self.neworder.append((m, i))
+
     def addOtherBranches(self, add_var_punctuation=False):
         """adds the other branches to MandokuText."""
         #[2012-12-05T21:55:39+0900]
@@ -749,7 +891,7 @@ function with access to a database."""
             except:
                 end = len(self.seq)
             sseq[fi] = (si, [a[self.cpos].replace(u'\u3000', '') for a in self.seq[start:end]])
-        for b in repo.heads:
+        for b in [a for a in repo.heads if a.name == a.name.upper()]:
             if b.name != self.version:
                 print b.name
                 b.checkout()
@@ -892,7 +1034,7 @@ class MandokuComp(object):
             self.s.set_seq1([a[self.maintext.cpos] for a in self.maintext.seq])
         self.s.set_seq2([a[self.othertexts[i].cpos] for a in self.othertexts[i].seq])
         self.o = self.s.get_opcodes()
-        
+                                 
     def reorder(self, text1, text2, dx=100, b=35):
         """Text1 must be in the expected order, as one or multiple
         segments. Text2 is the one we want to split at the 'same'
@@ -945,6 +1087,8 @@ class MandokuComp(object):
                 text2.newsections=text2.sections
                 return
         text2.newsections= sorted(text2.newsections, key=lambda x: x[1][0])
+        if text2.mdcnt > 0:
+            text2.recheck_newsections()
         ##now we copy over the in the new order text 
         newseq = [('', '')]
         ##this holds files that do not participate in the text (those with -1 as start position)
@@ -1164,72 +1308,164 @@ class MandokuComp(object):
                 
 
 
-    def move_pg_and_xb6tot2(self, i=0):
+    def move_pg_and_xb6tot2(self, otx=0):
         """update text2 with layout markers from text1"""
         ##TODO: what I really want is a separation of target of the action and the action itself,
         ## then I could define various actions that move some features of t1 to t2 etc.
         t1 = self.maintext
-        t2 = self.othertexts[i]
+        t2 = self.othertexts[otx]
         if t1.cpos == 0:
             t1.punc_reorder()
         if t2.cpos == 0:
             t2.punc_reorder()
-        if self.s is None:
-            self.setsequence()
-        for i in range(0, len(t2.seq)):
-            if u'\xb6' in t2.seq[i][t2.mpos]:
-                t2.seq[i] = t2.seq[i][:t2.mpos] + (t2.seq[i][t2.mpos].replace(u'\xb6', ''), )
-        for tag, i1, i2, j1, j2 in self.o:
-            dx = j1 - i1
-            li = i2 - i1
-            lj = j2 - j1
-            #no matter what tag, if they are the same length; we take it
-            #i.e. equal or replace
-            if li == lj:
-                for i in range(i1, i2):
-                    if "md" in t2.seq[i+dx][t2.mpos]:
-                        pass
-                        #print "y", tag, i+dx, t2.seq[i+dx][t2.mpos], " / ", t1.seq[i]
-                    else:
-                        t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] + (t1.seq[i][t1.mpos].replace('\n', '').replace('<pb:', '<md:') + t2.seq[i+dx][t2.mpos], )+ t2.seq[i+dx][t2.mpos+1:]
-                    # if "md" in "".join(t2.seq[i+dx]):
-                    #     print t2.seq[i+dx]
-            else:
-                if tag == 'replace':
-    #                print dx, i1, i2
-                    l = min(li, lj)
-                    for i in range(i1, i1+l):
-                        t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] + (t1.seq[i][t1.mpos].replace('\n', '').replace('<pb:', '<md:') + t2.seq[i+dx][t2.mpos], ) + t2.seq[i+dx][t2.mpos+1:]
-                    #only if text1 is longer, we add the rest of 1 add the last char
-                    if li > lj:
+        #avoid unnecessary processing time with big files if possible
+        if len(t1.seq) < t1.bigfile or len(t1.sections) != len(t2.sections):
+            if self.s is None:
+                self.setsequence()
+            for i in range(0, len(t2.seq)):
+                if u'\xb6' in t2.seq[i][t2.mpos]:
+                    t2.seq[i] = t2.seq[i][:t2.mpos] + (t2.seq[i][t2.mpos].replace(u'\xb6', ''), )
+            for tag, i1, i2, j1, j2 in self.o:
+                dx = j1 - i1
+                li = i2 - i1
+                lj = j2 - j1
+                #no matter what tag, if they are the same length; we take it
+                #i.e. equal or replace
+                if li == lj:
+                    for i in range(i1, i2):
+                        if "md" in t2.seq[i+dx][t2.mpos]:
+                            pass
+                            #print "y", tag, i+dx, t2.seq[i+dx][t2.mpos], " / ", t1.seq[i]
+                        else:
+                            t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] + (t1.seq[i][t1.mpos].replace('\n', '').replace('<pb:', '<md:') + t2.seq[i+dx][t2.mpos], )+ t2.seq[i+dx][t2.mpos+1:]
+                        # if "md" in "".join(t2.seq[i+dx]):
+                        #     print t2.seq[i+dx]
+                else:
+                    if tag == 'replace':
+        #                print dx, i1, i2
+                        l = min(li, lj)
+                        for i in range(i1, i1+l):
+                            t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] + (t1.seq[i][t1.mpos].replace('\n', '').replace('<pb:', '<md:') + t2.seq[i+dx][t2.mpos], ) + t2.seq[i+dx][t2.mpos+1:]
+                        #only if text1 is longer, we add the rest of 1 add the last char
+                        if li > lj:
+                            #skip punc before  \u3000 
+                            inp=""
+                            c = t1.seq[i:i2]
+                            for z1, a in enumerate(c):
+                                try:
+                                    if c[z1+1][t1.cpos] != u"\u3000":
+                                        inp += a[t1.mpos].replace('\n', '').replace('<pb:', '<md:')
+                                        #print "delz", t2.seq[j1-1], "/", inp
+                                except:
+                                    inp += a[t1.mpos].replace('\n', '').replace('<pb:', '<md:')
+                            #t1.seq[i][t1.mpos].replace('\n', '').replace('<pb:', '<md:') + "".join([a[t1.mpos].replace('\n', '').replace('<pb:', '<md:') for  a in t1.seq[i:i2]])
+                            t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] +(inp + t2.seq[i+dx][t2.mpos] , ) + t2.seq[i+dx][t2.mpos+1:]
+                    elif tag == 'delete':
                         #skip punc before  \u3000 
                         inp=""
-                        c = t1.seq[i:i2]
+                        c = t1.seq[i1:i2]
                         for z1, a in enumerate(c):
                             try:
                                 if c[z1+1][t1.cpos] != u"\u3000":
                                     inp += a[t1.mpos].replace('\n', '').replace('<pb:', '<md:')
-                                    #print "delz", t2.seq[j1-1], "/", inp
+                                    #print "dely", t2.seq[j1-1], "/", inp
                             except:
                                 inp += a[t1.mpos].replace('\n', '').replace('<pb:', '<md:')
-                        #t1.seq[i][t1.mpos].replace('\n', '').replace('<pb:', '<md:') + "".join([a[t1.mpos].replace('\n', '').replace('<pb:', '<md:') for  a in t1.seq[i:i2]])
-                        t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] +(inp + t2.seq[i+dx][t2.mpos] , ) + t2.seq[i+dx][t2.mpos+1:]
-                elif tag == 'delete':
-                    #skip punc before  \u3000 
-                    inp=""
-                    c = t1.seq[i:i2]
-                    for z1, a in enumerate(c):
-                        try:
-                            if c[z1+1][t1.cpos] != u"\u3000":
-                                inp += a[t1.mpos].replace('\n', '').replace('<pb:', '<md:')
-                                #print "dely", t2.seq[j1-1], "/", inp
-                        except:
-                            inp += a[t1.mpos].replace('\n', '').replace('<pb:', '<md:')
-                    t2.seq[j1-1] = t2.seq[j1-1][:t2.mpos] + (inp + t2.seq[j1-1][t2.mpos], ) + t2.seq[i+dx][t2.mpos+1:]
-                    #print "x", j1-1, tag, "".join(t2.seq[j1-1]), "/", "$".join(["#".join(a) for  a in t1.seq[i:i2]])
+                        t2.seq[j1-1] = t2.seq[j1-1][:t2.mpos] + (inp + t2.seq[j1-1][t2.mpos], ) + t2.seq[j1-1][t2.mpos+1:]
+                        #print "x", j1-1, tag, "".join(t2.seq[j1-1]), "/", "$".join(["#".join(a) for  a in t1.seq[i:i2]])
+        elif len(t1.sections) == len(t2.sections):
+            for sn in range(1, len(t1.sections)+1):
+                #for now, we assume the section numbers correspondent to each other
+                s, f = t1.sections[sn-1]
+                t1start = s
+                t2start = t2.sections[sn-1][0]
+                try:
+                    t1end = t1.sections[sn][0]
+                except:
+                    t1end = len(t1.seq)
+                try:
+                    t2end = t2.sections[sn][0]
+                except:
+                    t2end = len(t2.seq)
+                t1seq = t1.seq[t1start:t1end]
+                t2seq = t2.seq[t2start:t2end]
+
+                s=SequenceMatcher()
+                s.set_seq1([a[t1.cpos] for a in t1seq])
+                s.set_seq2([a[t2.cpos] for a in t2seq])
+
+                for i in range(0, len(t2seq)):
+                    if u'\xb6' in t2.seq[i+t2start][t2.mpos]:
+                        t2.seq[i+t2start] = t2.seq[i+t2start][:t2.mpos] + (t2.seq[i+t2start][t2.mpos].replace(u'\xb6', ''), )
+                for tag, i1, i2, j1, j2 in s.get_opcodes():
+                    dx = j1 - i1 + t2start
+                    li = i2 - i1
+                    lj = j2 - j1
+                    #no matter what tag, if they are the same length; we take it
+                    #i.e. equal or replace
+                    if li == lj:
+                        for i in range(i1, i2):
+                            if "md" in t2.seq[i+dx][t2.mpos]:
+                                pass
+                                #print "y", tag, i+dx, t2.seq[i+dx][t2.mpos], " / ", t1.seq[i]
+                            else:
+                                t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] + (t1.seq[i+t1start][t1.mpos].replace('\n', '').replace('<pb:', '<md:') + t2.seq[i+dx][t2.mpos], )+ t2.seq[i+dx][t2.mpos+1:]
+                        # if "md" in "".join(t2.seq[i+dx]):
+                        #     print t1.sections[sn][1], i+dx, "".join(t2.seq[i+dx])
+                    else:
+                        if tag == 'replace':
+            #                print dx, i1, i2
+                            l = min(li, lj)
+                            for i in range(i1, i1+l):
+                                t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] + (t1.seq[i+t1start][t1.mpos].replace('\n', '').replace('<pb:', '<md:') + t2.seq[i+dx][t2.mpos], ) + t2.seq[i+dx][t2.mpos+1:]
+                            #only if text1 is longer, we add the rest of 1 add the last char
+                            if li > lj:
+                                #skip punc before  \u3000 
+                                inp=""
+                                c = t1.seq[i+t1start:i2+t1start]
+                                for z1, a in enumerate(c):
+                                    try:
+                                        if c[z1+1][t1.cpos] != u"\u3000":
+                                            inp += a[t1.mpos].replace('\n', '').replace('<pb:', '<md:')
+                                            #print "delz", t2.seq[j1-1], "/", inp
+                                    except:
+                                        inp += a[t1.mpos].replace('\n', '').replace('<pb:', '<md:')
+                                #t1.seq[i][t1.mpos].replace('\n', '').replace('<pb:', '<md:') + "".join([a[t1.mpos].replace('\n', '').replace('<pb:', '<md:') for  a in t1.seq[i:i2]])
+                                t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] +(inp + t2.seq[i+dx][t2.mpos] , ) + t2.seq[i+dx][t2.mpos+1:]
+                        elif tag == 'delete':
+                            #skip punc before  \u3000 
+                            inp=""
+                            c = t1.seq[i1+t1start:i2+t1start]
+                            for z1, a in enumerate(c):
+                                try:
+                                    if c[z1+1][t1.cpos] != u"\u3000":
+                                        inp += a[t1.mpos].replace('\n', '').replace('<pb:', '<md:')
+                                        #print "dely", t2.seq[j1-1], "/", inp
+                                except:
+                                    inp += a[t1.mpos].replace('\n', '').replace('<pb:', '<md:')
+                            t2.seq[j1-1+t2start] = t2.seq[j1-1+t2start][:t2.mpos] + (inp + t2.seq[j1-1+t2start][t2.mpos], ) + t2.seq[j1-1+t2start][t2.mpos+1:]
+                            #print "x", j1-1, tag, "".join(t2.seq[j1-1]), "/", "$".join(["#".join(a) for  a in t1.seq[i:i2]])
+                        
+        else:
+            #do nothing?
+            pass
         for lz in range(0, len(t2.seq)):
-            if t2.seq[lz][t2.mpos].find('<md') > 0:
+            ts = t2.seq[lz][t2.mpos]
+            if "pb" in ts or "md" in ts:
+                mdx = ""
+                pbx = ""
+                #reduce multiple md or pb to 1
+                pblx = re.split("(<..[^>]+>)", ts)
+                for lx in pblx:
+                    if lx[1:3] == "md":
+                        mdx = "%s¶" % (lx)
+                    elif lx[1:3] == "pb":
+                        pbx = "\n%s\n" % (lx)
+                t2.seq[lz] = t2.seq[lz][:t2.mpos] + (u"%s%s" % (mdx, pbx), ) + t2.seq[lz][t2.mpos+1:]
+            if "md" in ts:
                 t2.mdcnt += 1
+
+
     def mergepunc(self, i=0):
         """update text1 with punctuation from text2"""
         t1 = self.maintext

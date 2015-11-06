@@ -15,7 +15,7 @@ tab={'a':'1', 'b':'2', 'c':'3', 'd': '4', 'e': '5', 'f': '6', 'g':'7', 'h':'8', 
 idx={}
 pcnt = 0
 notes = []
-
+defs = {}
 
 def PrintToIdxfile(outdir, string, collection ):
     global idx
@@ -39,12 +39,17 @@ def PrintToIdxfile(outdir, string, collection ):
 
     
             
-def MandokuIndex(file, idlog='logfile.log', left=2, right=2, length=3, collection='test', use_vol=0):
+def MandokuIndex(file, idlogfile='logfile.log', left=2, right=2, length=3, collection='test', use_vol=0):
     usepb = True
     pcnt = 0
     global notes
-    defs = {'line' : 0, 'noteflag': 0, 'versflag': 0, 'file': file, 'char': 0, 'para' : 0,
-            'txtfile' : os.path.splitext(os.path.split(file)[-1])[0] }
+    defs['txtfile'] = os.path.splitext(os.path.split(file)[-1])[0]
+    defs['line'] = 0
+    defs['noteflag'] = 0
+    defs['versflag'] = 0
+    defs['file'] = file
+    defs['char'] = 0
+    defs['para'] = 0
     s=[]
     #prefill the pre array    
     pre =  [a for a in ch_re.split(u"　" * left) if len(a) > 0]
@@ -145,7 +150,7 @@ def MandokuIndex(file, idlog='logfile.log', left=2, right=2, length=3, collectio
 
         defs['line']=0
         
-    idlog = codecs.open(idlog, 'a', 'utf-8')
+    idlog = codecs.open(idlogfile, 'a', 'utf-8')
     # lets see if we can open the file
     try:
         f=codecs.open(file, 'r', 'utf-8')
@@ -190,8 +195,13 @@ def MandokuIndex(file, idlog='logfile.log', left=2, right=2, length=3, collectio
             # use md only if md present!
             usepb = False
             l1, l2 = line.split("<md", 1)
-            addtostack(l1)
-            setPage(l2)
+            if not defs.has_key('page'):
+                setPage(l2)
+                addtostack(l1)
+            else:
+                addtostack(l1)
+                setPage(l2)
+                
 #            defs['line'] += l2.count(u'¶')
             defs['char'] = 0
             addtostack(l2[l2.find('>')+1:])
@@ -272,10 +282,10 @@ def mdIndexGit(txtdir, repo, branches, left, right, length):
             #extra 
             varx = []
             m=SequenceMatcher()
-            s = MandokuIndex("%s/%s" % (txtdir, f), idlog='logfile.log', left=left, right=right, length=length)
+            s = MandokuIndex("%s/%s" % (txtdir, f), idlogfile='logfile.log', left=left, right=right, length=length)
             m.set_seq1([a.split('\t')[0] for a in s])
             #now we add the other versions
-            k = branches.keys()
+            k = [a for a in branches.keys() if a == a.upper()]
             k.sort()
             for b in k:
                 nx = []
@@ -287,7 +297,7 @@ def mdIndexGit(txtdir, repo, branches, left, right, length):
                 if debug:
                     print "now on branch: ", f,  b.decode('utf-8'), branches[b]
                 b=b.decode('utf-8')
-                x = MandokuIndex("%s/%s" % (txtdir, f), idlog='logfile.log', left=left, right=right, length=length)
+                x = MandokuIndex("%s/%s" % (txtdir, f), idlogfile='logfile.log', left=left, right=right, length=length)
                 m.set_seq2([a.split('\t')[0] for a in x])
                 for tag, i1, i2, j1, j2 in m.get_opcodes():
                     if tag == "replace":
@@ -325,7 +335,7 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7):
     txtid = os.path.split(txtdir)[-1]
     coll = txtid[0:4]
     #check if a previous run exists:
-    for b in repo.branches:
+    for b in [a for a in repo.branches if a.name == a.name.upper() or a.name == "master"]:
         now[b.name] = b.commit.hexsha
     lg = '%s/meta/%s/%s.log' % (idxdir, coll, txtid)
     # if we have a log file, this is an update
@@ -372,7 +382,7 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7):
     else:
         rec.write(u"# creating index at %s\n" % (datetime.datetime.now()))
     rec.write(u"para: '%s', %d, %d, %d\n" % (idxdir, left, right, length))
-    for b in repo.branches:
+    for b in [a for a in repo.branches if a.name == a.name.upper() or a.name=="master"]:
         rec.write(u"%s\t%s\n" % (b.name.decode('utf-8'), b.commit.hexsha))
     # check for identical hashes:
     if  len(now) > 0 and changed:
