@@ -8,8 +8,8 @@ try:
     krpbase = sys.argv[1]
 except:
     krpbase = "/Users/Shared/krp/"
-kridx= "%s%s" % (krpbase, "index")
-ccidx= "%s%s" % (krpbase, "ccidx")
+kridx= "%s%s" % (krpbase, "index_stage")
+ccidx= "%s%s" % (krpbase, "index")
 
 try:
     os.makedirs(ccidx)

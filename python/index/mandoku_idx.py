@@ -155,6 +155,7 @@ def MandokuIndex(file, idlogfile='logfile.log', left=2, right=2, length=3, colle
     try:
         f=codecs.open(file, 'r', 'utf-8')
     except:
+        idlog.close()
         return s
     for line in f:
         if line.startswith(u'校勘記¶'):
@@ -247,6 +248,8 @@ def MandokuIndex(file, idlogfile='logfile.log', left=2, right=2, length=3, colle
             npre.pop(0)
         notes=[]
     # we are now finished reading the file, need to process the rest
+    idlog.close()
+    f.close()
     for i in range(right+length, 0, -1):
         #we need to check and make sure that we have a page
         try:
@@ -274,7 +277,10 @@ def mdIndexGit(txtdir, repo, branches, left, right, length):
     # branches is a dictionary with branchname and sha value or HEAD
     #TODO: what if no master exists?
     alls=[]
-    repo.git.checkout(branches['master'])
+    try:
+        repo.git.checkout(branches['master'])
+    except:
+        pass
     for f in os.listdir(txtdir):
         if debug:
             print f
@@ -319,8 +325,11 @@ def mdIndexGit(txtdir, repo, branches, left, right, length):
                             varx[i] += " " + b
             s.extend(varx)
             alls.append(s)
-#                print "varx: ", " - ".join(varx)
-    repo.git.checkout(branches['master'])
+            #                print "varx: ", " - ".join(varx)
+    try:
+        repo.git.checkout(branches['master'])
+    except:
+        pass
     if debug:
         print len(alls)
     return alls
@@ -344,8 +353,9 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7):
         print lg, update
     changed = True
     if update:
-#        changed = False
-        for l in codecs.open(lg, 'r', 'utf-8'):
+        #        changed = False
+        lgf = codecs.open(lg, 'r', 'utf-8')
+        for l in lgf:
             if l.startswith('para:'):
                 if debug:
                     print "INFO: overwriting parameters from old run: %s" % (l[5:-1])  
@@ -364,6 +374,7 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7):
                     #if we have a new version, we need to do it anyway
                     changed = True
         #if we have a different number of versions, proceed
+        lgf.close()
         if not changed:
             changed = len(old) != len(now)
         if changed:
@@ -385,6 +396,7 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7):
     for b in [a for a in repo.branches if a.name == a.name.upper() or a.name=="master"]:
         rec.write(u"%s\t%s\n" % (b.name.decode('utf-8'), b.commit.hexsha))
     # check for identical hashes:
+    rec.close()
     if  len(now) > 0 and changed:
         index = mdIndexGit(txtdir, repo, now, left, right, length)
         if not update:
@@ -435,7 +447,6 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7):
     
     ## do sth with the index... : either write out new or write patch
 #    rec.write("hash: \n")
-    rec.close()
     repo.git.checkout('master')
     
 

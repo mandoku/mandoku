@@ -24,8 +24,8 @@ except:
         mdbase = "/Users/chris/krpnew"
 # todo: look at mandoku-index-queue
 # print mdbase
-mdtext = "%s/text" % (mdbase)
-mdidx =  "%s/index" % (mdbase)
+mdtext = "%s/gh" % (mdbase)
+mdidx =  "%s/index_stage" % (mdbase)
 mdsys = "%s/system" % (mdbase)
 for d in [mdidx, mdsys]:
     try:
@@ -40,7 +40,7 @@ def textwalk(arg, dirname, names):
         if txtid_re.match(f):
             p = "%s/%s" % (dirname, f)
             print p
-            md.StartIndex(p, mdidx)
+            md.StartIndex(p, mdidx, length=10)
             idxtxt.write("%s\n" % (f))
             
 
