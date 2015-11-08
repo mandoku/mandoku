@@ -378,7 +378,6 @@ Click on a link or move the cursor to the link and then press enter
 
 		   
       
-
 (defun mandoku-initialize ()
   (let* ((md 
 	  (if (not mandoku-base-dir)
@@ -386,13 +385,7 @@ Click on a link or move the cursor to the link and then press enter
 	    mandoku-base-dir))
 	 (mduser (concat md "/user"))
 	 )
-    (setq mandoku-titles-by-date
-	  (if (file-exists-p (expand-file-name "krp-by-date.txt" (concat md "/KR-Workspace/Settings")))
-	      (expand-file-name "krp-by-date.txt" (concat md "/KR-Workspace/Settings"))
-	      (expand-file-name "krp-by-date.txt" (concat md "/system"))))
-
-    (if (not (file-exists-p mandoku-titles-by-date))
-	(url-copy-file "https://raw.githubusercontent.com/kanripo/KR-Workspace/master/Settings/krp-by-date.txt"  (expand-file-name "krp-by-date.txt" (concat md "/system"))))
+    (mkdir md t)
       ;; looks like we have to bootstrap the krp directory structure
       (progn
 	(if (not mandoku-base-dir)
@@ -426,11 +419,17 @@ Click on a link or move the cursor to the link and then press enter
       ;; (setq mandoku-sys-dir  (concat mandoku-base-dir "system/"))
       ;; (setq mandoku-image-dir (concat mandoku-base-dir "images/"))
       (setq mandoku-catalog (concat mandoku-meta-dir "mandoku-catalog.txt"))
+    (setq mandoku-titles-by-date
+	  (if (file-exists-p (expand-file-name "krp-by-date.txt" (concat md "/KR-Workspace/Settings")))
+	      (expand-file-name "krp-by-date.txt" (concat md "/KR-Workspace/Settings"))
+	      (expand-file-name "krp-by-date.txt" (concat md "/system"))))
+
+    (if (not (file-exists-p mandoku-titles-by-date))
+	(url-copy-file "https://raw.githubusercontent.com/kanripo/KR-Workspace/master/Settings/krp-by-date.txt"  (expand-file-name "krp-by-date.txt" (concat md "/system"))))
     (mandoku-read-titletables)
     ))
   (setq mandoku-initialized-p t)
 )
-
 
 (defun mandoku-show-local-init ()
   (interactive)
