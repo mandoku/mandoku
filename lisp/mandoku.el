@@ -7,7 +7,7 @@
 ;;
 ;; Author: Christian Wittern <cwittern@gmail.com>
 ;; URL: http://www.mandoku.org
-;; Version: 0.3
+;; Version: 0.9
 ;; Keywords: convenience
 ;; Package-Requires: ((org "8") (github-clone "20150705.1705"))
 ;; This file is not part of GNU Emacs.
@@ -58,6 +58,7 @@
 (defvar mandoku-local-init-file nil)
 ;; we store the http password for gitlab in memory for one session
 ;; todo: make this a per server setting!
+(defvar mandoku-user-account nil)
 (defvar mandoku-gh-rep "kanripo")
 (defvar mandoku-gh-user nil)
 (defvar mandoku-gh-server "github.com")
@@ -93,6 +94,7 @@
 ;; (defvar mandoku-catalog-user-path-list nil)
 (defvar mandoku-titles-by-date nil)
 (defvar mandoku-git-use-http t)
+(defvar mandoku-gaiji-images-path nil)
 
 (defvar mandoku-initialized-p nil)
 
@@ -278,7 +280,7 @@
 
 (defun mandoku-read-titletables () 
   "read the titles table"
-;;   (setq mandoku-subcolls (make-hash-table :test 'equal))
+  (setq mandoku-subcolls (make-hash-table :test 'equal))
 ;;   (when (file-exists-p (concat mandoku-sys-dir  "subcolls.txt"))
 ;;     (with-temp-buffer
 ;;       (let ((coding-system-for-read 'utf-8)
@@ -298,7 +300,11 @@
 	(goto-char (point-min))
 	(while (re-search-forward "^\\([A-z0-9]+\\)	\\([^	]+\\)	\\([^	
 ]+\\)" nil t)
-	     (puthash (match-string 1) (match-string 3) mandoku-titles))))))
+	  (puthash (match-string 1) (match-string 3) mandoku-titles)
+	  (if (< (length (match-string 1)) 6)
+	      (puthash (match-string 1) (match-string 3) mandoku-subcolls))
+	      
+	  )))))
 
 ;; catalog / title handling
 
@@ -577,6 +583,12 @@ One character is either a character or one entity expression"
       (setq buffer-read-only nil)
       (erase-buffer)
       (mandoku-search-internal search-string index-buffer)
+      ;; fix the image display
+      (goto-char (point-min))
+      (while (re-search-forward "<img[^>]+/images/\\([^>]+\\)./>" nil t)
+	(if mandoku-gaiji-images-path
+	    (replace-match (concat "[[file:" mandoku-gaiji-images-path (match-string 1) "]]"))
+	  (replace-match "⬤")))
       ;; setup the buffer for the index results
       (set-buffer result-buffer)
       (setq buffer-read-only nil)
@@ -798,7 +810,7 @@ One character is either a character or one entity expression"
 	)
 	)
       (mandoku-index-mode)
- ;     (org-overview)
+      (mandoku-refresh-images)
       (hide-sublevels 2)
       (replace-buffer-in-windows index-buffer)
 ;      (kill-buffer index-buffer)
@@ -1656,6 +1668,7 @@ eds
 	(forward-line)
 	(if (looking-at "\n")
 	    (mandoku-index-insert-result (mandoku-index-get-search-string) "*temp-mandoku*" (current-buffer) hw))
+	(mandoku-refresh-images)
 	))
     )
    ))
@@ -2029,6 +2042,12 @@ Letters do not insert themselves; instead, they are commands.
 				    (: (* (any " \t\n")) eos)))
 			    ""
 			    str))
+
+(defun mandoku-refresh-images ()
+  "Refreshes images displayed inline."
+  (interactive)
+  (org-remove-inline-images)
+  (org-display-inline-images))
 
 
 (provide 'mandoku)
