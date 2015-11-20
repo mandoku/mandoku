@@ -47,7 +47,7 @@
 (require 'mandoku-link)
 (require 'mandoku-github)
 (defvar mandoku-base-dir nil "This is the root of the mandoku hierarchy, this needs to be provided by the user in its init file")
-(defvar mandoku-do-remote nil)
+(defvar mandoku-do-remote t)
 (defvar mandoku-preferred-edition nil "Preselect a certain edition to avoid repeated selection")
 ;;;###autoload
 (defconst mandoku-lisp-dir (file-name-directory (or load-file-name (buffer-file-name)))
