@@ -5,10 +5,36 @@
 
 (require 'github-clone)
 
+(defun mandoku-get-remote-text-now (&optional txtid)
+  (interactive)
+  (let* ((buf (current-buffer))
+	 (curpos (point))
+	 (fn (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))))
+	 (ext (file-name-extension (file-name-nondirectory (buffer-file-name ))))
+	 (tmpid (car (split-string  fn "_" )))
+	 (txtid (if txtid
+		    txtid
+	   (if (string-match "[a-z]"  tmpid (- (length tmpid) 1))
+		     (substring tmpid 0 (- (length tmpid) 1))
+		   tmpid)))
+	 (repid (car (split-string txtid "\\([0-9]\\)")))
+	 (groupid (substring txtid 0 (+ (length repid) 2)))
+	 (target (concat mandoku-text-dir groupid "/" txtid)))
+    (condition-case nil
+	(mandoku-clone-repo
+	 (concat (github-clone-user-name) "/" txtid ) target)
+    (error 
+	(mandoku-clone-repo
+	 (concat "kanripo/" txtid ) target t)
+	))
+    (kill-buffer buf)
+    (find-file (concat target "/" fn "." ext))
+    (goto-char (- curpos 70))
+    ))
 
 (defun mandoku-get-remote-text (&optional txtid)
   "This checks if a text is available in a repo and then clones
-it into the appropriate place If a txtid is given, it will use
+it into the appropriate place asynchroneously. If a txtid is given, it will use
 that txtid, otherwise it tries to derive one from the current
 filename.
 We should check if the file exists before cloning!"
@@ -206,19 +232,26 @@ We should check if the file exists before cloning!"
       )))
 
 
-(defun mandoku-clone-repo (repo directory)
-  (let* ((name (oref repo :name))
+(defun mandoku-clone-repo (user-repo-url directory &optional ask)
+  (let* ((name (github-clone-repo-name user-repo-url))
+	 (repo (github-clone-info (car name) (cdr name)))
          (target (if (file-exists-p directory)
-                     (expand-file-name name directory)
+                     (expand-file-name (cdr name) directory)
                    directory))
          (repo-url (eieio-oref repo github-clone-url-slot)))
-    (message "Cloning %s into %s from \"%s\"" name target repo-url)
+    (message "Cloning %s into %s from \"%s\"" (cdr name) target repo-url)
     (if (not (= 0 (shell-command (format "git clone %s %s" repo-url target)
                                  "*github-clone output*")))
         (error "Failed to clone repo \"%s\" to directory \"%s\"" repo-url target))
-    (when (not (string-equal (oref (oref repo :owner) :login)
-                                  (github-clone-user-name)))
+    (when ( and (not (string-equal (oref (oref repo :owner) :login)
+				   (github-clone-user-name)))
+		ask
+		(yes-or-no-p "Fork repo and add remote? "))
       (github-clone-fork-repo repo))))
+
+(defun gh-unset-config (key)
+  "Sets a GitHub specific value to the global Git config."
+  (gh-command-to-string "config" "--global" "--unset" (gh-namespaced-key key)))
 
 (provide 'mandoku-github)
 ;; mandoku-github.el ends here

@@ -72,7 +72,12 @@
 (defvar mandoku-md-menu)
 (defvar mandoku-catalog nil)
 (defvar mandoku-local-index-list nil)
-
+(defvar mandoku-extra-reps '("KR-Workspace" "KR-Gaiji" "KR-Catalog")
+  "Additional data repositories from Kanseki Repository:
+'KR-Workspace' : Workspace for the user.
+'KR-Gaiji' : Mapping table and images for non-system characters.
+'KR-Catalog' : Additional metadata for the texts.
+")
 (defvar mandoku-location-plist nil
   "Plist holds the most recent stored location with associated information.")
 
@@ -2048,6 +2053,13 @@ Letters do not insert themselves; instead, they are commands.
   (interactive)
   (org-remove-inline-images)
   (org-display-inline-images))
+
+(defun mandoku-get-extra (rep)
+  (condition-case nil
+      ;; first try the user
+      (mandoku-clone-repo (concat  (github-clone-user-name) "/" rep) (concat mandoku-base-dir rep) )
+    (mandoku-clone-repo (concat  "kanripo/" rep) (concat mandoku-base-dir rep) )
+    ))
 
 
 (provide 'mandoku)
