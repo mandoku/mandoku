@@ -251,9 +251,14 @@ We should check if the file exists before cloning!"
 	(magit-status-internal target)
 	(github-clone-fork-repo repo))))
 
-
+(defun mandoku-gh-dont-save-password (orig-fun &rest args)
+  (if (equal "password" (car args ))
+      (message "we do not save the password.")
+    (apply orig-fun args)))
+(advice-add 'gh-set-config :around #'mandoku-gh-dont-save-password)
+;;
 (defun gh-unset-config (key)
-  "Sets a GitHub specific value to the global Git config."
+  "Removes a GitHub specific value from the global Git config."
   (gh-command-to-string "config" "--global" "--unset" (gh-namespaced-key key)))
 
 (provide 'mandoku-github)
