@@ -395,6 +395,7 @@ Click on a link or move the cursor to the link and then press enter
 	      (read-string "Directory for mandoku?" )
 	    mandoku-base-dir))
 	 (mduser (concat md "/user"))
+	 (mandoku-ws-settings (expand-file-name (concat md "/KR-Workspace/Settings")))
 	 )
     (mkdir md t)
       ;; looks like we have to bootstrap the krp directory structure
@@ -422,23 +423,32 @@ Click on a link or move the cursor to the link and then press enter
       (dolist (sd mandoku-subdirs)
 	(mkdir (concat mandoku-base-dir sd) t))
       (mandoku-setup-dirvars)
-      ;; (setq mandoku-text-dir (concat mandoku-base-dir "text/"))
-      ;; (setq mandoku-work-dir (concat mandoku-base-dir "work/"))
-      ;; (setq mandoku-user-dir (concat mandoku-base-dir "user/"))
-      ;; (setq mandoku-meta-dir (concat mandoku-base-dir "meta/"))
-      ;; (setq mandoku-temp-dir (concat mandoku-base-dir "temp/"))
-      ;; (setq mandoku-sys-dir  (concat mandoku-base-dir "system/"))
-      ;; (setq mandoku-image-dir (concat mandoku-base-dir "images/"))
+      ;; check for workspace
+      (when (and (not (file-exists-p  mandoku-ws-settings))
+		 (yes-or-no-p "No workspace found, download it now?"))
+	(mandoku-get-extra "KR-Workspace")
+	(mandoku-get-extra "KR-Gaiji")
+	)
+      (if (file-exists-p (expand-file-name "images" (concat md "/KR-Gaiji")))
+	  (setq mandoku-gaiji-images-path (expand-file-name "images" (concat md "/KR-Gaiji"))))
+      ;; might need to get rid of this altogether
       (setq mandoku-catalog (concat mandoku-meta-dir "mandoku-catalog.txt"))
-    (setq mandoku-titles-by-date
-	  (if (file-exists-p (expand-file-name "krp-by-date.txt" (concat md "/KR-Workspace/Settings")))
-	      (expand-file-name "krp-by-date.txt" (concat md "/KR-Workspace/Settings"))
+      
+      (setq mandoku-titles-by-date
+	    (if (file-exists-p (expand-file-name "krp-by-date.txt" mandoku-ws-settings))
+		(expand-file-name "krp-by-date.txt" mandoku-ws-settings)
 	      (expand-file-name "krp-by-date.txt" (concat md "/system"))))
-
+      
     (if (not (file-exists-p mandoku-titles-by-date))
 	(url-copy-file "https://raw.githubusercontent.com/kanripo/KR-Workspace/master/Settings/krp-by-date.txt"  (expand-file-name "krp-by-date.txt" (concat md "/system"))))
     (mandoku-read-titletables)
-    ))
+    )
+  ;; load user settings in the workspace
+  (when (file-exists-p mandoku-ws-settings)
+    (ignore-errors 
+      (add-to-list 'load-path mandoku-ws-settings)
+    (mapc 'load (directory-files mandoku-ws-settings 't "^[^#].*el$")))))
+
   (setq mandoku-initialized-p t)
 )
 
@@ -2117,8 +2127,9 @@ Letters do not insert themselves; instead, they are commands.
   (condition-case nil
       ;; first try the user
       (mandoku-clone-repo (concat  (github-clone-user-name) "/" rep) (concat mandoku-base-dir rep) )
+    (error 
     (mandoku-clone-repo (concat  "kanripo/" rep) (concat mandoku-base-dir rep) )
-    ))
+    )))
 
 
 (provide 'mandoku)
