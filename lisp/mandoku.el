@@ -430,7 +430,7 @@ Click on a link or move the cursor to the link and then press enter
 	(mandoku-get-extra "KR-Gaiji")
 	)
       (if (file-exists-p (expand-file-name "images" (concat md "/KR-Gaiji")))
-	  (setq mandoku-gaiji-images-path (expand-file-name "images" (concat md "/KR-Gaiji"))))
+	  (setq mandoku-gaiji-images-path (concat (expand-file-name "images" (concat md "/KR-Gaiji")) "/")))
       ;; might need to get rid of this altogether
       (setq mandoku-catalog (concat mandoku-meta-dir "mandoku-catalog.txt"))
       
