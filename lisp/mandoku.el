@@ -1315,6 +1315,7 @@ eds
   (set (make-local-variable 'facsimile-list) nil)
   (mandoku-add-comment-face-markers)
   (mandoku-hide-p-markers)
+  (mandoku-display-inline-images)
   (add-to-invisibility-spec 'mandoku)
   (local-unset-key [menu-bar Org])
   (local-unset-key [menu-bar Tbl])
@@ -1360,7 +1361,7 @@ eds
 
 ;(setq mandoku-hide-p-re "\\(?:<[^>]*>\\)\\|¶\n\\|¶")
 ;(setq mandoku-hide-p-re "\\(?:<[^>]*>\\)\\|¶")
-(setq mandoku-hide-p-re "\\(<[pm][db]\\)\\([^_]+_[^_]+_\\)\\([^>]+>\\)\\|¶\\|&\\([^;]+\\);")
+(setq mandoku-hide-p-re "\\(<[pm][db]\\)\\([^_]+_[^_]+_\\)\\([^>]+>\\)\\|¶")
 (defun mandoku-hide-p-markers ()
   "add overlay 'mandoku to hide/show special characters "
   (save-match-data
@@ -1372,7 +1373,8 @@ eds
 	  (if (match-beginning 1)
 	      (overlay-put (make-overlay (match-beginning 1) (match-end 1)) 'invisible 'mandoku)
 	    (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'invisible 'mandoku)))
-))))
+	)
+      )))
 ;; faces
 ;(set-face-attribute 'mandoku-comment-face nil :height 150)
 ;(set-face-attribute 'mandoku-comment-face nil :background "yellow1")
@@ -1399,6 +1401,63 @@ eds
 	    (overlay-put (make-overlay (match-beginning 1) (+ 1 (match-end 1))) 'face 'mandoku-comment-face)
 	  (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'face 'mandoku-comment-face))))
     ))
+(setq mandoku-gaiji-re "&\\(KR[^;]+\\);")
+
+(defun mandoku-display-inline-images (&optional include-linked refresh beg end)
+  "Display the character entities as inline images.
+(mostly borrowed from org-display-inline-images).
+When REFRESH is set, refresh existing images between BEG and END.
+This will create new image displays only if necessary.
+BEG and END default to the buffer boundaries."
+  (interactive "P")
+  (when (and mandoku-gaiji-images-path (display-graphic-p))
+    (unless refresh
+      (org-remove-inline-images)
+      (if (fboundp 'clear-image-cache) (clear-image-cache)))
+    (save-excursion
+      (save-restriction
+	(widen)
+	(setq beg (or beg (point-min)) end (or end (point-max)))
+	(goto-char beg)
+	(let ((re mandoku-gaiji-re)
+	      (case-fold-search t)
+	      old file ov img type attrwidth width)
+	  (while (re-search-forward re end t)
+	    (setq old (get-char-property-and-overlay (match-beginning 1)
+						     'org-image-overlay)
+		  file (expand-file-name
+			(concat mandoku-gaiji-images-path (match-string 1) ".png"))) 
+	    (when (image-type-available-p 'imagemagick)
+	      (setq attrwidth (if (or (listp org-image-actual-width)
+				      (null org-image-actual-width))
+				  (save-excursion
+				    (save-match-data
+				      (when (re-search-backward
+					     "#\\+attr.*:width[ \t]+\\([^ ]+\\)"
+					     (save-excursion
+					       (re-search-backward "^[ \t]*$\\|\\`" nil t)) t)
+					(string-to-number (match-string 1))))))
+		    width (cond ((eq org-image-actual-width t) nil)
+				((null org-image-actual-width) attrwidth)
+				((numberp org-image-actual-width)
+				 org-image-actual-width)
+				((listp org-image-actual-width)
+				 (or attrwidth (car org-image-actual-width))))
+		    type (if width 'imagemagick)))
+	    (when (file-exists-p file)
+	      (if (and (car-safe old) refresh)
+		  (image-refresh (overlay-get (cdr old) 'display))
+		(setq img (save-match-data (create-image file type nil :width width)))
+		(when img
+		  (setq ov (make-overlay (match-beginning 0) (match-end 0)))
+		  (overlay-put ov 'display img)
+		  (overlay-put ov 'face 'default)
+		  (overlay-put ov 'org-image-overlay t)
+		  (overlay-put ov 'modification-hooks
+			       (list 'org-display-inline-remove-overlay))
+		  (push ov org-inline-image-overlays))))))))))
+
+
 
 (define-key mandoku-view-mode-map
   "C-ce" 'view-mode)

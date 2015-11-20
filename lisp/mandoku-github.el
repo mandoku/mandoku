@@ -247,7 +247,10 @@ We should check if the file exists before cloning!"
 				   (github-clone-user-name)))
 		ask
 		(yes-or-no-p "Fork repo and add remote? "))
-      (github-clone-fork-repo repo))))
+	;; this will set the default directory for magit, 
+	(magit-status-internal target)
+	(github-clone-fork-repo repo))))
+
 
 (defun gh-unset-config (key)
   "Sets a GitHub specific value to the global Git config."
