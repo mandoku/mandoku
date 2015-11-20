@@ -7,7 +7,7 @@
 ;;
 ;; Author: Christian Wittern <cwittern@gmail.com>
 ;; URL: http://www.mandoku.org
-;; Version: 0.3
+;; Version: 0.9
 ;; Keywords: convenience
 ;; Package-Requires: ((org "8") (github-clone "20150705.1705"))
 ;; This file is not part of GNU Emacs.
@@ -43,9 +43,9 @@
 ;;; Code:
 
 (require 'org)
-(require 'github-clone)
 (require 'mandoku-remote)
 (require 'mandoku-link)
+(require 'mandoku-github)
 (defvar mandoku-base-dir nil "This is the root of the mandoku hierarchy, this needs to be provided by the user in its init file")
 (defvar mandoku-do-remote nil)
 (defvar mandoku-preferred-edition nil "Preselect a certain edition to avoid repeated selection")
@@ -58,6 +58,7 @@
 (defvar mandoku-local-init-file nil)
 ;; we store the http password for gitlab in memory for one session
 ;; todo: make this a per server setting!
+(defvar mandoku-user-account nil)
 (defvar mandoku-gh-rep "kanripo")
 (defvar mandoku-gh-user nil)
 (defvar mandoku-gh-server "github.com")
@@ -71,7 +72,12 @@
 (defvar mandoku-md-menu)
 (defvar mandoku-catalog nil)
 (defvar mandoku-local-index-list nil)
-
+(defvar mandoku-extra-reps '("KR-Workspace" "KR-Gaiji" "KR-Catalog")
+  "Additional data repositories from Kanseki Repository:
+'KR-Workspace' : Workspace for the user.
+'KR-Gaiji' : Mapping table and images for non-system characters.
+'KR-Catalog' : Additional metadata for the texts.
+")
 (defvar mandoku-location-plist nil
   "Plist holds the most recent stored location with associated information.")
 
@@ -93,6 +99,7 @@
 ;; (defvar mandoku-catalog-user-path-list nil)
 (defvar mandoku-titles-by-date nil)
 (defvar mandoku-git-use-http t)
+(defvar mandoku-gaiji-images-path nil)
 
 (defvar mandoku-initialized-p nil)
 
@@ -278,7 +285,7 @@
 
 (defun mandoku-read-titletables () 
   "read the titles table"
-;;   (setq mandoku-subcolls (make-hash-table :test 'equal))
+  (setq mandoku-subcolls (make-hash-table :test 'equal))
 ;;   (when (file-exists-p (concat mandoku-sys-dir  "subcolls.txt"))
 ;;     (with-temp-buffer
 ;;       (let ((coding-system-for-read 'utf-8)
@@ -298,7 +305,11 @@
 	(goto-char (point-min))
 	(while (re-search-forward "^\\([A-z0-9]+\\)	\\([^	]+\\)	\\([^	
 ]+\\)" nil t)
-	     (puthash (match-string 1) (match-string 3) mandoku-titles))))))
+	  (puthash (match-string 1) (match-string 3) mandoku-titles)
+	  (if (< (length (match-string 1)) 6)
+	      (puthash (match-string 1) (match-string 3) mandoku-subcolls))
+	      
+	  )))))
 
 ;; catalog / title handling
 
@@ -378,21 +389,15 @@ Click on a link or move the cursor to the link and then press enter
 
 		   
       
-
 (defun mandoku-initialize ()
   (let* ((md 
 	  (if (not mandoku-base-dir)
 	      (read-string "Directory for mandoku?" )
 	    mandoku-base-dir))
 	 (mduser (concat md "/user"))
+	 (mandoku-ws-settings (expand-file-name (concat md "/KR-Workspace/Settings")))
 	 )
-    (setq mandoku-titles-by-date
-	  (if (file-exists-p (expand-file-name "krp-by-date.txt" (concat md "/KR-Workspace/Settings")))
-	      (expand-file-name "krp-by-date.txt" (concat md "/KR-Workspace/Settings"))
-	      (expand-file-name "krp-by-date.txt" (concat md "/system"))))
-
-    (if (not (file-exists-p mandoku-titles-by-date))
-	(url-copy-file "https://raw.githubusercontent.com/kanripo/KR-Workspace/master/Settings/krp-by-date.txt"  (expand-file-name "krp-by-date.txt" (concat md "/system"))))
+    (mkdir md t)
       ;; looks like we have to bootstrap the krp directory structure
       (progn
 	(if (not mandoku-base-dir)
@@ -418,19 +423,34 @@ Click on a link or move the cursor to the link and then press enter
       (dolist (sd mandoku-subdirs)
 	(mkdir (concat mandoku-base-dir sd) t))
       (mandoku-setup-dirvars)
-      ;; (setq mandoku-text-dir (concat mandoku-base-dir "text/"))
-      ;; (setq mandoku-work-dir (concat mandoku-base-dir "work/"))
-      ;; (setq mandoku-user-dir (concat mandoku-base-dir "user/"))
-      ;; (setq mandoku-meta-dir (concat mandoku-base-dir "meta/"))
-      ;; (setq mandoku-temp-dir (concat mandoku-base-dir "temp/"))
-      ;; (setq mandoku-sys-dir  (concat mandoku-base-dir "system/"))
-      ;; (setq mandoku-image-dir (concat mandoku-base-dir "images/"))
+      ;; check for workspace
+      (when (and (not (file-exists-p  mandoku-ws-settings))
+		 (yes-or-no-p "No workspace found, download it now?"))
+	(mandoku-get-extra "KR-Workspace")
+	(mandoku-get-extra "KR-Gaiji")
+	)
+      (if (file-exists-p (expand-file-name "images" (concat md "/KR-Gaiji")))
+	  (setq mandoku-gaiji-images-path (expand-file-name "images" (concat md "/KR-Gaiji"))))
+      ;; might need to get rid of this altogether
       (setq mandoku-catalog (concat mandoku-meta-dir "mandoku-catalog.txt"))
+      
+      (setq mandoku-titles-by-date
+	    (if (file-exists-p (expand-file-name "krp-by-date.txt" mandoku-ws-settings))
+		(expand-file-name "krp-by-date.txt" mandoku-ws-settings)
+	      (expand-file-name "krp-by-date.txt" (concat md "/system"))))
+      
+    (if (not (file-exists-p mandoku-titles-by-date))
+	(url-copy-file "https://raw.githubusercontent.com/kanripo/KR-Workspace/master/Settings/krp-by-date.txt"  (expand-file-name "krp-by-date.txt" (concat md "/system"))))
     (mandoku-read-titletables)
-    ))
+    )
+  ;; load user settings in the workspace
+  (when (file-exists-p mandoku-ws-settings)
+    (ignore-errors 
+      (add-to-list 'load-path mandoku-ws-settings)
+    (mapc 'load (directory-files mandoku-ws-settings 't "^[^#].*el$")))))
+
   (setq mandoku-initialized-p t)
 )
-
 
 (defun mandoku-show-local-init ()
   (interactive)
@@ -578,6 +598,12 @@ One character is either a character or one entity expression"
       (setq buffer-read-only nil)
       (erase-buffer)
       (mandoku-search-internal search-string index-buffer)
+      ;; fix the image display
+      (goto-char (point-min))
+      (while (re-search-forward "<img[^>]+/images/\\([^>]+\\)./>" nil t)
+	(if mandoku-gaiji-images-path
+	    (replace-match (concat "[[file:" mandoku-gaiji-images-path (match-string 1) "]]"))
+	  (replace-match "⬤")))
       ;; setup the buffer for the index results
       (set-buffer result-buffer)
       (setq buffer-read-only nil)
@@ -799,7 +825,7 @@ One character is either a character or one entity expression"
 	)
 	)
       (mandoku-index-mode)
- ;     (org-overview)
+      (mandoku-refresh-images)
       (hide-sublevels 2)
       (replace-buffer-in-windows index-buffer)
 ;      (kill-buffer index-buffer)
@@ -1299,6 +1325,7 @@ eds
   (set (make-local-variable 'facsimile-list) nil)
   (mandoku-add-comment-face-markers)
   (mandoku-hide-p-markers)
+  (mandoku-display-inline-images)
   (add-to-invisibility-spec 'mandoku)
   (local-unset-key [menu-bar Org])
   (local-unset-key [menu-bar Tbl])
@@ -1344,7 +1371,7 @@ eds
 
 ;(setq mandoku-hide-p-re "\\(?:<[^>]*>\\)\\|¶\n\\|¶")
 ;(setq mandoku-hide-p-re "\\(?:<[^>]*>\\)\\|¶")
-(setq mandoku-hide-p-re "\\(<[pm][db]\\)\\([^_]+_[^_]+_\\)\\([^>]+>\\)\\|¶\\|&\\([^;]+\\);")
+(setq mandoku-hide-p-re "\\(<[pm][db]\\)\\([^_]+_[^_]+_\\)\\([^>]+>\\)\\|¶")
 (defun mandoku-hide-p-markers ()
   "add overlay 'mandoku to hide/show special characters "
   (save-match-data
@@ -1356,7 +1383,8 @@ eds
 	  (if (match-beginning 1)
 	      (overlay-put (make-overlay (match-beginning 1) (match-end 1)) 'invisible 'mandoku)
 	    (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'invisible 'mandoku)))
-))))
+	)
+      )))
 ;; faces
 ;(set-face-attribute 'mandoku-comment-face nil :height 150)
 ;(set-face-attribute 'mandoku-comment-face nil :background "yellow1")
@@ -1383,6 +1411,63 @@ eds
 	    (overlay-put (make-overlay (match-beginning 1) (+ 1 (match-end 1))) 'face 'mandoku-comment-face)
 	  (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'face 'mandoku-comment-face))))
     ))
+(setq mandoku-gaiji-re "&\\(KR[^;]+\\);")
+
+(defun mandoku-display-inline-images (&optional include-linked refresh beg end)
+  "Display the character entities as inline images.
+(mostly borrowed from org-display-inline-images).
+When REFRESH is set, refresh existing images between BEG and END.
+This will create new image displays only if necessary.
+BEG and END default to the buffer boundaries."
+  (interactive "P")
+  (when (and mandoku-gaiji-images-path (display-graphic-p))
+    (unless refresh
+      (org-remove-inline-images)
+      (if (fboundp 'clear-image-cache) (clear-image-cache)))
+    (save-excursion
+      (save-restriction
+	(widen)
+	(setq beg (or beg (point-min)) end (or end (point-max)))
+	(goto-char beg)
+	(let ((re mandoku-gaiji-re)
+	      (case-fold-search t)
+	      old file ov img type attrwidth width)
+	  (while (re-search-forward re end t)
+	    (setq old (get-char-property-and-overlay (match-beginning 1)
+						     'org-image-overlay)
+		  file (expand-file-name
+			(concat mandoku-gaiji-images-path (match-string 1) ".png"))) 
+	    (when (image-type-available-p 'imagemagick)
+	      (setq attrwidth (if (or (listp org-image-actual-width)
+				      (null org-image-actual-width))
+				  (save-excursion
+				    (save-match-data
+				      (when (re-search-backward
+					     "#\\+attr.*:width[ \t]+\\([^ ]+\\)"
+					     (save-excursion
+					       (re-search-backward "^[ \t]*$\\|\\`" nil t)) t)
+					(string-to-number (match-string 1))))))
+		    width (cond ((eq org-image-actual-width t) nil)
+				((null org-image-actual-width) attrwidth)
+				((numberp org-image-actual-width)
+				 org-image-actual-width)
+				((listp org-image-actual-width)
+				 (or attrwidth (car org-image-actual-width))))
+		    type (if width 'imagemagick)))
+	    (when (file-exists-p file)
+	      (if (and (car-safe old) refresh)
+		  (image-refresh (overlay-get (cdr old) 'display))
+		(setq img (save-match-data (create-image file type nil :width width)))
+		(when img
+		  (setq ov (make-overlay (match-beginning 0) (match-end 0)))
+		  (overlay-put ov 'display img)
+		  (overlay-put ov 'face 'default)
+		  (overlay-put ov 'org-image-overlay t)
+		  (overlay-put ov 'modification-hooks
+			       (list 'org-display-inline-remove-overlay))
+		  (push ov org-inline-image-overlays))))))))))
+
+
 
 (define-key mandoku-view-mode-map
   "C-ce" 'view-mode)
@@ -1657,6 +1742,7 @@ eds
 	(forward-line)
 	(if (looking-at "\n")
 	    (mandoku-index-insert-result (mandoku-index-get-search-string) "*temp-mandoku*" (current-buffer) hw))
+	(mandoku-refresh-images)
 	))
     )
    ))
@@ -1871,203 +1957,6 @@ Letters do not insert themselves; instead, they are commands.
 )
 
 
-(defun mandoku-get-remote-text (&optional txtid)
-  "This checks if a text is available in a repo and then clones
-it into the appropriate place If a txtid is given, it will use
-that txtid, otherwise it tries to derive one from the current
-filename.
-We should check if the file exists before cloning!"
-  (interactive)
-  (let* ((buf (current-buffer))
-	 (fn (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))))
-	 (ext (file-name-extension (file-name-nondirectory (buffer-file-name ))))
-;	 (txtid (downcase (car (split-string  fn "_" ))))
-	 (tmpid (car (split-string  fn "_" )))
-	 (mandoku-gh-user "kanripo")
-	 (mandoku-gh-server "github.com")
-	 (txtid (if txtid
-		    txtid
-	   (if (string-match "[a-z]"  tmpid (- (length tmpid) 1))
-		     (substring tmpid 0 (- (length tmpid) 1))
-		   tmpid)))
-	 (repid (car (split-string txtid "\\([0-9]\\)")))
-	 (groupid (substring txtid 0 (+ (length repid) 2)))
-	 ;; (clone-url (if mandoku-git-use-http
-	 ;; 		(concat "https://" mandoku-gh-server "/")
-	 ;; 	      (concat "git@" mandoku-gh-server ":")))
-	 ;; (txturl (concat clone-url (mandoku-get-user) "/" txtid ".git"))
-	 (targetdir (concat mandoku-text-dir groupid "/")))
-    (mkdir targetdir t)
-    (github-clone (concat mandoku-gh-rep "/" txtid) targetdir)
-;    (mandoku-clone (concat targetdir txtid)  txturl)
-;    (kill-buffer buf)
-;    (find-file (concat targetdir txtid "/" fn "." ext)))
-))
-
- ; (shell-command-to-string (concat "cd " default-directory "  && " git " clone " txturl ))) 
-
-;; this will be implemented once the gitlab API change is in place
-(defun mandoku-gitlab-create-project ()
-  "Create a gitlab project for the current text"
-  (interactive)
-  (let*  ((tit (mandoku-get-title))
-	  (txtid (mandoku-get-textid))
-	  (branch (mandoku-get-current-branch))
-	  (url "False") rem cont)
-    (if (equal branch "master")
-	(setq cont (y-or-n-p "You are still on the master branch. It is recommended to create a different branch first. Do you want to continue?"))
-      (setq cont t)
-      )
-    (if (and cont (y-or-n-p "This will create a project on gitlab and push a copy there. Do you want to continue?"))
-	  (setq url (substring (shell-command-to-string (concat mandoku-python-program " " mandoku-sys-dir "python/makerep.py " txtid " " tit )) 0 -1)))
-    (if (equal (substring url 0 4) "git@")
-	(progn
-	  ; we create a remote for this repository
-	  (shell-command-to-string (concat mandoku-git-program " remote add " mandoku-gitlab-remote-name " " url))
-	  ; and now push to the repository .. maybe do this asyncroneosly..
-	  (shell-command-to-string (concat mandoku-git-program " push -u " mandoku-gitlab-remote-name " " branch))
-	  )
-      (if (and cont (not (equal url "False")))
-	  ; the remote dir already exists, still need to add it as remote here:
-	  (progn
-	    (shell-command-to-string
-	     (concat mandoku-git-program " remote add " mandoku-gitlab-remote-name " "
-		     (cadr (split-string url " "))))
-					; now we add the remote default branch to this .git/config
-	    (shell-command-to-string
-	     (concat mandoku-git-program " fetch " mandoku-gitlab-remote-name  ))
-	    (shell-command-to-string
-	     (concat mandoku-git-program " checkout " (car (split-string url " ")) ))
-	    
-	    )
-      ))
-    
-;  (message "%s" url)
-  ))
-
-(defun mandoku-fork (txtid)
-  "Fork a repository to the current user. At the moment, this requires curl"
-  (let ((res
-  (shell-command-to-string
-   (concat "curl -s -u "
-	   mandoku-user-token
-	   ":x-oauth-basic -X POST https://api."
-	   ;; unlikely this will work for a different server, but hey..
-	   mandoku-gh-server
-	   "/repos/"
-	   ;; this is the gh user of the org, usually kanripo!
-	   mandoku-gh-user
-	   "/"
-	   txtid
-	   "/forks"))))
-    (if (string-match (concat (mandoku-get-user) "/" txtid) res)
-	(message (concat txtid " has been cloned successfully"))
-    )
-  )
-  )
-
-(defun mandoku-url-to-txtid (url)
-;  (if mandoku-git-use-http
-      (substring (car (last (split-string url "/"))) 0 -4)
-;  (substring (cadr (split-string url "/")) 0 -4))
-  )
-
-(defun mandoku-clone (targetdir url)
-  (let* ((default-directory targetdir)
-	 (process-connection-type nil)   ; pipe, no pty (--no-progress)
-	 (curbuf    (current-buffer))
-	 (buf       (get-buffer-create "*mandoku bootstrap*"))
-	 (txtid     (mandoku-url-to-txtid url)))
-    (with-current-buffer (find-file-noselect mandoku-log-file)
-      (goto-char (point-max))
-      (insert (format-time-string "[%Y-%m-%dT%T%z] INFO " (current-time)))
-      (insert (format "Starting to download %s %s\n"
-		      (replace-regexp-in-string "http://[^@]+@" "http://" url)
-		      (mandoku-textid-to-title txtid)))
-      (save-buffer)
-      )
-    (with-current-buffer buf
-      (goto-char (point-max))
-      (insert (format-time-string "[%Y-%m-%dT%T%z]\n" (current-time)))
-      (set-process-sentinel (start-process-shell-command (concat ""
-								 (replace-regexp-in-string "http://[^@]+@" "http://" url)) buf
-							 (concat mandoku-git-program  " clone " url " -v " targetdir))
-			    'mandoku-clone-sentinel)
-      )
-    (set-buffer curbuf)
-    (message "Downloading %s %s" txtid (mandoku-textid-to-title txtid))
-  ))
-
-(defun mandoku-clone-sentinel (proc msg)
-    (if (string-match "finished" msg)
-      ;; TODO: check write to log, write to index queue etc.
-	(let ((txtid  (mandoku-url-to-txtid (format "%s" proc)))) 
-	  ;; make the log entry
-	  (with-current-buffer (find-file-noselect mandoku-log-file)
-	    (goto-char (point-max))
-	    (insert (format-time-string "[%Y-%m-%dT%T%z] INFO " (current-time)))
-	    (insert (format "Finished downloading %s %s\n" proc (mandoku-textid-to-title txtid)))
-	    (save-buffer))
-	  ;; dont need to do this for the wiki repo
-	  (unless (string-match "wiki" (format "%s" proc))
-	    (progn
-	      ;; this has to be the local catalog file
-	      (with-current-buffer (find-file-noselect mandoku-local-catalog)
-		(goto-char (point-max))
-		(insert (format "*** [[mandoku:%s][%s]] %s\n" txtid txtid (mandoku-textid-to-title txtid)))
-		(save-buffer))
-	      ;; add it to the index queue
-	      (with-current-buffer (find-file-noselect mandoku-index-queue)
-		(goto-char (point-max))
-		(insert (format "%s %s\n" txtid (mandoku-textid-to-title txtid)))
-		(save-buffer)))))
-      )
-    (message "Download %s %s" proc msg)
-    )
-
-(defun mandoku-download-add-text-to-queue ()
-  "Adds the text at point or on the current line to dl queue"
-  (interactive)
-  (let ((txtid (mandoku-get-textid)))
-    (if (not txtid)
-	(setq txtid (read-string "Enter ID number of text to download: ")))
-    (if (mandoku-text-local-p txtid)
-	(message "%s %s already downloaded!" txtid (mandoku-textid-to-title txtid))
-      (with-current-buffer (find-file-noselect mandoku-download-queue)
-	(goto-char (point-max))
-	;; we first clone the text if we have a user token
-	;; this assumes we have internet and can acccess github...
-	(if (< 0 (length mandoku-user-token))
-	    (mandoku-fork txtid))
-	(insert (format "%s %s\n" txtid (mandoku-textid-to-title txtid)))
-	(save-buffer)
-	(kill-buffer)
-	(message "%s %s added to download list" txtid (mandoku-textid-to-title txtid))))
-    ))
-
-(defun mandoku-download-show-queue ()
-  (interactive)
-  (find-file mandoku-download-queue)
-  (goto-char (point-min)))
-
-(defun mandoku-download-process-queue ()
-  "Work through the queue and download the texts if necessary."
-  (interactive)
-  (let (txtid)
-    (with-current-buffer (find-file-noselect mandoku-download-queue)
-      (goto-char (point-min))
-      (while (not (eobp))
-	(setq txtid (mandoku-get-textid))
-	(if (and txtid (not (mandoku-text-local-p txtid)))
-	    (mandoku-get-remote-text txtid))
-	(delete-region (point-at-bol)
-		  (progn (forward-line) (point)))
-;	(next-line)
-	)
-      (save-buffer)
-      (message "Finished processing the texts in the download list %s" mandoku-download-queue)
-      )))
-
 
 ;; convenience: abort when using mouse in other buffer
 ;; recommended by yasuoka-san 2013-10-22
@@ -2227,6 +2116,20 @@ We should check if the file exists before cloning!"
 				    (: (* (any " \t\n")) eos)))
 			    ""
 			    str))
+
+(defun mandoku-refresh-images ()
+  "Refreshes images displayed inline."
+  (interactive)
+  (org-remove-inline-images)
+  (org-display-inline-images))
+
+(defun mandoku-get-extra (rep)
+  (condition-case nil
+      ;; first try the user
+      (mandoku-clone-repo (concat  (github-clone-user-name) "/" rep) (concat mandoku-base-dir rep) )
+    (error 
+    (mandoku-clone-repo (concat  "kanripo/" rep) (concat mandoku-base-dir rep) )
+    )))
 
 
 (provide 'mandoku)
