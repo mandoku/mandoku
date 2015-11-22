@@ -1003,7 +1003,7 @@ that includes all text ids of texts that matched here."
 	      (if (posix-string-match "l" s)
 		   (car (split-string s "l"))
 		s))))
-	   (line (if (posix-string-match "[a-o]" s)
+	   (line (if (posix-string-match "[a-o]." s)
 		     (string-to-number (car (cdr  (split-string (car (split-string s "::")) "[a-o]"))))
 		 0))
 	   (search (if (posix-string-match "::" s)
@@ -1031,6 +1031,7 @@ that includes all text ids of texts that matched here."
     ))
   ;; return t to indicate that the search is done.
     t))
+
 (defun mandoku-position-at-point ()
   (interactive)
   (message (mandoku-position-at-point-formatted)))
@@ -1956,6 +1957,30 @@ Letters do not insert themselves; instead, they are commands.
     (mandoku-post-update-internal))
 )
 
+(defun mandoku-display-subcoll (key)
+  "Show the matches of 'key.$' (that is, key and the next char) for a textid in the list of texts"
+  (let ((myList (mandoku-hash-to-list (if (> (length key) 3) mandoku-titles
+				      mandoku-subcolls)))
+	(buf (get-buffer-create "*Mandoku Titles*")))
+    (set-buffer buf)
+    (erase-buffer)
+    (insert
+     (if (< 2 (length key)) (concat "([[mandoku:*:" (substring key 0 -1)  "][Up]]) " ) "")
+       "Entries for " key ": \n")
+    (ignore-errors
+    (dolist (x   
+	     (sort myList (lambda (a b) (string< (car a) (car b)))))
+      (if (string-match (concat key (if (> (length key) 3) ".+" ".$")) (car x))
+	  (insert (format (concat "[[mandoku:"
+			  (if (> (length key) 3) "" "*:")
+			  "%s][%s %s]] \t\n") (car x) (car x)  (car (cdr x))))
+	)))
+    (org-mode)
+    (goto-char (point-min))
+    (next-line 1)
+    (beginning-of-line)
+    (display-buffer buf )
+    ))
 
 
 ;; convenience: abort when using mouse in other buffer
@@ -2017,7 +2042,9 @@ Letters do not insert themselves; instead, they are commands.
 	  (goto-char (point-min))
 	  (if (looking-at "^refs/heads/")
 	      (buffer-substring 12 (1- (point-max)))))))
-)
+    )
+
+
 
 ;; routines to work with settings when loading settings.org
 ;;[2014-01-07T11:21:05+0900]

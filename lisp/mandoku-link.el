@@ -12,7 +12,8 @@
 LINK will consist of a <textid> recognized by mandoku."
   ;; need to get the file name and then call mandoku-execute-file-search
   (let* ((coll (car (split-string link ":")))
-	 (textid (if (equal coll "meta")
+	 (textid (if (or (equal coll "meta")
+			 (equal coll "*"))
 		     (car (cdr (split-string link ":")))
 		   (car (split-string link "[.:]"))))
 	 (page (concat (or
@@ -30,16 +31,19 @@ LINK will consist of a <textid> recognized by mandoku."
 					;"/Readme.org")
 					  )))
 			  coll)))
-	 (filename  (if (equal coll "meta")
+	 (filename  (ignore-errors (if (equal coll "meta")
 			(mandoku-meta-textid-to-file textid)
-		      (concat "/"  (substring textid 0 4) "/" (substring textid 0 8) "/" fname))))
-;    (message (format "%s" page))
-    (if (equal coll "meta")
+		      (concat "/"  (substring textid 0 4) "/" (substring textid 0 8) "/" fname)))))
+					;    (message (format "%s" page))
+    (if (equal coll "*")
+	;; we search for
+	(mandoku-display-subcoll textid)
+      (if (equal coll "meta")
 	  ;; this does a headline only search in meta; we need to have the ID on the headline for this to work
 	  (org-open-file filename  t nil (concat "#" textid)) 
 					;      (message (format "%s" (concat mandoku-meta-dir  textid ".org" )))
-      (if (file-exists-p (concat mandoku-text-dir filename))
-	  (org-open-file (concat mandoku-text-dir "/" filename) t nil 
+	(if (file-exists-p (concat mandoku-text-dir filename))
+	    (org-open-file (concat mandoku-text-dir "/" filename) t nil 
 			 ;;(or src page))
 			  (if src 
 			      (concat page "::" src)
@@ -51,13 +55,14 @@ LINK will consist of a <textid> recognized by mandoku."
 			      (concat page "::" src)
 			    page))
 	  (if (file-exists-p (concat mandoku-temp-dir fname))
-	    (org-open-file (concat mandoku-temp-dir fname) t nil 
-			   (if src 
+	      (ignore-errors (org-open-file (concat mandoku-temp-dir fname) t nil 
+			   (if (< 0 (length src ))
 			       (concat page "::" src)
-			     page))
+			     page)))
 	  (mandoku-open-remote-file filename src page)
 	  )
-	  )))))
+	  (outline-show-all)
+	  ))))))
 
 
 
