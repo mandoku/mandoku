@@ -1750,160 +1750,38 @@ BEG and END default to the buffer boundaries."
 
 (add-hook 'org-cycle-hook 'mandoku-index-tab-change) 
 
-
-
-(defun mandoku-get-catalog-entries(file search &rest type)
-;; have not yet defined search types, this will be parallel to org-agenda-entry-types
-;;  (setq type (or type mandoku-search-types))
-  (let* ((org-startup-folded nil)
-	 (org-startup-align-all-tables nil)
-	 (buffer (if (file-exists-p file)
-		     (org-get-agenda-file-buffer file)
-		   (error "No such file %s" file)))
-	 arg results rtn deadline-results)
-    (if (not buffer)
-	;; If file does not exist, make sure an error message ends up in diary
-	(list (format "Mandoku search error: No such catalog-file %s" file))
-      (with-current-buffer buffer
-	(unless (derived-mode-p 'org-mode)
-	  (error "Catalog file %s is not in `org-mode'" file))
-	(setq mandoku-cat-buffer (or mandoku-cat-buffer buffer)))
-)))
-
 (defun mandoku-remove-nil-recursively (x)
   (if (listp x)
     (mapcar #'mandoku-remove-nil-recursively
             (remove nil x))
     x))
-;; catalog etc
 
-(defun mandoku-list-titles(filter)
-    (let ((buf (get-buffer-create "*Mandoku Titles*")))
-      (with-current-buffer buf
-	(mandoku-title-list-mode)
-	(set (make-local-variable 'package-menu--new-package-list)
-	     new-packages)
-	(package-menu--generate nil t))
-      ;; The package menu buffer has keybindings.  If the user types
-      ;; `M-x list-packages', that suggests it should become current.
-      (switch-to-buffer buf)))
 ;;;###autoload
-(defun mandoku-search-titles(s)
+(defun mandoku-search-titles(key)
+  "Show the matches of 'key' in the list of texts"
   (interactive "sMandoku | Search for title containing: ")
-  (let* ((files (mapcar 'cdr mandoku-catalogs-alist ))
-	 (buf (get-buffer-create "*Mandoku Titles*"))
-	 (type "title")
-	 rtn)
-    (setq rtn (mandoku-remove-nil-recursively (org-map-entries 'mandoku-get-catalog-entry "+LEVEL=3" files)))
-    (with-current-buffer buf
-      (mandoku-title-list-mode)
-      (setq tabulated-list-entries (mapcar 'mandoku-title-entry rtn))
-      (tabulated-list-print) 
-      (switch-to-buffer-other-window buf))
-;    (setq results (append results rtn))
-;    results))
+  (let ((myList (mandoku-hash-to-list mandoku-titles))
+	(buf (get-buffer-create "*Mandoku Titles*")))
+    (set-buffer buf)
+    (erase-buffer)
+    (insert
+       "Titles matching " key ": \n")
+    (ignore-errors
+    (dolist (x   
+	     (sort myList (lambda (a b) (string< (car a) (car b)))))
+      (if (and (< 4 (length (car x)))
+	       (string-match  key (cadr x)))
+	  (insert (format (concat "[[mandoku:"
+;;			  (if (> (length key) 3) "" "*:")
+			  "%s][%s %s]] \t\n") (car x) (car x)  (cadr x)))
+	)))
+    (org-mode)
+    (goto-char (point-min))
+    (next-line 1)
+    (beginning-of-line)
+    (display-buffer buf )
     ))
-
-(defun mandoku-title-entry (entry)
-  "Fromat the entry for  `tabulated-list-entries'.
-ent has the form ((serial-number title) author dynasty (sn-parent parent) )"
-  (let* (
-	 (sn (caar entry))
-	 (title (car (cdr (car entry))))
-	 (resp (or (nth 1 entry) ""))
-	 (dyn (or (nth 2 entry) ""))
-	 (lei (concat (substring (car (nth 3 entry)) 2) (car (cdr (nth 3 entry))))))
-    (list (cons sn nil)
-	  (vector lei sn title dyn resp ))
-))  
-
-(defun mandoku-search-resp(s)
-  (let* ((files (mapcar 'cdr mandoku-catalogs-alist ))
-	 results rtn)
-    (setq rtn (mandoku-remove-nil-recursively (org-map-entries 'mandoku-get-catalog-entry "+LEVEL=3" files)))
-    (setq results (append results rtn))
-    results))
-
-(defun mandoku-get-catalog-entry ()
-  "let bind the search-string as var s"
-  (let* ((begol (save-excursion (beginning-of-line) (search-forward " ") ))
-;	 (parent (save-excursion (org-up-heading-safe) (mandoku-get-header-item )))
-	 (rtn (mandoku-get-header-item)))
-
-    (if (equal type "title")
-	(if (string-match s (car (cdr rtn)))
-	    (list 
-	     rtn 
-	     (or (org-entry-get begol "RESP" ) "")
-	     (or (org-entry-get begol "DYNASTY" )   "")
-	     (save-excursion (org-up-heading-safe) (mandoku-get-header-item ))
-	     ))
-      (if (equal type "resp")
-	  (if (string-match s (org-entry-get begol "RESP" ))
-	    (list rtn (org-entry-get begol "RESP" ) (org-entry-get begol "DYNASTY" ) ))
-	(if (equal type "dyn")
-	  (if (string-match s (org-entry-get begol "DYNASTY" ))
-	    (list rtn (org-entry-get begol "RESP" ) (org-entry-get begol "DYNASTY" ) ))
-      )))))
-
-;; this works
-;; (setq r (mandoku-remove-nil-recursively (let ((s "周易"))
-;;   (org-map-entries 'mandoku-get-catalog-entry "+DYNASTY=\"宋\"" files))))
-
-(define-derived-mode mandoku-title-list-mode tabulated-list-mode "Title List"
-  "Major mode for browsing a list of titles.
-Letters do not insert themselves; instead, they are commands.
-\\<mandoku-title-list-mode-map>
-\\{mandoku-title-list-mode-map}"
-  (setq tabulated-list-format [("Bu" 8 nil)
-			       ("Number" 12 t)
-			       ("Title" 35 t)
-			       ("Dynasty"  10 mandoku-title-menu--dyn-predicate)
-			       ("Author" 0 t)])
-  (setq tabulated-list-padding 2)
-  (setq tabulated-list-sort-key (cons "Title" nil))
-  (tabulated-list-init-header))
-
-(defun mandoku-title-menu--dyn-predicate (A B)
-  (let ((dA (aref (cadr A) 3))
-	(dB (aref (cadr B) 3)))
-  (string< dA dB)))
-
-(defvar mandoku-title-list-mode-map 
-  (let ((map (make-sparse-keymap))
-;	(menu-map (make-sparse-keymap "Catalog")))
-	)
-;    (set-keymap-parent map tabulated-list-mode-map)
-    (define-key map "t" 'mandoku-title-list-goto-text)
-    (define-key map "c" 'mandoku-title-list-goto-catalog)
-    (define-key map "i" 'mandoku-title-list-goto-catalog)
-;    (define-key map "[RET]" 'mandoku-title-list-goto-text)
-    map)
-  "Local keymap for `mandoku-title-list-mode' buffers.")
-
-(define-key mandoku-title-list-mode-map  "t" 'mandoku-title-list-goto-text)
-(define-key mandoku-title-list-mode-map "c" 'mandoku-title-list-goto-catalog)
-(define-key mandoku-title-list-mode-map "i" 'mandoku-title-list-goto-catalog)
-
-
-(defun mandoku-title-list-goto-text ()
-  (interactive)
-  (let* ((id (tabulated-list-get-id))
-	 (entry (and id (assq id tabulated-list-entries))))
-    (if entry
-;; this is where I need to implement the jump
-	(org-mandoku-open (concat  (aref (cadr entry) 1) ".org"))
-      "")))
-
-(defun mandoku-title-list-goto-catalog ()
-  (interactive)
-  (let* ((id (tabulated-list-get-id))
-	 (entry (and id (assq id tabulated-list-entries))))
-    (if entry
-;; this is where I need to implement the jump
-	(org-mandoku-open (concat "meta:" (aref (cadr entry) 1) ":10"))
-      "")))
-
+  
 
 ;; maintenance
 
