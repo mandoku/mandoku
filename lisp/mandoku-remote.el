@@ -7,7 +7,7 @@
 (defvar mandoku-repositories-alist nil)
 ;(defvar mandoku-remote-url "http://localhost:5000/search")
 ;(setq mandoku-remote-url "http://127.0.0.1:5000")
-
+(defconst mandoku-dl-warning "# Don't edit this file.  If you want to edit, press C-c d to download it first.\n")
 (defun mandoku-search-remote (search-string index-buffer)
   (with-current-buffer index-buffer 
     (dolist (rep mandoku-repositories-alist)
@@ -33,11 +33,12 @@
     (unless (search-forward "mandoku-view" nil t)
       (insert "# -*- mode: mandoku-view; -*-\n"))
     (goto-line 2)
-    (insert "# Don't edit this file.  If you want to edit, press C-c d to download\n")
+    (insert mandoku-dl-warning)
     (while (search-forward "[file:" nil t)
       (replace-match "[mandoku:"))
     (save-buffer)
     (mandoku-view-mode)
+    (outline-show-all)
     (mandoku-execute-file-search 
 	 (if src 
 	     (concat page "::" src)

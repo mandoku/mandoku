@@ -29,7 +29,7 @@
 	))
     (kill-buffer buf)
     (find-file (concat target "/" fn "." ext))
-    (goto-char (- curpos 70))
+    (goto-char (- curpos (length mandoku-dl-warning)))
     ))
 
 (defun mandoku-get-remote-text (&optional txtid)
