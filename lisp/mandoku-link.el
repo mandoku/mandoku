@@ -43,17 +43,17 @@ LINK will consist of a <textid> recognized by mandoku."
 	  (org-open-file filename  t nil (concat "#" textid)) 
 					;      (message (format "%s" (concat mandoku-meta-dir  textid ".org" )))
 	(if (file-exists-p (concat mandoku-text-dir filename))
-	    (org-open-file (concat mandoku-text-dir "/" filename) t nil 
+	    (ignore-errors (org-open-file (concat mandoku-text-dir "/" filename) t nil 
 			 ;;(or src page))
 			  (if src 
 			      (concat page "::" src)
-			    page))
+			    page)))
 	(if (file-exists-p (concat mandoku-text-dir (replace-in-string filename (concat textid ".txt") "Readme.org" )))
-	  (org-open-file (concat mandoku-text-dir (replace-in-string filename (concat textid ".txt") "Readme.org" )) t nil 
+	  (ignore-errors (org-open-file (concat mandoku-text-dir (replace-in-string filename (concat textid ".txt") "Readme.org" )) t nil 
 			 ;;(or src page))
 			  (if src 
 			      (concat page "::" src)
-			    page))
+			    page)))
 	  (if (file-exists-p (concat mandoku-temp-dir fname))
 	      (ignore-errors (org-open-file (concat mandoku-temp-dir fname) t nil 
 			   (if (< 0 (length src ))
