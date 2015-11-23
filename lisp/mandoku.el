@@ -373,9 +373,14 @@
 		   
       
 (defun mandoku-initialize ()
-  (let* ((md 
+  (let* ((defmd (if (string-match "windows" (symbol-name system-type))
+		    "c:\\krp"
+		  "~/krp"))
+	 (md 
 	  (if (not mandoku-base-dir)
-	      (read-string "Directory for mandoku?" )
+	      (read-string
+	       (format "Please input the full path to the base directory for Mandoku (default:%s): " defmd)
+	       nil nil  defmd)
 	    mandoku-base-dir))
 	 (mduser (concat md "/user"))
 	 (mandoku-ws-settings (expand-file-name (concat md "/KR-Workspace/Settings")))
@@ -1757,7 +1762,8 @@ BEG and END default to the buffer boundaries."
   "Show the matches of 'key' in the list of texts"
   (interactive "sMandoku | Search for title containing: ")
   (let ((myList (mandoku-hash-to-list mandoku-titles))
-	(buf (get-buffer-create "*Mandoku Titles*")))
+	(buf (get-buffer-create "*Mandoku Titles*"))
+	(cnt 0))
     (set-buffer buf)
     (erase-buffer)
     (insert
@@ -1767,12 +1773,15 @@ BEG and END default to the buffer boundaries."
 	     (sort myList (lambda (a b) (string< (car a) (car b)))))
       (if (and (< 4 (length (car x)))
 	       (string-match  key (cadr x)))
-	  (insert (format (concat "[[mandoku:"
-;;			  (if (> (length key) 3) "" "*:")
-			  "%s][%s %s]] \t\n") (car x) (car x)  (cadr x)))
-	)))
+	  (progn
+	    (insert (format (concat "[[mandoku:"
+				    "%s][%s %s]] \t\n") (car x) (car x)  (cadr x)))
+	    (setq cnt (+ cnt 1))
+	))))
     (org-mode)
     (goto-char (point-min))
+    (end-of-line)
+    (insert (format "(%d)" cnt))
     (next-line 1)
     (beginning-of-line)
     (display-buffer buf )
@@ -1961,6 +1970,7 @@ BEG and END default to the buffer boundaries."
 
 ;; misc helper functions
 (defun mandoku-write-local-text-list ()
+  (interactive)
   (let ((textlist (sort (mandoku-list-local-texts) 'string<)))
     (with-current-buffer (find-file-noselect mandoku-local-catalog t)
       (erase-buffer)
