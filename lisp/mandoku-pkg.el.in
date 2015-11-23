@@ -1,5 +1,7 @@
-(define-package "mandoku" "0.05" "A tool to access repositories of premodern Chinese texts" 
+(define-package "mandoku" "0.9" "A tool to access repositories of premodern Chinese texts" 
     '(
       (org "8.0")
-       )
+      (magit "20151028")
+      (github-clone "20150705")
+      )
 )
