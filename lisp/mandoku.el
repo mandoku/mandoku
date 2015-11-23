@@ -341,37 +341,18 @@
 (defun mandoku-update-catalog ()
   (with-current-buffer (find-file-noselect mandoku-catalog)
     (erase-buffer)
-    (insert "#-*- mode: mandoku-view; -*-
+    (insert "# -*- mode: mandoku-view; -*-
 #+DATE: " (format-time-string "%Y-%m-%d\n" (current-time))  
 "#+TITLE: 漢籍リポジトリ目録
 
-# このファイルは自動作成しますので、編集しないでください
-# This file is generated automatically, so please do not edit
-
-リンクをクリックするかカーソルをリンクの上に移動して<enter>してください
-Click on a link or move the cursor to the link and then press enter
 
 [[file:local-texts.txt][Local (downloaded) texts 個人漢籍]]
-漢籍リポジトリ
+
+[[mandoku:*:KR][Kanseki Repository 漢籍リポジトリ]]
 
 ")
 
-    (dolist (x (sort mandoku-catalogs-alist (lambda (a b) (string< (car a) (car b)))))
-;; need to ignore local texts here...
-(if (not (string-match (car x ) mandoku-local-catalog))
-      (insert 
-       (if (> (length (car x)) 3)
-	   "**"
-	 "*")
-       (format " [[file:%s][%s %s]]\n" 
-	       (cdr x) 
-	       (car x)
-	       (gethash (car x)  mandoku-subcolls))))
-    (save-buffer)
-    (mandoku-view-mode)
-    ))
-  (mandoku-update-catalog-alist)
-)
+))
 
 ;; (defun mandoku-catalog-no-update-needed-p () 
 ;;   "Check for updates that might be necessary for catalog"
@@ -423,8 +404,10 @@ Click on a link or move the cursor to the link and then press enter
 		(insert ";; --end-- added by mandoku installer\n")
 		(save-buffer)))
 	  (kill-buffer)))
-      (if (not (file-exists-p (expand-file-name (concat user-emacs-directory "mandoku-init.el"))))
-	  (copy-file (expand-file-name "mandoku-init.el" (file-name-directory (or load-file-name (buffer-file-name)))) user-emacs-directory))
+      (if (not (file-exists-p (expand-file-name (concat user-emacs-directory "/mandoku-init.el"))))
+	  (copy-file (expand-file-name "mandoku-init.el"
+				       (file-name-directory
+					(find-lisp-object-file-name 'mandoku-show-catalog (symbol-function 'mandoku-show-catalog)))) user-emacs-directory))
       ;; create the other directories
       (dolist (sd mandoku-subdirs)
 	(mkdir (concat mandoku-base-dir sd) t))
@@ -437,9 +420,9 @@ Click on a link or move the cursor to the link and then press enter
 	)
       (if (file-exists-p (expand-file-name "images" (concat md "/KR-Gaiji")))
 	  (setq mandoku-gaiji-images-path (concat (expand-file-name "images" (concat md "/KR-Gaiji")) "/")))
-      ;; might need to get rid of this altogether
       (setq mandoku-catalog (concat mandoku-meta-dir "mandoku-catalog.txt"))
-      
+      (unless (file-exists-p mandoku-catalog)
+	(mandoku-update-catalog))
       (setq mandoku-titles-by-date
 	    (if (file-exists-p (expand-file-name "krp-by-date.txt" mandoku-ws-settings))
 		(expand-file-name "krp-by-date.txt" mandoku-ws-settings)
