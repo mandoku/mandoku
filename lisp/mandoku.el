@@ -336,6 +336,7 @@
   (unless mandoku-initialized-p
     (mandoku-initialize))
   (find-file mandoku-catalog)
+  (delete-other-windows)
   )
 
 (defun mandoku-update-catalog ()
