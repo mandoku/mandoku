@@ -416,9 +416,15 @@ Click on a link or move the cursor to the link and then press enter
 	  (if (not (search-forward "mandoku-base-dir" nil t))
 	      (progn
 		(goto-char (point-max))
+		(insert ";; --start-- added by mandoku installer\n")
 		(insert "(setq mandoku-base-dir \"" mandoku-base-dir "\")\n")
+		(insert ";; additional settings for mandoku: \n")
+		(insert "(load \"mandoku-init\")\n")
+		(insert ";; --end-- added by mandoku installer\n")
 		(save-buffer)))
 	  (kill-buffer)))
+      (if (not (file-exists-p (expand-file-name (concat user-emacs-directory "mandoku-init.el"))))
+	  (copy-file (expand-file-name "mandoku-init.el" (file-name-directory (or load-file-name (buffer-file-name)))) user-emacs-directory))
       ;; create the other directories
       (dolist (sd mandoku-subdirs)
 	(mkdir (concat mandoku-base-dir sd) t))
@@ -1846,7 +1852,7 @@ BEG and END default to the buffer boundaries."
     (erase-buffer)
     (insert
      (if (< 2 (length key)) (concat "([[mandoku:*:" (substring key 0 -1)  "][Up]]) " ) "")
-       "Entries for " key ": \n")
+       "Catalog entries for " key ": \n")
     (ignore-errors
     (dolist (x   
 	     (sort myList (lambda (a b) (string< (car a) (car b)))))
