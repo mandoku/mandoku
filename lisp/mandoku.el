@@ -415,12 +415,13 @@
       (dolist (sd mandoku-subdirs)
 	(mkdir (concat mandoku-base-dir sd) t))
       (mandoku-setup-dirvars)
-      ;; check for workspace
+      ;; check for workspace, but don't panic if it does not work out
+      (ignore-errors
       (when (and (not (file-exists-p  mandoku-ws-settings))
 		 (yes-or-no-p "No workspace found, download it now?"))
 	(mandoku-get-extra "KR-Workspace")
 	(mandoku-get-extra "KR-Gaiji")
-	)
+	))
       (if (file-exists-p (expand-file-name "images" (concat md "/KR-Gaiji")))
 	  (setq mandoku-gaiji-images-path (concat (expand-file-name "images" (concat md "/KR-Gaiji")) "/")))
       (setq mandoku-catalog (concat mandoku-meta-dir "mandoku-catalog.txt"))

@@ -34,10 +34,12 @@
   :ensure t)
 
 (use-package github-clone
+  :init (setq github-clone-url-slot :clone-url)
   :ensure t)
 
 (use-package mandoku
   :init (setq org-return-follows-link t)
+  (setq org-startup-folded 'showeverything)
   (setq mandoku-do-remote t)
   (setq mandoku-string-limit 10)
   (setq mandoku-index-display-limit 2000)

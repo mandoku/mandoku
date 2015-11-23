@@ -28,7 +28,9 @@
 	 (concat "kanripo/" txtid ) target t)
 	))
     (kill-buffer buf)
-    (find-file (concat target "/" fn "." ext))
+    (if (string-match "_" fn)
+	(find-file (concat target "/" fn "." ext))
+      (find-file (concat target "/" "Readme.org" )))
     (goto-char (- curpos (length mandoku-dl-warning)))
     ))
 
@@ -248,8 +250,9 @@ We should check if the file exists before cloning!"
 		ask
 		(yes-or-no-p "Fork repo and add remote? "))
 	;; this will set the default directory for magit, 
-	(magit-status-internal target)
-	(github-clone-fork-repo repo))))
+      (magit-status-internal target)
+      (sleep-for 0.5)
+      (github-clone-fork-repo repo))))
 
 (defun mandoku-gh-dont-save-password (orig-fun &rest args)
   (if (equal "password" (car args ))
