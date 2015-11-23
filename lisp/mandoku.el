@@ -351,7 +351,9 @@
 [[mandoku:*:KR][Kanseki Repository 漢籍リポジトリ]]
 
 ")
-
+  (mandoku-view-mode)
+  (goto-char (point-min))
+  (save-buffer)
 ))
 
 ;; (defun mandoku-catalog-no-update-needed-p () 
@@ -404,10 +406,6 @@
 		(insert ";; --end-- added by mandoku installer\n")
 		(save-buffer)))
 	  (kill-buffer)))
-      (if (not (file-exists-p (expand-file-name (concat user-emacs-directory "/mandoku-init.el"))))
-	  (copy-file (expand-file-name "mandoku-init.el"
-				       (file-name-directory
-					(find-lisp-object-file-name 'mandoku-show-catalog (symbol-function 'mandoku-show-catalog)))) user-emacs-directory))
       ;; create the other directories
       (dolist (sd mandoku-subdirs)
 	(mkdir (concat mandoku-base-dir sd) t))
@@ -430,6 +428,13 @@
       
     (if (not (file-exists-p mandoku-titles-by-date))
 	(url-copy-file "https://raw.githubusercontent.com/kanripo/KR-Workspace/master/Settings/krp-by-date.txt"  (expand-file-name "krp-by-date.txt" (concat md "/system"))))
+    (if (not (file-exists-p (expand-file-name (concat user-emacs-directory "/mandoku-init.el"))))
+	(progn 
+	  (copy-file (expand-file-name "mandoku-init.el"
+				       (file-name-directory
+					(find-lisp-object-file-name 'mandoku-show-catalog (symbol-function 'mandoku-show-catalog)))) user-emacs-directory)
+	  (load "mandoku-init")
+	  ))
     (mandoku-read-titletables)
     (mandoku-write-local-text-list)
     )
