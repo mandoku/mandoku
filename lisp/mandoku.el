@@ -442,6 +442,7 @@ Click on a link or move the cursor to the link and then press enter
     (if (not (file-exists-p mandoku-titles-by-date))
 	(url-copy-file "https://raw.githubusercontent.com/kanripo/KR-Workspace/master/Settings/krp-by-date.txt"  (expand-file-name "krp-by-date.txt" (concat md "/system"))))
     (mandoku-read-titletables)
+    (mandoku-write-local-text-list)
     )
   ;; load user settings in the workspace
   (when (file-exists-p mandoku-ws-settings)
@@ -1687,12 +1688,13 @@ BEG and END default to the buffer boundaries."
     ("Markers"
      ["Show" mandoku-toggle-visibility t])
     ("Browse"
-     ["Show Catalog" mandoku-show-catalog t]
+     ["Show catalog" mandoku-show-catalog t]
+     ["Update local catalog" mandoku-write-local-text-list t]
      )
     ("Search"
      ["Texts" mandoku-search-text t]
-;     ["Titles" mandoku-search-titles t]
-     ["Dictionary" mandoku-dict-mlookup t]
+     ["Titles" mandoku-search-titles t]
+;     ["Dictionary" mandoku-dict-mlookup t]
      ["My Files" mandoku-search-user-text t]
      )
     ;("Versions")
@@ -1964,6 +1966,75 @@ BEG and END default to the buffer boundaries."
 
 
 ;; misc helper functions
+(defun mandoku-write-local-text-list ()
+  (let ((textlist (sort (mandoku-list-local-texts) 'string<)))
+    (with-current-buffer (find-file-noselect mandoku-local-catalog t)
+      (erase-buffer)
+    (insert "# -*- mode: mandoku-view; -*-
+#+DATE: " (format-time-string "%Y-%m-%d\n" (current-time))  
+"#+TITLE: 漢籍リスト
+
+# このファイルは自動作成しますので、編集しないでください
+# This file is generated automatically, so please do not edit
+
+リンクをクリックするかカーソルをリンクの上に移動して<enter>してください
+Click on a link or move the cursor to the link and then press enter
+
+* Downloaded texts 個人漢籍
+")
+    (dolist (x textlist)
+      (insert 
+       (if (> (length x) 3)
+	   "**"
+	 "*")
+       (format " [[mandoku:%s][%s %s]]\n" x x
+	       (gethash x  mandoku-titles))))
+    (save-buffer)
+    (mandoku-view-mode)
+    (show-all)
+  )))
+
+(defun mandoku-list-local-texts (&optional directory)
+  "List local texts by textid. "
+  (interactive)
+  (let (el-files-list
+        (current-directory-list
+         (directory-files-and-attributes (or directory mandoku-text-dir) t)))
+    ;; while we are in the current directory
+    (while current-directory-list
+      (cond
+       ;; check to see whether filename ends in `.git'
+       ;; and if so, append its name to a list.
+       ((equal ".git" (substring (car (car current-directory-list)) -4))
+        (setq el-files-list
+              (cons (car (car current-directory-list)) el-files-list)))
+       ;; check whether filename is that of a directory
+       ((eq t (car (cdr (car current-directory-list))))
+        ;; decide whether to skip or recurse
+        (if
+            (equal "."
+                   (substring (car (car current-directory-list)) -1))
+            ;; then do nothing since filename is that of
+            ;;   current directory or parent, "." or ".."
+            ()
+          ;; else descend into the directory and repeat the process
+          (setq el-files-list
+                (append
+		 (mandoku-list-local-texts
+                  (car (car current-directory-list)))
+                 el-files-list)))))
+      ;; move to the next filename in the list; this also
+      ;; shortens the list so the while loop eventually comes to an end
+      (setq current-directory-list (cdr current-directory-list)))
+    ;; return the filenames
+    (mapcar 'mandoku-get-textid-from-filename el-files-list)))
+
+(defun mandoku-get-textid-from-filename (fn)
+  "fn is the filename including .git extension as in the mandoku-text-dir"
+  (let ((fnlist (split-string fn "/")))
+  (nth (- (length fnlist ) 2 )  fnlist))
+  )
+
 
 (defun mandoku-start ()
   "return the start of region if a region is active, otherwise point"
