@@ -72,6 +72,7 @@
 (defvar mandoku-md-menu)
 (defvar mandoku-catalog nil)
 (defvar mandoku-local-index-list nil)
+(defvar mandoku-for-commit-list nil)
 (defvar mandoku-extra-reps '("KR-Workspace" "KR-Gaiji" "KR-Catalog")
   "Additional data repositories from Kanseki Repository:
 'KR-Workspace' : Workspace for the user.
@@ -1334,6 +1335,7 @@ eds
   (local-unset-key [menu-bar Org])
   (local-unset-key [menu-bar Tbl])
   (easy-menu-add mandoku-md-menu mandoku-view-mode-map)
+  (add-hook 'after-save-hook 'mandoku-add-to-for-commit-list nil t)
   ;;;; this affects all windows in the frame, do not want this..
   ;; (if (string-match "/temp/" (buffer-file-name) )
   ;;     (set-background-color "honeydew"))
@@ -2117,6 +2119,10 @@ Click on a link or move the cursor to the link and then press enter
     (error 
     (mandoku-clone-repo (concat  "kanripo/" rep) (concat mandoku-base-dir rep) )
     )))
+
+(defun mandoku-add-to-for-commit-list ()
+  (if (string-match mandoku-text-dir fn)
+      (add-to-list 'mandoku-for-commit-list `(magit-toplevel (buffer-file-name (current-buffer))))))
 
 
 (provide 'mandoku)
