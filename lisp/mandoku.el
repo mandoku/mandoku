@@ -1342,10 +1342,14 @@ eds
 
 (defun mandoku-toggle-visibility ()
   (interactive)
-  (if (member 'mandoku buffer-invisibility-spec)
-      (remove-from-invisibility-spec 'mandoku)
-    (add-to-invisibility-spec 'mandoku))
-  (if (member 'mandoku buffer-invisibility-spec)
+  (if buffer-invisibility-spec
+      (progn
+	(visible-mode 1)
+	(mandoku-display-inline-images))
+    (progn 
+	(visible-mode -1)
+	(org-remove-inline-images)))
+  (if buffer-invisibility-spec
       (easy-menu-change
 	 '("Mandoku") "Markers"
 	 (list  ["Show" mandoku-toggle-visibility t]))
