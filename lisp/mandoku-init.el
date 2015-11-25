@@ -3,11 +3,14 @@
 
 ;; This file has some default settings for new users of mandoku.
 ;; This also includes settings for other packages.
-;; Please adapt the file to your needs.
+;; Please adapt the settings to your needs or insert new ones here
+(prefer-coding-system 'utf-8)
+(ignore-errors
+  (mac-auto-ascii-mode 1))
 
-;;; mandoku-base-dir
-;(setq mandoku-base-dir "~/krp")
+
 ;;; 
+;;; you should know what you are doing if you change anything below...
 
 (require 'package)
 (setq package-enable-at-startup nil)
@@ -22,9 +25,6 @@
   (package-refresh-contents)
   (package-install 'use-package))
 (require 'use-package)
-
-(prefer-coding-system 'utf-8)
-(mac-auto-ascii-mode 1)
 
 (use-package magit
   :bind ("C-x g" . magit-status)
@@ -49,8 +49,7 @@
   (define-key mandoku-view-mode-map (kbd "C-c i")  'mandoku-open-image-at-page)
   (define-key mandoku-view-mode-map (kbd "C-c d")  'mandoku-get-remote-text-now)
 
-  :bind (("C-c i" . mandoku-insert-image )
-	 ("<f6>" . mandoku-search-text)
+  :bind (("<f6>" . mandoku-search-text)
 	 ("<f7>"  . mandoku-search-titles)  )
 )
 

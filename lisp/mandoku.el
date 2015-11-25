@@ -419,7 +419,7 @@
       ;; check for workspace, but don't panic if it does not work out
       (ignore-errors
       (when (and (not (file-exists-p  mandoku-ws-settings))
-		 (yes-or-no-p "No workspace found, download it now?"))
+		 (yes-or-no-p "No workspace found. It necessary to take full advantage of Mandoku, but requires a (free) Github account.  If you do not currently have one, create one and come back, then you can download (clone) a workspace from GitHub. Do you want to download it now?"))
 	(mandoku-get-extra "KR-Workspace")
 	(mandoku-get-extra "KR-Gaiji")
 	))
@@ -435,8 +435,9 @@
       
     (if (not (file-exists-p mandoku-titles-by-date))
 	(url-copy-file "https://raw.githubusercontent.com/kanripo/KR-Workspace/master/Settings/krp-by-date.txt"  (expand-file-name "krp-by-date.txt" (concat md "/system"))))
-    (if (not (file-exists-p (expand-file-name (concat user-emacs-directory "/mandoku-init.el"))))
-	(progn 
+    (setq mandoku-local-init-file (expand-file-name (concat user-emacs-directory "/mandoku-init.el")))
+    (if (not (file-exists-p mandoku-local-init-file))
+	(progn
 	  (copy-file (expand-file-name "mandoku-init.el"
 				       (file-name-directory
 					(find-lisp-object-file-name 'mandoku-show-catalog (symbol-function 'mandoku-show-catalog)))) user-emacs-directory)
