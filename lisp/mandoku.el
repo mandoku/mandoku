@@ -72,6 +72,7 @@
 (defvar mandoku-md-menu)
 (defvar mandoku-catalog nil)
 (defvar mandoku-local-index-list nil)
+(defvar mandoku-for-commit-list nil)
 (defvar mandoku-extra-reps '("KR-Workspace" "KR-Gaiji" "KR-Catalog")
   "Additional data repositories from Kanseki Repository:
 'KR-Workspace' : Workspace for the user.
@@ -419,7 +420,7 @@
       ;; check for workspace, but don't panic if it does not work out
       (ignore-errors
       (when (and (not (file-exists-p  mandoku-ws-settings))
-		 (yes-or-no-p "No workspace found, download it now?"))
+		 (yes-or-no-p "No workspace found. It necessary to take full advantage of Mandoku, but requires a (free) Github account.  If you do not currently have one, create one and come back, then you can download (clone) a workspace from GitHub. Do you want to download it now?"))
 	(mandoku-get-extra "KR-Workspace")
 	(mandoku-get-extra "KR-Gaiji")
 	))
@@ -435,8 +436,9 @@
       
     (if (not (file-exists-p mandoku-titles-by-date))
 	(url-copy-file "https://raw.githubusercontent.com/kanripo/KR-Workspace/master/Settings/krp-by-date.txt"  (expand-file-name "krp-by-date.txt" (concat md "/system"))))
-    (if (not (file-exists-p (expand-file-name (concat user-emacs-directory "/mandoku-init.el"))))
-	(progn 
+    (setq mandoku-local-init-file (expand-file-name (concat user-emacs-directory "/mandoku-init.el")))
+    (if (not (file-exists-p mandoku-local-init-file))
+	(progn
 	  (copy-file (expand-file-name "mandoku-init.el"
 				       (file-name-directory
 					(find-lisp-object-file-name 'mandoku-show-catalog (symbol-function 'mandoku-show-catalog)))) user-emacs-directory)
@@ -1333,6 +1335,7 @@ eds
   (local-unset-key [menu-bar Org])
   (local-unset-key [menu-bar Tbl])
   (easy-menu-add mandoku-md-menu mandoku-view-mode-map)
+  (add-hook 'after-save-hook 'mandoku-add-to-for-commit-list nil t)
   ;;;; this affects all windows in the frame, do not want this..
   ;; (if (string-match "/temp/" (buffer-file-name) )
   ;;     (set-background-color "honeydew"))
@@ -1342,10 +1345,14 @@ eds
 
 (defun mandoku-toggle-visibility ()
   (interactive)
-  (if (member 'mandoku buffer-invisibility-spec)
-      (remove-from-invisibility-spec 'mandoku)
-    (add-to-invisibility-spec 'mandoku))
-  (if (member 'mandoku buffer-invisibility-spec)
+  (if buffer-invisibility-spec
+      (progn
+	(visible-mode 1)
+	(mandoku-display-inline-images))
+    (progn 
+	(visible-mode -1)
+	(org-remove-inline-images)))
+  (if buffer-invisibility-spec
       (easy-menu-change
 	 '("Mandoku") "Markers"
 	 (list  ["Show" mandoku-toggle-visibility t]))
@@ -2112,6 +2119,10 @@ Click on a link or move the cursor to the link and then press enter
     (error 
     (mandoku-clone-repo (concat  "kanripo/" rep) (concat mandoku-base-dir rep) )
     )))
+
+(defun mandoku-add-to-for-commit-list ()
+  (if (string-match mandoku-text-dir fn)
+      (add-to-list 'mandoku-for-commit-list `(magit-toplevel (buffer-file-name (current-buffer))))))
 
 
 (provide 'mandoku)
