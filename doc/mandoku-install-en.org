@@ -88,6 +88,8 @@
 (require 'package)
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.org/packages/"))
+(package-refresh-contents)
+(package-initialize)
 (package-install 'mandoku)
 )
 #+END_EXAMPLE
@@ -97,21 +99,45 @@
       keys "C-x" and "C-e" (that is, press the control key and while
       keeping it pressed, also press the "x" key.  Then release both
       keys, press the control key again, followed by the "e").  This
-      should get things going.
+      should get things going: Emacs will install Mandoku and other
+      packages that are required.  
 
+      To start using Mandoku for the first time, you will have to
+      manually ask it to show the catalog.  This is done by typing
+      "M-x" (M on the Mac is usually the command key, but in some
+      configurations it could also be the "option" or "alt" key, just
+      try to see which one works on your machine and then keep it
+      pressed and also press "x").  Once you release the keys, you
+      will see a prompt in the bottom most space of the Emacs window,
+      this is called the minibuffer.  Now type "mandoku-show-catalog",
+      and then the enter key.  This will initialize the mandoku
+      package.  This process will make sure that next time the catalog
+      will be loaded right away, so you need to do this only once.  
+      
+      Mandoku will now aks you where you want to put the files related
+      to the use of the Kanseki Repository, that is mostly the texts,
+      but also some other data files, the data you produce while you
+      work with it, etc.  The program will suggest "~/krp" for you,
+      which is the "krp" folder in your home directory.  You can
+      either accept this by pressing enter, or enter a different path
+      name followed by enter.  
 
-      Emacs will install Mandoku and other packages that are required.  It
-      will also try to install a workspace from your GitHub user
-      account.  For best results, you should use this workspace and
-      thus have your credentials for GitHub ready.  Emacs will ask you
-      for your account name and the password. This will be used to ask
-      the GitHub site to create a "token" for you. This token is
+      Mandoku will also try to install a workspace from your GitHub
+      user account.  For best results, you should use this workspace
+      and thus have your credentials for GitHub ready.  Emacs will ask
+      you for your account name and the password. This will be used to
+      ask the GitHub site to create a "token" for you. This token is
       stored and used for subsequent access from this machine; you
       will need the password only once and it will not be stored.  The
       startup process might take a while, but this is only necessary
-      for the first time.
+      for the first time. If you do not want to mess around with
+      accounts and passwords right now, you can also skip this step
+      and use Mandoku right away.  Using your GitHub credentials will
+      be necessary next when you want to download texts from the
+      Kanseki Repository for local use.
 
-
+      Once all is done, you should see a catalog file.  You can now
+      continue below under "Using the preview version". 
 
 
 
@@ -131,7 +157,8 @@
 
   After starting Emacs with the =Mandoku= preview package installed,
   Emacs will display the file =mandoku-catalog.txt=, which is a list
-  of titles available.  
+  of titles available.  The file will look a bit different now, as the
+  screenshot is from an earlier version.
 
   In some cases, the catalog file might be obscured by the Emacs
   splash screen. In such a case, the file can be brought to the front
