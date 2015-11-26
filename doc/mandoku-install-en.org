@@ -79,8 +79,8 @@
    range of Unicode).
 
    Once you have Emacs installed, open it and find the "*scratch*"
-   buffer.  This buffer is not listed on the Buffer menu, but you can
-   find it in the Buffer list, which is available there.  Once in the
+   buffer.  This buffer might not be listed on the Buffer menu, but you can always
+   find it in the Buffer list, which is available on the Buffer menu.  Once in the
    *scratch* buffer, paste the following code there:
 
 #+BEGIN_EXAMPLE
