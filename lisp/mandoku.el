@@ -422,7 +422,11 @@
       ;; check for workspace, but don't panic if it does not work out
       (ignore-errors
       (when (and (not (file-exists-p  mandoku-ws-settings))
-		 (yes-or-no-p "No workspace found. It necessary to take full advantage of Mandoku, but requires a (free) Github account.  If you do not currently have one, create one and come back, then you can download (clone) a workspace from GitHub. Do you want to download it now?"))
+		 (yes-or-no-p "No workspace found. 
+It necessary to take full advantage of Mandoku, but requires a (free) Github account.  
+If you do not currently have one, create one and come back, then you can download (clone) a workspace from GitHub. 
+Otherwise, deal with Github later and continue without a workspace.
+Do you want to download it now?"))
 	(mandoku-get-extra "KR-Workspace")
 	(mandoku-get-extra "KR-Gaiji")
 	))
@@ -1350,10 +1354,10 @@ eds
   (if buffer-invisibility-spec
       (progn
 	(visible-mode 1)
-	(mandoku-display-inline-images))
+	(org-remove-inline-images))
     (progn 
 	(visible-mode -1)
-	(org-remove-inline-images)))
+	(mandoku-display-inline-images)))
   (if buffer-invisibility-spec
       (easy-menu-change
 	 '("Mandoku") "Markers"
