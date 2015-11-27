@@ -252,7 +252,11 @@ We should check if the file exists before cloning!"
 	;; this will set the default directory for magit, 
       (magit-status-internal target)
       (sleep-for 0.5)
-      (github-clone-fork-repo repo))))
+      (github-clone-fork-repo repo)
+      (message "Successfully forked and added remote")
+      ))
+  (message "Successfully cloned repository")
+  )
 
 (defun mandoku-gh-dont-save-password (orig-fun &rest args)
   (if (equal "password" (car args ))
@@ -263,6 +267,7 @@ We should check if the file exists before cloning!"
 (defun gh-unset-config (key)
   "Removes a GitHub specific value from the global Git config."
   (gh-command-to-string "config" "--global" "--unset" (gh-namespaced-key key)))
+
 
 (provide 'mandoku-github)
 ;; mandoku-github.el ends here

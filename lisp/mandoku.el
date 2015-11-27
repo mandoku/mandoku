@@ -45,7 +45,9 @@
 (require 'org)
 (require 'mandoku-remote)
 (require 'mandoku-link)
+(require 'magit)
 (require 'mandoku-github)
+(require 'git)
 (defvar mandoku-base-dir nil "This is the root of the mandoku hierarchy, this needs to be provided by the user in its init file")
 (defvar mandoku-do-remote t)
 (defvar mandoku-preferred-edition nil "Preselect a certain edition to avoid repeated selection")
@@ -2121,9 +2123,16 @@ Click on a link or move the cursor to the link and then press enter
     )))
 
 (defun mandoku-add-to-for-commit-list ()
+  (ignore-errors
+  (let ((fn (magit-toplevel (buffer-file-name (current-buffer)))))
   (if (string-match mandoku-text-dir fn)
-      (add-to-list 'mandoku-for-commit-list `(magit-toplevel (buffer-file-name (current-buffer))))))
+      (add-to-list 'mandoku-for-commit-list )))))
 
+(defun mandoku-commit-from-list ()
+  (interactive)
+  (dolist (x mandoku-for-commit-list)
+
+    ))
 
 (provide 'mandoku)
 
