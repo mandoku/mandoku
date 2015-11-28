@@ -1,10 +1,10 @@
 #+TITLE: Installing and using the Mandoku preview version
-#+DATE: 2014-03-04
+#+DATE: 2015-11-24
 #+OPTIONS: toc:nil ^:nil
 
 * Installing the preview version of Mandoku
 
-  As of December 2013, a new preview version of =Mandoku= is
+  As of November 2015, a new preview version of =Mandoku= is
   available.  This now is much more complete than the previous
   versions (but there still remains a lot to be done:-).  Much work
   has been invested in making the installation procedure more smooth,
@@ -18,116 +18,136 @@
   Requirements:
   - On all platforms, =git= and =python= are required for the
     installation process and software updates, to run the program of
-    course Emacs is also needed.
+    course Emacs is also needed. 
   - A working network connection
   - About 400 MB of free space on the system harddisk
 
 ** Installing a package for Windows
 
-   The package for Windows has been tested on Windows 8.  It might
-   work on earlier versions, but there might also be problems.  The
-   Emacs application included in the =Mandoku= package below is the
-   one from [[http://ftp.gnu.org/gnu/emacs/windows/emacs-24.3-bin-i386.zip][the Gnu software archive]] (version 24.3 of March 2013); the
-   only modification is that a startup file has been placed in the
-   =site-lisp= directory.
+   The package for Windows has been tested on Windows 10.  It might
+   work on earlier versions, but there might also be problems.
+   Currently there is no 32 bit version of the package. The Emacs
+   application included in the =Mandoku= package below is version 24.5
+   from
+   [[https://raw.githubusercontent.com/chuntaro/NTEmacs64/master/emacs-24.5-IME-patched.zip][the
+   NTemacs project]], this is known to work with the input methods for
+   Chinese and Japanese.
    
    1. The =Mandoku= preview package includes a version of the =git=
       program, which is used to download and update necessary
       files. If you want to use =git= outside of =Mandoku=, it is
       recommended to download and install the =git= software from the
-      [[http://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git][msysgit software repository]]; the current version is
-      [[http://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git][Git-1.9.4-preview]].
+      [[https://git-for-windows.github.io/][Git for Windows]] software
+      repository. The current version known to work is v2.6.3.
+
    2. Download the =Mandoku= installation package
-      [[file:data/mandoku-preview-2014-09-25.zip][mandoku-preview-2014-09-25.zip]]
-      (165MB).
+      [[file:data/mandoku-preview-2015-11-27.zip][mandoku-preview-2015-11-27.zip]]
+      (250MB).
    3. Doubleclick on the package and move the folder =krp=, which is
       found inside the package to a destination on a root directory of
       your computer, such as =C:=, =D:= and so on as a destination.
-   4. Within the folder =krp=, click on the file "start-mandoku",
-      which is a batchfile that sets up the environment and then
-      starts Emacs. This file can also be accessed through a shortcut
-      placed on the the Desktop, so you can easily find it next time.
+   4. Within the folder =krp=, navigate to the =bin= folder found
+      there and then click on the file "start-mandoku", which is a
+      batchfile that sets up the environment and then starts
+      Emacs. This file can also be accessed through a shortcut placed
+      on the the Desktop, so you can easily find it next time. To make
+      such a shortcut, right-click on the file "start-mandoku" and
+      select "Send-to", then "Desktop (create shortcut)". You will
+      then be able to use that shortcut to start Emacs (and Mandoku)
+      next time.  Alternatively, you can also pin it to the taskbar
+      for convenient access.
+   5. When started for the first time, Emacs will install Mandoku and
+      other packages that are required.  It will also try to install a
+      workspace from your GitHub user account.  For best results, you
+      should use this workspace and thus have your credentials for
+      GitHub ready.  Emacs will ask you for your account name and the
+      password. This will be used to ask the GitHub site to create a
+      "token" for you. This token is stored and used for subsequent
+      access from this machine; you will need the password only once
+      and it will not be stored.  The startup process might take a
+      while, but this is only necessary for the first time.
 
       
 
-** Installing a package for Macintosh
+** Installing Mandoku on a Macintosh computer
 
-   The package for Macintosh has been tested on OS X 10.9 (Mavericks).
-   It might also work on other versions.
+   At the moment, there is no package for the Mac.  To install, use a
+   recent version of Emacs (the version containing the patch by
+   Yamamoto Mitsuharu of Chiba University, available at
+   [[https://github.com/railwaycat/homebrew-emacsmacport/releases][GitHub
+   user railwaycat's account]], since this version supports the whole
+   range of Unicode).
 
-   The Emacs binary available in the package below is the version 24.3 from one ahas been modified
-   by applying a patch from Yamamoto Mitsuharu and by placing a
-   startup file in the =site-lisp= directory.
+   Once you have Emacs installed, open it and find the "*scratch*"
+   buffer.  This buffer might not be listed on the Buffer menu, but you can always
+   find it in the Buffer list, which is available on the Buffer menu.  Once in the
+   *scratch* buffer, paste the following code there:
 
-   1. On OS X 10.6 it is necessary to first install the =git=
-      program. Please download the installer from the
-      [[http://code.google.com/p/git-osx-installer/][git-osx-installer]] software archive: the current version is [[http://code.google.com/p/git-osx-installer/downloads/detail?name=git-1.8.3.2-intel-universal-snow-leopard.dmg&can=3&q=&sort=-uploaded][Git
-      1.8.3.2]]. Doubleclick on the downloaded file and again on the
-      file =name=git-1.8.3.2-intel-universal-snow-leopard.dmg= to
-      mount it, now click on the file
-      =name=git-1.8.3.2-intel-universal-snow-leopard.pkg= and follow
-      the on-screen instructions to install the software.  This is not
-      necessary on OS X 10.8.
-   2. Download and open the =Mandoku= preview package [[file:data/mandoku-preview-2014-01-13.dmg][mandoku-preview-2014-01-13.dmg]] (55MB).
-   3. There are two items in the volume:
-      - =Emacs=
-      - =krp=
-   4. Drag =Emacs= into the Applications folder.  If there is already
-      an item called =Emacs=, it is recommended to replace this
-      item. If you use this frequently, you can place =Emacs= in the
-      dock for convenient access.
-   5. Drag =krp= to your home directory. Alternatively, you can also
-      drag this to the =Shared= folder so that it can be used by other
-      users of the computer.
+#+BEGIN_EXAMPLE
+(progn
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.org/packages/"))
+(package-refresh-contents)
+(package-initialize)
+(package-install 'mandoku)
+)
+#+END_EXAMPLE
+
+      Then move the cursor to the very end of the buffer, in a
+      position after the last closing ")" parenthesis and press the
+      keys "C-x" and "C-e" (that is, press the control key and while
+      keeping it pressed, also press the "x" key.  Then release both
+      keys, press the control key again, followed by the "e").  This
+      should get things going: Emacs will install Mandoku and other
+      packages that are required.  
+
+      To start using Mandoku for the first time, you will have to
+      manually ask it to show the catalog.  This is done by typing
+      "M-x" (M on the Mac is usually the command key, but in some
+      configurations it could also be the "option" or "alt" key, just
+      try to see which one works on your machine and then keep it
+      pressed and also press "x").  Once you release the keys, you
+      will see a prompt in the bottom most space of the Emacs window,
+      this is called the minibuffer.  Now type "mandoku-show-catalog",
+      and then the enter key.  This will initialize the mandoku
+      package.  This process will make sure that next time the catalog
+      will be loaded right away, so you need to do this only once.  
+      
+      Mandoku will now aks you where you want to put the files related
+      to the use of the Kanseki Repository, that is mostly the texts,
+      but also some other data files, the data you produce while you
+      work with it, etc.  The program will suggest "~/krp" for you,
+      which is the "krp" folder in your home directory.  You can
+      either accept this by pressing enter, or enter a different path
+      name followed by enter.  
+
+      Mandoku will also try to install a workspace from your GitHub
+      user account.  For best results, you should use this workspace
+      and thus have your credentials for GitHub ready.  Emacs will ask
+      you for your account name and the password. This will be used to
+      ask the GitHub site to create a "token" for you. This token is
+      stored and used for subsequent access from this machine; you
+      will need the password only once and it will not be stored.  The
+      startup process might take a while, but this is only necessary
+      for the first time. If you do not want to mess around with
+      accounts and passwords right now, you can also skip this step
+      and use Mandoku right away.  Using your GitHub credentials will
+      be necessary next when you want to download texts from the
+      Kanseki Repository for local use.
+
+      Once all is done, you should see a catalog file.  You can now
+      continue below under "Using the preview version". 
 
 
 
 ** Installing =Mandoku= into existing Emacs installations
 
-   =Mandoku= consists of a package with Emacs-lisp (and some other)
-   code, and of metadata necessary for the operation, this makes the
-   installation more complicated than is usually the case for Emacs
-   add-on packages.
-
-   The easiest way to include it into existing installations (on
-   Windows or Macintosh) is to use the above mentioned packages and
-   then make sure that =mandoku-default.el= (in the =mandoku/lisp=
-   directory) is loaded; this should take care of the initialization
-   by setting some variables and then loading =mandoku-local-init=
-   from your Emacs init directory; the latter file should have been
-   created during installation.
-   
-   In addition to this, there are two ways to accomplish the install manually:
-   1. Using the file =mandoku-install= by evaluating the following
-      elisp expression:
-#+BEGIN_SRC elisp
-(setq mandoku-base-dir "~/krp")
-(with-temp-buffer (url-insert-file-contents 
-       "https://raw.github.com/cwittern/mandoku/master/lisp/mandoku-install.el")
-  (eval-region (point-min) (point-max)))
-  (mandoku-install mandoku-base-dir)
-  (add-to-list 'load-path user-emacs-directory)
-  (mandoku-setup-local-init-file)
-  (load "mandoku-local-init")
-#+END_SRC
-      This will install the program code and necessary files under the
-      base directory =krp= in your home directory. It will also clone
-      the metadata repository and compile the necessary files, this
-      might take at least 10 minutes to finish.
-
-
-
-   2. Alternatively, you might want to follow the steps in
-      =mandoku-install= manually to understand what exactly is
-      installed to your computer.  
-
-      
-   So far, the preview package has not been tested under systems other
-   than Windows and Macintosh, but I would be very interested to know
-   the results of such an experiment.
-
-
-
+   =Mandoku= consists of a package with Emacs-lisp code.  The code
+   itself is available in the melpa package. If you already have melpa
+   in your list of package repositories, just go there and install the
+   "mandoku" package.  Otherwise follow the instructions given for
+   Macintosh users above.
 
 
 * Using the preview version
@@ -137,10 +157,12 @@
 
   After starting Emacs with the =Mandoku= preview package installed,
   Emacs will display the file =mandoku-catalog.txt=, which is a list
-  of catalog files available locally.  The catalog files themselves
-  can be browsed by clicking on the filename links.  
+  of titles available.  The file will look a bit different now, as the
+  screenshot is from an earlier version.
 
-  In some cases, the catalog file might be obscured by the Emacs splash screen. In such a case, the file can be brought to the front using the buffer menu as shown here:
+  In some cases, the catalog file might be obscured by the Emacs
+  splash screen. In such a case, the file can be brought to the front
+  using the buffer menu as shown here:
 #+ATTR_HTML: :alt Emacs splash screen  :width 600
 [[file:images/emacs-splash.png]]
 
@@ -171,7 +193,7 @@
   Of these, we will first look at the "Search" menu, which has the following entries:
   - Texts       <f6>
   - Titles      <f7>
-  - Dictionary  <f5>
+
 
   There are three different search actions, that is, within the texts,
   within the titles of the texts and within the dictionaries.  We will
@@ -259,35 +281,35 @@
 #+ATTR_HTML: :alt Emacs title display  :width 500
 [[file:images/mandoku-title-search-1.png]]
 
-** Dictionary search
+# ** Dictionary search
 
-   Dictionary search is initiated by pressing F5. If some text has
-   been selected, this selected text will be the search term.
-   Otherwise, the line of text that is currently displayed will be the
-   searched for.  For every string of one or more characters that has
-   an entry in at least one of the dictionaries, an item is generated
-   in the dictionary display.  In the dictionary display buffer, the
-   first line will display the text location, if one had been
-   identified, the following lines, beginning with two "**" characters
-   will contain the dictionary information.  Moving the cursor (or
-   "point") to the beginning of this line and then pressing the "tab"
-   key will open the display and reveal a list of the dictionaries
-   that contain this term. Pressing the "tab" key again will open all
-   dictionary entries at the same time. This might be a bit confusing,
-   in which case one can move the point to the beginning of the
-   desired line and press "tab" again. Some dictionaries have the full
-   text, others have only a reference to the page (and volume) where
-   the entry is found.  These are listed under the last entry "其他詞典".
+#    Dictionary search is initiated by pressing F5. If some text has
+#    been selected, this selected text will be the search term.
+#    Otherwise, the line of text that is currently displayed will be the
+#    searched for.  For every string of one or more characters that has
+#    an entry in at least one of the dictionaries, an item is generated
+#    in the dictionary display.  In the dictionary display buffer, the
+#    first line will display the text location, if one had been
+#    identified, the following lines, beginning with two "**" characters
+#    will contain the dictionary information.  Moving the cursor (or
+#    "point") to the beginning of this line and then pressing the "tab"
+#    key will open the display and reveal a list of the dictionaries
+#    that contain this term. Pressing the "tab" key again will open all
+#    dictionary entries at the same time. This might be a bit confusing,
+#    in which case one can move the point to the beginning of the
+#    desired line and press "tab" again. Some dictionaries have the full
+#    text, others have only a reference to the page (and volume) where
+#    the entry is found.  These are listed under the last entry "其他詞典".
 
-   Here is an example of a dictionary search, in this case for "周易", which will display three items:
-#+ATTR_HTML: :alt Emacs dictionary result display  :width 300
-[[file:images/mandoku-dict-1.png]]
+#    Here is an example of a dictionary search, in this case for "周易", which will display three items:
+# #+ATTR_HTML: :alt Emacs dictionary result display  :width 300
+# [[file:images/mandoku-dict-1.png]]
 
-  Pressing tab on the start of the line displaying "** 周易" changes the display to:
-#+ATTR_HTML: :alt Emacs dictionary result display  :width 400
-[[file:images/mandoku-dict-2.png]]
+#   Pressing tab on the start of the line displaying "** 周易" changes the display to:
+# #+ATTR_HTML: :alt Emacs dictionary result display  :width 400
+# [[file:images/mandoku-dict-2.png]]
 
-  And here is what is displayed under "其他詞典":
-#+ATTR_HTML: :alt Emacs dictionary result display  :width 400
-[[file:images/mandoku-dict-3.png]]
+#   And here is what is displayed under "其他詞典":
+# #+ATTR_HTML: :alt Emacs dictionary result display  :width 400
+# [[file:images/mandoku-dict-3.png]]
    
