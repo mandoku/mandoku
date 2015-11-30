@@ -121,12 +121,12 @@
 (defvar mandoku-textid-regex  "[A-Z]\\{2\\}[0-9][A-z]+[0-9]\\{4\\}")
 
 ;;[2014-06-03T14:31:46+0900] better handling of git
-(defcustom mandoku-git-program (executable-find "git")
+(defcustom mandoku-git-program (concat "\"" (executable-find "git") "\"")
   "Name of the git executable used by mandoku."
   :type '(string)
   :group 'mandoku)
 
-(defcustom mandoku-python-program (executable-find "python")
+(defcustom mandoku-python-program (concat "\"" (executable-find "python") "\"")
   "Name of the python executable used by mandoku."
   :type '(string)
   :group 'mandoku)
@@ -458,7 +458,7 @@ Do you want to download it now?"))
     (ignore-errors 
       (add-to-list 'load-path mandoku-ws-settings)
     (mapc 'load (directory-files mandoku-ws-settings 't "^[^#].*el$")))))
-
+  (add-hook 'git-commit-setup-hook 'mandoku-git-prepare-info) 
   (setq mandoku-initialized-p t)
 )
 
@@ -2138,17 +2138,29 @@ Click on a link or move the cursor to the link and then press enter
 
     ))
 
-(defun mandoku-git-user-email ()
-(substring
-(let ((default-directory (expand-file-name "~/")))
-  (shell-command-to-string (concat mandoku-git-program " config --global --get user.email"  ))) 0 -1))
+(defun mandoku-git-config-get (section item)
+  (let ((default-directory (expand-file-name "~/")))
+    (ignore-errors (substring
+     (shell-command-to-string (concat mandoku-git-program " config --global --get " section "." item  )) 0 -1))))
 
+(defun mandoku-git-config-set (section item value)
+  (let ((default-directory (expand-file-name "~/")))
+     (shell-command-to-string (concat mandoku-git-program " config --global " section "." item " " value  ))))
 
-(defun mandoku-git-user-name ()
-(substring
-(let ((default-directory (expand-file-name "~/")))
-  (shell-command-to-string (concat mandoku-git-program " config --global --get user.name"  ))) 0 -1))
+(defun mandoku-git-prepare-info()
+  "Make sure we have name and email so that we can commit"
+  (unless (mandoku-git-config-get "user" "email")
+    (mandoku-git-config-set "user" "email"
+			    (read-string 
+			     (format "Please enter an email adress for use with git: "))))
+  (unless (mandoku-git-config-get "user" "name")
+    (mandoku-git-config-set "user" "name"
+			    (or (mandoku-git-config-get "github" "user")
+			    (read-string 
+			     (format "Please enter your name for use with git: "))))))
   
+    
+
 ;; git config --global credential.helper wincred
 ;; one more
 ;; and again.
