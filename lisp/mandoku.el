@@ -2138,6 +2138,18 @@ Click on a link or move the cursor to the link and then press enter
 
     ))
 
+(defun mandoku-git-user-email ()
+(substring
+(let ((default-directory (expand-file-name "~/")))
+  (shell-command-to-string (concat mandoku-git-program " config --global --get user.email"  ))) 0 -1))
+
+
+(defun mandoku-git-user-name ()
+(substring
+(let ((default-directory (expand-file-name "~/")))
+  (shell-command-to-string (concat mandoku-git-program " config --global --get user.name"  ))) 0 -1))
+  
+
 (provide 'mandoku)
 
 ;;; mandoku.el ends here
