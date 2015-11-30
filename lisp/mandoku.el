@@ -2151,6 +2151,7 @@ Click on a link or move the cursor to the link and then press enter
   
 ;; git config --global credential.helper wincred
 ;; one more
+;; and again.
 (provide 'mandoku)
 
 ;;; mandoku.el ends here
