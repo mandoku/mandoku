@@ -457,8 +457,16 @@ Do you want to download it now?"))
   (when (file-exists-p mandoku-ws-settings)
     (ignore-errors 
       (add-to-list 'load-path mandoku-ws-settings)
-    (mapc 'load (directory-files mandoku-ws-settings 't "^[^#].*el$")))))
-  (add-hook 'git-commit-setup-hook 'mandoku-git-prepare-info) 
+      (mapc 'load (directory-files mandoku-ws-settings 't "^[^#].*el$")))))
+  ;; if we do not have a credential helper, set one (is this stupid?
+  (unless (equal "\"\"" mandoku-git-program)
+    (add-hook 'git-commit-setup-hook 'mandoku-git-prepare-info)
+    (unless (mandoku-git-config-get "credential" "helper")
+      (mandoku-git-config-set "credential" "helper"
+			    (if (eq window-system 'w32)
+				"wincred"
+			      (if (eq window-system 'mac)
+				  "osxkeychain")))))
   (setq mandoku-initialized-p t)
 )
 
