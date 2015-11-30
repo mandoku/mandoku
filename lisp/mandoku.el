@@ -2150,6 +2150,7 @@ Click on a link or move the cursor to the link and then press enter
   (shell-command-to-string (concat mandoku-git-program " config --global --get user.name"  ))) 0 -1))
   
 ;; git config --global credential.helper wincred
+;; one more
 (provide 'mandoku)
 
 ;;; mandoku.el ends here
