@@ -2149,7 +2149,7 @@ Click on a link or move the cursor to the link and then press enter
 (let ((default-directory (expand-file-name "~/")))
   (shell-command-to-string (concat mandoku-git-program " config --global --get user.name"  ))) 0 -1))
   
-
+;; git config --global credential.helper wincred
 (provide 'mandoku)
 
 ;;; mandoku.el ends here
