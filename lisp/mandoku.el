@@ -1722,6 +1722,7 @@ BEG and END default to the buffer boundaries."
     ;("Versions")
     ("Maintenance"
      ["Download this text now!" mandoku-get-remote-text (string-match "fatal" (car (mandoku-get-branches)))]
+     ["Download my texts from GitHub" mandoku-get-user-repos-from-gh t]
      ["Download texts in DL list" mandoku-download-process-queue t]
      ["Add to download list" mandoku-download-add-text-to-queue t]
      ["Show download list" mandoku-download-show-queue t]
@@ -2138,7 +2139,7 @@ Click on a link or move the cursor to the link and then press enter
   (ignore-errors
   (let ((fn (magit-toplevel (buffer-file-name (current-buffer)))))
   (if (string-match mandoku-text-dir fn)
-      (add-to-list 'mandoku-for-commit-list )))))
+      (add-to-list 'mandoku-for-commit-list fn )))))
 
 (defun mandoku-commit-from-list ()
   (interactive)
@@ -2167,7 +2168,6 @@ Click on a link or move the cursor to the link and then press enter
 			    (read-string 
 			     (format "Please enter your name for use with git: "))))))
   
-    
 
 ;; git config --global credential.helper wincred
 ;; one more

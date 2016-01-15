@@ -4,7 +4,7 @@
 ;; relies on gh.el and github-clone.el
 
 (require 'github-clone)
-
+;;this can now also be used from elisp
 (defun mandoku-get-remote-text-now (&optional txtid)
   (interactive)
   (let* ((buf (current-buffer))
@@ -18,8 +18,10 @@
 		     (substring tmpid 0 (- (length tmpid) 1))
 		   tmpid)))
 	 (repid (car (split-string txtid "\\([0-9]\\)")))
-	 (groupid (substring txtid 0 (+ (length repid) 2)))
-	 (target (concat mandoku-text-dir groupid "/" txtid)))
+	 (groupid (ignore-errors (substring txtid 0 (+ (length repid) 2))))
+	 (target (if groupid
+		     (concat mandoku-text-dir groupid "/" txtid)
+		   (concat mandoku-base-dir txtid))))
     (condition-case nil
 	(mandoku-clone-repo
 	 (concat (github-clone-user-name) "/" txtid ) target)
@@ -27,12 +29,15 @@
 	(mandoku-clone-repo
 	 (concat "kanripo/" txtid ) target t)
 	))
-    (kill-buffer buf)
-    (if (string-match "_" fn)
-	(find-file (concat target "/" fn "." ext))
-      (find-file (concat target "/" "Readme.org" )))
-    (goto-char (- curpos (length mandoku-dl-warning)))
-    ))
+    (if (or (string-match "^KR" fn)
+	    (string-match "Readme" fn))
+    (progn
+      (kill-buffer buf)
+      (if (string-match "_" fn)
+	  (find-file (concat target "/" fn "." ext))
+	(find-file (concat target "/" "Readme.org" )))
+      (goto-char (- curpos (length mandoku-dl-warning)))
+    ))))
 
 (defun mandoku-get-remote-text (&optional txtid)
   "This checks if a text is available in a repo and then clones
@@ -268,6 +273,33 @@ We should check if the file exists before cloning!"
   "Removes a GitHub specific value from the global Git config."
   (gh-command-to-string "config" "--global" "--unset" (gh-namespaced-key key)))
 
+;; check if f is a KR repos
+(defun mandoku-kr-rep-p (f)
+    (string-match "^KR[0-9]" f))
+
+(defun mandoku-kr-to-clone (kr-gh-repos)
+  "Remove files already locally available from list of remote repos"
+  (let ((local-texts (mandoku-list-local-texts))
+	(new-list nil))
+    (dolist (x kr-gh-repos)
+      (unless (member x local-texts)
+        (setq new-list (cons x new-list))))
+    (nreverse new-list)))
+    
+
+;; this gives me all KR repos of the current user
+;; TODO: what about other accounts this user owns? -- IGNORE
+(defun mandoku-gh-user-repos ()
+  (remove-if-not #'mandoku-kr-rep-p
+  (cl-loop for fork in (oref (gh-repos-user-list (gh-repos-api "api")) :data)
+	 collect (car (last (split-string (oref fork :html-url) "/"))))))
+
+(defun mandoku-get-user-repos-from-gh()
+  "Gets the user's repos not already available locally"
+  (interactive)
+  (dolist (x (mandoku-kr-to-clone (mandoku-gh-user-repos)))
+    (mandoku-get-remote-text-now x))
+  (message "All done for now!"))
 
 (provide 'mandoku-github)
 ;; mandoku-github.el ends here
