@@ -58,6 +58,7 @@
 	 (hd (plist-get mandoku-location-plist :context))
 	 (rest (plist-get mandoku-location-plist :rest))
 	 (key (plist-get mandoku-location-plist :key))
+	 (fn (plist-get mandoku-location-plist :filename))
 	 (lf (or key hd))
 	 )
     (with-current-buffer (find-file annot-file)

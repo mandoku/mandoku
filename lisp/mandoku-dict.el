@@ -20,7 +20,7 @@
 	(pos    (mandoku-position-at-point)))
     (set-buffer result-buffer)
     (setq buffer-file-name nil)
-    (toggle-read-only 0)
+    (read-only-mode 0)
     (erase-buffer)
     (insert "* " (if pos pos "")  "\n")
     (url-insert-file-contents (concat mandoku-dict-url "/procline?query=" (replace-regexp-in-string "&" "$" inp)))
