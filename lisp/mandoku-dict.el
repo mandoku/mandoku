@@ -88,7 +88,7 @@
   \\{mandoku-dict-mode-map}"
   (setq case-fold-search nil)
   (set (make-local-variable 'org-startup-folded) 'overview)
-  (toggle-read-only 1)
+  (read-only-mode 0)
 ;  (view-mode)
 )
 
