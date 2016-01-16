@@ -1723,13 +1723,13 @@ BEG and END default to the buffer boundaries."
     ("Maintenance"
      ["Download this text now!" mandoku-get-remote-text (string-match "fatal" (car (mandoku-get-branches)))]
      ["Download my texts from GitHub" mandoku-get-user-repos-from-gh t]
-     ["Download texts in DL list" mandoku-download-process-queue t]
-     ["Add to download list" mandoku-download-add-text-to-queue t]
-     ["Show download list" mandoku-download-show-queue t]
+;     ["Download texts in DL list" mandoku-download-process-queue t]
+;     ["Add to download list" mandoku-download-add-text-to-queue t]
+;     ["Show download list" mandoku-download-show-queue t]
      ["Update search index" mandoku-update-index t]
      ["Setup file" mandoku-show-local-init t]
      ["Convert my work files" mandoku-find-files-to-convert t]
-;     ["Update mandoku" mandoku-update t]
+     ["Update mandoku" mandoku-update t]
 ;     ["Update installed texts" mandoku-update-texts nil]
      
 ;     ["Add repository" mandoku-gitlab-create-project (not (member mandoku-gitlab-remote-name (mandoku-get-remotes)))]
@@ -1832,37 +1832,8 @@ BEG and END default to the buffer boundaries."
 
 (defun mandoku-update()
   (interactive)
-  (mandoku-update-internal "/mandoku/lisp")
-  (dolist ( rep mandoku-repositories-alist)
-		(mandoku-update-internal (concat "/meta/" (car rep)))))
-
-(defun mandoku-update-internal (package)
-  (let* (
-	 (buf       (switch-to-buffer "*mandoku bootstrap*"))
-	 (default-directory (concat mandoku-base-dir package))
-	 (process-connection-type nil)   ; pipe, no pty (--no-progress)
-
-	   ;; First update mandoku
-	 (status
-	  (call-process
-	   mandoku-git-program nil `(,buf t) t "pull" "origin" "-v" )))
-
-	(unless (zerop status)
-	  (error "Couldn't update %s from the remote Git repository." (concat mandoku-base-dir package)))
-	(let ((byte-compile-warnings nil)
-	      ;; Byte-compile runs emacs-lisp-mode-hook; disable it
-	      emacs-lisp-mode-hook)
-	  (byte-recompile-directory default-directory 0))
-	(mandoku-post-update)
-	))
-
-(defun mandoku-post-update ()
-  "This gets called immediately after an update to perform necessary additional steps"
-;; the actual code will have to be in an external file that gets loaded before execution
-  (ignore-errors 
-    (load-library "mandoku-update")
-    (mandoku-post-update-internal))
-)
+  (package-refresh-contents)
+  (package-install (car (cdr (assoc 'mandoku package-archive-contents)))))
 
 (defun mandoku-display-subcoll (key)
   "Show the matches of 'key.$' (that is, key and the next char) for a textid in the list of texts"
