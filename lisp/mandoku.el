@@ -120,13 +120,24 @@
 ;; that is: two uppercase characters, followed by a number and one or more upper or lowercase characters followed by 4 digits.
 (defvar mandoku-textid-regex  "[A-Z]\\{2\\}[0-9][A-z]+[0-9]\\{4\\}")
 
+(defvar mandoku-w32-p
+  (or (equal system-type 'windows-nt)
+      (equal system-type 'ms-dos)))
+
+
 ;;[2014-06-03T14:31:46+0900] better handling of git
-(defcustom mandoku-git-program (concat "\"" (executable-find "git") "\"")
+(defcustom mandoku-git-program
+  (if mandoku-w32-p
+      (concat "\"" (executable-find "git") "\"")
+    (executable-find "git"))
   "Name of the git executable used by mandoku."
   :type '(string)
   :group 'mandoku)
 
-(defcustom mandoku-python-program (concat "\"" (executable-find "python") "\"")
+(defcustom mandoku-python-program 
+  (if mandoku-w32-p
+      (concat "\"" (executable-find "python") "\"")
+      (executable-find "python"))
   "Name of the python executable used by mandoku."
   :type '(string)
   :group 'mandoku)
@@ -1250,10 +1261,13 @@ eds
 	(goto-char (point-max))
 	(re-search-backward (concat "^" pg "\\([0-9][0-9]\\)\t\\([^\t\n]+\\)\t\\([^\t\n]+\\)") nil t)
 	(message (match-string 0))
-	(setq lastpg (string-to-number (match-string 1)))
-	(while (and (< (nth 3 loc) lastpg)  
-		    (re-search-backward (concat "^" pg "\\([0-9][0-9]\\)\t\\([^\t\n]+\\)\t\\([^\t\n]+\\)") nil t))
-	  (setq lastpg (string-to-number (match-string 1))))
+	(if (match-string 1)
+	    (progn
+	      (setq lastpg (string-to-number (match-string 1)))
+	      (while (and (< (nth 3 loc) lastpg)  
+			  (re-search-backward (concat "^" pg "\\([0-9][0-9]\\)\t\\([^\t\n]+\\)\t\\([^\t\n]+\\)") nil t))
+		(setq lastpg (string-to-number (match-string 1)))))
+	  (goto-char (point-min)))
 	(next-line)
 	(re-search-backward (concat "\t" ed " [^\t]+\t\\(.*\\)$") nil t)
 	(list pref (match-string 1))
