@@ -4,8 +4,16 @@
 ;; relies on gh.el and github-clone.el
 
 (require 'github-clone)
+
+(defun mandoku-get-remote-text-from-account (&optional txtid)
+  (interactive)
+  (let ((ghaccount
+	 (read-string
+	  "Please enter the name of the GitHub account to use: " )))
+    (mandoku-get-remote-text-now txtid ghaccount)))
+
 ;;this can now also be used from elisp
-(defun mandoku-get-remote-text-now (&optional txtid)
+(defun mandoku-get-remote-text-now (&optional txtid github-source-account)
   (interactive)
   (let* ((buf (current-buffer))
 	 (curpos (point))
@@ -23,8 +31,11 @@
 		     (concat mandoku-text-dir groupid "/" txtid)
 		   (concat mandoku-base-dir txtid))))
     (condition-case nil
-	(mandoku-clone-repo
-	 (concat (github-clone-user-name) "/" txtid ) target)
+	(if github-source-account
+	    (mandoku-clone-repo
+	     (concat github-source-account "/" txtid ) target)
+	  (mandoku-clone-repo
+	   (concat (github-clone-user-name) "/" txtid ) target))
     (error 
 	(mandoku-clone-repo
 	 (concat "kanripo/" txtid ) target t)

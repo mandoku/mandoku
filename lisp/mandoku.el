@@ -1736,6 +1736,7 @@ BEG and END default to the buffer boundaries."
     ;("Versions")
     ("Maintenance"
      ["Download this text now!" mandoku-get-remote-text (string-match "fatal" (car (mandoku-get-branches)))]
+     ["Download this text from other account" mandoku-get-remote-text-from-account (string-match "fatal" (car (mandoku-get-branches)))]
      ["Download my texts from GitHub" mandoku-get-user-repos-from-gh t]
 ;     ["Download texts in DL list" mandoku-download-process-queue t]
 ;     ["Add to download list" mandoku-download-add-text-to-queue t]
