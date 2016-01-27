@@ -1382,11 +1382,11 @@ eds
 	(mandoku-display-inline-images)))
   (if buffer-invisibility-spec
       (easy-menu-change
-	 '("Mandoku") "Markers"
-	 (list  ["Show" mandoku-toggle-visibility t]))
+	 '("Mandoku") "Display"
+	 (list  ["Show markers" mandoku-toggle-visibility t]))
     (easy-menu-change
-	 '("Mandoku") "Markers"
-	 (list ["Hide" mandoku-toggle-visibility t])))
+	 '("Mandoku") "Display"
+	 (list ["Hide markers" mandoku-toggle-visibility t])))
   (redraw-display)
 )
 
@@ -1721,8 +1721,8 @@ BEG and END default to the buffer boundaries."
   
 (easy-menu-define mandoku-md-menu mandoku-view-mode-map "Mandoku menu"
   '("Mandoku"
-    ("Markers"
-     ["Show" mandoku-toggle-visibility t])
+    ("Display"
+     ["Show markers" mandoku-toggle-visibility t])
     ("Browse"
      ["Show catalog" mandoku-show-catalog t]
      ["Update local catalog" mandoku-write-local-text-list t]
