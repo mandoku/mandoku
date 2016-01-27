@@ -694,14 +694,14 @@ One character is either a character or one entity expression"
 ))
 
 
-(defun mandoku-tabulate-index-buffer (index-buffer)
+(defun mandoku-tabulate-index-buffer (index-buffer tablen)
   (switch-to-buffer-other-window index-buffer t)
   (let ((tabhash (make-hash-table :test 'equal))
 	(m))
     (goto-char (point-min))
     (while (re-search-forward "^\\([^	]+\\)	\\([^	
 ]+\\)" nil t)
-      (setq m (substring (match-string 2) 0 4))
+      (setq m (substring (match-string 2) 0 tablen))
       (if (gethash m tabhash)
 	  (puthash m (+ (gethash m tabhash) 1) tabhash)
 	(puthash m 1 tabhash)))
@@ -832,7 +832,7 @@ One character is either a character or one entity expression"
 	(mandoku-count 0)
 	(mandoku-filtered-count 0)
       	(search-char (string-to-char search-string))
-	(tab (mandoku-tabulate-index-buffer index-buffer))
+	(tab (mandoku-tabulate-index-buffer index-buffer 4))
 	(cnt (mandoku-sum-hash tab)))
     (if (and (not (= 0 mandoku-index-display-limit)) (> cnt mandoku-index-display-limit))
 ;    (if nil
