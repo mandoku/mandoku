@@ -40,7 +40,7 @@ def textwalk(arg, dirname, names):
         if txtid_re.match(f):
             p = "%s/%s" % (dirname, f)
             print p
-            md.StartIndex(p, mdidx, length=10)
+            md.StartIndex(p, mdidx, left=5, length=12)
             idxtxt.write("%s\n" % (f))
             
 
