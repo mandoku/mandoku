@@ -405,6 +405,13 @@ function with access to a database."""
         zhu_buf = ""
         self.seq.append(('', ''))
         for line in infile:
+            if line.upper().startswith(u':END:') and self.in_zhu:
+                self.in_zhu = False
+                zhu_buf += line
+                self.seq[-1] = (self.seq[-1][:-1] + (self.seq[-1][-1] + zhu_buf,))
+            elif self.in_zhu:
+                zhu_buf += line
+                continue
             try:
                 line, extra = line.split('\t', 1)
             except:
@@ -421,13 +428,6 @@ function with access to a database."""
             elif line.startswith(u':zhu:'):
                 self.in_zhu = True
                 zhu_buf = line
-                continue
-            elif line.startswith(u':END:') and self.in_zhu:
-                self.in_zhu = False
-                zhu_buf += line
-                self.seq[-1] = (self.seq[-1][:-1] + (self.seq[-1][-1] + zhu_buf,))
-            elif self.in_zhu:
-                zhu_buf += line
                 continue
             elif line.startswith(u'<pb:') and len(self.seq) == 1:
                 #this is a pb before the text starts, add to the first element
