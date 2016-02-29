@@ -478,6 +478,17 @@ Do you want to download it now?"))
 				"wincred"
 			      (if (eq window-system 'mac)
 				  "osxkeychain")))))
+  ;; check for name and email, to avoid later problems
+  (unless (mandoku-git-config-get "user" "name")
+    (mandoku-git-config-set "user" "name"
+			    (read-string "Git needs a name to identify you. How should git call you? " (user-full-name))))
+  (unless (mandoku-git-config-get "user" "email")
+    (mandoku-git-config-set "user" "email"
+			    (read-string "Git needs an email alias to identify you. How should git mail you? " (concat (user-login-name) "@" (system-name)))))
+  
+  ;; otherwise git will hang on windoof...
+  (if (eq window-system 'w32)
+      (setenv "GIT_ASKPASS" "git-gui--askpass"))
   (setq mandoku-initialized-p t)
 )
 
