@@ -44,6 +44,9 @@
   version available [[file:mandoku-install-en.html][Installation
   instructions]]:
 
+  [2016-03-01] updated installation instructions and a new version available.
+  [[file:mandoku-install-en.html][Installation  instructions]]:
+
 * Software
   The software for using Mandoku texts falls in two broad categories:
   text processing software and a frontend to the user.  For both of

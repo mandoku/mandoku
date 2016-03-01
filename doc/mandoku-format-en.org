@@ -73,14 +73,14 @@ Conventions for the text format used by =Mandoku= are made up of three parts:
 
 ** Text identifiers
    As of September 2013, Mandoku switched to a new type of text
-   identifiers. This identifier, such as =ZB6i0076= is composed of three parts:
-   - "ZB", which is the repository identifier -- this indicates the origin of the text
+   identifiers. This identifier, such as =KR6i0076= is composed of three parts:
+   - "KR", which is the repository identifier -- this indicates the origin of the text
    - "6i", which indicates in which subcollection the text is found,
      in this case "經集部類", which is part of the top-level grouping
      "6 佛部".
    - "0076" which is the serial number of the text in the collection.
 
-   Most texts of the part "6 佛部" of the ZB repository do derive from
+   Most texts of the part "6 佛部" of the KR repository do derive from
    the CBETA collection of Buddhist texts, which has a different set
    of text identifiers, in this case, the text in question has the
    title "維摩詰所說經" and the CBETA identifier =T14n0475=, this was
@@ -89,7 +89,7 @@ Conventions for the text format used by =Mandoku= are made up of three parts:
 ** About texts, versions and editions
 
    In =Mandoku= every text has a text identifier, for example
-   =ZB6i0076==, which uniquely identifies the text within a larger
+   =KR6i0076==, which uniquely identifies the text within a larger
    collection and makes it possible to refer to it unambiguoqusly.
    This identifier is usually also the name of the folder, where all
    files that make up a text are stored. The text is usually split up
@@ -97,11 +97,11 @@ Conventions for the text format used by =Mandoku= are made up of three parts:
    numbered in sequence.  An additional file may give the table of
    contents with links to the appropriate location in the files.
 
-: ZB6i0076_000.txt
-: ZB6i0076_001.txt
-: ZB6i0076_002.txt
-: ZB6i0076_003.txt
-: ZB6i0076.org
+: KR6i0076_000.txt
+: KR6i0076_001.txt
+: KR6i0076_002.txt
+: KR6i0076_003.txt
+: KR6i0076.org
 
 
    The source of the text has to be given (at the beginning of the
@@ -131,7 +131,7 @@ Conventions for the text format used by =Mandoku= are made up of three parts:
    readable form, for example:
 
 : #+PROPERTY: BASEEDITION T
-: #+PROPERTY: ID ZB6i0076
+: #+PROPERTY: ID KR6i0076
 : #+PROPERTY: CBETA_ID T14n0475
 : #+PROPERTY: WITNESS 【CBETA】
 : #+PROPERTY: JUAN 1
@@ -146,12 +146,12 @@ Conventions for the text format used by =Mandoku= are made up of three parts:
 *** Page numbers
   The page number is given in the following form:
 #+BEGIN_EXAMPLE
-<pb:ZB6i0076_T_0537a>
+<pb:KR6i0076_T_0537a>
 #+END_EXAMPLE
 
   There are three parts to this number, separated by the "_"
   character, surrounded by the page break indicator "<pb: .. >":
-  - "ZB6i0076" is the identification number of the text
+  - "KR6i0076" is the identification number of the text
   - "T" is the identifier of the edition
   - "0537a" is the page number ("a" stands for the upper part of the
     text or the first half of a page in woodblock prints that are

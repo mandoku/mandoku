@@ -1,18 +1,19 @@
-#+TITLE: Installing and using the Mandoku preview version
-#+DATE: 2015-11-24
+#+TITLE: Installing and using Mandoku
+#+DATE: 2016-03-01
 #+OPTIONS: toc:nil ^:nil
 
-* Installing the preview version of Mandoku
+* Installing the bundle version of Mandoku
 
-  As of November 2015, a new preview version of =Mandoku= is
-  available.  This now is much more complete than the previous
-  versions (but there still remains a lot to be done:-).  Much work
-  has been invested in making the installation procedure more smooth,
-  so as to enable more people to use it.  
+  Mandoku for Windows is now distributed as a bundle, which includes
+  all needed software in one archive file. This now is much more
+  complete than the previous versions.  Much work has been invested in
+  making the installation procedure more smooth, so as to enable more
+  people to use it.
 
-  Again there are different installers, for Windows and Macintosh
-  operating systems which can be downloaded from the links provided
-  below.
+  On other platforms, most of the required files are already installed
+  or can be used as originally distributed; only the Emacs packages
+  needed for the operation, including Mandoku, need to be installed as
+  described below.
 
 
   Requirements:
@@ -22,27 +23,25 @@
   - A working network connection
   - About 400 MB of free space on the system harddisk
 
-** Installing a package for Windows
+** Installing a bundle for Windows
 
-   The package for Windows has been tested on Windows 10.  It might
-   work on earlier versions, but there might also be problems.
+   The bundle for Windows has been tested on Windows 8 and 10.  It
+   might work on earlier versions, but there might also be problems.
    Currently there is no 32 bit version of the package. The Emacs
    application included in the =Mandoku= package below is version 24.5
-   from
-   [[https://raw.githubusercontent.com/chuntaro/NTEmacs64/master/emacs-24.5-IME-patched.zip][the
-   NTemacs project]], this is known to work with the input methods for
-   Chinese and Japanese.
+   from [[https://raw.githubusercontent.com/chuntaro/NTEmacs64/master/emacs-24.5-IME-patched.zip][the NTemacs project]], this is known to work with the input
+   methods for Chinese and Japanese.
    
-   1. The =Mandoku= preview package includes a version of the =git=
+   1. The =Mandoku= bundle includes a version of the =git=
       program, which is used to download and update necessary
       files. If you want to use =git= outside of =Mandoku=, it is
       recommended to download and install the =git= software from the
       [[https://git-for-windows.github.io/][Git for Windows]] software
-      repository. The current version known to work is v2.6.3.
+      repository. The current version known to work is v2.7.2.
 
-   2. Download the =Mandoku= installation package
-      [[file:data/mandoku-preview-2015-11-27.zip][mandoku-preview-2015-11-27.zip]]
-      (250MB).
+   2. Download the =Mandoku= installation bundle
+      [[file:data/mandoku-2016-03.zip][mandoku-2016-03.zip]]
+      (200MB).
    3. Doubleclick on the package and move the folder =krp=, which is
       found inside the package to a destination on a root directory of
       your computer, such as =C:=, =D:= and so on as a destination.
@@ -150,12 +149,12 @@
    Macintosh users above.
 
 
-* Using the preview version
+* Using Mandoku
 
   At the moment, only a small fraction of the planned functionality
   has been realized.
 
-  After starting Emacs with the =Mandoku= preview package installed,
+  After starting Emacs with the =Mandoku= package installed,
   Emacs will display the file =mandoku-catalog.txt=, which is a list
   of titles available.  The file will look a bit different now, as the
   screenshot is from an earlier version.
@@ -184,15 +183,15 @@
 
 
   The =Mandoku= menu has the following top level entries:
-  - Markers
+  - Display
   - Browse
   - Search
-  - Versions
   - Maintenance
 
   Of these, we will first look at the "Search" menu, which has the following entries:
   - Texts       <f6>
   - Titles      <f7>
+  - My files
 
 
   There are three different search actions, that is, within the texts,
