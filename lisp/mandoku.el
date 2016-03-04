@@ -430,6 +430,15 @@
       (dolist (sd mandoku-subdirs)
 	(mkdir (concat mandoku-base-dir sd) t))
       (mandoku-setup-dirvars)
+      ;; try to set to a size that still shows the minibuffer!
+      (when window-system
+	(set-frame-position (selected-frame)  100 0)
+	(set-frame-size (selected-frame)
+			;;# of chars per line
+			80
+			;;# of lines
+			(/ (x-display-pixel-height)
+			   (+ 4 (line-pixel-height)))))
       ;; check for workspace, but don't panic if it does not work out
       (ignore-errors
       (when (and (not (file-exists-p  mandoku-ws-settings))
@@ -479,13 +488,7 @@ Do you want to download it now?"))
 			      (if (eq window-system 'mac)
 				  "osxkeychain")))))
   ;; check for name and email, to avoid later problems
-  (unless (mandoku-git-config-get "user" "name")
-    (mandoku-git-config-set "user" "name"
-			    (read-string "Git needs a name to identify you. How should git call you? " (user-full-name))))
-  (unless (mandoku-git-config-get "user" "email")
-    (mandoku-git-config-set "user" "email"
-			    (read-string "Git needs an email alias to identify you. How should git mail you? " (concat (user-login-name) "@" (system-name)))))
-  
+  (mandoku-git-prepare-info)
   ;; otherwise git will hang on windoof...
   (if (eq window-system 'w32)
       (setenv "GIT_ASKPASS" "git-gui--askpass"))
@@ -2155,15 +2158,15 @@ Click on a link or move the cursor to the link and then press enter
 
 (defun mandoku-git-prepare-info()
   "Make sure we have name and email so that we can commit"
-  (unless (mandoku-git-config-get "user" "email")
-    (mandoku-git-config-set "user" "email"
-			    (read-string 
-			     (format "Please enter an email adress for use with git: "))))
   (unless (mandoku-git-config-get "user" "name")
     (mandoku-git-config-set "user" "name"
-			    (or (mandoku-git-config-get "github" "user")
-			    (read-string 
-			     (format "Please enter your name for use with git: "))))))
+   (read-string "Git needs a name to identify you. How should git call you? " (or (user-full-name)  (user-login-name)))))
+  (unless (mandoku-git-config-get "user" "email")
+    (mandoku-git-config-set "user" "email"
+    (read-string "Git needs an email alias to identify you. How should git mail you? "
+     (concat (or(user-login-name)
+    (replace-in-string (user-full-name) " " ""))
+    "@" (system-name))))))
   
 
 ;; git config --global credential.helper wincred
