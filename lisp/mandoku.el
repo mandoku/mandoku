@@ -2168,6 +2168,53 @@ Click on a link or move the cursor to the link and then press enter
     (replace-in-string (user-full-name) " " ""))
     "@" (system-name))))))
   
+(defcustom update-texts-sh "#!/bin/sh
+# version #0.01#
+# automate committing and fetching.  This is called from the mandoku command
+cd \"${0%/*}\"
+cwd=`pwd`
+remote=$2
+#this script needs to be run in the $krp/text directory
+for d in */*
+do
+    echo $d
+    if [ -d $d ]
+    then
+	cd $d
+	# fetch from remote
+	for branch in `git branch -a | grep -v remotes | grep -v HEAD | sed -e 's/* \(.*\)/\1/'`; do
+	    git fetch $remote $branch
+	done
+	# Remove deleted files
+	git ls-files --deleted -z | xargs -0 git rm >/dev/null 2>&1
+	# Add new files
+	git add . >/dev/null 2>&1
+	git commit -am \"$(date)\"
+	for branch in `git branch -a | grep -v remotes | grep -v HEAD | sed -e 's/* \(.*\)/\1/'`; do
+	    git push $remote $branch
+	done
+	cd $cwd
+    fi
+done
+"
+  "Script to update the text repositories. Part of mandoku to make updating easier."
+  :type '(string)
+  :group 'mandoku)
+
+(defun mandoku-update-texts ()
+  (interactive)
+  ;; in the future propably will need to check for the version of this file...
+  (unless (file-exists-p (concat mandoku-text-dir "gitupd.sh"))
+    (with-current-buffer (find-file-noselect (concat mandoku-text-dir "gitupd.sh") t)
+      (insert update-texts-sh)
+      (save-buffer)
+      (kill-buffer)))
+  (start-process-shell-command
+   " *gitupd*"
+   " *gitupd-buffer*"
+   (concat "sh "  mandoku-text-dir "gitupd.sh "
+	   (mandoku-git-config-get "github" "user")))  
+)
 
 ;; git config --global credential.helper wincred
 ;; one more
