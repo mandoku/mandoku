@@ -403,6 +403,15 @@
     (mkdir md t)
       ;; looks like we have to bootstrap the krp directory structure
       (progn
+      ;; try to set to a size that still shows the minibuffer!
+      (when window-system
+	(set-frame-position (selected-frame)  100 0)
+	(set-frame-size (selected-frame)
+			;;# of chars per line
+			80
+			;;# of lines
+			(/ (x-display-pixel-height)
+			   (+ 4 (line-pixel-height)))))
 	(if (not mandoku-base-dir)
 	  (setq mandoku-base-dir 
 		(if (not (string= (substring md -1) "/"))
@@ -430,15 +439,6 @@
       (dolist (sd mandoku-subdirs)
 	(mkdir (concat mandoku-base-dir sd) t))
       (mandoku-setup-dirvars)
-      ;; try to set to a size that still shows the minibuffer!
-      (when window-system
-	(set-frame-position (selected-frame)  100 0)
-	(set-frame-size (selected-frame)
-			;;# of chars per line
-			80
-			;;# of lines
-			(/ (x-display-pixel-height)
-			   (+ 4 (line-pixel-height)))))
       ;; check for workspace, but don't panic if it does not work out
       (ignore-errors
       (when (and (not (file-exists-p  mandoku-ws-settings))
@@ -2164,8 +2164,9 @@ Click on a link or move the cursor to the link and then press enter
   (unless (mandoku-git-config-get "user" "email")
     (mandoku-git-config-set "user" "email"
     (read-string "Git needs an email alias to identify you. How should git mail you? "
-     (concat (or(user-login-name)
-    (replace-in-string (user-full-name) " " ""))
+		 (concat (or
+			  (replace-in-string (user-login-name) " " "")
+			  (replace-in-string (user-full-name) " " ""))
     "@" (system-name))))))
   
 (defcustom update-texts-sh "#!/bin/sh
