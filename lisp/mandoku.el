@@ -419,7 +419,7 @@
 		    (concat md "/")
 		  md)))
 	      ;; see if we have a emacs init file, store it there!
-      (let ((init-file (if user-init-file
+      (let ((init-file (if (file-exists-p user-init-file)
 			   user-init-file
 			 (if user-emacs-directory
 			     (concat user-emacs-directory "/init.el")
@@ -432,7 +432,7 @@
 		(insert ";; --start-- added by mandoku installer\n")
 		(insert "(setq mandoku-base-dir \"" mandoku-base-dir "\")\n")
 		(insert ";; additional settings for mandoku: \n")
-		(insert "(load \"mandoku-init\")\n")
+		(insert "(load (concat user-emacs-directory \"mandoku-init\"))\n")
 		(insert ";; --end-- added by mandoku installer\n")
 		(save-buffer)))
 	  (kill-buffer)))
@@ -1755,7 +1755,7 @@ BEG and END default to the buffer boundaries."
      ["Download my texts from GitHub" mandoku-get-user-repos-from-gh t]
 ;     ["Download texts in DL list" mandoku-download-process-queue t]
 ;     ["Add to download list" mandoku-download-add-text-to-queue t]
-					;     ["Show download list" mandoku-download-show-queue t]
+;     ["Show download list" mandoku-download-show-queue t]
      ["Commit, push and pull all texts" mandoku-update-texts t]
      ["Update search index" mandoku-update-index t]
      ["Setup file" mandoku-show-local-init t]
