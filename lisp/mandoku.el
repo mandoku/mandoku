@@ -411,8 +411,9 @@
 			80
 			;;# of lines
 			(/ (x-display-pixel-height)
-			   (+ 4 (line-pixel-height)))))
-	(if (not mandoku-base-dir)
+			   (+ 4 (line-pixel-height))))
+	(redisplay))
+      (if (not mandoku-base-dir)
 	  (setq mandoku-base-dir 
 		(if (not (string= (substring md -1) "/"))
 		    (concat md "/")
@@ -2172,9 +2173,9 @@ Click on a link or move the cursor to the link and then press enter
 (defcustom update-texts-sh "#!/bin/sh
 # version #0.01#
 # automate committing and fetching.  This is called from the mandoku command
-cd \"${0%/*}\"
+cd \"$(dirname ${0%/*})/text\"
 cwd=`pwd`
-remote=$2
+remote=$1
 #this script needs to be run in the $krp/text directory
 for d in */*
 do
@@ -2202,11 +2203,15 @@ done
   :type '(string)
   :group 'mandoku)
 
+;; this will activate the automatic saving, commit and push:
+;; (run-at-time "00:59" 1800 'mandoku-update-texts)
 (defun mandoku-update-texts ()
   (interactive)
+  ;; first, save the relevant buffers.
+  (save-some-buffers t (lambda () (derived-mode-p 'mandoku-view-mode)))
   ;; in the future propably will need to check for the version of this file...
-  (unless (file-exists-p (concat mandoku-text-dir "gitupd.sh"))
-    (with-current-buffer (find-file-noselect (concat mandoku-text-dir "gitupd.sh") t)
+  (unless (file-exists-p (concat mandoku-sys-dir "gitupd.sh"))
+    (with-current-buffer (find-file-noselect (concat mandoku-sys-dir "gitupd.sh") t)
       (insert update-texts-sh)
       (save-buffer)
       (kill-buffer)))
