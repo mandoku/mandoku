@@ -1367,7 +1367,7 @@ eds
   (setq case-fold-search nil)
   (setq header-line-format (mandoku-header-line))
   (set (make-local-variable 'org-startup-folded) 'showeverything)
-  (set (make-local-variable 'tab-with) 30)
+  (set (make-local-variable 'tab-width) 30)
 ;; editions will hold a list of editions, for which a facsimile exists
   (set (make-local-variable 'editions) nil)
 ;; this will be populated with the list of paths to facsimile of the pages in this file
