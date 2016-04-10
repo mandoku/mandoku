@@ -72,6 +72,8 @@
 ;;;###autoload
 (defvar mandoku-repositories-alist '(("dummy" . "http://www.example.com")))
 (defvar mandoku-md-menu)
+(defvar mandoku-position nil "Position as a list of textid edition page line" )
+(defvar mandoku-position-marker (make-marker) "Marker for the last position in the text")
 (defvar mandoku-catalog nil)
 (defvar mandoku-local-index-list nil)
 (defvar mandoku-for-commit-list nil)
@@ -83,6 +85,8 @@
 ")
 (defvar mandoku-location-plist nil
   "Plist holds the most recent stored location with associated information.")
+;; TODO: add drawers
+;; '(org-drawers (quote ("PROPERTIES" "CLOCK" "LOGBOOK" "zhu")))
 
 ;; ** Textfilters
 ;; we have one default textfilter, which always exists and can be dynamically treated. 
@@ -554,6 +558,10 @@ Do you want to download it now?"))
      (list (read-string "Search for: " search-for))))
   (unless mandoku-initialized-p
     (mandoku-initialize))
+  (when (derived-mode-p 'mandoku-view-mode)
+    (setq mandoku-position (mandoku-position-at-point-internal))
+    (set-marker mandoku-position-marker (point))
+    )
   (mandoku-grep-internal (mandoku-cut-string search-for))
   )
 
