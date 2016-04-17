@@ -1374,7 +1374,6 @@ eds
   \\{mandoku-view-mode-map}"
   (setq case-fold-search nil)
   (setq header-line-format (mandoku-header-line))
-  (set (make-local-variable 'org-startup-folded) 'showeverything)
   (set (make-local-variable 'tab-width) 30)
 ;; editions will hold a list of editions, for which a facsimile exists
   (set (make-local-variable 'editions) nil)
@@ -1392,7 +1391,8 @@ eds
   ;; (if (string-match "/temp/" (buffer-file-name) )
   ;;     (set-background-color "honeydew"))
 ;  (mandoku-install-version-files-menu)
-;  (view-mode)
+					;  (view-mode)
+  (set (make-local-variable 'org-startup-folded) 'showall)
 )
 
 (defun mandoku-toggle-visibility ()
