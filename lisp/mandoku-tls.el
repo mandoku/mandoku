@@ -13,6 +13,7 @@
 
 (require 'mandoku)
 (require 'mandoku-dict)
+(require 'helm-charinfo)
 ;; TODO: this needs to be fixed!  Does not work when packaged!
 (defvar mandoku-tls-root-path
   (replace-in-string (file-name-directory (or byte-compile-current-file
@@ -279,6 +280,19 @@
 
 
 (global-set-key (kbd "M-s t") 'mandoku-tls-concepts-helm)
+;;
+;; for tls
+(global-unset-key (kbd "M-t")) ; was transpose-word
+(global-set-key (kbd "M-t c") 'mandoku-tls-concepts-helm)
+(global-set-key (kbd "M-t w") 'mandoku-tls-show-words)
+(global-set-key (kbd "M-t l") 'mandoku-tls-procline)
+(global-set-key (kbd "M-t s") 'mandoku-tls-syn-func-helm)
+(global-set-key (kbd "M-t a") 'mandoku-tls-make-attribution)
+(global-set-key (kbd "M-t n") 'mandoku-tls-new-swl)
+(global-set-key (kbd "M-t x") 'mandoku-tls-create-new-annot)
+(global-set-key (kbd "M-t z") 'mandoku-tls-new-syntactic-word)
+(global-set-key (kbd "M-t u") 'mandoku-tls-new-uuid-for-heading)
+(global-set-key (kbd "M-t i") 'mandoku-tls-insert-new-annot)
 
 
 (defun mandoku-tls-helm-syn-func-candidates ()
