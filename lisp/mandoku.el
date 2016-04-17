@@ -48,6 +48,7 @@
 (require 'magit)
 (require 'mandoku-github)
 (require 'git)
+(require 'url)
 (defvar mandoku-base-dir nil "This is the root of the mandoku hierarchy, this needs to be provided by the user in its init file")
 (defvar mandoku-do-remote t)
 (defvar mandoku-preferred-edition nil "Preselect a certain edition to avoid repeated selection")
@@ -2113,6 +2114,10 @@ Click on a link or move the cursor to the link and then press enter
   "removes the special characters used by mandoku from the string"
   (replace-regexp-in-string "\\(?:<[^>]*>\\)?¶?" ""
     (replace-regexp-in-string "\\(\t.*\\)?\n" "" str)))
+
+(defun mandoku-remove-punct-and-markup (str)
+  (comment-string-strip (replace-regexp-in-string "\\([　-㏿]\\)" ""
+			    (mandoku-remove-markup str)) t t ))
 
 (defun mandoku-split-string (str)
   "Given a string of the form \"str1::str2\", return a list of
