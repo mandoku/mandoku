@@ -428,7 +428,8 @@
 			       (setq mandoku-tls-concept (or (cadr (split-string candidate "->")) candidate))))))))
 	 (fallback-source '((name . "Create new concept")
 			    (dummy)
-			    (action . mandoku-tls-create-new-annot)) )
+			    (action . (("New" . (lambda (candidate)
+						  (setq mandoku-tls-concept (mandoku-tls-create-new-annot (upcase candidate))) ))))))
 	 ;;
 	 concept readings)
     (helm :sources '(mandoku-tls-helm-source fallback-source))
@@ -495,7 +496,7 @@
       (forward-line 1)
       (save-buffer)
       (message "Please enter the definition")
-    ))
+    concept))
 
 (defun mandoku-tls-new-syntactic-word (&optional syn-func def)
   "For an existing Lexeme, we add a syntactic word (usage instance)."
