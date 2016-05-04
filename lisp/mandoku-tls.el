@@ -16,10 +16,11 @@
 (require 'helm-charinfo)
 ;; TODO: this needs to be fixed!  Does not work when packaged!
 (defvar mandoku-tls-root-path
-  (replace-in-string (file-name-directory (or byte-compile-current-file
+  (or mandoku-base-dir
+      (replace-in-string (file-name-directory (or byte-compile-current-file
                                              load-file-name
-                                             buffer-file-name)) "mandoku/lisp/" ""))
-
+                                             buffer-file-name)) "mandoku/lisp/" "")))
+;;http://www.unicode.org/Public/UCD/latest/ucd/Unihan.zip
 (defcustom mandoku-tls-lexicon-path
   (concat mandoku-tls-root-path "tls/lexicon/")
   "Path to TLS lexicon"
@@ -27,7 +28,7 @@
   :group 'mandoku-tls)
 
 (defcustom mandoku-tls-text-path
-  (concat (replace-in-string mandoku-tls-root-path "tls/" "") "tls-texts/")
+  (concat (replace-in-string mandoku-tls-root-path "tls/" "") "text/tls/")
   "Path to TLS texts"
   :type 'string
   :group 'mandoku-tls)
@@ -289,7 +290,7 @@
 (global-set-key (kbd "M-t s") 'mandoku-tls-syn-func-helm)
 (global-set-key (kbd "M-t a") 'mandoku-tls-make-attribution)
 (global-set-key (kbd "M-t n") 'mandoku-tls-new-swl)
-(global-set-key (kbd "M-t x") 'mandoku-tls-create-new-annot)
+;(global-set-key (kbd "M-t x") 'mandoku-tls-create-new-annot)
 (global-set-key (kbd "M-t z") 'mandoku-tls-new-syntactic-word)
 (global-set-key (kbd "M-t u") 'mandoku-tls-new-uuid-for-heading)
 (global-set-key (kbd "M-t i") 'mandoku-tls-insert-new-annot)
@@ -323,14 +324,16 @@
 
 
 (defun mandoku-tls-initialize ()
-  (unless mandoku-tls-initialized-p
-    (message "Reading the TLS database.  This will take a moment.")
-    (mandoku-tls-read-swl)
-    (mandoku-tls-read-synwords)
-    (mandoku-tls-read-concepts)
-    (mandoku-tls-read-syn-func-org)
-    (setq mandoku-tls-initialized-p t)
-    (message "Finished reading the TLS database.  Ready to go!"))
+  (if (file-exists-p mandoku-tls-lexicon-path)
+      (unless mandoku-tls-initialized-p
+	(message "Reading the TLS database.  This will take a moment.")
+	(mandoku-tls-read-swl)
+	(mandoku-tls-read-synwords)
+	(mandoku-tls-read-concepts)
+	(mandoku-tls-read-syn-func-org)
+	(setq mandoku-tls-initialized-p t)
+	(message "Finished reading the TLS database.  Ready to go!"))
+    (message "TLS database not found. Please clone the necessary files first."))
 )    
 
 (defun mandoku-tls-show-words (&optional uuid)
@@ -459,7 +462,10 @@
 	  (setq char (save-excursion
 		  (outline-up-heading 1)
 		  (org-get-heading)))
-	  (setq swl-line (concat char " " hw))
+	  (setq swl-line
+		(concat char " "
+			(replace-regexp-in-string " \\([NV]\\) " "\t\\1 " 
+						  (replace-regexp-in-string "\\[\\[tls:concept" "\t[[tls:concept" hw))				 ))
 	  (mandoku-tls-insert-new-annot swl-line)
       
 	  )
@@ -690,7 +696,7 @@
 ;;   )
 ;; )    
 
-    
+
 (provide 'mandoku-tls)
 
 

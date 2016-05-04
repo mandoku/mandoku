@@ -250,8 +250,8 @@ We should check if the file exists before cloning!"
       )))
 
 
-(defun mandoku-clone-repo (user-repo-url directory &optional ask)
-  (let* ((name (github-clone-repo-name user-repo-url))
+(defun mandoku-clone-repo (user-repo-url directory &optional ask name)
+  (let* ((name (or name (github-clone-repo-name user-repo-url)))
 	 (repo (github-clone-info (car name) (cdr name)))
          (target (if (file-exists-p directory)
                      (expand-file-name (cdr name) directory)
