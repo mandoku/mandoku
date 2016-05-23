@@ -2237,6 +2237,27 @@ done
 	   (mandoku-git-config-get "github" "user")))  
 )
 
+;; dealing with branches
+(defun mandoku-get-active-branches (cd)
+  ;; active are the branches currently under "_branches"
+					;  (prune-directory-list (directory-files  (concat (file-name-directory (buffer-file-name)) "_branches") t "^[^\.]+"  ))
+    (if (file-exists-p cd)
+	(directory-files cd nil "^[^\.]+"  )
+      nil
+      ))
+  
+(defun mandoku-location-other-branch (&optional branch)
+  (interactive)
+  (let* ((cd (concat (file-name-directory (buffer-file-name)) "_branches"))
+	 (p (substring (cadr (split-string (mandoku-position-at-point) )) 1))
+	(b (ido-completing-read "Edition: " (mandoku-get-active-branches cd) nil t))
+	(bf (concat cd "/" b "/" (file-name-nondirectory buffer-file-name) )))
+    (when (file-exists-p bf)
+      (find-file-other-window bf)
+      (mandoku-execute-file-search p)
+)))
+
+      
 ;; git config --global credential.helper wincred
 ;; one more
 ;; and again.
