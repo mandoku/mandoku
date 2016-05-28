@@ -54,10 +54,10 @@ astpua = Ur'\U000F0000-\U000FFFFD\U00100000-\U0010FFFD'
 ##this will recognize image links like [[./img]] as 1 kanji --> clear this out later?!
 ent=r'\[\[.*?\]\]|\[[^\]]*\]|&[^;]*;|&amp;[CZ][X3-7]-[A-F0-9]+'
 #now
-#kp_re = re.compile(u"(%s|[%s%s])" % (ent, kanji, pua))
+kp_re = re.compile(u"(%s|[%s%s])" % (ent, kanji, pua))
 # astpua = ""
 # astkanji = ""
-kp_re = re.compile(u"(%s|{[%s%s]+:[^}]*}|[%s%s])" % (ent, kanji+astkanji, pua+astpua, kanji+astkanji, pua+astpua))
+#kp_re = re.compile(u"(%s|{[%s%s]+:[^}]*}|[%s%s])" % (ent, kanji+astkanji, pua+astpua, kanji+astkanji, pua+astpua))
 ch_re = re.compile(ur'(\[[^\]]*\]|&[^;]*;|&amp;C[X3-7]-[A-F0-9]+|.)')
 img_re = re.compile(ur'<i[^>]*>')
 punc_re = re.compile(ur"[\u3001-\u33FF\uFE00-\uFF7F]")
