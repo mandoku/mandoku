@@ -197,8 +197,10 @@ function with access to a database."""
             ex=meta_re.split(s)
             for e in ex:
                 if len(e) > 0:
-                    if e[0] in (u'<', u'¶', u'\n'):
+                    if e[0] in (u'¶', u'\n'):
                         m += e
+                    elif e[0] == "<":
+                        p += e
                     else:
                         for j in range(0, len(e)):
                             if e[j] in (u'〈', u'《', u'「', u'『', u'【', u'〖', u'〘', u'〚', u'\u3000', '(', '*', '.', ' '):
@@ -405,6 +407,13 @@ function with access to a database."""
         zhu_buf = ""
         self.seq.append(('', ''))
         for line in infile:
+            if line.upper().startswith(u':END:') and self.in_zhu:
+                self.in_zhu = False
+                zhu_buf += line
+                self.seq[-1] = (self.seq[-1][:-1] + (self.seq[-1][-1] + zhu_buf,))
+            elif self.in_zhu:
+                zhu_buf += line
+                continue
             try:
                 line, extra = line.split('\t', 1)
             except:
@@ -421,13 +430,6 @@ function with access to a database."""
             elif line.startswith(u':zhu:'):
                 self.in_zhu = True
                 zhu_buf = line
-                continue
-            elif line.startswith(u':END:') and self.in_zhu:
-                self.in_zhu = False
-                zhu_buf += line
-                self.seq[-1] = (self.seq[-1][:-1] + (self.seq[-1][-1] + zhu_buf,))
-            elif self.in_zhu:
-                zhu_buf += line
                 continue
             elif line.startswith(u'<pb:') and len(self.seq) == 1:
                 #this is a pb before the text starts, add to the first element
@@ -519,7 +521,7 @@ function with access to a database."""
         #print "after: ", self.sections
         
             
-    def write_to_sections(self, path, header=False, alignpb=True):
+    def write_to_sections(self, path, header=False, alignpb=True, add=True):
         """write the text to path using the filename(s) in the sections array."""
         # if we got the sections from a different file, we might need to align them to a pb
         if alignpb:
@@ -564,17 +566,22 @@ function with access to a database."""
                 #seq entry belong before the next character, thus the
                 #next file
                 try:
-                    if len(self.seq[start - 1]) > self.cpos + 2:
+                    # this is the first line of the new file
+                    if add and len(self.seq[start - 1]) > self.cpos + 2:
                         tow = "".join(self.seq[start - 1][self.cpos + 2 :])
                         self.write(outfile, "%s\n" % (tow.replace("\n", "")))
                 except:
                     pass
                 #self.write(outfile, "\n-- break --\n")
-                self.write(outfile, "".join(["".join(a) for a in self.seq[start:limit - 1]]))
-                try:
-                    self.write(outfile, "".join(["".join(a) for a in self.seq[limit - 1 :limit][0][: self.cpos + 2]]))
-                except:
-                    self.write(outfile, "".join(["".join(a) for a in self.seq[limit - 1 :limit]]))
+                if add:
+                    self.write(outfile, "".join(["".join(a) for a in self.seq[start:limit - 1]]))
+                else:
+                    #[2016-02-27T20:54:45+0900] dont cut the extra part of the last line
+                    self.write(outfile, "".join(["".join(a) for a in self.seq[start:limit]]))
+                # try:
+                #     self.write(outfile, "".join(["".join(a) for a in self.seq[limit - 1 :limit][0][: self.cpos + 2]]))
+                # except:
+                #     self.write(outfile, "".join(["".join(a) for a in self.seq[limit - 1 :limit]]))
             outfile.write("\n")    
             outfile.close()
 
@@ -622,7 +629,7 @@ function with access to a database."""
                     out.write(u"#+PROPERTY: LASTPB  %s\n" % (pb[pb.find('<'):pb.find('>')+1]))
                     break
         if not jnx:
-            out.write("#+PROPERTY: JUAN %d\n" % (section ))
+            out.write("#+PROPERTY: JUAN %d\n" % (section +1))
 
     def printNgram(self, sx, sec, pos, extra=None):
         if extra:
@@ -1306,7 +1313,43 @@ class MandokuComp(object):
                     ##TODO
                     pass
                 
-
+    def extratot1(self, otx=0):
+        """Update text 1 with the extra information from text 2.
+        Linebreaks in T1 will be removed and replaced with LB from T2"""
+        t1 = self.maintext
+        t2 = self.othertexts[otx]
+        if t1.cpos == 0:
+            t1.punc_reorder()
+        if t2.cpos == 0:
+            t2.punc_reorder()
+        if self.s is None:
+            self.setsequence()
+        # for i in range(0, len(t1.seq)):
+        #     if u'\n' in t1.seq[i][t1.mpos]:
+        #         t1.seq[i] = t1.seq[i][:t1.mpos] + (t1.seq[i][t1.mpos].replace(u'\n', ''), )
+        for tag, i1, i2, j1, j2 in self.o:
+            dx = j1 - i1
+            li = i2 - i1
+            lj = j2 - j1
+            if li == lj:
+                for i in range(i1, i2):
+                    if len(t2.seq[i+dx]) > 4:
+                        t1.seq[i] = t1.seq[i][:t1.mpos] + (t1.seq[i][t1.mpos].replace(u'\n', ''), ) + (re.sub(r"<pb[^>]*>|\xb6", "", t2.seq[i+dx][4]),) 
+            elif tag == 'replace':
+                l = min(li, lj)
+                for i in range(i1, i1+l):
+                    if len(t2.seq[i+dx]) > 4:
+                        t1.seq[i] = t1.seq[i][:t1.mpos] + (t1.seq[i][t1.mpos].replace(u'\n', ''), ) + (re.sub(r"<pb[^>]*>|\xb6", "", t2.seq[i+dx][4]),) 
+                #only if text1 is longer, we add the rest of 1 add the last char
+                if li < lj:
+                    # untested!
+                    t1.seq[i1+li] = t1.seq[i1+li][:t1.mpos] + (t1.seq[i1+li][t1.mpos].replace(u'\n', ''), ) + ("".join([re.sub(r"<pb[^>]*>|\xb6", "", a[4]) for a in t2.seq[i+li+dx:i+lj+dx] if len(a) > 4]), )
+            elif tag == 'insert':
+                add = "\n" + "".join(["".join(a) for a in t2.seq[j1:j2]])
+                t1.seq[i2] =  (add.replace("\n", "\n# i#")+"\n",) + t1.seq[i2]
+            elif tag == 'delete':
+                # nothing in t2, pass
+                pass
 
     def move_pg_and_xb6tot2(self, otx=0):
         """update text2 with layout markers from text1"""
