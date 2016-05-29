@@ -407,6 +407,8 @@ function with access to a database."""
         zhu_buf = ""
         self.seq.append(('', ''))
         for line in infile:
+            if "# src:" in line or "# dating:" in line:
+                self.seq[-1] = (self.seq[-1][:-1] + (self.seq[-1][-1] + line,))
             if line.upper().startswith(u':END:') and self.in_zhu:
                 self.in_zhu = False
                 zhu_buf += line
@@ -596,7 +598,10 @@ function with access to a database."""
         if self.defs.has_key('title'):
             out.write("#+TITLE: %s\n" % (self.defs['title']))
         out.write("#+DATE: %s\n" % (datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-#        out.write("#+PROPERTY: ID %s\n" % (self.))
+        try:
+            out.write("#+PROPERTY: ID %s\n" % (self.textid))
+        except:
+            pass
         for dx in self.defs.keys():
             if dx.startswith('#<pb'):
                 continue
@@ -1380,7 +1385,9 @@ class MandokuComp(object):
                             pass
                             #print "y", tag, i+dx, t2.seq[i+dx][t2.mpos], " / ", t1.seq[i]
                         else:
-                            t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] + (t1.seq[i][t1.mpos].replace('\n', '').replace('<pb:', '<md:') + t2.seq[i+dx][t2.mpos], )+ t2.seq[i+dx][t2.mpos+1:]
+                            #the pb is now in position 0! maybe replace with md?
+                            ### t1.seq[i][0].replace('\n', '').replace('<pb:', '<md:')
+                            t2.seq[i+dx] = (t1.seq[i][0],)+ t2.seq[i+dx][t2.cpos:t2.mpos] + (t1.seq[i][t1.mpos] + t2.seq[i+dx][t2.mpos], )+ t2.seq[i+dx][t2.mpos+1:]
                         # if "md" in "".join(t2.seq[i+dx]):
                         #     print t2.seq[i+dx]
                 else:
@@ -1388,7 +1395,7 @@ class MandokuComp(object):
         #                print dx, i1, i2
                         l = min(li, lj)
                         for i in range(i1, i1+l):
-                            t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] + (t1.seq[i][t1.mpos].replace('\n', '').replace('<pb:', '<md:') + t2.seq[i+dx][t2.mpos], ) + t2.seq[i+dx][t2.mpos+1:]
+                            t2.seq[i+dx] = (t1.seq[i][0],) t2.seq[i+dx][t2.cpos:t2.mpos] + (t1.seq[i][t1.mpos].replace('\n', '') + t2.seq[i+dx][t2.mpos], ) + t2.seq[i+dx][t2.mpos+1:]
                         #only if text1 is longer, we add the rest of 1 add the last char
                         if li > lj:
                             #skip punc before  \u3000 
@@ -1410,9 +1417,11 @@ class MandokuComp(object):
                         for z1, a in enumerate(c):
                             try:
                                 if c[z1+1][t1.cpos] != u"\u3000":
+                                    inp += a[0].replace('\n', '').replace('<pb:', '<md:')
                                     inp += a[t1.mpos].replace('\n', '').replace('<pb:', '<md:')
                                     #print "dely", t2.seq[j1-1], "/", inp
                             except:
+                                inp += a[0].replace('\n', '').replace('<pb:', '<md:')
                                 inp += a[t1.mpos].replace('\n', '').replace('<pb:', '<md:')
                         t2.seq[j1-1] = t2.seq[j1-1][:t2.mpos] + (inp + t2.seq[j1-1][t2.mpos], ) + t2.seq[j1-1][t2.mpos+1:]
                         #print "x", j1-1, tag, "".join(t2.seq[j1-1]), "/", "$".join(["#".join(a) for  a in t1.seq[i:i2]])
@@ -1452,7 +1461,7 @@ class MandokuComp(object):
                                 pass
                                 #print "y", tag, i+dx, t2.seq[i+dx][t2.mpos], " / ", t1.seq[i]
                             else:
-                                t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] + (t1.seq[i+t1start][t1.mpos].replace('\n', '').replace('<pb:', '<md:') + t2.seq[i+dx][t2.mpos], )+ t2.seq[i+dx][t2.mpos+1:]
+                                t2.seq[i+dx] = (t1.seq[i+t1start][0],)+  t2.seq[i+dx][t2.cpos:t2.mpos] + (t1.seq[i+t1start][t1.mpos].replace('\n', '') + t2.seq[i+dx][t2.mpos], )+ t2.seq[i+dx][t2.mpos+1:]
                         # if "md" in "".join(t2.seq[i+dx]):
                         #     print t1.sections[sn][1], i+dx, "".join(t2.seq[i+dx])
                     else:
@@ -1460,7 +1469,7 @@ class MandokuComp(object):
             #                print dx, i1, i2
                             l = min(li, lj)
                             for i in range(i1, i1+l):
-                                t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] + (t1.seq[i+t1start][t1.mpos].replace('\n', '').replace('<pb:', '<md:') + t2.seq[i+dx][t2.mpos], ) + t2.seq[i+dx][t2.mpos+1:]
+                                t2.seq[i+dx] = (t1.seq[i+t1start][0],)+ t2.seq[i+dx][t2.cpos:t2.mpos] + (t1.seq[i+t1start][t1.mpos].replace('\n', '')  + t2.seq[i+dx][t2.mpos], ) + t2.seq[i+dx][t2.mpos+1:]
                             #only if text1 is longer, we add the rest of 1 add the last char
                             if li > lj:
                                 #skip punc before  \u3000 
@@ -1469,10 +1478,12 @@ class MandokuComp(object):
                                 for z1, a in enumerate(c):
                                     try:
                                         if c[z1+1][t1.cpos] != u"\u3000":
-                                            inp += a[t1.mpos].replace('\n', '').replace('<pb:', '<md:')
+                                            inp += a[0].replace('\n', '').replace('<pb:', '<md:')
+                                            inp += a[t1.mpos].replace('\n', '')
                                             #print "delz", t2.seq[j1-1], "/", inp
                                     except:
-                                        inp += a[t1.mpos].replace('\n', '').replace('<pb:', '<md:')
+                                        inp += a[0].replace('\n', '').replace('<pb:', '<md:')
+                                        inp += a[t1.mpos].replace('\n', '')
                                 #t1.seq[i][t1.mpos].replace('\n', '').replace('<pb:', '<md:') + "".join([a[t1.mpos].replace('\n', '').replace('<pb:', '<md:') for  a in t1.seq[i:i2]])
                                 t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] +(inp + t2.seq[i+dx][t2.mpos] , ) + t2.seq[i+dx][t2.mpos+1:]
                         elif tag == 'delete':
@@ -1482,10 +1493,12 @@ class MandokuComp(object):
                             for z1, a in enumerate(c):
                                 try:
                                     if c[z1+1][t1.cpos] != u"\u3000":
-                                        inp += a[t1.mpos].replace('\n', '').replace('<pb:', '<md:')
+                                        inp += a[0].replace('\n', '').replace('<pb:', '<md:')
+                                        inp += a[t1.mpos].replace('\n', '')
                                         #print "dely", t2.seq[j1-1], "/", inp
                                 except:
-                                    inp += a[t1.mpos].replace('\n', '').replace('<pb:', '<md:')
+                                    inp += a[0].replace('\n', '').replace('<pb:', '<md:')
+                                    inp += a[t1.mpos].replace('\n', '')
                             t2.seq[j1-1+t2start] = t2.seq[j1-1+t2start][:t2.mpos] + (inp + t2.seq[j1-1+t2start][t2.mpos], ) + t2.seq[j1-1+t2start][t2.mpos+1:]
                             #print "x", j1-1, tag, "".join(t2.seq[j1-1]), "/", "$".join(["#".join(a) for  a in t1.seq[i:i2]])
                         
