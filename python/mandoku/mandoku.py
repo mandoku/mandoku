@@ -1395,7 +1395,7 @@ class MandokuComp(object):
         #                print dx, i1, i2
                         l = min(li, lj)
                         for i in range(i1, i1+l):
-                            t2.seq[i+dx] = (t1.seq[i][0],) t2.seq[i+dx][t2.cpos:t2.mpos] + (t1.seq[i][t1.mpos].replace('\n', '') + t2.seq[i+dx][t2.mpos], ) + t2.seq[i+dx][t2.mpos+1:]
+                            t2.seq[i+dx] = (t1.seq[i][0],) + t2.seq[i+dx][t2.cpos:t2.mpos] + (t1.seq[i][t1.mpos].replace('\n', '') + t2.seq[i+dx][t2.mpos], ) + t2.seq[i+dx][t2.mpos+1:]
                         #only if text1 is longer, we add the rest of 1 add the last char
                         if li > lj:
                             #skip punc before  \u3000 
