@@ -1348,10 +1348,20 @@ class MandokuComp(object):
                 #only if text1 is longer, we add the rest of 1 add the last char
                 if li < lj:
                     # untested!
-                    t1.seq[i1+li] = t1.seq[i1+li][:t1.mpos] + (t1.seq[i1+li][t1.mpos].replace(u'\n', ''), ) + ("".join([re.sub(r"<pb[^>]*>|\xb6", "", a[4]) for a in t2.seq[i+li+dx:i+lj+dx] if len(a) > 4]), )
+                    try:
+                        t1.seq[i1+li] = t1.seq[i1+li][:t1.mpos] + (t1.seq[i1+li][t1.mpos].replace(u'\n', ''), ) + ("".join([re.sub(r"<pb[^>]*>|\xb6", "", a[4]) for a in t2.seq[i+li+dx:i+lj+dx] if len(a) > 4]), )
+                    except:
+                        print "i1+li", i1+li, "t1seq", len(t1.seq)
+                        print "".join([a[4] for a in t2.seq[i+li+dx:i+lj+dx] if len(a) > 4])
+                        t1.seq[-1] = (t1.seq[-1][:] + ("".join([a[4] for a in t2.seq[i+li+dx:i+lj+dx] if len(a) > 4]),))
             elif tag == 'insert':
                 add = "\n" + "".join(["".join(a) for a in t2.seq[j1:j2]])
-                t1.seq[i2] =  (add.replace("\n", "\n# i#")+"\n",) + t1.seq[i2]
+                try:
+                    t1.seq[i2] =  (add.replace("\n", "\n# i#")+"\n",) + t1.seq[i2]
+                except:
+                    print "i2", i2
+                    print "t1seq", len(t1.seq)
+                    t1.seq[-1] =  (add.replace("\n", "\n# i#")+"\n",) + t1.seq[-1]
             elif tag == 'delete':
                 # nothing in t2, pass
                 pass
