@@ -79,7 +79,7 @@ class MandokuText(object):
         self.flags = {}
         self.baseedition = ""
         #cutoff for some operations.
-        self.bigfile = 1500000
+        self.bigfile = 0
         self.sections = []
         self.neworder = []
         #a dictionary of sparsedicts:
@@ -188,6 +188,7 @@ function with access to a database."""
         punctuation before the char, the char and punctuation after
         the char, additional stuff like pagebreaks goes into the fourth item."""
         #we do this only if it has not been done before...
+        #TODO: need to check the tuple arith here, seems a bit fishy [2016-06-25T16:49:14+0900]
         if self.cpos > 0:
             return
         for i in range(len(self.seq)-1, -1, -1):
@@ -217,7 +218,7 @@ function with access to a database."""
                     self.seq[i+1] = (p + self.seq[i+1][0], ) + self.seq[i+1][1:]
                 except:
                     pass
-                    #print i, p, self.seq[i]
+                    print i, p, self.seq[i]
             if self.seq[i][1].startswith('{'):
                 ts = self.seq[i][1]
                 k = ts[1:ts.find(':')]
@@ -239,7 +240,7 @@ function with access to a database."""
                 elif len(rep) > 0:
                     self.seq[i] = ('{', '', ':' + rep + '}', ) + self.seq[i][2:]
         self.cpos = 1
-        self.mpos = 3
+        self.mpos = 2
 
     def maketoc(self):
         prevlev = 0
@@ -407,6 +408,7 @@ function with access to a database."""
         zhu_buf = ""
         self.seq.append(('', ''))
         for line in infile:
+            line = line.replace("\r", "")
             if "# src:" in line or "# dating:" in line:
                 self.seq[-1] = (self.seq[-1][:-1] + (self.seq[-1][-1] + line,))
             if line.upper().startswith(u':END:') and self.in_zhu:
@@ -436,7 +438,14 @@ function with access to a database."""
             elif line.startswith(u'<pb:') and len(self.seq) == 1:
                 #this is a pb before the text starts, add to the first element
                 #self.seq[-1] = (self.seq[-1][:-1] + (self.seq[-1][-1] + line,))
-                self.seq.extend([('', line)])
+                start = line.index("<")
+                end = line.index(">")+1
+                self.seq.extend([('', line[start:end])])
+                ex = self.re.split(line[end:])
+                cs=[a for a in zip(*[iter(ex[1:])]*2)]
+                self.seq[-1] = (self.seq[-1][:-1] + (self.seq[-1][-1] + ex[0],))
+                self.seq.extend(cs)
+                
             elif line.startswith(u'-*-'):
                 continue
             elif line.startswith(u'校勘記¶'):
@@ -1293,8 +1302,8 @@ class MandokuComp(object):
                 for i in range(i1, i2):
                     if action == 'punc':
                         t2.seq[i+dx] = (t2.seq[i+dx][0], t1.seq[i][1], t2.seq[i+dx][2], t1.seq[i][3],) + t2.seq[i+dx][4:]
-                    else:
-                        t2.seq[i+dx] = (t1.seq[i][0],) + t2.seq[i+dx][1:3] + t1.seq[i][4:]
+                    elif action == 'layout':
+                        t2.seq[i+dx] = t2.seq[i+dx][0:3] + (t2.seq[i+dx] + t1[i][-1],)
             elif tag == 'replace':
 #                print dx, i1, i2
                 l = min(li, lj)
@@ -1302,7 +1311,7 @@ class MandokuComp(object):
                     if action == 'punc':
                         t2.seq[i+dx] = (t2.seq[i+dx][0], t1.seq[i][1], t2.seq[i+dx][2], t1.seq[i][3],) + t2.seq[i+dx][4:]
                     else:
-                        t2.seq[i+dx] = (t1.seq[i][0],) + t2.seq[i+dx][1:3] + t1.seq[i][4:]
+                        t2.seq[i+dx] = (t1.seq[i][0],) + t2.seq[i+dx][1:3] + t1.seq[i][3:]
                 #only if text1 is longer, we add the rest of 1 add the last char
                 if li > lj:
                     if action == 'punc':
@@ -1318,7 +1327,7 @@ class MandokuComp(object):
                     ##TODO
                     pass
                 
-    def extratot1(self, otx=0):
+    def extratot1(self, otx=0, preservelb=False):
         """Update text 1 with the extra information from text 2.
         Linebreaks in T1 will be removed and replaced with LB from T2"""
         t1 = self.maintext
@@ -1329,9 +1338,10 @@ class MandokuComp(object):
             t2.punc_reorder()
         if self.s is None:
             self.setsequence()
-        # for i in range(0, len(t1.seq)):
-        #     if u'\n' in t1.seq[i][t1.mpos]:
-        #         t1.seq[i] = t1.seq[i][:t1.mpos] + (t1.seq[i][t1.mpos].replace(u'\n', ''), )
+        if preservelb:
+            for i in range(0, len(t1.seq)):
+                if u'\n' in t1.seq[i][t1.mpos]:
+                    t1.seq[i] = t1.seq[i][:t1.mpos] + (t1.seq[i][t1.mpos].replace(u'\n', ''), )
         for tag, i1, i2, j1, j2 in self.o:
             dx = j1 - i1
             li = i2 - i1
@@ -1339,12 +1349,12 @@ class MandokuComp(object):
             if li == lj:
                 for i in range(i1, i2):
                     if len(t2.seq[i+dx]) > 4:
-                        t1.seq[i] = t1.seq[i][:t1.mpos] + (t1.seq[i][t1.mpos].replace(u'\n', ''), ) + (re.sub(r"<pb[^>]*>|\xb6", "", t2.seq[i+dx][4]),) 
+                        t1.seq[i] = t1.seq[i][:t1.mpos] + (t1.seq[i][t1.mpos].replace(u'\n', ''), ) + (re.sub(r"<pb[^>]*>|\xb6", "", t2.seq[i+dx][-1]),) 
             elif tag == 'replace':
                 l = min(li, lj)
                 for i in range(i1, i1+l):
                     if len(t2.seq[i+dx]) > 4:
-                        t1.seq[i] = t1.seq[i][:t1.mpos] + (t1.seq[i][t1.mpos].replace(u'\n', ''), ) + (re.sub(r"<pb[^>]*>|\xb6", "", t2.seq[i+dx][4]),) 
+                        t1.seq[i] = t1.seq[i][:t1.mpos] + (t1.seq[i][t1.mpos].replace(u'\n', ''), ) + (re.sub(r"<pb[^>]*>|\xb6", "", t2.seq[i+dx][-1]),) 
                 #only if text1 is longer, we add the rest of 1 add the last char
                 if li < lj:
                     # untested!
@@ -1366,6 +1376,85 @@ class MandokuComp(object):
                 # nothing in t2, pass
                 pass
 
+    def moveover(self, source_seq, target_seq, spos=1, tpos=1):
+        """Update target with layout markers from source.
+        spos is the character position for the source sequence,
+        tpos is the character position for the target sequence"""
+        pages = collections.defaultdict(int)
+        s=SequenceMatcher()
+        s.set_seq1([a[spos] for a in source_seq])
+        s.set_seq2([a[tpos] for a in target_seq])
+        o = s.get_opcodes()
+        res = ()
+        pgx = ""
+        for tag, i1, i2, j1, j2 in o:
+            dx = i1 - j1
+            li = i2 - i1
+            lj = j2 - j1
+            #print "dx",  dx, "li", li, "i1", i1, "".join(["".join(a) for a in source_seq[i1:i2]]).replace("\n", "")
+            #print "res",  len(res), "lj", lj, "j1", j1, "".join(["".join(a) for a in target_seq[j1:j2]]).replace("\n", "")
+            # need to find first pb
+            if lj == 0:
+                for i in range(i1, i2):
+                    prev = "".join(source_seq[i])
+                    if "<pb" in prev:
+                        start = prev.index("<")
+                        end = prev.index(">")+1
+                        pgx = prev[start:end]
+                        #print "pgx", pgx
+            for i in range(j1, j2):
+                t2 = ""
+                k = source_seq[i+dx]
+                prev = "".join(k)
+                foll = "".join(k[spos:])
+                if "<pb" in prev:
+                    #print "prev:", prev
+                    start = prev.index("<")
+                    end = prev.index(">")+1
+                    pg = prev[start:end]
+                    if not pages.has_key(pg):
+                        t1 = pg + target_seq[i][0]
+                    else:
+                        t1 = target_seq[i][0]
+                    pages[pg] += 1
+                    #print "pg:" , pg
+                else:
+                    t1 = target_seq[i][0] 
+                if "<pb" in foll:
+                    start = foll.index("<")
+                    end = foll.index(">")+1
+                    pg = foll[start:end]
+                    if not pages.has_key(pg):
+                        t2 = t2 + target_seq[i][-1] + pg
+                    else:
+                        t2 =  t2 + target_seq[i][-1]
+                    pages[pg] += 1
+                else:
+                    t2 = t2 + target_seq[i][-1]
+                if u"\xb6" in "".join(source_seq[i+dx]):
+                    t2 = "%s%s" % (t2,  source_seq[i+dx][-1].replace("\n", ""))
+                tx = (pgx +t1, target_seq[i][1:-1], t2,)
+                res = res + (tx,)
+                pgx=""
+            if li > lj:
+                #pgx = ""
+                #do not reset here, we might have one from above!
+                for i in range(i2-lj+li-2, i2):
+                    prev = "".join(source_seq[i])
+                    if "<pb" in prev:
+                        start = prev.index("<")
+                        end = prev.index(">")+1
+                        pgx = prev[start:end]
+                        #print "pgy", pgx
+                    if u"\xb6" in "".join(source_seq[i]):
+                        pgx = "%s%s" % (pgx,  source_seq[i][-1].replace("\n", ""))
+                #how do I know it should always be at the end?
+                new = (res[-1][:-1] + ("%s%s" % (res[-1][-1], pgx),))
+                res = res[:-1] + (new,)
+                pgx=""
+        return list(res)
+
+
     def move_pg_and_xb6tot2(self, otx=0):
         """update text2 with layout markers from text1"""
         ##TODO: what I really want is a separation of target of the action and the action itself,
@@ -1378,64 +1467,12 @@ class MandokuComp(object):
             t2.punc_reorder()
         #avoid unnecessary processing time with big files if possible
         if len(t1.seq) < t1.bigfile or len(t1.sections) != len(t2.sections):
-            if self.s is None:
-                self.setsequence()
             for i in range(0, len(t2.seq)):
                 if u'\xb6' in t2.seq[i][t2.mpos]:
                     t2.seq[i] = t2.seq[i][:t2.mpos] + (t2.seq[i][t2.mpos].replace(u'\xb6', ''), )
-            for tag, i1, i2, j1, j2 in self.o:
-                dx = j1 - i1
-                li = i2 - i1
-                lj = j2 - j1
-                #no matter what tag, if they are the same length; we take it
-                #i.e. equal or replace
-                if li == lj:
-                    for i in range(i1, i2):
-                        if "md" in t2.seq[i+dx][t2.mpos]:
-                            pass
-                            #print "y", tag, i+dx, t2.seq[i+dx][t2.mpos], " / ", t1.seq[i]
-                        else:
-                            #the pb is now in position 0! maybe replace with md?
-                            ### t1.seq[i][0].replace('\n', '').replace('<pb:', '<md:')
-                            t2.seq[i+dx] = (t1.seq[i][0],)+ t2.seq[i+dx][t2.cpos:t2.mpos] + (t1.seq[i][t1.mpos] + t2.seq[i+dx][t2.mpos], )+ t2.seq[i+dx][t2.mpos+1:]
-                        # if "md" in "".join(t2.seq[i+dx]):
-                        #     print t2.seq[i+dx]
-                else:
-                    if tag == 'replace':
-        #                print dx, i1, i2
-                        l = min(li, lj)
-                        for i in range(i1, i1+l):
-                            t2.seq[i+dx] = (t1.seq[i][0],) + t2.seq[i+dx][t2.cpos:t2.mpos] + (t1.seq[i][t1.mpos].replace('\n', '') + t2.seq[i+dx][t2.mpos], ) + t2.seq[i+dx][t2.mpos+1:]
-                        #only if text1 is longer, we add the rest of 1 add the last char
-                        if li > lj:
-                            #skip punc before  \u3000 
-                            inp=""
-                            c = t1.seq[i:i2]
-                            for z1, a in enumerate(c):
-                                try:
-                                    if c[z1+1][t1.cpos] != u"\u3000":
-                                        inp += a[t1.mpos].replace('\n', '').replace('<pb:', '<md:')
-                                        #print "delz", t2.seq[j1-1], "/", inp
-                                except:
-                                    inp += a[t1.mpos].replace('\n', '').replace('<pb:', '<md:')
-                            #t1.seq[i][t1.mpos].replace('\n', '').replace('<pb:', '<md:') + "".join([a[t1.mpos].replace('\n', '').replace('<pb:', '<md:') for  a in t1.seq[i:i2]])
-                            t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] +(inp + t2.seq[i+dx][t2.mpos] , ) + t2.seq[i+dx][t2.mpos+1:]
-                    elif tag == 'delete':
-                        #skip punc before  \u3000 
-                        inp=""
-                        c = t1.seq[i1:i2]
-                        for z1, a in enumerate(c):
-                            try:
-                                if c[z1+1][t1.cpos] != u"\u3000":
-                                    inp += a[0].replace('\n', '').replace('<pb:', '<md:')
-                                    inp += a[t1.mpos].replace('\n', '').replace('<pb:', '<md:')
-                                    #print "dely", t2.seq[j1-1], "/", inp
-                            except:
-                                inp += a[0].replace('\n', '').replace('<pb:', '<md:')
-                                inp += a[t1.mpos].replace('\n', '').replace('<pb:', '<md:')
-                        t2.seq[j1-1] = t2.seq[j1-1][:t2.mpos] + (inp + t2.seq[j1-1][t2.mpos], ) + t2.seq[j1-1][t2.mpos+1:]
-                        #print "x", j1-1, tag, "".join(t2.seq[j1-1]), "/", "$".join(["#".join(a) for  a in t1.seq[i:i2]])
+            t2.seq = self.moveover(t1.seq, t2.seq, t1.cpos, t2.cpos)
         elif len(t1.sections) == len(t2.sections):
+            res = []
             for sn in range(1, len(t1.sections)+1):
                 #for now, we assume the section numbers correspondent to each other
                 s, f = t1.sections[sn-1]
@@ -1451,85 +1488,33 @@ class MandokuComp(object):
                     t2end = len(t2.seq)
                 t1seq = t1.seq[t1start:t1end]
                 t2seq = t2.seq[t2start:t2end]
-
-                s=SequenceMatcher()
-                s.set_seq1([a[t1.cpos] for a in t1seq])
-                s.set_seq2([a[t2.cpos] for a in t2seq])
-
-                for i in range(0, len(t2seq)):
-                    if u'\xb6' in t2.seq[i+t2start][t2.mpos]:
-                        t2.seq[i+t2start] = t2.seq[i+t2start][:t2.mpos] + (t2.seq[i+t2start][t2.mpos].replace(u'\xb6', ''), )
-                for tag, i1, i2, j1, j2 in s.get_opcodes():
-                    dx = j1 - i1 + t2start
-                    li = i2 - i1
-                    lj = j2 - j1
-                    #no matter what tag, if they are the same length; we take it
-                    #i.e. equal or replace
-                    if li == lj:
-                        for i in range(i1, i2):
-                            if "md" in t2.seq[i+dx][t2.mpos]:
-                                pass
-                                #print "y", tag, i+dx, t2.seq[i+dx][t2.mpos], " / ", t1.seq[i]
-                            else:
-                                t2.seq[i+dx] = (t1.seq[i+t1start][0],)+  t2.seq[i+dx][t2.cpos:t2.mpos] + (t1.seq[i+t1start][t1.mpos].replace('\n', '') + t2.seq[i+dx][t2.mpos], )+ t2.seq[i+dx][t2.mpos+1:]
-                        # if "md" in "".join(t2.seq[i+dx]):
-                        #     print t1.sections[sn][1], i+dx, "".join(t2.seq[i+dx])
-                    else:
-                        if tag == 'replace':
-            #                print dx, i1, i2
-                            l = min(li, lj)
-                            for i in range(i1, i1+l):
-                                t2.seq[i+dx] = (t1.seq[i+t1start][0],)+ t2.seq[i+dx][t2.cpos:t2.mpos] + (t1.seq[i+t1start][t1.mpos].replace('\n', '')  + t2.seq[i+dx][t2.mpos], ) + t2.seq[i+dx][t2.mpos+1:]
-                            #only if text1 is longer, we add the rest of 1 add the last char
-                            if li > lj:
-                                #skip punc before  \u3000 
-                                inp=""
-                                c = t1.seq[i+t1start:i2+t1start]
-                                for z1, a in enumerate(c):
-                                    try:
-                                        if c[z1+1][t1.cpos] != u"\u3000":
-                                            inp += a[0].replace('\n', '').replace('<pb:', '<md:')
-                                            inp += a[t1.mpos].replace('\n', '')
-                                            #print "delz", t2.seq[j1-1], "/", inp
-                                    except:
-                                        inp += a[0].replace('\n', '').replace('<pb:', '<md:')
-                                        inp += a[t1.mpos].replace('\n', '')
-                                #t1.seq[i][t1.mpos].replace('\n', '').replace('<pb:', '<md:') + "".join([a[t1.mpos].replace('\n', '').replace('<pb:', '<md:') for  a in t1.seq[i:i2]])
-                                t2.seq[i+dx] = t2.seq[i+dx][:t2.mpos] +(inp + t2.seq[i+dx][t2.mpos] , ) + t2.seq[i+dx][t2.mpos+1:]
-                        elif tag == 'delete':
-                            #skip punc before  \u3000 
-                            inp=""
-                            c = t1.seq[i1+t1start:i2+t1start]
-                            for z1, a in enumerate(c):
-                                try:
-                                    if c[z1+1][t1.cpos] != u"\u3000":
-                                        inp += a[0].replace('\n', '').replace('<pb:', '<md:')
-                                        inp += a[t1.mpos].replace('\n', '')
-                                        #print "dely", t2.seq[j1-1], "/", inp
-                                except:
-                                    inp += a[0].replace('\n', '').replace('<pb:', '<md:')
-                                    inp += a[t1.mpos].replace('\n', '')
-                            t2.seq[j1-1+t2start] = t2.seq[j1-1+t2start][:t2.mpos] + (inp + t2.seq[j1-1+t2start][t2.mpos], ) + t2.seq[j1-1+t2start][t2.mpos+1:]
-                            #print "x", j1-1, tag, "".join(t2.seq[j1-1]), "/", "$".join(["#".join(a) for  a in t1.seq[i:i2]])
-                        
+                #print "t2seq", len(t2seq), 
+                r = self.moveover(t1seq, t2seq, t1.cpos, t2.cpos)
+                #print len(r)
+                res.extend(r)
+            t2.seq = res
         else:
             #do nothing?
             pass
-        for lz in range(0, len(t2.seq)):
-            ts = t2.seq[lz][t2.mpos]
-            if "pb" in ts or "md" in ts:
-                mdx = ""
-                pbx = ""
-                #reduce multiple md or pb to 1
-                pblx = re.split("(<..[^>]+>)", ts)
-                for lx in pblx:
-                    if lx[1:3] == "md":
-                        mdx = "%s¶" % (lx)
-                    elif lx[1:3] == "pb":
-                        pbx = "\n%s\n" % (lx)
-                t2.seq[lz] = t2.seq[lz][:t2.mpos] + (u"%s%s" % (mdx, pbx), ) + t2.seq[lz][t2.mpos+1:]
-            if "md" in ts:
-                t2.mdcnt += 1
+        # for lz in range(0, len(t2.seq)):
+        #     try:
+        #         ts = t2.seq[lz][t2.mpos]
+        #     except:
+        #         print "prob", len(t2.seq), lz, t2.seq[lz], t2.mpos
+        #         ts = ""
+        #     if "pb" in ts or "md" in ts:
+        #         mdx = ""
+        #         pbx = ""
+        #         #reduce multiple md or pb to 1
+        #         pblx = re.split("(<..[^>]+>)", ts)
+        #         for lx in pblx:
+        #             if lx[1:3] == "md":
+        #                 mdx = u"%s¶" % (lx)
+        #             elif lx[1:3] == "pb":
+        #                 pbx = u"\n%s\n" % (lx)
+        #         t2.seq[lz] = t2.seq[lz][:t2.mpos] + (u"%s%s" % (mdx, pbx), ) + t2.seq[lz][t2.mpos+1:]
+        #     if "md" in ts:
+        #         t2.mdcnt += 1
 
 
     def mergepunc(self, i=0):
