@@ -201,7 +201,10 @@ function with access to a database."""
                     if e[0] in (u'¶', u'\n'):
                         m += e
                     elif e[0] == "<":
-                        p += e
+                        #this used to be
+                        # p += e
+                        # in order to collect this and move it later.  However, this does not work well for \xb6 following a pb immediately, so changed this for the time being..
+                        m += e
                     else:
                         for j in range(0, len(e)):
                             if e[j] in (u'〈', u'《', u'「', u'『', u'【', u'〖', u'〘', u'〚', u'\u3000', '(', '*', '.', ' '):
@@ -1391,8 +1394,8 @@ class MandokuComp(object):
             dx = i1 - j1
             li = i2 - i1
             lj = j2 - j1
-            #print "dx",  dx, "li", li, "i1", i1, "".join(["".join(a) for a in source_seq[i1:i2]]).replace("\n", "")
-            #print "res",  len(res), "lj", lj, "j1", j1, "".join(["".join(a) for a in target_seq[j1:j2]]).replace("\n", "")
+            # print "dx",  dx, "li", li, "i1", i1, "".join(["".join(a) for a in source_seq[i1:i2]]).replace("\n", "")
+            # print "res",  len(res), "lj", lj, "j1", j1, "".join(["".join(a) for a in target_seq[j1:j2]]).replace("\n", "")
             # need to find first pb
             if lj == 0:
                 for i in range(i1, i2):
@@ -1405,19 +1408,20 @@ class MandokuComp(object):
             for i in range(j1, j2):
                 t2 = ""
                 k = source_seq[i+dx]
-                prev = "".join(k)
-                foll = "".join(k[spos:])
+                prev = "".join(k[:spos])
+                # dangerous, I am assuming mpos here...
+                foll = "".join(k[spos+2:])
                 if "<pb" in prev:
                     #print "prev:", prev
                     start = prev.index("<")
                     end = prev.index(">")+1
                     pg = prev[start:end]
                     if not pages.has_key(pg):
-                        t1 = pg + target_seq[i][0]
+                        t1 = prev.replace("\n", "") + target_seq[i][0]
                     else:
                         t1 = target_seq[i][0]
                     pages[pg] += 1
-                    #print "pg:" , pg
+                    # print "pgp:" , pg
                 else:
                     t1 = target_seq[i][0] 
                 if "<pb" in foll:
@@ -1425,14 +1429,17 @@ class MandokuComp(object):
                     end = foll.index(">")+1
                     pg = foll[start:end]
                     if not pages.has_key(pg):
-                        t2 = t2 + target_seq[i][-1] + pg
+                        # if "/" in foll:
+                        #     print "src:", source_seq[i+dx], "foll", foll
+                        t2 = t2 + target_seq[i][-1] + foll.replace("\n", "")
                     else:
-                        t2 =  t2 + target_seq[i][-1]
+                        t2 = t2 + target_seq[i][-1]
+                    # print "pgf:" , pg
                     pages[pg] += 1
+                elif u"\xb6" in foll:
+                    t2 = t2 + target_seq[i][-1] +  foll.replace("\n", "")
                 else:
                     t2 = t2 + target_seq[i][-1]
-                if u"\xb6" in "".join(source_seq[i+dx]):
-                    t2 = "%s%s" % (t2,  source_seq[i+dx][-1].replace("\n", ""))
                 tx = (pgx +t1, target_seq[i][1:-1], t2,)
                 res = res + (tx,)
                 pgx=""
