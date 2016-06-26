@@ -49,6 +49,7 @@
 (require 'mandoku-github)
 (require 'git)
 (require 'url)
+(require 'url-handlers)
 (defvar mandoku-base-dir nil "This is the root of the mandoku hierarchy, this needs to be provided by the user in its init file")
 (defvar mandoku-do-remote t)
 (defvar mandoku-preferred-edition nil "Preselect a certain edition to avoid repeated selection")
