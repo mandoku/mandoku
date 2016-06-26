@@ -1455,10 +1455,12 @@ class MandokuComp(object):
                     t2 = t2 + target_seq[i][-1] +  foll.replace("\n", "")
                 else:
                     t2 = t2 + target_seq[i][-1]
+                if txt_2.pbcnt > 0:
+                    pgx=pgx.replace("pb", "md")
                 tx = (pgx +t1, target_seq[i][1:-1], t2,)
                 res = res + (tx,)
                 pgx=""
-            if li > lj:
+            if li > lj and lj > 0:
                 #pgx = ""
                 #do not reset here, we might have one from above!
                 for i in range(i2-lj+li-2, i2):
@@ -1471,6 +1473,8 @@ class MandokuComp(object):
                     if u"\xb6" in "".join(source_seq[i]):
                         pgx = "%s%s" % (pgx,  source_seq[i][-1].replace("\n", ""))
                 #how do I know it should always be at the end?
+                if txt_2.pbcnt > 0:
+                    pgx=pgx.replace("pb", "md")
                 new = (res[-1][:-1] + ("%s%s" % (res[-1][-1], pgx),))
                 res = res[:-1] + (new,)
                 pgx=""
