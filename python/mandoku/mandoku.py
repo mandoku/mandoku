@@ -243,7 +243,7 @@ function with access to a database."""
                 elif len(rep) > 0:
                     self.seq[i] = ('{', '', ':' + rep + '}', ) + self.seq[i][2:]
         self.cpos = 1
-        self.mpos = 2
+        self.mpos = 3
 
     def maketoc(self):
         prevlev = 0
