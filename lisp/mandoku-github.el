@@ -264,12 +264,14 @@ We should check if the file exists before cloning!"
     (when ( and (not (string-equal (oref (oref repo :owner) :login)
 				   (github-clone-user-name)))
 		ask
-		(yes-or-no-p "Fork repo and add remote? "))
+;		(yes-or-no-p "Fork repo and add remote? "))
+		(yes-or-no-p "Do you want to also use GitHub to work with this text? "))
 	;; this will set the default directory for magit, 
       (magit-status-internal target)
       (sleep-for 0.5)
       (github-clone-fork-repo repo)
-      (message "Successfully forked and added remote")
+;      (message "Successfully forked and added remote")
+      (message "Successfully set this text up for use on GitHub.")
       ))
   (message "Successfully cloned repository")
   )
