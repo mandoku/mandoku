@@ -1383,10 +1383,12 @@ class MandokuComp(object):
                 # nothing in t2, pass
                 pass
 
-    def moveover(self, source_seq, target_seq, spos=1, tpos=1):
+    def moveover(self, source_seq, target_seq, txt_1, txt_2):
         """Update target with layout markers from source.
         spos is the character position for the source sequence,
         tpos is the character position for the target sequence"""
+        spos = txt_1.cpos
+        tpos = txt_2.cpos
         pages = collections.defaultdict(int)
         s=SequenceMatcher()
         s.set_seq1([a[spos] for a in source_seq])
@@ -1423,7 +1425,7 @@ class MandokuComp(object):
                     fail += 1
                 prev = "".join(k[:spos])
                 # dangerous, I am assuming mpos s= spos+2 here...
-                foll = "".join(k[spos+2:])
+                foll = "".join(k[txt_1.mpos:])
                 if "<pb" in prev:
                     #print "prev:", prev
                     start = prev.index("<")
@@ -1485,12 +1487,12 @@ class MandokuComp(object):
             t1.punc_reorder()
         if t2.cpos == 0:
             t2.punc_reorder()
+        for i in range(0, len(t2.seq)):
+            if u'\xb6' in t2.seq[i][t2.mpos]:
+                t2.seq[i] = t2.seq[i][:t2.mpos] + (t2.seq[i][t2.mpos].replace(u'\xb6', ''), )
         #avoid unnecessary processing time with big files if possible
         if len(t1.seq) < t1.bigfile or len(t1.sections) != len(t2.sections):
-            for i in range(0, len(t2.seq)):
-                if u'\xb6' in t2.seq[i][t2.mpos]:
-                    t2.seq[i] = t2.seq[i][:t2.mpos] + (t2.seq[i][t2.mpos].replace(u'\xb6', ''), )
-            t2.seq = self.moveover(t1.seq, t2.seq, t1.cpos, t2.cpos)
+            t2.seq = self.moveover(t1.seq, t2.seq, t1, t2)
         elif len(t1.sections) == len(t2.sections):
             res = []
             for sn in range(1, len(t1.sections)+1):
@@ -1510,7 +1512,7 @@ class MandokuComp(object):
                 t2seq = t2.seq[t2start:t2end]
                 #print "t2seq", len(t2seq),
                 sys.stderr.write("%s, " % (sn))
-                r = self.moveover(t1seq, t2seq, t1.cpos, t2.cpos)
+                r = self.moveover(t1seq, t2seq, t1, t2)
                 #print len(r)
                 res.extend(r)
             t2.seq = res
