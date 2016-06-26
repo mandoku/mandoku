@@ -1411,6 +1411,8 @@ class MandokuComp(object):
                         start = prev.index("<")
                         end = prev.index(">")+1
                         pgx = prev[start:end]
+                        if txt_2.pbcnt > 0:
+                            pgx=pgx.replace("pb", "md")
                         #print "pgx", pgx
             for i in range(j1, j2):
                 t2 = ""
@@ -1424,8 +1426,9 @@ class MandokuComp(object):
                         return target_seq
                     fail += 1
                 prev = "".join(k[:spos])
-                # dangerous, I am assuming mpos s= spos+2 here...
                 foll = "".join(k[txt_1.mpos:])
+                if txt_2.pbcnt > 0:
+                    foll=foll.replace("pb", "md")
                 if "<pb" in prev:
                     #print "prev:", prev
                     start = prev.index("<")
@@ -1455,8 +1458,6 @@ class MandokuComp(object):
                     t2 = t2 + target_seq[i][-1] +  foll.replace("\n", "")
                 else:
                     t2 = t2 + target_seq[i][-1]
-                if txt_2.pbcnt > 0:
-                    pgx=pgx.replace("pb", "md")
                 tx = (pgx +t1, target_seq[i][1:-1], t2,)
                 res = res + (tx,)
                 pgx=""
@@ -1472,9 +1473,9 @@ class MandokuComp(object):
                         #print "pgy", pgx
                     if u"\xb6" in "".join(source_seq[i]):
                         pgx = "%s%s" % (pgx,  source_seq[i][-1].replace("\n", ""))
-                #how do I know it should always be at the end?
-                if txt_2.pbcnt > 0:
-                    pgx=pgx.replace("pb", "md")
+                    if txt_2.pbcnt > 0:
+                        pgx=pgx.replace("pb", "md")
+#how do I know it should always be at the end?
                 new = (res[-1][:-1] + ("%s%s" % (res[-1][-1], pgx),))
                 res = res[:-1] + (new,)
                 pgx=""
