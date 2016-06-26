@@ -65,7 +65,7 @@ meta_re = re.compile(ur'(<[^>]*>|\xb6|\n)')
 sys.stdout = codecs.getwriter('utf8')(sys.stdout)
 puamagic = 1060864
 
-
+flatten = lambda lst: reduce(lambda l, i: l + flatten(i) if isinstance(i, (list, tuple)) else l + [i], lst, []) 
 class MandokuText(object):
     def __init__(self, textpath, version='master', starlines=True, encoding='utf-8', ext='.txt', coll=None):
         """Read and parse the text.  If we get a directory, read all files in lexical order as parts of the text."""
@@ -473,11 +473,12 @@ function with access to a database."""
 # #                    self.in_note = not (self.in_note)
 #                    rp=line[1:-1].split(' ', 2)
                     if rp[0].startswith('PROPERTY'):
+                        nrp=rp[1].strip().split()
                         try:
-                            self.defs[rp[1].lower()] = rp[2].strip()
+                            self.defs[nrp[0].lower()] = nrp[1].strip()
                             if rp[1].startswith('LASTPB'):
                                 pass
-    #                            setPage(rp[2])
+   #                            setPage(rp[2])
                         except:
                             pass
                     ##[2011-03-11T13:44:09+0900] TODO: handle sections
@@ -535,7 +536,7 @@ function with access to a database."""
         #print "after: ", self.sections
         
             
-    def write_to_sections(self, path, header=False, alignpb=True, add=True):
+    def write_to_sections(self, path, header=False, alignpb=True, add=True, jnxoverride=False):
         """write the text to path using the filename(s) in the sections array."""
         # if we got the sections from a different file, we might need to align them to a pb
         if alignpb:
@@ -556,7 +557,7 @@ function with access to a database."""
                 limit = len(self.seq)
             outfile=codecs.open(of, 'w', self.encoding)
             if header:
-                self.writeheader(outfile, i)
+                self.writeheader(outfile, i, jnxoverride)
                 ## [2015-04-23T16:16:39+0900] we now use the above alignpb handling to split the sections more 
                 #lastpb only if cpos > 0?
                 # tmp = start
@@ -588,10 +589,10 @@ function with access to a database."""
                     pass
                 #self.write(outfile, "\n-- break --\n")
                 if add:
-                    self.write(outfile, "".join(["".join(a) for a in self.seq[start:limit - 1]]))
+                    self.write(outfile, "".join(["".join(flatten(a)) for a in self.seq[start:limit - 1]]))
                 else:
                     #[2016-02-27T20:54:45+0900] dont cut the extra part of the last line
-                    self.write(outfile, "".join(["".join(a) for a in self.seq[start:limit]]))
+                    self.write(outfile, "".join(["".join(flatten(a)) for a in self.seq[start:limit]]))
                 # try:
                 #     self.write(outfile, "".join(["".join(a) for a in self.seq[limit - 1 :limit][0][: self.cpos + 2]]))
                 # except:
@@ -602,7 +603,7 @@ function with access to a database."""
     def write_xml(self, outfile):
         """write the text out as xml in the supplied file object"""
         pass
-    def writeheader(self, out, section):
+    def writeheader(self, out, section, jnxoverride=False):
         be=False
         jnx = False
         """writes the metadata for the section to the file"""
@@ -614,12 +615,15 @@ function with access to a database."""
             out.write("#+PROPERTY: ID %s\n" % (self.textid))
         except:
             pass
+        if jnxoverride:
+            out.write("#+PROPERTY: JUAN %d\n" % (section))
+            jnx = True
         for dx in self.defs.keys():
             if dx.startswith('#<pb'):
                 continue
             if dx in ('lastpb', 'date', 'sec', 'title', 'source'):
                 continue
-            if dx == "juan":
+            if (not jnx) and (dx == "juan"):
                 try:
                     jx = int(self.defs[dx])
                     out.write("#+PROPERTY: JUAN %d\n" % (section ))
@@ -1388,6 +1392,7 @@ class MandokuComp(object):
         s.set_seq1([a[spos] for a in source_seq])
         s.set_seq2([a[tpos] for a in target_seq])
         o = s.get_opcodes()
+        fail = 0
         res = ()
         pgx = ""
         for tag, i1, i2, j1, j2 in o:
@@ -1407,9 +1412,17 @@ class MandokuComp(object):
                         #print "pgx", pgx
             for i in range(j1, j2):
                 t2 = ""
-                k = source_seq[i+dx]
+                try:
+                    k = source_seq[i+dx]
+                except:
+                    #print "i", i, "dx", dx, len(source_seq)
+                    k=""
+                    if fail > 5:
+                        sys.stderr.write("Sequence failed!\n")
+                        return target_seq
+                    fail += 1
                 prev = "".join(k[:spos])
-                # dangerous, I am assuming mpos here...
+                # dangerous, I am assuming mpos s= spos+2 here...
                 foll = "".join(k[spos+2:])
                 if "<pb" in prev:
                     #print "prev:", prev
@@ -1495,7 +1508,8 @@ class MandokuComp(object):
                     t2end = len(t2.seq)
                 t1seq = t1.seq[t1start:t1end]
                 t2seq = t2.seq[t2start:t2end]
-                #print "t2seq", len(t2seq), 
+                #print "t2seq", len(t2seq),
+                sys.stderr.write("%s, " % (sn))
                 r = self.moveover(t1seq, t2seq, t1.cpos, t2.cpos)
                 #print len(r)
                 res.extend(r)
