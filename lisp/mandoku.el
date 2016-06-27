@@ -1320,7 +1320,7 @@ eds
 (defun mandoku-make-img-index (&optional path)
   "Generate an image index for all editions in path or, if not given, in the current directory"
   (let ((p (or path (file-name-directory (buffer-file-name))))
-	(br (mapcar 'mandoku-chomp (mandoku-get-branches))))
+	(br (mandoku-get-branches)))
     (mkdir (concat (substring p 0 -1) ".wiki/imglist") t)
 ;    (dolist (b br)
 ;      (if (> 1 (length b))
@@ -1759,7 +1759,9 @@ BEG and END default to the buffer boundaries."
 ;     ["Dictionary" mandoku-dict-mlookup t]
      ["My Files" mandoku-search-user-text t]
      )
-    ;("Versions")
+    ("Editions"
+     ["View this location in other edition" mandoku-location-other-branch t]
+     )
     ("Maintenance"
      ["Download this text now!" mandoku-get-remote-text (string-match "fatal" (car (mandoku-get-branches)))]
      ["Download this text from other account" mandoku-get-remote-text-from-account (string-match "fatal" (car (mandoku-get-branches)))]
@@ -1945,11 +1947,17 @@ BEG and END default to the buffer boundaries."
   (let* ( (default-directory (file-name-directory (buffer-file-name )))
 	  (res (shell-command-to-string (concat mandoku-git-program " remote"))) )
     (split-string res "\n")))
+(defsubst mandoku-trim-and-star (s)
+  "Remove whitespace and start at the beginning and the end of string S."
+  (replace-regexp-in-string
+   "\\`[ \t\n\r\*]+" ""
+   (replace-regexp-in-string "[ \t\n\r]+\\'" "" s)))
+
   
 (defun mandoku-get-branches ()
   (let* ( (default-directory (file-name-directory (buffer-file-name )))
 	  (res (shell-command-to-string (concat mandoku-git-program " branch"))) )
-    (split-string res "\n")))
+    (delete "" (mapcar 'mandoku-trim-and-star (split-string res "\n")))))
 
 (defun mandoku-get-current-branch ()
     (with-temp-buffer 
@@ -2130,13 +2138,13 @@ Click on a link or move the cursor to the link and then press enter
            strlist)
           (t (error "mandoku-split-string: only one :: allowed: %s" str)))))
 
-
-(defun mandoku-chomp (str)
-  "Chomp leading and tailing whitespace from STR."
-  (replace-regexp-in-string (rx (or (: bos (* (any " \t\n")))
-				    (: (* (any " \t\n")) eos)))
-			    ""
-			    str))
+;; don't really understand this, so not removing for now...
+;; (defun mandoku-chomp (str)
+;;   "Chomp leading and tailing whitespace from STR."
+;;   (replace-regexp-in-string (rx (or (: bos (* (any " \t\n")))
+;; 				    (: (* (any " \t\n")) eos)))
+;; 			    ""
+;; 			    str))
 
 (defun mandoku-refresh-images ()
   "Refreshes images displayed inline."
@@ -2251,14 +2259,31 @@ done
   (interactive)
   (let* ((cd (concat (file-name-directory (buffer-file-name)) "_branches"))
 	 (p (substring (cadr (split-string (mandoku-position-at-point) )) 1))
-	(b (ido-completing-read "Edition: " (mandoku-get-active-branches cd) nil t))
+	(b (ido-completing-read "Edition: " (delete "_data" (mandoku-get-branches)) nil t))
 	(bf (concat cd "/" b "/" (file-name-nondirectory buffer-file-name) )))
+    (unless (file-exists-p bf)
+      (mandoku-checkout-other-branch b))
     (when (file-exists-p bf)
       (find-file-other-window bf)
       (mandoku-execute-file-search p)
 )))
 
-      
+(defun mandoku-checkout-data-branch ()
+  (interactive)
+  (mandoku-checkout-other-branch "_data")
+  )
+
+(defun mandoku-checkout-other-branch (&optional br)
+  (interactive)
+  (let* ((fn (file-name-directory (buffer-file-name)))
+	 (cd (if (string= br "_data") fn (concat fn "_branches")))
+	 (branch (or br (ido-completing-read "Edition: " (delete "_data" (mandoku-get-branches))) nil t)
+	 ))
+    (unless (file-exists-p cd)
+      (make-directory cd))
+    (unless (file-exists-p (concat cd "/" branch))
+      (mandoku-shell-command mandoku-git-program (format " clone -b %s --single-branch %s %s/%s" branch fn cd branch)))))
+
 ;; git config --global credential.helper wincred
 ;; one more
 ;; and again.
