@@ -61,7 +61,7 @@ kp_re = re.compile(u"(%s|[%s%s])" % (ent, kanji, pua))
 ch_re = re.compile(ur'(\[[^\]]*\]|&[^;]*;|&amp;C[X3-7]-[A-F0-9]+|.)')
 img_re = re.compile(ur'<i[^>]*>')
 punc_re = re.compile(ur"[\u3001-\u33FF\uFE00-\uFF7F]")
-meta_re = re.compile(ur'(<[^>]*>|\xb6|\n)')
+meta_re = re.compile(ur'(<[^>]*>|\n#\+BEGIN_VERSE\n|\n#\+END_VERSE\n|\xb6|\n)')
 sys.stdout = codecs.getwriter('utf8')(sys.stdout)
 puamagic = 1060864
 
@@ -198,7 +198,9 @@ function with access to a database."""
             ex=meta_re.split(s)
             for e in ex:
                 if len(e) > 0:
-                    if e[0] in (u'¶', u'\n'):
+                    if "BEGIN_VERSE" in e:
+                        p += e
+                    elif e[0] in (u'¶', u'\n'):
                         m += e
                     elif e[0] == "<":
                         #this used to be
@@ -408,23 +410,29 @@ function with access to a database."""
     
     def parse(self, infile):
         ##we add an empty seq at the beginning of each file
+        extra = ""
         zhu_buf = ""
         self.seq.append(('', ''))
         for line in infile:
             line = line.replace("\r", "")
             if "# src:" in line or "# dating:" in line:
                 self.seq[-1] = (self.seq[-1][:-1] + (self.seq[-1][-1] + line,))
-            if line.upper().startswith(u':END:') and self.in_zhu:
+            elif line.upper().startswith('#+BEGIN') or line.upper().startswith('#+END'):
+                self.seq[-1] = (self.seq[-1][:-1] + (self.seq[-1][-1] + line,))
+            elif line.upper().startswith(u':END:') and self.in_zhu:
                 self.in_zhu = False
                 zhu_buf += line
-                self.seq[-1] = (self.seq[-1][:-1] + (self.seq[-1][-1] + zhu_buf,))
+                #self.seq[-1] = (self.seq[-1][:-1] + (self.seq[-1][-1] + zhu_buf,))
+                extra = zhu_buf
+                zhu_buf = ""
             elif self.in_zhu:
                 zhu_buf += line
                 continue
             try:
                 line, extra = line.split('\t', 1)
             except:
-                extra = ''
+                #extra = ''
+                pass
             self.pbcnt += len(re.findall(ur"<pb:", line))
             self.mdcnt += len(re.findall(ur"<md:", line))
             #this is basically a hack for the YP-C files of DZJY
@@ -434,7 +442,7 @@ function with access to a database."""
                 ## we add the line always to the last string of the last tuple
                 self.seq[-1] = (self.seq[-1][:-1] + (self.seq[-1][-1] + line,))
             ## parse the zhu annotations
-            elif line.startswith(u':zhu:'):
+            elif line.startswith(u':zhu:') or line.strip().upper().startswith(u':PROPERTIES:'):
                 self.in_zhu = True
                 zhu_buf = line
                 continue
@@ -461,9 +469,6 @@ function with access to a database."""
 #                print "have a #+"
                 if line.startswith('#<') or line.startswith('#-'):
                     pass
-                elif line.upper().startswith('#+BEGIN') or line.upper().startswith('#+END'):
-                    #this is a commented pb, we treat it as a regular pb
-                    self.seq[-1] = (self.seq[-1][:] + (line,))
                 elif line.startswith('#+'):
                     rp=line[2:-1].split(':', 2)
 #                    print "have a #+"
@@ -509,9 +514,9 @@ function with access to a database."""
                 self.seq[-1] = (self.seq[-1][:-1] + (self.seq[-1][-1] + ex[0],))
                 self.seq.extend(cs)
                 #what comes beyond the tab is added as extra element to the last tuple of the line
-                if extra:
+                if len(extra) > 0:
                     self.seq[-1] = (self.seq[-1][:] + ('\t' + extra,))
-
+                    extra = ""
         #reduce empty         
     def write_org(self, outfile, header=False):
         """write the text out in the supplied file object"""
@@ -602,7 +607,49 @@ function with access to a database."""
 
     def write_xml(self, outfile):
         """write the text out as xml in the supplied file object"""
-        pass
+        iv=False
+        of = codecs.open(outfile, "w", "utf-8")
+        of.write("""<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader>
+      <fileDesc>
+         <titleStmt>
+            <title>%s</title>
+         </titleStmt>
+         <publicationStmt>
+            <p>%s</p>
+         </publicationStmt>
+         <sourceDesc>
+            <p>%s</p>
+         </sourceDesc>
+      </fileDesc>
+  </teiHeader>
+  <text>
+      <body>
+""" % (self.defs['title'], "Published on: %s" % (self.defs['date']), "Baseedition: %s, witness: %s" % (self.defs['baseedition'], self.defs['witness']) ))        
+        for i in self.seq:
+            for j in i:
+                if "<pb" in j or "<md" in j:
+                    start = j.index("<") + 3
+                    end = j.index(">")
+                    pg = j[start:end].split("_")
+                    np = "<pb ed='%s' n='%s'/>" % (pg[0], pg[2])
+                    o = "%s%s%s" % (j[0:start-3], np, j[end+1:])
+                    of.write(o.replace(u"\xb6", "<lb/>"))
+                elif u"\xb6" in j:
+                    of.write(j.replace(u"\xb6", "<lb/>"))
+                elif "BEGIN_VERSE" in j:
+                    of.write("<lg>\n<l>")
+                    iv=True
+                elif "END_VERSE" in j:
+                    of.write("</l></lg>\n")
+                    iv=False
+                else:
+                    if iv:
+                        of.write(j.replace("\n", "</l>\n<l>"))
+                    else:
+                        of.write(j)
+        of.write("\n</body></text></TEI>\n")
     def writeheader(self, out, section, jnxoverride=False):
         be=False
         jnx = False
@@ -1395,7 +1442,7 @@ class MandokuComp(object):
         s.set_seq2([a[tpos] for a in target_seq])
         o = s.get_opcodes()
         fail = 0
-        res = ()
+        res = []
         pgx = ""
         for tag, i1, i2, j1, j2 in o:
             dx = i1 - j1
@@ -1441,7 +1488,7 @@ class MandokuComp(object):
                     pages[pg] += 1
                     # print "pgp:" , pg
                 else:
-                    t1 = target_seq[i][0] 
+                    t1 = target_seq[i][0]
                 if "<pb" in foll:
                     start = foll.index("<")
                     end = foll.index(">")+1
@@ -1449,17 +1496,20 @@ class MandokuComp(object):
                     if not pages.has_key(pg):
                         # if "/" in foll:
                         #     print "src:", source_seq[i+dx], "foll", foll
-                        t2 = t2 + target_seq[i][-1] + foll.replace("\n", "")
+                        t2 = target_seq[i][txt_2.mpos] + foll.replace("\n", "")
                     else:
-                        t2 = t2 + target_seq[i][-1]
+                        t2 = target_seq[i][txt_2.mpos]
                     # print "pgf:" , pg
                     pages[pg] += 1
                 elif u"\xb6" in foll:
-                    t2 = t2 + target_seq[i][-1] +  foll.replace("\n", "")
+                    t2 = target_seq[i][txt_2.mpos] +  foll.replace("\n", "")
                 else:
-                    t2 = t2 + target_seq[i][-1]
-                tx = (pgx +t1, target_seq[i][1:-1], t2,)
-                res = res + (tx,)
+                    t2 = target_seq[i][txt_2.mpos]
+                if len(target_seq[i]) > 4:
+                    tx = (pgx + t1,) + target_seq[i][tpos:tpos+1] + ( t2,) + target_seq[i][txt_2.mpos+1:]
+                else:
+                    tx = (pgx + t1,) + target_seq[i][tpos:tpos+1] + ( t2,)
+                res.append(tx)
                 pgx=""
             if li > lj and lj > 0:
                 #pgx = ""
@@ -1472,13 +1522,21 @@ class MandokuComp(object):
                         pgx = prev[start:end]
                         #print "pgy", pgx
                     if u"\xb6" in "".join(source_seq[i]):
-                        pgx = "%s%s" % (pgx,  source_seq[i][-1].replace("\n", ""))
+                        pgx = "%s%s" % (pgx,  source_seq[i][txt_1.mpos].replace("\n", ""))
                     if txt_2.pbcnt > 0:
                         pgx=pgx.replace("pb", "md")
-#how do I know it should always be at the end?
-                new = (res[-1][:-1] + ("%s%s" % (res[-1][-1], pgx),))
-                res = res[:-1] + (new,)
+                if len(res[-1]) > 4:
+                    new = res[-1][:txt_2.mpos] + ( "%s%s" % (res[-1][txt_2.mpos], pgx),) + res[-1][txt_2.mpos+1:]
+                else:
+                    try:
+                        new = res[-1][:txt_2.mpos] + ( "%s%s" % (res[-1][txt_2.mpos], pgx),)
+                    except:
+                        print "Error", res[-1], "pgx:", pgx, ":",  ",".join([len(x) for x in res[-4:]])
+                        new = res[-1]
+                res[-1] = new
+                #print new
                 pgx=""
+        print "LEN", len(target_seq), len(res)
         return list(res)
 
 
