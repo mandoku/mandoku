@@ -345,6 +345,12 @@
 	(message (mandoku-char-to-ucs char))
 )
 
+(defun mandoku-copy-clean (beg end)
+  (interactive "r")
+  (kill-new
+   (mandoku-remove-punct-and-markup
+    (buffer-substring-no-properties beg end)))
+)
 
 (defun mandoku-grep (beg end)
   (interactive "r")
@@ -1007,12 +1013,15 @@ that includes all text ids of texts that matched here."
 		    (search-forward "* ")
 		    (car (mandoku-get-header-item ))))
 	  (filtername  (read-string (concat "Name for this filter (default:" search "): ") search))
-	  (fn (concat mandoku-filter-dir filtername ".txt" )))
+	  (fn (concat mandoku-filters-dir filtername ".txt" )))
       (with-current-buffer (find-file-noselect fn)
 	(insert ";;" (current-time-string) "\n")
 	(dolist (axx txtids)
 	  (insert axx " " (mandoku-textid-to-title axx) "\n"))
-	)
+	(save-buffer))
+      (when (yes-or-no-p "Load the new text filter?")
+	(mandoku-read-textfilter fn)
+	(setq mandoku-use-textfilter t))
       (message "%s %s" search fn)
     )
 ))
@@ -1384,7 +1393,7 @@ eds
   (mandoku-add-comment-face-markers)
   (mandoku-hide-p-markers)
   (mandoku-display-inline-images)
-  (add-to-invisibility-spec 'mandoku)
+;  (add-to-invisibility-spec 'mandoku)
   (local-unset-key [menu-bar Org])
   (local-unset-key [menu-bar Tbl])
   (easy-menu-add mandoku-md-menu mandoku-view-mode-map)
@@ -1394,7 +1403,7 @@ eds
   ;;     (set-background-color "honeydew"))
 ;  (mandoku-install-version-files-menu)
 					;  (view-mode)
-  (set (make-local-variable 'org-startup-folded) 'showall)
+  (set (make-local-variable 'org-startup-folded) 'nofold)
 )
 
 (defun mandoku-toggle-visibility ()
@@ -1682,7 +1691,7 @@ BEG and END default to the buffer boundaries."
 (defvar mandoku-index-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "e" 'view-mode)
-    (define-key map " " 'View-scroll-page-forward)
+    (define-key map " " 'view-scroll-page-forward)
     (define-key map "t" 'manoku-index-no-filter)
     (define-key map "s" 'mandoku-index-sort-pre)
          map)
