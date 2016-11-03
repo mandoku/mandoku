@@ -76,6 +76,7 @@ class MandokuText(object):
             pass
         self.in_note = False
         self.in_zhu = False
+        self.concept_count = 0
         self.flags = {}
         self.baseedition = ""
         #cutoff for some operations.
@@ -422,10 +423,11 @@ function with access to a database."""
             elif line.upper().startswith(u':END:') and self.in_zhu:
                 self.in_zhu = False
                 zhu_buf += line
-                #self.seq[-1] = (self.seq[-1][:-1] + (self.seq[-1][-1] + zhu_buf,))
-                extra = zhu_buf
+                self.seq[-1] = (self.seq[-1][:-1] + (self.seq[-1][-1] + zhu_buf,))
+                #extra = extra + zhu_buf
                 zhu_buf = ""
             elif self.in_zhu:
+                self.concept_count += len(re.findall(r"concept:", line))
                 zhu_buf += line
                 continue
             try:
@@ -442,7 +444,7 @@ function with access to a database."""
                 ## we add the line always to the last string of the last tuple
                 self.seq[-1] = (self.seq[-1][:-1] + (self.seq[-1][-1] + line,))
             ## parse the zhu annotations
-            elif line.startswith(u':zhu:') or line.strip().upper().startswith(u':PROPERTIES:'):
+            elif line.strip().startswith(u':zhu:') or line.strip().upper().startswith(u':PROPERTIES:'):
                 self.in_zhu = True
                 zhu_buf = line
                 continue
@@ -1531,12 +1533,12 @@ class MandokuComp(object):
                     try:
                         new = res[-1][:txt_2.mpos] + ( "%s%s" % (res[-1][txt_2.mpos], pgx),)
                     except:
-                        print "Error", res[-1], "pgx:", pgx, ":",  ",".join([len(x) for x in res[-4:]])
+                        print "Error", res[-1], "pgx:", pgx, ":",  ",".join([str(len(x)) for x in res[-4:]])
                         new = res[-1]
                 res[-1] = new
                 #print new
                 pgx=""
-        print "LEN", len(target_seq), len(res)
+        #print "LEN", len(target_seq), len(res)
         return list(res)
 
 
