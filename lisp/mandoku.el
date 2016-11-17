@@ -768,6 +768,7 @@ One character is either a character or one entity expression"
 (defun mandoku-index-insert-result (search-string index-buffer result-buffer  &optional filter)
   (let (;(mandoku-use-textfilter nil)
       	(search-char (string-to-char search-string))
+	(ngtab (mandoku-ngram-index-buffer index-buffer search-string 3))
 	(mandoku-filtered-count 0))
       (progn
 ;;    (switch-to-buffer-other-window index-buffer t)
@@ -846,6 +847,7 @@ One character is either a character or one entity expression"
 ;; additional properties
 	    (insert ":PROPERTIES:"
 		    "\n:ID: " txtid
+		    "\n:NCNT: " (format "%5.5d" (mandoku-ngram-index-cnt (replace-regexp-in-string "[\t\s\n+]" "" (format "%s%c%s" pre search-char post)) ngtab 3))
 		    "\n:PAGE: " txtid ":" page
 		    "\n:PRE: "  (concat (nreverse (string-to-list pre)))
 		    "\n:POST: "
@@ -857,8 +859,38 @@ One character is either a character or one entity expression"
 ;	    (setq mandoku-count (+ mandoku-count 1))
 	    ))))
       mandoku-filtered-count
-      ))    
+      ))
+(defun mandoku-ngram-index-cnt (s ngramhash &optional n)
+  (let ((n (or n 2))
+	(cnt 0)
+	m j)
+    (setq j 0)
+    (while (< j  (- (length s) (- n 1)))
+      (setq m (substring s j (+ j n)))
+      (setq cnt (+ cnt (or (gethash m ngramhash) 0)))
+      (setq j (+ j 1)))
+    cnt))
 
+(defun mandoku-ngram-index-buffer (index-buffer search-string &optional n)
+  (let ((n (or n 2))
+	(s1 (substring search-string 0 1))
+	(ngramhash (make-hash-table :test 'equal))
+	m s j)
+    (with-current-buffer index-buffer
+      (goto-char (point-min))
+      (while (re-search-forward "^\\([^,]+\\),\\([^	]+\\)	\\([^	
+]+\\)" nil t)
+	(setq s (concat (match-string 2) s1 (match-string 1)))
+	(setq j 0)
+	(while (< j  (- (length s) (- n 1)))
+	  (setq m (substring s j (+ j n)))
+	  (if (gethash m ngramhash)
+	      (puthash m (+ (gethash m ngramhash) 1) ngramhash)
+	    (puthash m 1 ngramhash))
+	  ;(message m)
+	  (setq j (+ j 1)))))
+    ngramhash))
+  
 (defun mandoku-read-index-buffer (index-buffer result-buffer search-string)
   (let* (
 	(mandoku-count 0)
@@ -1393,7 +1425,7 @@ eds
   (mandoku-add-comment-face-markers)
   (mandoku-hide-p-markers)
   (mandoku-display-inline-images)
-;  (add-to-invisibility-spec 'mandoku)
+  (add-to-invisibility-spec 'mandoku)
   (local-unset-key [menu-bar Org])
   (local-unset-key [menu-bar Tbl])
   (easy-menu-add mandoku-md-menu mandoku-view-mode-map)
