@@ -121,7 +121,13 @@
 (add-hook 'org-cycle-hook 'mandoku-dict-highlight) 
 
 ;; add link type dic
-(org-add-link-type "dic" 'org-dic-open)
+(if (fboundp 'org-link-set-parameters)
+    (org-link-set-parameters "dic"
+                 :follow #'org-dic-open
+                 )
+  (org-add-link-type "dic" 'org-dic-open))
+
+; (org-add-link-type "dic" 'org-dic-open)
 ;(add-hook 'org-store-link-functions 'org-dic-store-link)
 
 (defun org-dic-open (link)
