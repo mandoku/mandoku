@@ -100,6 +100,9 @@
 (defvar mandoku-use-textfilter nil)
 ;; control, which collections are used.
 ;; this could be a list? currently only one subcoll allowed, but it could be a regex understood by the shell ZB6[rq]
+(defvar mandoku-datefilter 10000)
+;; this is the number of characters to use in an ngram for the index; nil means "off"
+(defvar mandoku-ngram-n nil)
 (defvar mandoku-search-limit-to-coll nil)
 ;; ** Catalogs
 ;;;###autoload
@@ -317,6 +320,7 @@
 ;; 	  (puthash (match-string 1) (match-string 2) mandoku-subcolls)))))
 
   (setq mandoku-titles (make-hash-table :test 'equal))
+  (setq mandoku-textdates (make-hash-table :test 'equal))
   (when (file-exists-p mandoku-titles-by-date)
     (with-temp-buffer
       (let ((coding-system-for-read 'utf-8)
@@ -326,6 +330,7 @@
 	(while (re-search-forward "^\\([A-z0-9]+\\)	\\([^	]+\\)	\\([^	
 ]+\\)" nil t)
 	  (puthash (match-string 1) (match-string 3) mandoku-titles)
+	  (puthash (match-string 1) (match-string 2) mandoku-textdates)
 	  (if (< (length (match-string 1)) 6)
 	      (puthash (match-string 1) (match-string 3) mandoku-subcolls))
 	      
@@ -768,11 +773,11 @@ One character is either a character or one entity expression"
 (defun mandoku-index-insert-result (search-string index-buffer result-buffer  &optional filter)
   (let (;(mandoku-use-textfilter nil)
       	(search-char (string-to-char search-string))
-	(ngtab (mandoku-ngram-index-buffer index-buffer search-string 3))
+	(ngtab (mandoku-ngram-index-buffer index-buffer search-string mandoku-ngram-n))
 	(mandoku-filtered-count 0))
       (progn
 ;;    (switch-to-buffer-other-window index-buffer t)
-      (set-buffer index-buffer)
+	(set-buffer index-buffer)
 ;; first: sort the result (after the filename)
     (setq buffer-file-name nil)
       (sort-lines nil (point-min) (point-max))
@@ -816,9 +821,10 @@ One character is either a character or one entity expression"
 		 (vol (mandoku-textid-to-vol txtid))
 		 (tit (mandoku-textid-to-title txtid)))
 	    (set-buffer result-buffer)
-	    (unless (mandoku-apply-filter txtid)
-	    (setq mandoku-filtered-count (+ mandoku-filtered-count 1))
-	    (insert "** [[mandoku:" 
+	    (unless (and (mandoku-apply-filter txtid)
+			(mandoku-apply-datefilter txtid))
+	      (setq mandoku-filtered-count (+ mandoku-filtered-count 1))
+	      (insert "** [[mandoku:" 
 		    txtf
 		    ":"
 		    page
@@ -845,9 +851,11 @@ One character is either a character or one entity expression"
 		    "》]]\n"
 		    )
 ;; additional properties
-	    (insert ":PROPERTIES:"
+	      (insert ":PROPERTIES:"
 		    "\n:ID: " txtid
-		    "\n:NCNT: " (format "%5.5d" (mandoku-ngram-index-cnt (replace-regexp-in-string "[\t\s\n+]" "" (format "%s%c%s" pre search-char post)) ngtab 3))
+		    "\n:TXTDATE: " (gethash txtid mandoku-textdates)
+		    (if mandoku-ngram-n
+		    "\n:NCNT: " (format "%5.5d" (mandoku-ngram-index-cnt (replace-regexp-in-string "[\t\s\n+]" "" (format "%s%c%s" pre search-char post)) ngtab mandoku-ngram-n)))
 		    "\n:PAGE: " txtid ":" page
 		    "\n:PRE: "  (concat (nreverse (string-to-list pre)))
 		    "\n:POST: "
@@ -876,6 +884,7 @@ One character is either a character or one entity expression"
 	(s1 (substring search-string 0 1))
 	(ngramhash (make-hash-table :test 'equal))
 	m s j)
+    (if mandoku-ngram-n
     (with-current-buffer index-buffer
       (goto-char (point-min))
       (while (re-search-forward "^\\([^,]+\\),\\([^	]+\\)	\\([^	
@@ -889,7 +898,7 @@ One character is either a character or one entity expression"
 	    (puthash m 1 ngramhash))
 	  ;(message m)
 	  (setq j (+ j 1)))))
-    ngramhash))
+    ngramhash)))
   
 (defun mandoku-read-index-buffer (index-buffer result-buffer search-string)
   (let* (
@@ -993,6 +1002,11 @@ One character is either a character or one entity expression"
     (setq buffer-read-only nil)
     (erase-buffer)
     (mandoku-read-index-buffer index-buffer result-buffer search-string))))
+
+(defun mandoku-apply-datefilter (textid)
+  ;(if mandoku-datefilter
+   (< mandoku-datefilter (string-to-int (gethash textid mandoku-textdates)))
+   );)
 
 (defun mandoku-apply-filter (textid)
   "Apply a filter to the search results."
@@ -1592,17 +1606,37 @@ BEG and END default to the buffer boundaries."
 ;;   (replace-match "。
 ;; " (match-data))
 ;; ))
-
-(defun mandoku-index-sort-pre ()
-"sort the result index by the preceding string, this has been saved in the property PRE"
-(interactive)
-(save-excursion
-  (mark-whole-buffer)
-  (setq buffer-read-only nil)
-  (org-sort-entries t ?r nil nil "PRE")
+(defun mandoku-index-sort-func (s)
+  (goto-char (point-min))
+  (org-next-visible-heading 1)
+  (eval s)
   (hide-sublevels 2)
 )
-)
+
+(defun mandoku-index-sort-pre ()
+  "sort the result index by the preceding string, this has been saved in the property PRE"
+  (interactive)
+  (mandoku-index-sort-func "(org-sort-entries t ?r nil nil \"PRE\")"))
+
+(defun mandoku-index-sort-post ()
+  "sort the result index by the following string, this has been saved in the property POST"
+  (interactive)
+  (mandoku-index-sort-func "(org-sort-entries t ?r nil nil \"POST\")"))
+
+(defun mandoku-index-sort-id ()
+  "sort the result index by the text number, this has been saved in the property ID"
+  (interactive)
+  (mandoku-index-sort-func "(org-sort-entries t ?r nil nil \"ID\")"))
+
+(defun mandoku-index-sort-textdate ()
+  "sort the result index by the text date, this has been saved in the property TXTDATE"
+  (interactive)
+  (mandoku-index-sort-func "(org-sort-entries t ?r nil nil \"TXTDATE\")"))
+
+(defun mandoku-index-sort-ncnt ()
+  "sort the result index by the ngram count, this has been saved in the property NCNT"
+  (interactive)
+  (mandoku-index-sort-func "(org-sort-entries t ?R nil nil \"NCNT\")"))
 
 
 (defun mandoku-closest-elm-in-seq (n seq)
@@ -1725,7 +1759,11 @@ BEG and END default to the buffer boundaries."
     (define-key map "e" 'view-mode)
     (define-key map " " 'view-scroll-page-forward)
     (define-key map "t" 'manoku-index-no-filter)
-    (define-key map "s" 'mandoku-index-sort-pre)
+    (define-key map "p" 'mandoku-index-sort-pre)
+    (define-key map "d" 'mandoku-index-sort-textdate)
+    (define-key map "f" 'mandoku-index-sort-post)
+    (define-key map "i" 'mandoku-index-sort-id)
+    (define-key map "n" 'mandoku-index-sort-ncnt)
          map)
   "Keymap for mandoku-index mode"
 )
