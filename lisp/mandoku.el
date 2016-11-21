@@ -855,7 +855,8 @@ One character is either a character or one entity expression"
 		    "\n:ID: " txtid
 		    "\n:TXTDATE: " (gethash txtid mandoku-textdates)
 		    (if mandoku-ngram-n
-			(format "\n:NCNT: %5.5d" (mandoku-ngram-index-cnt (replace-regexp-in-string "[\t\s\n+]" "" (format "%s%c%s" pre search-char post)) ngtab mandoku-ngram-n)))
+			(format "\n:NCNT: %5.5d" (mandoku-ngram-index-cnt (replace-regexp-in-string "[\t\s\n+]" "" (format "%s%c%s" pre search-char post)) ngtab mandoku-ngram-n))
+		      "")
 		    "\n:PAGE: " txtid ":" page
 		    "\n:PRE: "  (concat (nreverse (string-to-list pre)))
 		    "\n:POST: "
@@ -889,7 +890,8 @@ One character is either a character or one entity expression"
 	(goto-char (+ 1 (point-min)))
 	(while (re-search-forward "^\\([^,]+\\),\\([^	]+\\)	\\([^	
 ]+\\)" nil t)
-	  (setq s (concat (match-string 2) s1 (match-string 1)))
+	  (setq s (replace-regexp-in-string "\\[\\[file:[^\\[]*\\]\\]" "⬤"
+					    (concat (match-string 2) s1 (match-string 1))))
 	  (setq j 0)
 	  (while (< j  (- (length s) (- n 1)))
 	    (setq m (substring s j (+ j n)))
@@ -1613,6 +1615,7 @@ BEG and END default to the buffer boundaries."
     (goto-char (point-min))
     (org-next-visible-heading 1)
     (org-sort-entries t type nil nil s)
+    (mandoku-display-inline-images)
     (hide-sublevels 2)))
 
 
@@ -1788,7 +1791,8 @@ BEG and END default to the buffer boundaries."
   (set-variable 'tab-with 24 t)
 ;  (set (make-local-variable 'tab-with) 24)
   (set (make-local-variable 'org-startup-folded) "nofold")
-;  (toggle-read-only 1)
+  (mandoku-display-inline-images)
+					;  (toggle-read-only 1)
 ;  (view-mode)
 )
 
@@ -1996,7 +2000,24 @@ BEG and END default to the buffer boundaries."
     (display-buffer buf )
     ))
 
+;; citfind
 
+(defun mandoku-citfind (beg end)
+  (interactive "r")
+  (let ((tempfile (make-temp-file "citfind"))
+	(citfind-buffer (get-buffer-create "*Mancoku-result*"))
+	(default-directory mandoku-sys-dir)
+	(mandoku-python-program "/home/chris/.pyenv/shims/python")
+	(src-txt  (car (last (split-string (buffer-file-name ) "/")))))
+    (with-temp-file tempfile
+      (insert (format "# %s\n" src-txt)))
+    (write-region beg end tempfile t)
+    (with-current-buffer citfind-buffer
+      (shell-command (concat mandoku-python-program " " mandoku-sys-dir "/citfind.py " tempfile) citfind-buffer) 
+    ;; mode
+    (mandoku-index-mode)
+    )))
+			
 ;; convenience: abort when using mouse in other buffer
 ;; recommended by yasuoka-san 2013-10-22
 (defun mandoku-abort-minibuffer ()
