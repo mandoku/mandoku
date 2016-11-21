@@ -1615,7 +1615,8 @@ BEG and END default to the buffer boundaries."
     (goto-char (point-min))
     (org-next-visible-heading 1)
     (org-sort-entries t type nil nil s)
-    (mandoku-display-inline-images)
+					;(mandoku-display-inline-images)
+    (org-redisplay-inline-images)
     (hide-sublevels 2)))
 
 
@@ -2005,9 +2006,9 @@ BEG and END default to the buffer boundaries."
 (defun mandoku-citfind (beg end)
   (interactive "r")
   (let ((tempfile (make-temp-file "citfind"))
-	(citfind-buffer (get-buffer-create "*Mancoku-result*"))
+	(citfind-buffer (get-buffer-create "*Mandoku-result*"))
 	(default-directory mandoku-sys-dir)
-	(mandoku-python-program "/home/chris/.pyenv/shims/python")
+	;(mandoku-python-program "/home/chris/.pyenv/shims/python")
 	(src-txt  (car (last (split-string (buffer-file-name ) "/")))))
     (with-temp-file tempfile
       (insert (format "# %s\n" src-txt)))
