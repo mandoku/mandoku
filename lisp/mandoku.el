@@ -904,7 +904,7 @@ One character is either a character or one entity expression"
   (let* (
 	(mandoku-count 0)
 	(mandoku-filtered-count 0)
-	(sort-message "Sort: by (d)ate (p)receding or (f)ollowing char, text (i)d number or (n)gram count.\n")
+	(sort-message "Sort: by (d)ate, (p)receding or (f)ollowing character, text (i)d number or (n)gram count.\n")
 	(date-message "")
       	(search-char (string-to-char search-string))
 	(tab (mandoku-tabulate-index-buffer index-buffer 4))
