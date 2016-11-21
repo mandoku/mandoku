@@ -855,7 +855,7 @@ One character is either a character or one entity expression"
 		    "\n:ID: " txtid
 		    "\n:TXTDATE: " (gethash txtid mandoku-textdates)
 		    (if mandoku-ngram-n
-		    "\n:NCNT: " (format "%5.5d" (mandoku-ngram-index-cnt (replace-regexp-in-string "[\t\s\n+]" "" (format "%s%c%s" pre search-char post)) ngtab mandoku-ngram-n)))
+			(format "\n:NCNT: %5.5d" (mandoku-ngram-index-cnt (replace-regexp-in-string "[\t\s\n+]" "" (format "%s%c%s" pre search-char post)) ngtab mandoku-ngram-n)))
 		    "\n:PAGE: " txtid ":" page
 		    "\n:PRE: "  (concat (nreverse (string-to-list pre)))
 		    "\n:POST: "
@@ -884,26 +884,28 @@ One character is either a character or one entity expression"
 	(s1 (substring search-string 0 1))
 	(ngramhash (make-hash-table :test 'equal))
 	m s j)
-    (if mandoku-ngram-n
-    (with-current-buffer index-buffer
-      (goto-char (point-min))
-      (while (re-search-forward "^\\([^,]+\\),\\([^	]+\\)	\\([^	
+    (when mandoku-ngram-n
+      (with-current-buffer index-buffer
+	(goto-char (+ 1 (point-min)))
+	(while (re-search-forward "^\\([^,]+\\),\\([^	]+\\)	\\([^	
 ]+\\)" nil t)
-	(setq s (concat (match-string 2) s1 (match-string 1)))
-	(setq j 0)
-	(while (< j  (- (length s) (- n 1)))
-	  (setq m (substring s j (+ j n)))
-	  (if (gethash m ngramhash)
-	      (puthash m (+ (gethash m ngramhash) 1) ngramhash)
-	    (puthash m 1 ngramhash))
-	  ;(message m)
-	  (setq j (+ j 1)))))
+	  (setq s (concat (match-string 2) s1 (match-string 1)))
+	  (setq j 0)
+	  (while (< j  (- (length s) (- n 1)))
+	    (setq m (substring s j (+ j n)))
+	    (if (gethash m ngramhash)
+		(puthash m (+ (gethash m ngramhash) 1) ngramhash)
+	      (puthash m 1 ngramhash))
+					;(message m)
+	    (setq j (+ j 1)))))
     ngramhash)))
   
 (defun mandoku-read-index-buffer (index-buffer result-buffer search-string)
   (let* (
 	(mandoku-count 0)
 	(mandoku-filtered-count 0)
+	(sort-message "Sort: by (d)ate (p)receding or (f)ollowing char, text (i)d number or (n)gram count.\n")
+	(date-message "")
       	(search-char (string-to-char search-string))
 	(tab (mandoku-tabulate-index-buffer index-buffer 4))
 	(cnt (mandoku-sum-hash tab)))
@@ -916,14 +918,14 @@ One character is either a character or one entity expression"
 ;      (insert (format "There were %d matches for your search of %s:\n"
 ;       mandoku-count search-string))
       (if (equal mandoku-use-textfilter t)
-	  (insert (format "Active Filter: %s , Matches: %d (Press 't' to temporarily disable the filter)\nLocation\tMatch\tSource\n* %s (%d/%d)\n" 
+	  (insert (format "Active Filter: %s , Matches: %d (Press 't' to temporarily disable the filter)\nLocation\tMatch\tSource\n* %s (%d/%d)\n%s" 
 			  (mapconcat 'mandoku-active-filter mandoku-textfilter-list "")
-			  mandoku-filtered-count search-string mandoku-filtered-count cnt))
+			  mandoku-filtered-count search-string mandoku-filtered-count cnt sort-message))
 	(if (> cnt mandoku-index-display-limit )
 	    (insert (format "Too many results!\nDisplaying only overview\n* %s (%d)\nCollection\tMatches\n" search-string cnt ))
 
 ;	    (insert (format "Too many results: %d for %s! Displaying only overview\nCollection\tMatches\n" cnt search-string))
-	  (insert (format "Location\tMatch\tSource\n* %s (%d)\n"  search-string cnt))
+	  (insert (format "Mandoku search result%s\n%sLocation\tMatch\t         Source\n* %s (%d)\n" date-message sort-message search-string cnt))
 	)
 	)
       (mandoku-index-mode)
@@ -1606,37 +1608,48 @@ BEG and END default to the buffer boundaries."
 ;;   (replace-match "。
 ;; " (match-data))
 ;; ))
-(defun mandoku-index-sort-func (s)
-  (goto-char (point-min))
-  (org-next-visible-heading 1)
-  (eval s)
-  (hide-sublevels 2)
-)
+(defun mandoku-index-sort-func (type s)
+  (when (derived-mode-p 'mandoku-index-mode)
+    (goto-char (point-min))
+    (org-next-visible-heading 1)
+    (org-sort-entries t type nil nil s)
+    (hide-sublevels 2)))
+
 
 (defun mandoku-index-sort-pre ()
   "sort the result index by the preceding string, this has been saved in the property PRE"
   (interactive)
-  (mandoku-index-sort-func "(org-sort-entries t ?r nil nil \"PRE\")"))
+  (mandoku-index-sort-func ?r "PRE")
+  (message "Sorted the index with the characters preceding the match as sort key."))
+
 
 (defun mandoku-index-sort-post ()
   "sort the result index by the following string, this has been saved in the property POST"
   (interactive)
-  (mandoku-index-sort-func "(org-sort-entries t ?r nil nil \"POST\")"))
+  (mandoku-index-sort-func ?r "POST")
+  (message "Sorted the index with the characters following the match as sort key."))
+  
 
 (defun mandoku-index-sort-id ()
   "sort the result index by the text number, this has been saved in the property ID"
   (interactive)
-  (mandoku-index-sort-func "(org-sort-entries t ?r nil nil \"ID\")"))
+  (mandoku-index-sort-func ?r "ID")
+  (message "Sorted the index with the text number as sort key."))
+  
 
 (defun mandoku-index-sort-textdate ()
   "sort the result index by the text date, this has been saved in the property TXTDATE"
   (interactive)
-  (mandoku-index-sort-func "(org-sort-entries t ?r nil nil \"TXTDATE\")"))
+  (mandoku-index-sort-func ?r "TXTDATE")
+  (message "Sorted the index with the text date as sort key."))
+  
 
 (defun mandoku-index-sort-ncnt ()
   "sort the result index by the ngram count, this has been saved in the property NCNT"
   (interactive)
-  (mandoku-index-sort-func "(org-sort-entries t ?R nil nil \"NCNT\")"))
+  (mandoku-index-sort-func ?R "NCNT")
+  (message "Sorted the index with the ngram count as sort key."))
+
 
 
 (defun mandoku-closest-elm-in-seq (n seq)
