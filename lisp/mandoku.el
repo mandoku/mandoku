@@ -668,6 +668,11 @@ One character is either a character or one entity expression"
       (mandoku-search-internal search-string index-buffer)
       ;; fix the image display
       (goto-char (point-min))
+      (while (search-forward "\n" nil t)
+	(replace-match (concat "\n" (substring search-string 0 1))))
+      (goto-char (point-min))
+      (if (looking-at "\n")
+	  (kill-line))
       (while (re-search-forward "<img[^>]+/images/\\([^>]+\\)./>" nil t)
 	(if mandoku-gaiji-images-path
 	    (replace-match (concat "[[file:" mandoku-gaiji-images-path (match-string 1) "]]"))
@@ -844,7 +849,6 @@ One character is either a character or one entity expression"
 		    "\t"
 		    (replace-regexp-in-string "[\t\s\n+]" "" pre)
 ;		    "\t"
-		    search-char
 		    (replace-regexp-in-string "[\t\s\n+]" "" post)
 		    "  [[mandoku:meta:"
 		    txtid
@@ -862,7 +866,6 @@ One character is either a character or one entity expression"
 		    "\n:PAGE: " txtid ":" page
 		    "\n:PRE: "  (concat (nreverse (string-to-list pre)))
 		    "\n:POST: "
-		    search-char
 		    (replace-regexp-in-string "[\t\s\n+]" "" post)
 		    "\n:END:\n"
 		    ))
@@ -887,7 +890,6 @@ One character is either a character or one entity expression"
 (defun mandoku-ngram-index-buffer (index-buffer search-string &optional n skip)
   "If skip it non-nil, the search-string itself will not added as ngram."
   (let ((n (or n 2))
-	(s1 (substring search-string 0 1))
 	(ngramhash (make-hash-table :test 'equal))
 	m s j l)
     (when mandoku-ngram-n
@@ -897,7 +899,7 @@ One character is either a character or one entity expression"
 ]+\\)" nil t)
 	  (setq l (length (match-string 2)))
 	  (setq s (replace-regexp-in-string "\\[\\[file:[^\\[]*\\]\\]" "⬤"
-					    (concat (match-string 2) s1 (match-string 1))))
+					    (concat (match-string 2) (match-string 1))))
 	  (setq j 0)
 	  (while (< j  (- (length s) (- n 1)))
 	    (unless (and skip (>= j l) (> (- (+ l (length search-string)) 1) j))
