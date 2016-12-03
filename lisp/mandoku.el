@@ -782,82 +782,51 @@ One character is either a character or one entity expression"
       	(search-char (string-to-char search-string))
 	(ngtab (mandoku-mi-index-buffer index-buffer search-string))
 	(mandoku-filtered-count 0))
-      (progn
-;;    (switch-to-buffer-other-window index-buffer t)
-	(set-buffer index-buffer)
-;; first: sort the result (after the filename)
+    (set-buffer index-buffer)
     (setq buffer-file-name nil)
-      (sort-lines nil (point-min) (point-max))
-      (goto-char (point-min))
-      (while (re-search-forward
-	      (concat
-	       ;; match-string 1: collection
-	       ;; match-string 2: match
-	       ;; match-string 3: pre
-	       ;; match-string 4: location
-	       ;; the following are optional:
-	       ;; match-string 5: dummy
-	       ;; match-string 6: addinfo
-	       ;; match-string 1: dummy
-	       ;; match-string 2: collection
-	       ;; match-string 3: match
-	       ;; match-string 4: pre
-	       ;; match-string 5: location
-	       ;; the following are optional:
-	       ;; match-string 6: dummy
-	       ;; match-string 7: addinfo
-	       (concat "^\\([^,]*\\),\\([^\t]*\\)\t" filter  "\\([^\t \n]*\\)\t?\\([^\n\t]*\\)?$")
-	) nil t )
-	(let* (
-	       ;;if no subcoll, need to switch the match assignments.
-	      (pre (match-string 2))
-	      (post (match-string 1))
-	      (extra (match-string 4))
-	      (location (split-string (match-string 3) ":" ))
-	      )
-	  (let* ((txtf (concat filter  (car location)))
-		 (txtid (concat filter (car (split-string (car location) "_"))))
-		 (line (car (cdr (cdr location))))
-		 (pag (car (cdr location)) ) 
-		 (page (if (string-match "[-_]"  pag)
-			   (concat (substring pag 0 (- (length pag) 1))
-				   (mandoku-num-to-section (substring pag (- (length pag) 1))) line)
-			 (concat
-			  pag
-			  line)))
-		 (vol (mandoku-textid-to-vol txtid))
-		 (tit (mandoku-textid-to-title txtid)))
-	    (set-buffer result-buffer)
-	    (unless (and (mandoku-apply-filter txtid)
-			(mandoku-apply-datefilter txtid))
-	      (setq mandoku-filtered-count (+ mandoku-filtered-count 1))
-	      (insert "** [[mandoku:" 
-		    txtf
-		    ":"
-		    page
-		    "::"
-		    search-string
-		    "]["
-;		    txtid
-;		    " "
-		    (if vol
-			(concat vol ", ")
-		      (or (ignore-errors (concat (number-to-string (string-to-number (cadr (split-string (car location) "_")))) ","))
+    ;; first: sort the result (after the filename)
+    (sort-lines nil (point-min) (point-max))
+    (goto-char (point-min))
+    (while (re-search-forward
+	    (concat "^\\([^,]*\\),\\([^\t]*\\)\t" filter  "\\([^\t \n]*\\)\t?\\([^\n\t]*\\)?$")
+	 nil t )
+      (let* ((pre (match-string 2))
+	     (post (match-string 1))
+	     (extra (match-string 4))
+	     (location (split-string (match-string 3) ":" ))
+	     (txtf (concat filter  (car location)))
+	     (txtid (concat filter (car (split-string (car location) "_"))))
+	     (line (car (cdr (cdr location))))
+	     (pag (car (cdr location)) ) 
+	     (page (if (string-match "[-_]"  pag)
+		       (concat (substring pag 0 (- (length pag) 1))
+			       (mandoku-num-to-section (substring pag (- (length pag) 1))) line)
+		     (concat
+		      pag
+		      line)))
+	     (vol (mandoku-textid-to-vol txtid))
+	     (tit (mandoku-textid-to-title txtid)))
+	(set-buffer result-buffer)
+	(unless (and (mandoku-apply-filter txtid)
+		     (mandoku-apply-datefilter txtid))
+	  (setq mandoku-filtered-count (+ mandoku-filtered-count 1))
+	  (insert (format "** [[mandoku:%s:%s::%s][% 4s% 5s]]  % 10s%-30s  %s\n"
+		  txtf page search-string  
+		  (if vol
+		      (concat vol ", ")
+		    (or (ignore-errors (concat (number-to-string (string-to-number (cadr (split-string (car location) "_")))) ","))
 			  ""))
-		    (replace-regexp-in-string "^0+" "" page)
-		    "]]"
-		    "\t"
-		    (replace-regexp-in-string "[\t\s\n+]" "" pre)
-;		    "\t"
-		    (replace-regexp-in-string "[\t\s\n+]" "" post)
-		    "  [[mandoku:meta:"
-		    txtid
-		    ":10][《" txtid " "
-		    (format "%s" tit)
-		    "》]]\n"
-		    )
+		  (replace-regexp-in-string "^0+" "" page)
+		  (replace-regexp-in-string "[\t\s\n+]" "" pre)
+		  (replace-regexp-in-string "[\t\s\n+]" "" post)
+		  (concat "  [[mandoku:meta:"
+			    txtid
+			    ":10][《" txtid " "
+			    (format "%s" tit)
+			    "》]]")
+			    ))
 ;; additional properties
-	      (insert ":PROPERTIES:"
+	  (insert ":PROPERTIES:"
 		    "\n:ID: " txtid
 		    "\n:TXTDATE: " (gethash txtid mandoku-textdates)
 		    (if mandoku-ngram-n
@@ -871,7 +840,7 @@ One character is either a character or one entity expression"
 		    ))
 	    (set-buffer index-buffer)
 ;	    (setq mandoku-count (+ mandoku-count 1))
-	    ))))
+	    ))
       mandoku-filtered-count
       ))
 
@@ -958,6 +927,7 @@ One character is either a character or one entity expression"
   (let* (
 	(mandoku-count 0)
 	(mandoku-filtered-count 0)
+	(loc-mat-src (format "%-12s %-36s%s" "Location" "Match" "Source"))
 	(sort-message "Sort: by (d)ate, (p)receding or (f)ollowing character, text (i)d number or (n)gram count.\n")
 	(date-message "")
       	(search-char (string-to-char search-string))
@@ -972,14 +942,17 @@ One character is either a character or one entity expression"
 ;      (insert (format "There were %d matches for your search of %s:\n"
 ;       mandoku-count search-string))
       (if (equal mandoku-use-textfilter t)
-	  (insert (format "Active Filter: %s , Matches: %d (Press 't' to temporarily disable the filter)\nLocation\tMatch\tSource\n* %s (%d/%d)\n%s" 
+	  (insert (format "Active Filter: %s , Matches: %d (Press 't' to temporarily disable the filter)\n%s\n* %s (%d/%d)\n%s" 
 			  (mapconcat 'mandoku-active-filter mandoku-textfilter-list "")
-			  mandoku-filtered-count search-string mandoku-filtered-count cnt sort-message))
+			  mandoku-filtered-count
+			  loc-mat-src
+			  search-string
+			  mandoku-filtered-count cnt sort-message))
 	(if (> cnt mandoku-index-display-limit )
 	    (insert (format "Too many results!\nDisplaying only overview\n* %s (%d)\nCollection\tMatches\n" search-string cnt ))
 
 ;	    (insert (format "Too many results: %d for %s! Displaying only overview\nCollection\tMatches\n" cnt search-string))
-	  (insert (format "Mandoku search result%s\n%sLocation\tMatch\t         Source\n* %s (%d)\n" date-message sort-message search-string cnt))
+	  (insert (format "Mandoku search result%s\n%s%s\n* %s (%d)\n" date-message sort-message loc-mat-src search-string cnt))
 	)
 	)
       (mandoku-index-mode)
@@ -1826,7 +1799,7 @@ BEG and END default to the buffer boundaries."
 (defvar mandoku-index-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "e" 'view-mode)
-    (define-key map " " 'view-scroll-page-forward)
+    ;(define-key map " " 'view-scroll-page-forward)
     (define-key map "t" 'manoku-index-no-filter)
     (define-key map "p" 'mandoku-index-sort-pre)
     (define-key map "d" 'mandoku-index-sort-textdate)
