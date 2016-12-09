@@ -19,14 +19,22 @@ except:
 
 for d1 in os.listdir(kridx):
     sa = "%s/%s" % ( kridx, d1)
-    for d in os.listdir(sa):
+    sal = os.listdir(sa)
+    sal.sort()
+    for d in sal:
         sd = "%s/%s" % (sa, d)
         if os.path.isdir(sd):
-            for d2 in os.listdir(sd):
+            d2l = os.listdir(sd)
+            d2l.sort()
+            for d2 in d2l:
                 sd2 = "%s/%s" % (sd, d2)
                 if os.path.isdir(sd2):
-                    os.makedirs("%s/%s/%s" % (ccidx, d, d2))
+                    try:
+                        os.makedirs("%s/%s/%s" % (ccidx, d, d2))
+                    except:
+                        pass
                     files = [a for a in os.listdir(sd2) if not a.startswith(".")]
+                    files.sort()
                     try:
                         c = files[0].split(".")[0]
                     except:
