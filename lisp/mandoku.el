@@ -76,6 +76,7 @@
 (defvar mandoku-md-menu)
 (defvar mandoku-position nil "Position as a list of textid edition page line" )
 (defvar mandoku-position-marker (make-marker) "Marker for the last position in the text")
+(defvar mandoku-search-for nil "Last search term for the mandoku search." )
 (defvar mandoku-catalog nil)
 (defvar mandoku-local-index-list nil)
 (defvar mandoku-for-commit-list nil)
@@ -571,6 +572,7 @@ Do you want to download it now?"))
      (list (read-string "Search for: " search-for))))
   (unless mandoku-initialized-p
     (mandoku-initialize))
+  (setq mandoku-search-for search-for)
   (when (derived-mode-p 'mandoku-view-mode)
     (setq mandoku-position (mandoku-position-at-point-internal))
     (set-marker mandoku-position-marker (point))
@@ -666,6 +668,11 @@ One character is either a character or one entity expression"
       (mandoku-search-internal search-string index-buffer)
       ;; fix the image display
       (goto-char (point-min))
+      (while (search-forward "\n" nil t)
+	(replace-match (concat "\n" (substring search-string 0 1))))
+      (goto-char (point-min))
+      (if (looking-at "\n")
+	  (kill-line))
       (while (re-search-forward "<img[^>]+/images/\\([^>]+\\)./>" nil t)
 	(if mandoku-gaiji-images-path
 	    (replace-match (concat "[[file:" mandoku-gaiji-images-path (match-string 1) "]]"))
@@ -773,102 +780,70 @@ One character is either a character or one entity expression"
 (defun mandoku-index-insert-result (search-string index-buffer result-buffer  &optional filter)
   (let (;(mandoku-use-textfilter nil)
       	(search-char (string-to-char search-string))
-	(ngtab (mandoku-ngram-index-buffer index-buffer search-string mandoku-ngram-n))
+	(ngtab (mandoku-mi-index-buffer index-buffer search-string))
 	(mandoku-filtered-count 0))
-      (progn
-;;    (switch-to-buffer-other-window index-buffer t)
-	(set-buffer index-buffer)
-;; first: sort the result (after the filename)
+    (set-buffer index-buffer)
     (setq buffer-file-name nil)
-      (sort-lines nil (point-min) (point-max))
-      (goto-char (point-min))
-      (while (re-search-forward
-	      (concat
-	       ;; match-string 1: collection
-	       ;; match-string 2: match
-	       ;; match-string 3: pre
-	       ;; match-string 4: location
-	       ;; the following are optional:
-	       ;; match-string 5: dummy
-	       ;; match-string 6: addinfo
-	       ;; match-string 1: dummy
-	       ;; match-string 2: collection
-	       ;; match-string 3: match
-	       ;; match-string 4: pre
-	       ;; match-string 5: location
-	       ;; the following are optional:
-	       ;; match-string 6: dummy
-	       ;; match-string 7: addinfo
-	       (concat "^\\([^,]*\\),\\([^\t]*\\)\t" filter  "\\([^\t \n]*\\)\t?\\([^\n\t]*\\)?$")
-	) nil t )
-	(let* (
-	       ;;if no subcoll, need to switch the match assignments.
-	      (pre (match-string 2))
-	      (post (match-string 1))
-	      (extra (match-string 4))
-	      (location (split-string (match-string 3) ":" ))
-	      )
-	  (let* ((txtf (concat filter  (car location)))
-		 (txtid (concat filter (car (split-string (car location) "_"))))
-		 (line (car (cdr (cdr location))))
-		 (pag (car (cdr location)) ) 
-		 (page (if (string-match "[-_]"  pag)
-			   (concat (substring pag 0 (- (length pag) 1))
-				   (mandoku-num-to-section (substring pag (- (length pag) 1))) line)
-			 (concat
-			  pag
-			  line)))
-		 (vol (mandoku-textid-to-vol txtid))
-		 (tit (mandoku-textid-to-title txtid)))
-	    (set-buffer result-buffer)
-	    (unless (and (mandoku-apply-filter txtid)
-			(mandoku-apply-datefilter txtid))
-	      (setq mandoku-filtered-count (+ mandoku-filtered-count 1))
-	      (insert "** [[mandoku:" 
-		    txtf
-		    ":"
-		    page
-		    "::"
-		    search-string
-		    "]["
-;		    txtid
-;		    " "
-		    (if vol
-			(concat vol ", ")
-		      (or (ignore-errors (concat (number-to-string (string-to-number (cadr (split-string (car location) "_")))) ","))
+    ;; first: sort the result (after the filename)
+    (sort-lines nil (point-min) (point-max))
+    (goto-char (point-min))
+    (while (re-search-forward
+	    (concat "^\\([^,]*\\),\\([^\t]*\\)\t" filter  "\\([^\t \n]*\\)\t?\\([^\n\t]*\\)?$")
+	 nil t )
+      (let* ((pre (match-string 2))
+	     (post (match-string 1))
+	     (extra (match-string 4))
+	     (location (split-string (match-string 3) ":" ))
+	     (txtf (concat filter  (car location)))
+	     (txtid (concat filter (car (split-string (car location) "_"))))
+	     (line (car (cdr (cdr location))))
+	     (pag (car (cdr location)) ) 
+	     (page (if (string-match "[-_]"  pag)
+		       (concat (substring pag 0 (- (length pag) 1))
+			       (mandoku-num-to-section (substring pag (- (length pag) 1))) line)
+		     (concat
+		      pag
+		      line)))
+	     (vol (mandoku-textid-to-vol txtid))
+	     (tit (mandoku-textid-to-title txtid)))
+	(set-buffer result-buffer)
+	(unless (and (mandoku-apply-filter txtid)
+		     (mandoku-apply-datefilter txtid))
+	  (setq mandoku-filtered-count (+ mandoku-filtered-count 1))
+	  (insert (format "** [[mandoku:%s:%s::%s][% 4s% 5s]]  % 10s%-30s  %s\n"
+		  txtf page search-string  
+		  (if vol
+		      (concat vol ", ")
+		    (or (ignore-errors (concat (number-to-string (string-to-number (cadr (split-string (car location) "_")))) ","))
 			  ""))
-		    (replace-regexp-in-string "^0+" "" page)
-		    "]]"
-		    "\t"
-		    (replace-regexp-in-string "[\t\s\n+]" "" pre)
-;		    "\t"
-		    search-char
-		    (replace-regexp-in-string "[\t\s\n+]" "" post)
-		    "  [[mandoku:meta:"
-		    txtid
-		    ":10][《" txtid " "
-		    (format "%s" tit)
-		    "》]]\n"
-		    )
+		  (replace-regexp-in-string "^0+" "" page)
+		  (replace-regexp-in-string "[\t\s\n+]" "" pre)
+		  (replace-regexp-in-string "[\t\s\n+]" "" post)
+		  (concat "  [[mandoku:meta:"
+			    txtid
+			    ":10][《" txtid " "
+			    (format "%s" tit)
+			    "》]]")
+			    ))
 ;; additional properties
-	      (insert ":PROPERTIES:"
+	  (insert ":PROPERTIES:"
 		    "\n:ID: " txtid
 		    "\n:TXTDATE: " (gethash txtid mandoku-textdates)
 		    (if mandoku-ngram-n
-			(format "\n:NCNT: %5.5d" (mandoku-ngram-index-cnt (replace-regexp-in-string "[\t\s\n+]" "" (format "%s%c%s" pre search-char post)) ngtab mandoku-ngram-n))
+			(format "\n:NCNT: %5.5f" (mandoku-ngram-index-cnt (replace-regexp-in-string "[\t\s\n+]" "" (format "%s%c%s" pre search-char post)) ngtab mandoku-ngram-n))
 		      "")
 		    "\n:PAGE: " txtid ":" page
 		    "\n:PRE: "  (concat (nreverse (string-to-list pre)))
 		    "\n:POST: "
-		    search-char
 		    (replace-regexp-in-string "[\t\s\n+]" "" post)
 		    "\n:END:\n"
 		    ))
 	    (set-buffer index-buffer)
 ;	    (setq mandoku-count (+ mandoku-count 1))
-	    ))))
+	    ))
       mandoku-filtered-count
       ))
+
 (defun mandoku-ngram-index-cnt (s ngramhash &optional n)
   (let ((n (or n 2))
 	(cnt 0)
@@ -876,36 +851,83 @@ One character is either a character or one entity expression"
     (setq j 0)
     (while (< j  (- (length s) (- n 1)))
       (setq m (substring s j (+ j n)))
-      (setq cnt (+ cnt (or (gethash m ngramhash) 0)))
+      (setq cnt (+ cnt (string-to-int (or (plist-get (gethash m ngramhash) :right) "0"))))
       (setq j (+ j 1)))
     cnt))
+;; ngram-n
 
-(defun mandoku-ngram-index-buffer (index-buffer search-string &optional n)
+(defun mandoku-ngram-index-buffer (index-buffer search-string &optional n skip)
+  "If skip it non-nil, the search-string itself will not added as ngram."
   (let ((n (or n 2))
-	(s1 (substring search-string 0 1))
 	(ngramhash (make-hash-table :test 'equal))
-	m s j)
+	m s j l)
     (when mandoku-ngram-n
       (with-current-buffer index-buffer
 	(goto-char (+ 1 (point-min)))
 	(while (re-search-forward "^\\([^,]+\\),\\([^	]+\\)	\\([^	
 ]+\\)" nil t)
+	  (setq l (length (match-string 2)))
 	  (setq s (replace-regexp-in-string "\\[\\[file:[^\\[]*\\]\\]" "⬤"
-					    (concat (match-string 2) s1 (match-string 1))))
+					    (concat (match-string 2) (match-string 1))))
 	  (setq j 0)
 	  (while (< j  (- (length s) (- n 1)))
-	    (setq m (substring s j (+ j n)))
-	    (if (gethash m ngramhash)
-		(puthash m (+ (gethash m ngramhash) 1) ngramhash)
-	      (puthash m 1 ngramhash))
+	    (unless (and skip (>= j l) (> (- (+ l (length search-string)) 1) j))
+	      (setq m (substring s j (+ j n)))
+	      (if (gethash m ngramhash)
+		  (puthash m (+ (gethash m ngramhash) 1) ngramhash)
+		(puthash m 1 ngramhash)))
 					;(message m)
 	    (setq j (+ j 1)))))
     ngramhash)))
+
+(defun mandoku-calculate-mitab (ngtab)
+  (let ((total 0)
+	(mitab (make-hash-table :test 'equal)) 
+	  m1 m2 sum r1 l1)
+    (maphash (lambda (key value)
+	       (dolist (v (list :right :left))
+		 (if (eq v :left)
+		     (setq m1 (substring key 1 2)
+			   m2 (substring key 0 1))
+		   (setq m1 (substring key 0 1)
+			 m2 (substring key 1 2)))
+		 (setq r1 (gethash m1 mitab))
+		 (if (setq l1 (plist-get r1 v))
+		     (puthash m1 (setq r1 (plist-put r1 v (push (list m2 value) l1))) mitab)
+		   (puthash m1 (setq r1 (plist-put r1 v (cons (list m2 value) l1))) mitab)))
+	       (setq total (+ value total))
+	       ) ngtab)
+    (list mitab total)
+  ))
+
+
+(defun mandoku-mi-index-buffer (index-buffer search-string)
+  "Calculate the co-location probability for index buffer"
+  (let* ((ngtab (mandoku-ngram-index-buffer index-buffer search-string 2 t))
+	(mitabres (mandoku-calculate-mitab ngtab)) 
+	(mitab (car mitabres))
+	(total (cadr mitabres))
+	(restab (make-hash-table :test 'equal))
+	m1 r1 s1 sum)
+    (maphash (lambda (key value)
+	       (dolist (pl '(:right :left))
+		 (setq sum (apply '+ (mapcar 'cadr (plist-get value pl))))
+		 (dolist (v (remove nil (plist-get value pl)))
+		   (setq m1 (if (eq pl :right)
+				(concat key (car v))
+			      (concat (car v) key)))
+		   (setq s1 (format "%3.3f" (/ (coerce (cadr v) 'float) sum)))
+		   (setq r1 (plist-put (gethash m1 restab) pl s1))
+		   (puthash m1 r1 restab)
+		 ))
+	       ) mitab)
+    restab))
   
 (defun mandoku-read-index-buffer (index-buffer result-buffer search-string)
   (let* (
 	(mandoku-count 0)
 	(mandoku-filtered-count 0)
+	(loc-mat-src (format "%-12s %-36s%s" "Location" "Match" "Source"))
 	(sort-message "Sort: by (d)ate, (p)receding or (f)ollowing character, text (i)d number or (n)gram count.\n")
 	(date-message "")
       	(search-char (string-to-char search-string))
@@ -920,14 +942,17 @@ One character is either a character or one entity expression"
 ;      (insert (format "There were %d matches for your search of %s:\n"
 ;       mandoku-count search-string))
       (if (equal mandoku-use-textfilter t)
-	  (insert (format "Active Filter: %s , Matches: %d (Press 't' to temporarily disable the filter)\nLocation\tMatch\tSource\n* %s (%d/%d)\n%s" 
+	  (insert (format "Active Filter: %s , Matches: %d (Press 't' to temporarily disable the filter)\n%s\n* %s (%d/%d)\n%s" 
 			  (mapconcat 'mandoku-active-filter mandoku-textfilter-list "")
-			  mandoku-filtered-count search-string mandoku-filtered-count cnt sort-message))
+			  mandoku-filtered-count
+			  loc-mat-src
+			  search-string
+			  mandoku-filtered-count cnt sort-message))
 	(if (> cnt mandoku-index-display-limit )
 	    (insert (format "Too many results!\nDisplaying only overview\n* %s (%d)\nCollection\tMatches\n" search-string cnt ))
 
 ;	    (insert (format "Too many results: %d for %s! Displaying only overview\nCollection\tMatches\n" cnt search-string))
-	  (insert (format "Mandoku search result%s\n%sLocation\tMatch\t         Source\n* %s (%d)\n" date-message sort-message search-string cnt))
+	  (insert (format "Mandoku search result%s\n%s%s\n* %s (%d)\n" date-message sort-message loc-mat-src search-string cnt))
 	)
 	)
       (mandoku-index-mode)
@@ -1774,7 +1799,7 @@ BEG and END default to the buffer boundaries."
 (defvar mandoku-index-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "e" 'view-mode)
-    (define-key map " " 'view-scroll-page-forward)
+    ;(define-key map " " 'view-scroll-page-forward)
     (define-key map "t" 'manoku-index-no-filter)
     (define-key map "p" 'mandoku-index-sort-pre)
     (define-key map "d" 'mandoku-index-sort-textdate)
