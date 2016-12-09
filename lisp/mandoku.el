@@ -360,7 +360,11 @@
 
 (defun mandoku-grep (beg end)
   (interactive "r")
-  (mandoku-grep-internal (buffer-substring-no-properties beg end)))
+  (let ((index-buffer (get-buffer-create "*temp-mandoku*"))
+     (result-buffer (get-buffer-create "*Mandoku Index*")))
+    (mandoku-grep-internal (buffer-substring-no-properties beg end)
+			   index-buffer result-buffer)))
+
 
 ;;;###autoload
 (defun mandoku-show-catalog ()
@@ -569,7 +573,10 @@ Do you want to download it now?"))
 (defun mandoku-search-text (search-for)
   (interactive 
    (let ((search-for (mapconcat 'char-to-string (mandoku-next-three-chars) "")))
-     (list (read-string "Search for: " search-for))))
+     (list (read-string "Search for: " search-for))
+     ))
+  (let ((index-buffer (get-buffer-create "*temp-mandoku*"))
+     (result-buffer (get-buffer-create "*Mandoku Index*")))
   (unless mandoku-initialized-p
     (mandoku-initialize))
   (setq mandoku-search-for search-for)
@@ -577,8 +584,10 @@ Do you want to download it now?"))
     (setq mandoku-position (mandoku-position-at-point-internal))
     (set-marker mandoku-position-marker (point))
     )
-  (mandoku-grep-internal (mandoku-cut-string search-for))
-  )
+  (if (<= (list-length (split-string search-for ",")) 1)
+      (mandoku-grep-internal (mandoku-cut-string search-for) index-buffer result-buffer )
+    (mandoku-multiple-search (split-string search-for ",")))
+  ))
 
 (defun mandoku-next-three-chars ()
   (save-excursion
@@ -652,32 +661,49 @@ One character is either a character or one entity expression"
     (car (split-string  (org-get-heading))))
 )
 
-(defun mandoku-grep-internal (search-string)
-  (interactive "s")
+(defun mandoku-multiple-search (search-strings)
+  (let ((index-buffer (get-buffer-create "*temp-mandoku*"))
+	(result-buffer (get-buffer-create "*Mandoku Index*")))
+    (mapc
+     (lambda (search-for)
+       (
+	(mandoku-prepare-index-buffer index-buffer search-for)
+
+       
+       )
+     search-strings)
+    )
+    ))
+
+(defun mandoku-prepare-index-buffer (index-buffer search-string)
+  ;; setup the buffer for the index results
+  (set-buffer index-buffer)
+  (setq buffer-read-only nil)
+  (erase-buffer)
+  (mandoku-search-internal search-string index-buffer)
+  (goto-char (point-min))
+  ;; add the first char of searchstring to the index-buffer
+  (while (search-forward "\n" nil t)
+    (replace-match (concat "\n" (substring search-string 0 1))))
+  (goto-char (point-min))
+  ;; remove first, empty line
+  (if (looking-at "\n")
+      (kill-line))
+  ;; fix the image display
+  (while (re-search-forward "<img[^>]+/images/\\([^>]+\\)./>" nil t)
+    (if mandoku-gaiji-images-path
+	(replace-match (concat "[[file:" mandoku-gaiji-images-path (match-string 1) "]]"))
+      (replace-match "⬤")))
+index-buffer)
+
+(defun mandoku-grep-internal (search-string index-buffer result-buffer)
   (let ((coding-system-for-read 'utf-8)
 	(coding-system-for-write 'utf-8)
-	(index-buffer (get-buffer-create "*temp-mandoku*"))
 	(the-buf (current-buffer))
-	(result-buffer (get-buffer-create "*Mandoku Index*"))
 	(org-startup-folded t)
 	(mandoku-count 0))
     (progn
-      (set-buffer index-buffer)
-      (setq buffer-read-only nil)
-      (erase-buffer)
-      (mandoku-search-internal search-string index-buffer)
-      ;; fix the image display
-      (goto-char (point-min))
-      (while (search-forward "\n" nil t)
-	(replace-match (concat "\n" (substring search-string 0 1))))
-      (goto-char (point-min))
-      (if (looking-at "\n")
-	  (kill-line))
-      (while (re-search-forward "<img[^>]+/images/\\([^>]+\\)./>" nil t)
-	(if mandoku-gaiji-images-path
-	    (replace-match (concat "[[file:" mandoku-gaiji-images-path (match-string 1) "]]"))
-	  (replace-match "⬤")))
-      ;; setup the buffer for the index results
+      (mandoku-prepare-index-buffer index-buffer search-string)
       (set-buffer result-buffer)
       (setq buffer-read-only nil)
       (erase-buffer)
@@ -708,7 +734,6 @@ One character is either a character or one entity expression"
 		)
 	      (with-current-buffer index-buffer
 		(insert tmpstr))
-    
 	)))
     (mandoku-search-local search-string index-buffer))
 )
@@ -719,22 +744,22 @@ One character is either a character or one entity expression"
 	(coding-system-for-write 'utf-8)
 	(search-char (string-to-char search-string)))
 ;; /tmp/index/4e/4e00/4e00.ZB6q.idx \\ 千賢人出現於世是故,成當有	ZB6q0001_001:010a:2:8:9
-      (shell-command
-		    (concat mandoku-grep-command " -H " "^"
-		     (substring search-string 1 )
-		     " "
-		     mandoku-index-dir
-		     (substring (format "%04x" search-char) 0 2)
-		     "/"
-		     (format "%04x" search-char)
-		     "/"
-		     (format "%04x" search-char)
-		     (if mandoku-search-limit-to-coll
-			 (concat "." mandoku-search-limit-to-coll)
-		       "")
-		     "*.idx* | cut -d : -f 2-")
-		    index-buffer nil
-		    )
+    (shell-command
+     (concat mandoku-grep-command " -H " "^"
+	     (substring search-string 1 )
+	     " "
+	     mandoku-index-dir
+	     (substring (format "%04x" search-char) 0 2)
+	     "/"
+	     (format "%04x" search-char)
+	     "/"
+	     (format "%04x" search-char)
+	     (if mandoku-search-limit-to-coll
+		 (concat "." mandoku-search-limit-to-coll)
+	       "")
+	     "*.idx* | cut -d : -f 2-")
+     index-buffer nil
+     )
 ))
 
 
@@ -810,7 +835,7 @@ One character is either a character or one entity expression"
 	(unless (and (mandoku-apply-filter txtid)
 		     (mandoku-apply-datefilter txtid))
 	  (setq mandoku-filtered-count (+ mandoku-filtered-count 1))
-	  (insert (format "** [[mandoku:%s:%s::%s][% 4s% 5s]]  % 10s%-30s  %s\n"
+	  (insert (format "** [[mandoku:%s:%s::%s][% 4s% 6s]]  % 10s%-30s  %s\n"
 		  txtf page search-string  
 		  (if vol
 		      (concat vol ", ")
@@ -822,7 +847,7 @@ One character is either a character or one entity expression"
 		  (concat "  [[mandoku:meta:"
 			    txtid
 			    ":10][《" txtid " "
-			    (format "%s" tit)
+			    (format "%-20s" tit)
 			    "》]]")
 			    ))
 ;; additional properties
@@ -936,7 +961,8 @@ One character is either a character or one entity expression"
     (if (and (not (= 0 mandoku-index-display-limit)) (> cnt mandoku-index-display-limit))
 ;    (if nil
 	(mandoku-index-insert-tablist tab result-buffer)
-      (setq mandoku-filtered-count (mandoku-index-insert-result search-string index-buffer result-buffer "")))
+      (setq mandoku-filtered-count
+	    (mandoku-index-insert-result search-string index-buffer result-buffer "")))
       (switch-to-buffer-other-window result-buffer t)
       (goto-char (point-min))
 ;      (insert (format "There were %d matches for your search of %s:\n"
