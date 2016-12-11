@@ -678,28 +678,27 @@ One character is either a character or one entity expression"
      search-strings)
     (with-current-buffer result-buffer
       (erase-buffer)
-      (maphash
-       (lambda (key value)
-	 ;(setq res (remove-duplicates (mapcar 'car value) :test 'equal))
-	 ;(when t
-	 (when (<= (length search-strings) (length (setq res (remove-duplicates (mapcar 'car value) :test 'equal))))
-	   (insert "\n* " 
-		   key ": \n"
-		   (mapconcat
-		    (lambda (v)
-		      (let* ((lv (split-string (cdr v) "\t"))
-			     (srch (car v))
-			     (h1 (split-string (car lv) ","))
-			     (loc (split-string (cadr lv) ":"))
-			     (rest (caddr lv)))
-			(concat "** "
-				(cadr loc) "," (caddr loc) ":" (cadddr loc) " (" (car (last loc)) ") "
-				(replace-in-string
-				 (concat (cadr h1) (car h1))
-				 srch
-				 (concat " *" srch "* ")))))
-		     value "\n"))))
-       mhash)
+      (dolist
+	  (key (sort (mandoku-hash-keys-mhash mhash search-strings)
+		     (lambda (k1 k2)
+		       (> (length (gethash k1 mhash))
+			  (length (gethash k2 mhash))))))
+	(insert "\n* " 
+		key ": \n"
+		(mapconcat
+		 (lambda (v)
+		   (let* ((lv (split-string (cdr v) "\t"))
+			  (srch (car v))
+			  (h1 (split-string (car lv) ","))
+			  (loc (split-string (cadr lv) ":"))
+			  (rest (caddr lv)))
+		     (concat "** "
+			     (cadr loc) "," (caddr loc) ":" (cadddr loc) " (" (car (last loc)) ") "
+			     (replace-in-string
+			      (concat (cadr h1) (car h1))
+			      srch
+			      (concat " *" srch "* ")))))
+		 (gethash key mhash) "\n")))
       (goto-char (point-min))
       (mandoku-index-mode)
       (mandoku-refresh-images)
