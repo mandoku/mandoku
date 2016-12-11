@@ -698,12 +698,27 @@ One character is either a character or one entity expression"
 			      (concat (cadr h1) (car h1))
 			      srch
 			      (concat " *" srch "* ")))))
-		 (gethash key mhash) "\n")))
+		 (sort (gethash key mhash)
+		       (lambda (k1 k2)
+			 (< (mandoku-transform-location k1)
+			    (mandoku-transform-location k2))))
+		 "\n")))
       (goto-char (point-min))
       (mandoku-index-mode)
       (mandoku-refresh-images)
     )
     ))
+
+(defun mandoku-transform-location (loc)
+  (let ((l (split-string (cadr (split-string (cdr loc) "\t")) ":")))
+     (string-to-int
+      (format "%s%3.3d%3.3d"
+       (replace-regexp-in-string "\\([a-d]\\)" 
+				 (lambda (rep)
+				   (format "%s" (- (string-to-char rep) 96))) (cadr l))
+       (string-to-int (caddr l))
+       (string-to-int (cadddr l))))))
+
 
 (defun mandoku-hash-keys-mhash (hash-table search-strings)
   (let ((keys ()))
