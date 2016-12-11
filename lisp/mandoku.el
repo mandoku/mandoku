@@ -663,17 +663,57 @@ One character is either a character or one entity expression"
 
 (defun mandoku-multiple-search (search-strings)
   (let ((index-buffer (get-buffer-create "*temp-mandoku*"))
-	(result-buffer (get-buffer-create "*Mandoku Index*")))
+	(result-buffer (get-buffer-create "*Mandoku Index*"))
+	(mhash (make-hash-table :test 'equal))
+	res loc)
     (mapc
      (lambda (search-for)
-       (
 	(mandoku-prepare-index-buffer index-buffer search-for)
-
-       
-       )
+	(with-current-buffer index-buffer
+	  (dolist (line (split-string (buffer-string) "\n" t))
+	    (setq loc (car (split-string (cadr (split-string line "\t" t)) ":")))
+	    (puthash loc (cons (cons search-for line) (gethash loc mhash)) mhash)))
+	(message "Found %d for %s" (hash-table-count mhash) search-for)
+	  )
      search-strings)
+    (with-current-buffer result-buffer
+      (erase-buffer)
+      (maphash
+       (lambda (key value)
+	 ;(setq res (remove-duplicates (mapcar 'car value) :test 'equal))
+	 ;(when t
+	 (when (<= (length search-strings) (length (setq res (remove-duplicates (mapcar 'car value) :test 'equal))))
+	   (insert "\n* " 
+		   key ": \n"
+		   (mapconcat
+		    (lambda (v)
+		      (let* ((lv (split-string (cdr v) "\t"))
+			     (srch (car v))
+			     (h1 (split-string (car lv) ","))
+			     (loc (split-string (cadr lv) ":"))
+			     (rest (caddr lv)))
+			(concat "** "
+				(cadr loc) "," (caddr loc) ":" (cadddr loc) " (" (car (last loc)) ") "
+				(replace-in-string
+				 (concat (cadr h1) (car h1))
+				 srch
+				 (concat " *" srch "* ")))))
+		     value "\n"))))
+       mhash)
+      (goto-char (point-min))
+      (mandoku-index-mode)
+      (mandoku-refresh-images)
     )
     ))
+
+(defun mandoku-hash-keys-mhash (hash-table search-strings)
+  (let ((keys ()))
+    (maphash
+     (lambda (key value)
+       (when (<= (length search-strings) (length (setq res (remove-duplicates (mapcar 'car value) :test 'equal))))
+       (push key keys))) hash-table)
+    keys))
+
 
 (defun mandoku-prepare-index-buffer (index-buffer search-string)
   ;; setup the buffer for the index results
