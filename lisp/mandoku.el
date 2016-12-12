@@ -573,10 +573,10 @@ Do you want to download it now?"))
 (defun mandoku-search-text (search-for)
   (interactive 
    (let ((search-for (mapconcat 'char-to-string (mandoku-next-three-chars) "")))
-     (list (read-string "Search for: " search-for))
-     ))
+     (list (read-string "Search for: " search-for))))
   (let ((index-buffer (get-buffer-create "*temp-mandoku*"))
-     (result-buffer (get-buffer-create "*Mandoku Index*")))
+	(result-buffer (get-buffer-create "*Mandoku Index*"))
+	sf)
   (unless mandoku-initialized-p
     (mandoku-initialize))
   (setq mandoku-search-for search-for)
@@ -584,9 +584,9 @@ Do you want to download it now?"))
     (setq mandoku-position (mandoku-position-at-point-internal))
     (set-marker mandoku-position-marker (point))
     )
-  (if (<= (list-length (split-string search-for ",")) 1)
+  (if (<= (list-length (setq sf (split-string search-for "[ ,　、。，]+"))) 1)
       (mandoku-grep-internal (mandoku-cut-string search-for) index-buffer result-buffer )
-    (mandoku-multiple-search (split-string search-for ",")))
+    (mandoku-multiple-search sf))
   ))
 
 (defun mandoku-next-three-chars ()
@@ -664,7 +664,9 @@ One character is either a character or one entity expression"
 (defun mandoku-multiple-search (search-strings)
   (let ((index-buffer (get-buffer-create "*temp-mandoku*"))
 	(result-buffer (get-buffer-create "*Mandoku Index*"))
+	(sort-message "Sort: by (d)ate, text (i)d number or number of (h)its:\n")
 	(mhash (make-hash-table :test 'equal))
+	(cnt ())
 	res loc)
     (mapc
      (lambda (search-for)
@@ -673,7 +675,7 @@ One character is either a character or one entity expression"
 	  (dolist (line (split-string (buffer-string) "\n" t))
 	    (setq loc (car (split-string (cadr (split-string line "\t" t)) ":")))
 	    (puthash loc (cons (cons search-for line) (gethash loc mhash)) mhash)))
-	(message "Found %d for %s" (hash-table-count mhash) search-for)
+	;(message "Found %d for %s" (hash-table-count mhash) search-for)
 	  )
      search-strings)
     (with-current-buffer result-buffer
@@ -683,8 +685,18 @@ One character is either a character or one entity expression"
 		     (lambda (k1 k2)
 		       (> (length (gethash k1 mhash))
 			  (length (gethash k2 mhash))))))
-	(insert "\n* " 
-		key ": \n"
+	(let ((txtid (car (split-string key "_")))
+	      (juan (cadr (split-string key "_")))
+	      (hits (length (gethash key mhash)))
+	      )
+	  (insert "\n** "
+		txtid " "
+		(mandoku-textid-to-title (car (split-string key "_")))
+		" 第" (format "%d" (string-to-int juan))
+		(format "巻 (%d)" hits)
+		": \n"
+		(format ":PROPERTIES:\n:ID: %s\n:TXTDATE: %s_%s\n:HITS: %3.3d\n:END:\n"
+			key (gethash txtid mandoku-textdates) juan hits)
 		(mapconcat
 		 (lambda (v)
 		   (let* ((lv (split-string (cdr v) "\t"))
@@ -692,8 +704,10 @@ One character is either a character or one entity expression"
 			  (h1 (split-string (car lv) ","))
 			  (loc (split-string (cadr lv) ":"))
 			  (rest (caddr lv)))
-		     (concat "** "
-			     (cadr loc) "," (caddr loc) ":" (cadddr loc) " (" (car (last loc)) ") "
+		     (concat (format "*** [[mandoku:%s:%s%s::%s][%-16s]] "
+				     (car loc) (cadr loc) (caddr loc) srch
+				     (format "%s,%s:%s (%s)"
+					     (cadr loc) (caddr loc) (cadddr loc) (car (last loc))))
 			     (replace-in-string
 			      (concat (cadr h1) (car h1))
 			      srch
@@ -702,14 +716,17 @@ One character is either a character or one entity expression"
 		       (lambda (k1 k2)
 			 (< (mandoku-transform-location k1)
 			    (mandoku-transform-location k2))))
-		 "\n")))
+		 "\n"))))
       (goto-char (point-min))
+      (insert (format "Mandoku Search Result:\n%s* %s" sort-message (mapconcat 'identity search-strings ", ")))
       (mandoku-index-mode)
       (mandoku-refresh-images)
-    )
+      (hide-sublevels 3)
+      )
     ))
 
 (defun mandoku-transform-location (loc)
+  "Convert the location in the index to a sortable numeric representation"
   (let ((l (split-string (cadr (split-string (cdr loc) "\t")) ":")))
      (string-to-int
       (format "%s%3.3d%3.3d"
@@ -1723,10 +1740,8 @@ BEG and END default to the buffer boundaries."
     (goto-char (point-min))
     (org-next-visible-heading 1)
     (org-sort-entries t type nil nil s)
-					;(mandoku-display-inline-images)
-    (org-redisplay-inline-images)
+    (mandoku-refresh-images)
     (hide-sublevels 2)))
-
 
 (defun mandoku-index-sort-pre ()
   "sort the result index by the preceding string, this has been saved in the property PRE"
@@ -1734,27 +1749,29 @@ BEG and END default to the buffer boundaries."
   (mandoku-index-sort-func ?r "PRE")
   (message "Sorted the index with the characters preceding the match as sort key."))
 
-
 (defun mandoku-index-sort-post ()
   "sort the result index by the following string, this has been saved in the property POST"
   (interactive)
   (mandoku-index-sort-func ?r "POST")
   (message "Sorted the index with the characters following the match as sort key."))
-  
 
 (defun mandoku-index-sort-id ()
   "sort the result index by the text number, this has been saved in the property ID"
   (interactive)
   (mandoku-index-sort-func ?r "ID")
   (message "Sorted the index with the text number as sort key."))
-  
 
 (defun mandoku-index-sort-textdate ()
   "sort the result index by the text date, this has been saved in the property TXTDATE"
   (interactive)
   (mandoku-index-sort-func ?r "TXTDATE")
   (message "Sorted the index with the text date as sort key."))
-  
+
+(defun mandoku-index-sort-hits ()
+  "sort the result index by the number of hits that been saved in the property HITS"
+  (interactive)
+  (mandoku-index-sort-func ?R "HITS")
+  (message "Sorted the index with the number of hits as sort key."))
 
 (defun mandoku-index-sort-ncnt ()
   "sort the result index by the ngram count, this has been saved in the property NCNT"
@@ -1888,6 +1905,7 @@ BEG and END default to the buffer boundaries."
     (define-key map "d" 'mandoku-index-sort-textdate)
     (define-key map "f" 'mandoku-index-sort-post)
     (define-key map "i" 'mandoku-index-sort-id)
+    (define-key map "h" 'mandoku-index-sort-hits)
     (define-key map "n" 'mandoku-index-sort-ncnt)
          map)
   "Keymap for mandoku-index mode"
@@ -2282,9 +2300,13 @@ Click on a link or move the cursor to the link and then press enter
        ;; check whether filename is that of a directory
        ((eq t (car (cdr (car current-directory-list))))
         ;; decide whether to skip or recurse
-        (if
-            (equal "."
-                   (substring (car (car current-directory-list)) -1))
+        (if (or 
+	     (equal "."
+		    (substring (car (car current-directory-list)) -1))
+	     (equal "_data"
+		    (substring (car (car current-directory-list)) -5))
+	     (equal "_branches"
+	          (substring (car (car current-directory-list)) -9)))
             ;; then do nothing since filename is that of
             ;;   current directory or parent, "." or ".."
             ()
