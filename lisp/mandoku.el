@@ -708,10 +708,12 @@ One character is either a character or one entity expression"
 				     (car loc) (cadr loc) (caddr loc) srch
 				     (format "%s,%s:%s (%s)"
 					     (cadr loc) (caddr loc) (cadddr loc) (car (last loc))))
-			     (replace-in-string
+			     (replace-regexp-in-string
+			      (concat "\\(" srch "\\)")
+			      " *\\1* "
 			      (concat (cadr h1) (car h1))
-			      srch
-			      (concat " *" srch "* ")))))
+			      )
+			     )))
 		 (sort (gethash key mhash)
 		       (lambda (k1 k2)
 			 (< (mandoku-transform-location k1)
@@ -753,19 +755,26 @@ One character is either a character or one entity expression"
   (erase-buffer)
   (mandoku-search-internal search-string index-buffer)
   (goto-char (point-min))
+  (when (looking-at "\n")
+    (kill-line))
+  (insert (substring search-string 0 1))
   ;; add the first char of searchstring to the index-buffer
-  (while (search-forward "\n" nil t)
-    (replace-match (concat "\n" (substring search-string 0 1))))
+  (while (re-search-forward "\n\\(.\\)" nil t)
+    (replace-match (concat "\n" (substring search-string 0 1) (match-string 1))))
   (goto-char (point-min))
   ;; remove first, empty line
-  (if (looking-at "\n")
-      (kill-line))
   ;; fix the image display
   (while (re-search-forward "<img[^>]+/images/\\([^>]+\\)./>" nil t)
     (if mandoku-gaiji-images-path
-	(replace-match (concat "[[file:" mandoku-gaiji-images-path (match-string 1) "]]"))
+	(replace-match (concat "[[file:" mandoku-gaiji-images-path (match-string 1) "]]") t)
       (replace-match "⬤")))
-index-buffer)
+  (goto-char (point-min))
+  ;; just to be sure (the local index might have these..
+  (while (re-search-forward "&\\([^;]+\\);" nil t)
+    (if mandoku-gaiji-images-path
+	(replace-match (concat "[[file:" mandoku-gaiji-images-path (match-string 1) ".png]]") t)
+	(replace-match "⬤")))
+  index-buffer)
 
 (defun mandoku-grep-internal (search-string index-buffer result-buffer)
   (let ((coding-system-for-read 'utf-8)
@@ -2300,16 +2309,15 @@ Click on a link or move the cursor to the link and then press enter
        ;; check whether filename is that of a directory
        ((eq t (car (cdr (car current-directory-list))))
         ;; decide whether to skip or recurse
-        (if (or 
+        (unless (or 
+            ;; then do nothing since filename is that of
+            ;;   current directory or parent, "." or ".."
 	     (equal "."
 		    (substring (car (car current-directory-list)) -1))
 	     (equal "_data"
 		    (substring (car (car current-directory-list)) -5))
 	     (equal "_branches"
 	          (substring (car (car current-directory-list)) -9)))
-            ;; then do nothing since filename is that of
-            ;;   current directory or parent, "." or ".."
-            ()
           ;; else descend into the directory and repeat the process
           (setq el-files-list
                 (append
