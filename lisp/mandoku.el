@@ -584,7 +584,9 @@ Do you want to download it now?"))
     (setq mandoku-position (mandoku-position-at-point-internal))
     (set-marker mandoku-position-marker (point))
     )
-  (if (<= (list-length (setq sf (split-string search-for "[ ,　、。，]+"))) 1)
+  (if (or
+       (string-match "[{\\*\\[]" search-for)
+       (<= (list-length (setq sf (split-string search-for "[ ,　、。，]+"))) 1))
       (mandoku-grep-internal (mandoku-cut-string search-for) index-buffer result-buffer )
     (mandoku-multiple-search sf))
   ))
@@ -661,7 +663,26 @@ One character is either a character or one entity expression"
     (car (split-string  (org-get-heading))))
 )
 
-(defun mandoku-multiple-search (search-strings)
+(defun mandoku-find-cit-from-region (beg end &optional step)
+  (interactive "r")
+  (let ((src (mandoku-cut-string
+	      (mandoku-copy-clean beg end) 20))
+	(step (or step 4))
+	(search-strings ())
+	(tmp ())
+	j l n)
+    (loop for j from 0 to (- (length src) 1) by step do
+	  (push (char-to-string (elt src j)) search-strings))
+    (if (>= (- (% (length src) step) 1) 2)
+	(push (char-to-string (elt src (- (length src) 1))) search-strings))
+    (loop for j from 0 to (- (length search-strings) 2) do
+	  (push (format "%s.{1,6}%s" (elt search-strings (+ j 1)) (elt search-strings j))
+		tmp))
+    (mandoku-multiple-search tmp src)
+    (message (format "%s" tmp))
+))  
+
+(defun mandoku-multiple-search (search-strings &optional src)
   (let ((index-buffer (get-buffer-create "*temp-mandoku*"))
 	(result-buffer (get-buffer-create "*Mandoku Index*"))
 	(sort-message "Sort: by (d)ate, text (i)d number or number of (h)its:\n")
@@ -720,7 +741,9 @@ One character is either a character or one entity expression"
 			    (mandoku-transform-location k2))))
 		 "\n"))))
       (goto-char (point-min))
-      (insert (format "Mandoku Search Result:\n%s* %s" sort-message (mapconcat 'identity search-strings ", ")))
+      (insert (format "Mandoku Search Result:\n%s* %s" sort-message
+		      (if src src
+			(mapconcat 'identity search-strings ", "))))
       (mandoku-index-mode)
       (mandoku-refresh-images)
       (hide-sublevels 3)
@@ -740,10 +763,12 @@ One character is either a character or one entity expression"
 
 
 (defun mandoku-hash-keys-mhash (hash-table search-strings)
+  ;; this is where I remove the unwanted matches...
   (let ((keys ()))
     (maphash
      (lambda (key value)
-       (when (<= (length search-strings) (length (setq res (remove-duplicates (mapcar 'car value) :test 'equal))))
+       (when (<= (length search-strings)
+		 (length (setq res (remove-duplicates (mapcar 'car value) :test 'equal))))
        (push key keys))) hash-table)
     keys))
 
@@ -825,9 +850,9 @@ One character is either a character or one entity expression"
 	(search-char (string-to-char search-string)))
 ;; /tmp/index/4e/4e00/4e00.ZB6q.idx \\ 千賢人出現於世是故,成當有	ZB6q0001_001:010a:2:8:9
     (shell-command
-     (concat mandoku-grep-command " -H " "^"
+     (concat mandoku-grep-command " -H -e " "\"^"
 	     (substring search-string 1 )
-	     " "
+	     "\" "
 	     mandoku-index-dir
 	     (substring (format "%04x" search-char) 0 2)
 	     "/"
@@ -927,7 +952,7 @@ One character is either a character or one entity expression"
 		  (concat "  [[mandoku:meta:"
 			    txtid
 			    ":10][《" txtid " "
-			    (mandoku-cut-string tit 15)
+			    (mandoku-cut-string tit 15 t)
 			    "》]]")
 			    ))
 ;; additional properties
@@ -1118,10 +1143,12 @@ One character is either a character or one entity expression"
 	  olp))))
 
 
-(defun mandoku-cut-string (s &optional len)
+(defun mandoku-cut-string (s &optional len ell)
   (let ((l (or len mandoku-string-limit)))
     (if (< l (length s)  )
-      (concat (substring s 0 (- l 1)) "…")
+	(if ell
+	    (concat (substring s 0 (- l 1)) "…")
+	  (substring s 0 l))
     s))
 )
 
