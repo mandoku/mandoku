@@ -28,9 +28,10 @@
    The bundle for Windows has been tested on Windows 8 and 10.  It
    might work on earlier versions, but there might also be problems.
    Currently there is no 32 bit version of the package. The Emacs
-   application included in the =Mandoku= package below is version 24.5
-   from [[https://raw.githubusercontent.com/chuntaro/NTEmacs64/master/emacs-24.5-IME-patched.zip][the NTemacs project]], this is known to work with the input
-   methods for Chinese and Japanese.
+   application included in the =Mandoku= package below is version 25.1
+   from [[https://github.com/chuntaro/NTEmacs64][the NTemacs
+   project]], this is known to work with the input methods for Chinese
+   and Japanese.
    
    1. The =Mandoku= bundle includes a version of the =git=
       program, which is used to download and update necessary
@@ -40,7 +41,7 @@
       repository. The current version known to work is v2.7.2.
 
    2. Download the =Mandoku= installation bundle
-      [[file:data/mandoku-2016-03.zip][mandoku-2016-03.zip]]
+      [[file:data/mandoku-2016-12.zip][mandoku-2016-12.zip]]
       (200MB).
    3. Doubleclick on the package and move the folder =krp=, which is
       found inside the package to a destination on a root directory of
