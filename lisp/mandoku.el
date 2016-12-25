@@ -694,10 +694,11 @@ One character is either a character or one entity expression"
 	(mandoku-prepare-index-buffer index-buffer search-for)
 	(with-current-buffer index-buffer
 	  (dolist (line (split-string (buffer-string) "\n" t))
-	    (setq loc (car (split-string (cadr (split-string line "\t" t)) ":")))
-	    (puthash loc (cons (cons search-for line) (gethash loc mhash)) mhash)))
-	;(message "Found %d for %s" (hash-table-count mhash) search-for)
-	  )
+	    ;; lets ignore the other versions for the moment..
+	    (let ((tx (split-string line "\t" t)))
+	      (when (or (< (length tx) 3) (equal (caddr tx) "n"))
+		(setq loc (car (split-string (cadr tx) ":")))
+		(puthash loc (cons (cons search-for line) (gethash loc mhash)) mhash))))))
      search-strings)
     (with-current-buffer result-buffer
       (erase-buffer)
@@ -764,7 +765,7 @@ One character is either a character or one entity expression"
 
 (defun mandoku-hash-keys-mhash (hash-table search-strings)
   ;; this is where I remove the unwanted matches...
-  (let ((keys ()))
+  (let ((keys ()) res )
     (maphash
      (lambda (key value)
        (when (<= (length search-strings)
