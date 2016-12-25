@@ -207,6 +207,14 @@ This should only be changed in rare circumstances. Four strings will be provided
   :type '(string)
   :group 'mandoku-system)
 
+(defcustom mandoku-rg-program
+  (if mandoku-w32-p
+      (concat "\"" (executable-find "rg") "\"")
+    (executable-find "rg"))
+  "Name of the rg executable used by mandoku."
+  :type '(string)
+  :group 'mandoku-system)
+
 (defcustom mandoku-python-program 
   (if mandoku-w32-p
       (concat "\"" (executable-find "python") "\"")
@@ -628,7 +636,9 @@ Do you want to download it now?"))
 	(grep-find-ignored-files nil)
 	(grep-find-ignored-directories nil)
 	)
-    (rgrep search-for "*.txt" mandoku-work-dir nil)))
+    (if (fboundp 'ripgrep-regexp-x)
+	(ripgrep-regexp search-for mandoku-work-dir '("-ttxt"))
+      (rgrep search-for "*.txt" mandoku-work-dir nil))))
 
 
 
