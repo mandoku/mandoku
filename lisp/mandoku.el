@@ -50,29 +50,88 @@
 (require 'git)
 (require 'url)
 (require 'url-handlers)
-(defvar mandoku-base-dir nil "This is the root of the mandoku hierarchy, this needs to be provided by the user in its init file")
-(defvar mandoku-do-remote t)
-(defvar mandoku-preferred-edition nil "Preselect a certain edition to avoid repeated selection")
+
+(defgroup mandoku nil
+  "Main customization group for Mandoku.  The most frequently used settings are provided here.")
+(defgroup mandoku-system nil
+  "Customization group for advanced techincal settings in Mandoku.")
+(defgroup mandoku-user nil
+  "Customization group for specialized user settings in Mandoku." )
+
+(defcustom mandoku-base-dir nil
+  "This is the root of the mandoku hierarchy, this needs to be provided by the user in its init file"
+  :type '(directory)
+  :group 'mandoku-user)
+(defcustom mandoku-do-remote t
+  "Set to t if we want to query a remote repository.  This is the default setting and should not usually be changed."
+  :type '(boolean)
+  :group 'mandoku)
+
+(defcustom mandoku-preferred-edition nil "Preselect a certain edition to avoid repeated selection"
+  :type '(string)
+  :group 'mandoku-user)
+  
 ;;;###autoload
 (defconst mandoku-lisp-dir (file-name-directory (or load-file-name (buffer-file-name)))
   "directory of mandoku lisp code")
 (defvar mandoku-subdirs (list "text" "images" "meta" "temp" "temp/imglist" "system" "work" "index" "user"))
 ;; it probably does not much sense to do this here, but anyway, this is the idea...
-(defvar mandoku-grep-command "bzgrep" "The command used for mandoku's internal search function. On Windows, needs to be 'grep'.")
+(defcustom mandoku-grep-command "bzgrep" "The command used for mandoku's internal search function. On Windows, needs to be 'grep'."
+    :type '(string)
+  :group 'mandoku-system)
+
 (defvar mandoku-local-init-file nil)
 ;; we store the http password for gitlab in memory for one session
 ;; todo: make this a per server setting!
-(defvar mandoku-user-account nil)
-(defvar mandoku-gh-rep "kanripo")
-(defvar mandoku-gh-user nil)
-(defvar mandoku-gh-server "github.com")
-(defvar mandoku-gh-imglist-template "https://raw.githubusercontent.com/%s/%s/_data/imglist/%s.%s")
+(defcustom mandoku-user-account nil
+  "The name of the user account for mandoku. "
+  :type '(string)
+  :group 'mandoku-user)
+  
+(defcustom mandoku-gh-rep "kanripo"
+  "The name of the repository on GitHub. This is GitHub account that holds the files of the texts, it defaults to 'kanripo' and should usually not be changed."
+  :type '(string)
+  :group 'mandoku-user)
+  
+(defcustom mandoku-gh-user nil
+  "The name of the account on GitHub to be used."
+  :type '(string)
+  :group 'mandoku-user)
+  
+(defcustom mandoku-gh-server "github.com"
+  "The server for the GitHub site."
+  :type '(string)
+  :group 'mandoku-user)
+
+(defcustom mandoku-gh-imglist-template "https://raw.githubusercontent.com/%s/%s/_data/imglist/%s.%s"
+  "The template used to construct the URl for retrieving the list of images for a specific edition.
+This should only be changed in rare circumstances. Four strings will be provided for this template:
+- github repository
+- text-number
+- text-number_juan-number
+- file extension
+"
+  :type '(string)
+  :group 'mandoku-system)
+  
 (defvar mandoku-user-password nil)
-(defvar mandoku-string-limit 10)
-(defvar mandoku-index-display-limit 2000)
+(defcustom mandoku-string-limit 10
+  "Maximum length for a search string"
+  :type '(integer)
+  :group 'mandoku-system)
+
+(defcustom mandoku-index-display-limit 2000
+  "Number of initial search results to be displayed without tabulating the buffer"
+  :type '(integer)
+  :group 'mandoku)
+
 ;; Defined somewhere in this file, but used before definition.
 ;;;###autoload
-(defvar mandoku-repositories-alist '(("dummy" . "http://www.example.com")))
+(defcustom mandoku-repositories-alist '(("dummy" . "http://www.example.com"))
+  "List of the reopositories to query. The values are the name of the repository as key and its URL as value."
+  :type '(alist :key-type 'string :value-type 'string)
+  :group 'mandoku-system)
+
 (defvar mandoku-md-menu)
 (defvar mandoku-position nil "Position as a list of textid edition page line" )
 (defvar mandoku-position-marker (make-marker) "Marker for the last position in the text")
@@ -103,7 +162,11 @@
 ;; this could be a list? currently only one subcoll allowed, but it could be a regex understood by the shell ZB6[rq]
 (defvar mandoku-datefilter 10000)
 ;; this is the number of characters to use in an ngram for the index; nil means "off"
-(defvar mandoku-ngram-n nil)
+(defcustom mandoku-ngram-n nil
+  "This is the number of characters to use in an ngram for the index; nil means do not calculate ngrams."
+  :type '(integer)
+  :group 'mandoku)
+
 (defvar mandoku-search-limit-to-coll nil)
 ;; ** Catalogs
 ;;;###autoload
@@ -142,7 +205,7 @@
     (executable-find "git"))
   "Name of the git executable used by mandoku."
   :type '(string)
-  :group 'mandoku)
+  :group 'mandoku-system)
 
 (defcustom mandoku-python-program 
   (if mandoku-w32-p
@@ -150,12 +213,12 @@
       (executable-find "python"))
   "Name of the python executable used by mandoku."
   :type '(string)
-  :group 'mandoku)
+  :group 'mandoku-system)
 
 (defcustom mandoku-github-remote-name "kanripo"
   "Name of the remote used for the github site."
   :type '(string)
-  :group 'mandoku)
+  :group 'mandoku-system)
   
 ;; Add this since it appears to miss in emacs-2x
 (or (fboundp 'replace-in-string)
@@ -2505,7 +2568,7 @@ done
 "
   "Script to update the text repositories. Part of mandoku to make updating easier."
   :type '(string)
-  :group 'mandoku)
+  :group 'mandoku-system)
 
 ;; this will activate the automatic saving, commit and push:
 ;; (run-at-time "00:59" 1800 'mandoku-update-texts)
