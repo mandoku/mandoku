@@ -169,10 +169,10 @@ This should only be changed in rare circumstances. Four strings will be provided
 
 (defvar mandoku-search-limit-to-coll nil)
 ;; ** Catalogs
-;;;###autoload
 ;; (defvar mandoku-catalogs-alist nil)
 ;; (defvar mandoku-catalog-path-list nil)
 ;; (defvar mandoku-catalog-user-path-list nil)
+;;;###autoload
 (defvar mandoku-titles-by-date nil)
 (defvar mandoku-git-use-http t)
 (defvar mandoku-gaiji-images-path nil)
@@ -380,6 +380,7 @@ This should only be changed in rare circumstances. Four strings will be provided
 
 (defun mandoku-read-titletables () 
   "read the titles table"
+  (interactive)
   (setq mandoku-subcolls (make-hash-table :test 'equal))
 ;;   (when (file-exists-p (concat mandoku-sys-dir  "subcolls.txt"))
 ;;     (with-temp-buffer
@@ -1690,6 +1691,20 @@ eds
 					;  (view-mode)
   (set (make-local-variable 'org-startup-folded) 'nofold)
 )
+;; let's add the menu to the top menu which is always available
+(easy-menu-add-item
+ nil '("Tools")
+  '("Mandoku"
+     ["Show catalog" mandoku-show-catalog t]
+     ["Search Texts" mandoku-search-text t]
+     ["Search Titles" mandoku-search-titles t]
+     ["Search My Files" mandoku-search-user-text t]
+     ["Reload title table" mandoku-read-titletables t]
+     )
+ "Spell Checking")
+(easy-menu-add-item nil '("Tools") '("----") "Spell Checking")
+
+
 
 (defun mandoku-toggle-visibility ()
   (interactive)
@@ -2080,12 +2095,12 @@ BEG and END default to the buffer boundaries."
   
 (easy-menu-define mandoku-md-menu mandoku-view-mode-map "Mandoku menu"
   '("Mandoku"
-    ("Display"
-     ["Show markers" mandoku-toggle-visibility t])
     ("Browse"
      ["Show catalog" mandoku-show-catalog t]
      ["Update local catalog" mandoku-write-local-text-list t]
      )
+    ("Display"
+     ["Show markers" mandoku-toggle-visibility t])
     ("Search"
      ["Texts" mandoku-search-text t]
      ["Titles" mandoku-search-titles t]
@@ -2096,6 +2111,7 @@ BEG and END default to the buffer boundaries."
      ["View this location in other edition" mandoku-location-other-branch t]
      )
     ("Maintenance"
+     ["Reload title table" mandoku-read-titletables t]
      ["Download this text now!" mandoku-get-remote-text (string-match "fatal" (car (mandoku-get-branches)))]
      ["Download this text from other account" mandoku-get-remote-text-from-account (string-match "fatal" (car (mandoku-get-branches)))]
      ["Download my texts from GitHub" mandoku-get-user-repos-from-gh t]
@@ -2364,6 +2380,7 @@ BEG and END default to the buffer boundaries."
 
 
 ;; misc helper functions
+;;;###autoload
 (defun mandoku-write-local-text-list ()
   (interactive)
   (let ((textlist (sort (mandoku-list-local-texts) 'string<)))
