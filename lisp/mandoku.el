@@ -50,6 +50,7 @@
 (require 'git)
 (require 'url)
 (require 'url-handlers)
+(require 'cl)
 
 (defgroup mandoku nil
   "Main customization group for Mandoku.  The most frequently used settings are provided here.")
