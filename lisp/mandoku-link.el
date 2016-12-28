@@ -84,7 +84,7 @@ LINK will consist of a <textid> recognized by mandoku."
 	     (juan (mandoku-get-juan))
 	     (br (mandoku-get-current-branch))
 	     (outline (mapconcat 'identity (mandoku-get-outline-path) " / "))
-	     (link (concat "mandoku:" fn ":" loc-format))
+	     (link (concat "mandoku:" textid ":" loc-format))
 	     (end
 	      (if (org-region-active-p)
 		  (let* ((lc (cdr (cdr (mandoku-position-at-point-internal (region-end) ))))
