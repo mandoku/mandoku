@@ -514,7 +514,7 @@ This should only be changed in rare circumstances. Four strings will be provided
 		    (concat md "/")
 		  md)))
 	      ;; see if we have a emacs init file, store it there!
-      (let ((init-file (if (file-exists-p user-init-file)
+      (let ((init-file (if (and user-init-file (file-exists-p user-init-file))
 			   user-init-file
 			 (if user-emacs-directory
 			     (concat user-emacs-directory "/init.el")
