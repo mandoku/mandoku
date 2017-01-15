@@ -137,6 +137,7 @@ class MandokuText(object):
             self.version = repo.active_branch.name.decode('utf-8')
             self.date = time.strftime("%Y-%m-%d %H:%M +0000", time.gmtime(repo.active_branch.commit.authored_date))
         except:
+            print "Problem with git, not checked out!"
             self.version = version
         ## the revision of the text in git
         try:
@@ -1508,9 +1509,9 @@ class MandokuComp(object):
                 else:
                     t2 = target_seq[i][txt_2.mpos]
                 if len(target_seq[i]) > 4:
-                    tx = (pgx + t1,) + target_seq[i][tpos:tpos+1] + ( t2,) + target_seq[i][txt_2.mpos+1:]
+                    tx = (pgx + t1,) + target_seq[i][tpos:tpos+2] + ( t2,) + target_seq[i][txt_2.mpos+1:]
                 else:
-                    tx = (pgx + t1,) + target_seq[i][tpos:tpos+1] + ( t2,)
+                    tx = (pgx + t1,) + target_seq[i][tpos:tpos+2] + ( t2,)
                 res.append(tx)
                 pgx=""
             if li > lj and lj > 0:
