@@ -1471,8 +1471,8 @@ class MandokuComp(object):
                 except:
                     #print "i", i, "dx", dx, len(source_seq)
                     k=""
-                    if fail > 5:
-                        sys.stderr.write("Sequence failed!\n")
+                    if fail > 10:
+                        sys.stderr.write("Sequence failed! %s\n" % ("".join(source_seq[0:200])))
                         return target_seq
                     fail += 1
                 prev = "".join(k[:spos])
