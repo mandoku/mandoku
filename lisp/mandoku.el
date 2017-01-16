@@ -2647,12 +2647,12 @@ done
 (defun mandoku-checkout-other-branch (&optional br)
   (interactive)
   (let* ((fn (file-name-directory (buffer-file-name)))
-	 (cd (if (string= br "_data") fn (concat fn "_branches")))
+	 (cd (if (string= br "_data") fn (concat fn "_branches/")))
 	 (branch (or br (ido-completing-read "Edition: " (delete "_data" (mandoku-get-branches))) nil t)
 	 ))
     (unless (file-exists-p cd)
       (make-directory cd))
-    (unless (file-exists-p (concat cd "/" branch))
+    (unless (file-exists-p (concat cd branch))
       (mandoku-shell-command mandoku-git-program (format " clone -b %s --single-branch %s %s/%s" branch fn cd branch)))))
 
 ;; git config --global credential.helper wincred
