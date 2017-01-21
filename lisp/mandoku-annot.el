@@ -3,10 +3,55 @@
 
 (require 'mandoku)
 
+(defvar mandoku-annot-drawer ":zhu:")
 (defvar mandoku-annot-dir (expand-file-name  (concat mandoku-base-dir "notes/")))
 
 (defvar mandoku-annot-regex "^\\([^:\n ]+\\) *\\([^:]+\\)::\\(.*?\\)$") 
+(setq mandoku-annot-start (concat mandoku-annot-drawer "\n"))
+(setq mandoku-annot-end ":end:\n")
 
+(defun mandoku-annot-find ()
+  (interactive)
+  (let (beg end tl pos)
+    (while (search-forward mandoku-annot-start)
+      (setq beg (point))
+      (setq tl (mandoku-annot-targetline))
+      (setq pos (mandoku-position-at-point-internal))
+      (search-forward mandoku-annot-end)
+      (setq end (point))
+      (setq (mandoku-annot-collect beg end)
+      ;; now store the annotations or do something
+      ))))
+
+(defun mandoku-annot-targetline (&optional beg)
+  "Line that is target for the annotation."
+  (save-excursion
+    (when beg (goto-char beg))
+    (unless (looking-at mandoku-annot-drawer)
+      (search-backward mandoku-annot-drawer))
+    (forward-line -1)
+    (mandoku-remove-punct-and-markup (thing-at-point 'line))))
+
+(defun mandoku-annot-collect (beg end)
+  "Collect all annotations between beg and end. A new annotation
+begins in column 0 of a new line and at that position has to be a
+character from the line that is target of the annotation."
+  (let ((tl (mandoku-annot-targetline beg))
+	(buffer-invisibility-spec nil)
+	notes)
+    (save-excursion
+      (goto-char beg)
+      (forward-line 1)
+      (while (< (point) end)
+	(skip-chars-forward " ")
+	(when (or (looking-at ":")
+		  (string-match (char-to-string (char-after)) tl))
+	  (push (string-trim (buffer-substring-no-properties beg (- (point) 1))) notes)
+	  (setq beg (point)))
+	(forward-line 1)
+	))
+    (reverse notes)))
+  
 (defun mandoku-location-put (&rest stuff)
   "Add properties to the capture property list `mandoku-location-plist'"
   (while stuff
@@ -94,5 +139,6 @@
       
       (save-buffer)
 ))
+
 
 (provide 'mandoku-annot)
