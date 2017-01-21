@@ -666,17 +666,14 @@ Do you want to download it now?"))
     (mandoku-multiple-search sf))
   ))
 
-(defun mandoku-next-three-chars ()
-  (save-excursion
-    (mandoku-remove-nil-recursively
-     (list
-     (char-after)
-     (progn (mandoku-forward-one-char) (char-after))
-     (progn (mandoku-forward-one-char) (char-after))
-     (progn (mandoku-forward-one-char) (char-after))
-     (progn (mandoku-forward-one-char) (char-after))
-     (progn (mandoku-forward-one-char) (char-after))
-))))
+(defun mandoku-next-three-chars (&optional count)
+  (let ((cnt (or count 6)) chr)
+    (save-excursion
+     (push (char-after) chr)
+      (dotimes (c cnt)
+	(mandoku-forward-one-char)
+	(push (char-after) chr)))
+    (reverse chr)))
 
 
 (defun mandoku-forward-one-char ()
@@ -2496,7 +2493,7 @@ Click on a link or move the cursor to the link and then press enter
     (replace-regexp-in-string "\\(\t.*\\)?\n" "" str)))
 
 (defun mandoku-remove-punct-and-markup (str)
-  (comment-string-strip (replace-regexp-in-string "\\([　-㏿]\\)" ""
+  (comment-string-strip (replace-regexp-in-string "\\([　-㏿！-￮]\\)" ""
 			    (mandoku-remove-markup str)) t t ))
 
 (defun mandoku-split-string (str)
