@@ -1005,7 +1005,9 @@ One character is either a character or one entity expression"
 	     (post (match-string 1))
 	     (extra (match-string 4))
 	     (location (split-string (match-string 3) ":" ))
-	     (txtf (concat filter  (car location)))
+	     (branches (remove "n" (split-string extra)))
+	     (txtf (concat filter  (car location)
+			   (when branches (concat "@" (mapconcat 'identity branches " ")))))
 	     (txtid (concat filter (car (split-string (car location) "_"))))
 	     (line (car (cdr (cdr location))))
 	     (pag (car (cdr location)) ) 
@@ -1032,7 +1034,9 @@ One character is either a character or one entity expression"
 		  (replace-regexp-in-string "[\t\s\n+]" "" post)
 		  (concat "  [[mandoku:meta:"
 			    txtid
-			    ":10][《" txtid " "
+			    ":10][《" txtid
+			    (when branches (concat "@" (mapconcat 'identity branches " ")))
+			    " "
 			    (mandoku-cut-string tit 15 t)
 			    "》]]")
 			    ))
