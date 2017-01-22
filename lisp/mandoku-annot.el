@@ -3,12 +3,9 @@
 
 (require 'mandoku)
 
-(defvar mandoku-annot-drawer ":zhu:")
 (defvar mandoku-annot-dir (expand-file-name  (concat mandoku-base-dir "notes/")))
 
 (defvar mandoku-annot-regex "^\\([^:\n ]+\\) *\\([^:]+\\)::\\(.*?\\)$") 
-(setq mandoku-annot-start (concat mandoku-annot-drawer "\n"))
-(setq mandoku-annot-end ":end:\n")
 
 (defun mandoku-annot-find ()
   (interactive)

@@ -71,6 +71,14 @@
 (defcustom mandoku-preferred-edition nil "Preselect a certain edition to avoid repeated selection"
   :type '(string)
   :group 'mandoku-user)
+
+(defcustom mandoku-annot-drawer ":zhu:" "Start of a mandoku annotation. The end will always be :end: on a line by itself. Restart mandoku after changing this. Existing annotations will not be updated."
+  :type '(string)
+  :group 'mandoku)
+
+(defvar mandoku-annot-start (concat mandoku-annot-drawer "\n"))
+(defconst mandoku-annot-end ":end:\n")
+
   
 ;;;###autoload
 (defconst mandoku-lisp-dir (file-name-directory (or load-file-name (buffer-file-name)))
@@ -684,9 +692,9 @@ One character is either a character or one entity expression"
 	(save-match-data
 	  (if (looking-at "&[^;]*;")
 	      (forward-char (- (match-end 0) (match-beginning 0)))
-	    (if (looking-at ":zhu:")
+	    (if (looking-at mandoku-annot-drawer)
 		(progn
-		  (search-forward ":END:")
+		  (search-forward mandoku-annot-end)
 		  (forward-char 1))
 	      (forward-char 1)))
 	;; this skips over newlines, punctuation and markup.
