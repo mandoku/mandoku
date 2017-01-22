@@ -999,7 +999,7 @@ One character is either a character or one entity expression"
     (sort-lines nil (point-min) (point-max))
     (goto-char (point-min))
     (while (re-search-forward
-	    (concat "^\\([^,]*\\),\\([^\t]*\\)\t" filter  "\\([^\t \n]*\\)\t?\\([^\n\t]*\\)?$")
+	    (concat "^\\([^,]*\\),\\([^\t]*\\)\t" filter  "\\([^\t \n]*\\)\t?\\([^\n]*\\)?$")
 	 nil t )
       (let* ((pre (match-string 2))
 	     (post (match-string 1))
