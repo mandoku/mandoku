@@ -507,7 +507,7 @@ This should only be changed in rare circumstances. Four strings will be provided
       ;; looks like we have to bootstrap the krp directory structure
       (progn
       ;; try to set to a size that still shows the minibuffer!
-      (when window-system
+      (when (eq window-system 'w32)
 	(set-frame-position (selected-frame)  100 0)
 	(set-frame-size (selected-frame)
 			;;# of chars per line
