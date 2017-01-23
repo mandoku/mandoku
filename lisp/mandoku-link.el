@@ -15,11 +15,11 @@
   "Open the text (and optionally go to indicated  position) in LINK.
 LINK will consist of a <textid> recognized by mandoku."
   ;; need to get the file name and then call mandoku-execute-file-search
-  (let* ((coll (car (split-string link ":")))
+  (let* ((coll (car (split-string (car (split-string link ":")) "@")))
 	 (textid (if (or (equal coll "meta")
 			 (equal coll "*"))
 		     (car (cdr (split-string link ":")))
-		   (car (split-string link "[.:]"))))
+		   (car (split-string (car (split-string link "[.:]")) "@" ))))
 	 (page (concat (or
 			(ignore-errors (replace-in-string  (car  (cdr (split-string link ":"))) "_" ":" ))
 			"")))

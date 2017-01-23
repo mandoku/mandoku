@@ -1446,6 +1446,7 @@ that includes all text ids of texts that matched here."
 the character at point, ignoring non-Kanji characters"
   (save-excursion
     (let* ((p (or pnt (point)))
+	   (buffer-invisibility-spec nil)
 	  (begol (save-excursion (goto-char p) (search-backward "¶")))
 	  (charcount 0))
       (goto-char begol)

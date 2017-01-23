@@ -7,6 +7,52 @@
 
 (defvar mandoku-annot-regex "^\\([^:\n ]+\\) *\\([^:]+\\)::\\(.*?\\)$") 
 
+(defun mandoku-annot-write-to-file (filename &optional n)
+  "Write to file, optional n indicates a 'notes first' format."
+  (interactive)
+  (let (beg end tl pos notes
+	    (commit (magit-rev-verify "HEAD"))
+	    (fn (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))
+	    (outb (find-file-noselect filename)))
+    (goto-char (point-min))
+    (with-current-buffer outb
+      (erase-buffer)
+      (goto-char (point-min))
+      (insert (format-time-string ";;[%Y-%m-%dT%T%z]\n" (current-time)))
+      (insert "* Notes for " fn "\n"))
+    (while (search-forward mandoku-annot-start nil t)
+      (setq beg (point))
+      (setq tl (mandoku-annot-targetline))
+      (setq pos (mandoku-charcount-at-point-internal))
+      (search-forward mandoku-annot-end)
+      (setq end (point))
+      (setq notes (mandoku-annot-collect beg end))
+      (if (not n)
+	  (with-current-buffer outb
+	    (insert "** " (car tl) "\n:PROPERTIES:\n:COMMIT: "
+		    commit
+		    "\n:LOCATION: mandoku:"
+		    (format "%s:%s\n" (car (cadr tl)) (car (cdr (cdr (cadr tl)))))
+		    ":CHARPOS: " (number-to-string pos)
+		    "\n:END:\n"
+		    )
+	    (dolist (note notes)
+	      (insert note "\n")))
+	(with-current-buffer outb
+	  (dolist (note notes)
+	    (insert "** " (mandoku-cut-string (car (split-string note ))) "\n:PROPERTIES:\n:COMMIT: "
+		    commit
+		    "\n:TARGET: " (car tl)
+		  "\n:LOCATION: mandoku:"
+		  (format "%s:%s\n" (car (cadr tl)) (car (cdr (cdr (cadr tl)))))
+		  ":CHARPOS: " (number-to-string pos)
+		  "\n:END:\n"
+		  )
+	    (insert note "\n")))
+	  
+      ;; now store the annotations or do something
+      ))))
+
 (defun mandoku-annot-find ()
   (interactive)
   (let (beg end tl pos)
@@ -27,12 +73,17 @@
     (unless (looking-at mandoku-annot-drawer)
       (search-backward mandoku-annot-drawer))
     (forward-line -1)
-    (mandoku-remove-punct-and-markup (thing-at-point 'line))))
+    (list
+     (mandoku-remove-punct-and-markup (thing-at-point 'line))
+     (mandoku-position-at-point-internal))))
+
 
 (defun mandoku-annot-collect (beg end)
-  "Collect all annotations between beg and end. A new annotation
-begins in column 0 of a new line and at that position has to be a
-character from the line that is target of the annotation."
+  "This is called with beg as beginning and end as the end of an
+annotation drawer. It will collect all annotations between beg
+and end. A new annotation begins in column 0 of a new line and at
+that position has to be a character from the line that is target
+of the annotation."
   (let ((tl (mandoku-annot-targetline beg))
 	(buffer-invisibility-spec nil)
 	notes)
@@ -42,8 +93,9 @@ character from the line that is target of the annotation."
       (while (< (point) end)
 	(skip-chars-forward " ")
 	(when (or (looking-at ":")
-		  (string-match (char-to-string (char-after)) tl))
-	  (push (string-trim (buffer-substring-no-properties beg (- (point) 1))) notes)
+		  (string-match (char-to-string (char-after)) (car tl)))
+	  (push (string-trim
+		 (buffer-substring-no-properties beg (- (point) 1))) notes)
 	  (setq beg (point)))
 	(forward-line 1)
 	))
