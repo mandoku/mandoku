@@ -198,7 +198,7 @@ This should only be changed in rare circumstances. Four strings will be provided
 
 (defvar mandoku-kanji-regex "\\([㐀-鿿𠀀-𪛟]+\\)")
 
-(defvar mandoku-regex "<[^>]*>\\|[　-㏿＀-￯\n¶]+\\|\t[^\n]+\n")
+(defvar mandoku-regex "<[^>]*>\\|[　-㏿＀-￯\n¶]+\\|\t[^\n]+\n\\|^[ \t]\\|\n\\|^#[^\n]+\n")
 ;; that is: two uppercase characters, followed by a number and one or more upper or lowercase characters followed by 4 digits.
 (defvar mandoku-textid-regex  "[A-Z]\\{2\\}[0-9][A-z]+[0-9]\\{4\\}")
 
@@ -529,16 +529,15 @@ This should only be changed in rare circumstances. Four strings will be provided
 			   (expand-file-name "~/.emacs.d/init.el")))))
 	(with-current-buffer (find-file-noselect init-file)
 	  (goto-char (point-min))
-	  (if (not (search-forward "mandoku-base-dir" nil t))
-	      (progn
-		(goto-char (point-max))
-		(insert ";; --start-- added by mandoku installer\n")
-		(insert "(setq mandoku-base-dir \"" mandoku-base-dir "\")\n")
-		(insert ";; additional settings for mandoku: \n")
-		(insert "(load (concat user-emacs-directory \"mandoku-init\"))\n")
-		(insert "(mandoku-show-catalog)\n")
-		(insert ";; --end-- added by mandoku installer\n")
-		(save-buffer)))
+	  (unless (search-forward "mandoku-base-dir" nil t)
+            (goto-char (point-max))
+            (insert ";; --start-- added by mandoku installer\n")
+            (insert "(setq mandoku-base-dir \"" mandoku-base-dir "\")\n")
+            (insert ";; additional settings for mandoku: \n")
+            (insert "(load (concat user-emacs-directory \"mandoku-init\"))\n")
+            (insert "(mandoku-show-catalog)\n")
+            (insert ";; --end-- added by mandoku installer\n")
+            (save-buffer))
 	  (kill-buffer)))
       ;; create the other directories
       (dolist (sd mandoku-subdirs)
@@ -572,7 +571,8 @@ Do you want to download it now?"))
 	(progn
 	  (copy-file (expand-file-name "mandoku-init.el"
 				       (file-name-directory
-					(find-lisp-object-file-name 'mandoku-show-catalog (symbol-function 'mandoku-show-catalog)))) user-emacs-directory)
+					(find-lisp-object-file-name 'mandoku-show-catalog (symbol-function 'mandoku-show-catalog))))
+                     user-emacs-directory)
 	  (load "mandoku-init")
 	  ))
     (mandoku-read-titletables)
@@ -703,10 +703,11 @@ One character is either a character or one entity expression"
 	  (while (looking-at mandoku-regex)
 	    (forward-char (- (match-end 0) (match-beginning 0))))
 	  )
-	(if (looking-at ":zhu:")
-	    (progn
-	      (search-forward ":END:")
-	      (forward-char 1)))
+        (if (looking-at mandoku-annot-drawer)
+            (progn
+              (search-forward mandoku-annot-end)
+              (forward-char 1))
+          (forward-char 1))
 ))
 
 (defun mandoku-backward-one-char ()
@@ -1415,6 +1416,7 @@ that includes all text ids of texts that matched here."
   "This will always give the position in the base edition, except when forced to use <pb: with arg."
   (save-excursion
     (let ((p (or pnt (point)))
+          (buffer-invisibility-spec nil)
 	  (pb (if arg 
 		  "<pb:"
 		(or (if 
@@ -1425,8 +1427,7 @@ that includes all text ids of texts that matched here."
 		  "<pb:")))
 	  )
       (goto-char p)
-      (if 
-	  (re-search-backward pb nil t)
+      (if (re-search-backward pb nil t)
 	  (progn
 	    (re-search-forward ":\\([^_]*\\)_\\([^_]*\\)_\\([^_>]*\\)>" nil t)
 	    (let ((textid (match-string 1))
@@ -1437,8 +1438,8 @@ that includes all text ids of texts that matched here."
 		    (< (point) p )
 		    (re-search-forward "¶" (point-max) t))
 	      (setq line (+ line 1)))
-	    (list textid ed page line)))
-	(list " -- " " -- " " -- " 0))
+	    (list textid ed page line (mandoku-charcount-at-point-internal))))
+	(list " -- " " -- " " -- " 0 0))
       )))
 
 (defun mandoku-charcount-at-point-internal (&optional pnt)
@@ -2506,8 +2507,10 @@ Click on a link or move the cursor to the link and then press enter
     (replace-regexp-in-string "\\(\t.*\\)?\n" "" str)))
 
 (defun mandoku-remove-punct-and-markup (str)
-  (comment-string-strip (replace-regexp-in-string "\\([　-㏿！-￮]\\)" ""
-			    (mandoku-remove-markup str)) t t ))
+  (comment-string-strip
+   (replace-regexp-in-string "\\([　-㏿！-￮]\\)" ""
+                             (mandoku-remove-markup str))
+   t t ))
 
 (defun mandoku-split-string (str)
   "Given a string of the form \"str1::str2\", return a list of

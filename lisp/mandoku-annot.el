@@ -55,14 +55,17 @@
 
 (defun mandoku-annot-find ()
   (interactive)
-  (let (beg end tl pos)
+  (let (beg end tl bline pos)
     (while (search-forward mandoku-annot-start)
       (setq beg (point))
       (setq tl (mandoku-annot-targetline))
-      (setq pos (mandoku-position-at-point-internal))
+      (setq bline (save-excursion
+                    (forward-line -2)
+                    (point)))
+      (setq pos (mandoku-position-at-point-internal bline))
       (search-forward mandoku-annot-end)
       (setq end (point))
-      (setq (mandoku-annot-collect beg end)
+      (setq txx (mandoku-annot-collect beg end)
       ;; now store the annotations or do something
       ))))
 
@@ -74,7 +77,7 @@
       (search-backward mandoku-annot-drawer))
     (forward-line -1)
     (list
-     (mandoku-remove-punct-and-markup (thing-at-point 'line))
+     (thing-at-point 'line)
      (mandoku-position-at-point-internal))))
 
 
