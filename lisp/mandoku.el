@@ -707,7 +707,8 @@ One character is either a character or one entity expression"
             (progn
               (search-forward mandoku-annot-end)
               (forward-char 1))
-          (forward-char 1))
+          ;(forward-char 1)
+          )
 ))
 
 (defun mandoku-backward-one-char ()
@@ -2668,18 +2669,6 @@ done
       (make-directory cd))
     (unless (file-exists-p (concat cd branch))
       (mandoku-shell-command mandoku-git-program (format " clone -b %s --single-branch %s %s/%s" branch fn cd branch)))))
-
-(defun mandoku-re-seq (regexp string &optional n)
-  "Get a list of all regexp matches in a string, n is the matchstring, if relevant."
-  (save-match-data
-    (let ((pos 0)
-          (mn (or n 0))
-          matches)
-      (while (string-match regexp string pos)
-        (push (match-string mn string) matches)
-        (setq pos (match-end 0)))
-     (reverse matches))))
-
 
 ;; git config --global credential.helper wincred
 ;; one more
