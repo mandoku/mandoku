@@ -2420,6 +2420,7 @@ Click on a link or move the cursor to the link and then press enter
     (save-buffer)
     (mandoku-view-mode)
     (show-all)
+    (goto-char (point-min))
   )))
 
 (defun mandoku-list-local-texts (&optional directory)
@@ -2667,6 +2668,18 @@ done
       (make-directory cd))
     (unless (file-exists-p (concat cd branch))
       (mandoku-shell-command mandoku-git-program (format " clone -b %s --single-branch %s %s/%s" branch fn cd branch)))))
+
+(defun mandoku-re-seq (regexp string &optional n)
+  "Get a list of all regexp matches in a string, n is the matchstring, if relevant."
+  (save-match-data
+    (let ((pos 0)
+          (mn (or n 0))
+          matches)
+      (while (string-match regexp string pos)
+        (push (match-string mn string) matches)
+        (setq pos (match-end 0)))
+     (reverse matches))))
+
 
 ;; git config --global credential.helper wincred
 ;; one more
