@@ -77,7 +77,7 @@
       (search-backward mandoku-annot-drawer))
     (forward-line -1)
     (list
-     (thing-at-point 'line)
+     (thing-at-point 'line t)
      (mandoku-position-at-point-internal))))
 
 
