@@ -183,6 +183,8 @@ This should only be changed in rare circumstances. Four strings will be provided
 ;; (defvar mandoku-catalog-user-path-list nil)
 ;;;###autoload
 (defvar mandoku-titles-by-date nil)
+(defvar mandoku-titles-by-taisho nil "Lookup table for titles by Taisho volume or number.")
+(defvar mandoku-titles-file nil "Title table, includes mappings to other collections.")
 (defvar mandoku-git-use-http t)
 (defvar mandoku-gaiji-images-path nil)
 
@@ -386,7 +388,29 @@ This should only be changed in rare circumstances. Four strings will be provided
 	  (add-to-list 'mandoku-local-index-list (match-string 0))))
       ))
 )
+(defun mandoku-read-txt-titles ()
+  "This is the table which also includes references to other collections."
+;  (interactive)
+  (setq mandoku-titles-by-taisho (make-hash-table :test 'equal))
+  (when (file-exists-p mandoku-titles-file)
+    (with-temp-buffer
+      (let ((coding-system-for-read 'utf-8)
+	    textid line vol otherid)
+	(insert-file-contents mandoku-titles-file)
+	(goto-char (point-min))
+	(while (not (eobp))
+	  (if (looking-at "KR")
+	      (progn
+		(setq line (split-string (thing-at-point 'line t)))
+		(setq textid (car line))
+		(dolist (l (cdr line))
 
+		)
+	    (forward-line 1)
+	    ))
+  
+	  )))))
+	
 (defun mandoku-read-titletables () 
   "read the titles table"
   (interactive)
@@ -563,10 +587,15 @@ Do you want to download it now?"))
 	    (if (file-exists-p (expand-file-name "krp-by-date.txt" mandoku-ws-settings))
 		(expand-file-name "krp-by-date.txt" mandoku-ws-settings)
 	      (expand-file-name "krp-by-date.txt" (concat md "/system"))))
-      
-    (if (not (file-exists-p mandoku-titles-by-date))
-	(url-copy-file "https://raw.githubusercontent.com/kanripo/KR-Workspace/master/Settings/krp-by-date.txt"  (expand-file-name "krp-by-date.txt" (concat md "/system"))))
-    (setq mandoku-local-init-file (expand-file-name (concat user-emacs-directory "/mandoku-init.el")))
+      (if (not (file-exists-p mandoku-titles-by-date))
+	  (url-copy-file "https://raw.githubusercontent.com/kanripo/KR-Workspace/master/Settings/krp-by-date.txt"  (expand-file-name "krp-by-date.txt" (concat md "/system"))))
+      (setq mandoku-titles-file
+	    (if (file-exists-p (expand-file-name "krp-titles.txt" mandoku-ws-settings))
+		(expand-file-name "krp-titles.txt" mandoku-ws-settings)
+	      (expand-file-name "krp-titles.txt" (concat md "/system"))))
+      (if (not (file-exists-p mandoku-titles-file))
+	  (url-copy-file "https://raw.githubusercontent.com/kanripo/KR-Workspace/master/Settings/krp-titles.txt"  (expand-file-name "krp-titles.txt" (concat md "/system"))))
+      (setq mandoku-local-init-file (expand-file-name (concat user-emacs-directory "/mandoku-init.el")))
     (if (not (file-exists-p mandoku-local-init-file))
 	(progn
 	  (copy-file (expand-file-name "mandoku-init.el"
@@ -742,8 +771,20 @@ One character is either a character or one entity expression"
     (goto-char (point-min))
     (search-forward "
 * " nil t)
-    (car (split-string  (org-get-heading))))
-)
+    (car (split-string  (org-get-heading)))))
+
+(defun mandoku-open-textfile ()
+  "Looks at point and tries to open it as a mandoku link"
+  (interactive)
+  (when (string-match "KR" (thing-at-point 'symbol))
+    (save-excursion
+      (let ((bounds (bounds-of-thing-at-point 'symbol))
+	    b2 page)
+	(forward-thing 'symbol 1)
+	(when (looking-at ":")
+	    (forward-char)
+	    (setq bounds (cons (car bounds) (cdr (bounds-of-thing-at-point 'symbol)))))
+	(mandoku-link-open (buffer-substring-no-properties (car bounds) (cdr bounds)))))))
 
 (defun mandoku-find-cit-from-region (beg end &optional step)
   (interactive "r")
