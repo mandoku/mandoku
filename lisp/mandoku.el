@@ -1394,7 +1394,12 @@ that includes all text ids of texts that matched here."
       ))
 
 (defun mandoku-execute-file-search (s)
-"Go to the line indicated by s format is pagenumber:line or maybe 462a12"
+"Go to the line indicated by s format is pagenumber:line or maybe
+462a12. To disambiguate from other matches, a '>' character will
+be appended. Optionally, a search term is appended after a
+separator '::'. A character number can also be indicated with a
+separator ':'. 14a03:1::或 will thus go go page 14a, line 3,
+first character and highlight '或'."
   (when (or (eq major-mode 'mandoku-view-mode) (eq major-mode 'org-mode))
     (let* (
 	   (page
@@ -1408,16 +1413,19 @@ that includes all text ids of texts that matched here."
 		s))))
 	   (line (if (posix-string-match "[a-o]." s)
 		     (string-to-number (car (cdr  (split-string (car (split-string s "::")) "[a-o]"))))
-		 0))
+		   0))
+	   (char (string-to-int  (or (cadr (split-string s ":")) "")))
 	   (search (if (posix-string-match "::" s)
 		       (car (cdr (split-string s "::")))
 		     nil)))
     (goto-char (point-min))
-    (re-search-forward page nil t)
+    (re-search-forward (concat page ">") nil t)
     (while (< -1 line)
       (re-search-forward "¶" nil t)
       (+ (point) 1)
       (setq line (- line 1)))
+    ;; not sure about this...
+    (goto-char (+ (point) char))
     (if (equal (string-to-char s) ?#)
 	(org-back-to-heading t)
       (beginning-of-line-text))
@@ -2710,6 +2718,43 @@ done
       (make-directory cd))
     (unless (file-exists-p (concat cd branch))
       (mandoku-shell-command mandoku-git-program (format " clone -b %s --single-branch %s %s/%s" branch fn cd branch)))))
+;; file maintenance
+
+(defun mandoku-remove-zhu-and-trans (textid)
+  (mandoku-map-textid-files textid 'mandoku-remove-zhu)
+  (mandoku-map-textid-files textid 'mandoku-remove-trans))
+
+(defun mandoku-map-textid-files (textid func)
+  (let ((tdir (concat mandoku-text-dir (substring textid 0 4) "/" textid)))
+    (mapcar func (directory-files tdir t ".*txt$" ))))
+
+(defun mandoku-remove-zhu (file)
+  "This removes the zhu from the file"
+  (with-current-buffer (find-file-noselect file)
+    (fundamental-mode)
+    (goto-char (point-min))
+    (while (search-forward mandoku-annot-start nil t)
+      (setq beg (match-beginning 0))
+      (search-forward mandoku-annot-end)
+      (setq end (match-end 0))
+      (delete-region beg end))
+    (save-buffer)
+    (kill-buffer)))
+
+(defun mandoku-remove-trans (file)
+  "Remove translation (everything to the right of the tab) from
+the file."
+  (with-current-buffer (find-file-noselect file)
+    (fundamental-mode)
+    (goto-char (point-min))
+    (while (re-search-forward "\t.*" nil t)
+      (delete-region (match-beginning 0) (match-end 0)))
+    (save-buffer)
+    (kill-buffer)))
+
+
+
+
 
 ;; git config --global credential.helper wincred
 ;; one more

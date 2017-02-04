@@ -37,36 +37,31 @@ LINK will consist of a <textid> recognized by mandoku."
 			  coll)))
 	 (filename  (ignore-errors (if (equal coll "meta")
 			(mandoku-meta-textid-to-file textid)
-		      (concat "/"  (substring textid 0 4) "/" (substring textid 0 8) "/" fname)))))
+			(concat "/"  (substring textid 0 4) "/" (substring textid 0 8) "/" fname))))
+	 ftopen)
 					;    (message (format "%s" page))
     (if (equal coll "*")
 	;; we search for
 	(mandoku-display-subcoll textid)
       (if (equal coll "meta")
 	  ;; this does a headline only search in meta; we need to have the ID on the headline for this to work
-	  (org-open-file filename  t nil (concat "#" textid)) 
-					;      (message (format "%s" (concat mandoku-meta-dir  textid ".org" )))
-	(if (file-exists-p (concat mandoku-text-dir filename))
-	    (ignore-errors (org-open-file (concat mandoku-text-dir "/" filename) t nil 
-			 ;;(or src page))
-			  (if src 
-			      (concat page "::" src)
-			    page)))
-	(if (file-exists-p (concat mandoku-text-dir (replace-in-string filename (concat textid ".txt") "Readme.org" )))
-	  (ignore-errors (org-open-file (concat mandoku-text-dir (replace-in-string filename (concat textid ".txt") "Readme.org" )) t nil 
-			 ;;(or src page))
-			  (if src 
-			      (concat page "::" src)
-			    page)))
-	  (if (file-exists-p (concat mandoku-temp-dir fname))
-	      (ignore-errors (org-open-file (concat mandoku-temp-dir fname) t nil 
-			   (if (< 0 (length src ))
-			       (concat page "::" src)
-			     page)))
+	  (org-open-file filename  t nil (concat "#" textid))
+	(setq ftopen
+	      (if (file-exists-p (concat mandoku-text-dir filename))
+		  (concat mandoku-text-dir filename)
+		(if (file-exists-p (concat mandoku-text-dir (replace-in-string filename (concat textid ".txt") "Readme.org" )))
+		    (concat mandoku-text-dir (replace-in-string filename (concat textid ".txt") "Readme.org" ))
+		  (if (file-exists-p (concat mandoku-temp-dir fname))
+		      (concat mandoku-temp-dir fname)
+		    nil))))
+	(if ftopen
+	    (progn
+	      (find-file-other-window ftopen)
+	      (mandoku-execute-file-search (string-join (cdr (split-string link ":")) ":")))
 	  (mandoku-open-remote-file filename src page)
 	  )
 	  (outline-show-all)
-	  ))))))
+	  ))))
 
 
 
