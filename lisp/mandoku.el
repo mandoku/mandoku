@@ -1394,13 +1394,15 @@ that includes all text ids of texts that matched here."
       ))
 
 (defun mandoku-execute-file-search (s)
-"Go to the line indicated by s format is pagenumber:line or maybe
+  "Go to the line indicated by s format is pagenumber:line or maybe
 462a12. To disambiguate from other matches, a '>' character will
 be appended. Optionally, a search term is appended after a
 separator '::'. A character number can also be indicated with a
 separator ':'. 14a03:1::或 will thus go go page 14a, line 3,
 first character and highlight '或'."
-  (when (or (eq major-mode 'mandoku-view-mode) (eq major-mode 'org-mode))
+  (when (or (eq major-mode 'mandoku-view-mode)
+	  (eq major-mode 'mandoku-tls-view-mode)
+	  (eq major-mode 'org-mode))
     (let* (
 	   (page
 	    (if (equal (string-to-char s) ?#)
@@ -1418,8 +1420,10 @@ first character and highlight '或'."
 	   (search (if (posix-string-match "::" s)
 		       (car (cdr (split-string s "::")))
 		     nil)))
-    (goto-char (point-min))
-    (re-search-forward (concat page ">") nil t)
+      (goto-char (point-min))
+      (if (equal (string-to-char s) ?#)
+	  (re-search-forward page nil t)
+	(re-search-forward (concat page ">") nil t))
     (while (< -1 line)
       (re-search-forward "¶" nil t)
       (+ (point) 1)
