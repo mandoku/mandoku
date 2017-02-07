@@ -307,6 +307,11 @@ We should check if the file exists before cloning!"
   (cl-loop for fork in (oref (gh-repos-user-list (gh-repos-api "api")) :data)
 	 collect (car (last (split-string (oref fork :html-url) "/"))))))
 
+(defun mandoku-gh-org-repos (org)
+  (remove-if-not #'mandoku-kr-rep-p
+  (cl-loop for fork in (oref (gh-repos-org-list (gh-repos-api "api") org) :data)
+	 collect (car (last (split-string (oref fork :html-url) "/"))))))
+
 (defun mandoku-get-user-repos-from-gh()
   "Gets the user's repos not already available locally"
   (interactive)
