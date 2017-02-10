@@ -25,13 +25,63 @@
 
 ** Installing a bundle for Windows
 
+      
+
+*** (A) The Sinomacs bundle
+:PROPERTIES:
+:CUSTOM_ID: sinomacs
+:END:
+
+    This is now the preferred version for Windows, since it not only
+    installs the Mandoku package, but the whole [[http://github.com/mandoku/sinomacs][Sinomacs]] customization
+    for Emacs.  New users should find it easier to work with this
+    package.  As I found some problems with the binary of Emacs 25.1,
+    for the time being the included version is 24.5. This is still
+    very new and might not work as expected.  If you encounter
+    problems, please raise an [[https://github.com/mandoku/sinomacs/issues][issue on the Github site]]. You might also
+    try the older =Mandoku= bundle below.
+
+    The installation procedure is simple:
+
+   1. Download the installation bundle [[file:data/sinomacs-bundle-2017-02.zip][sinomacs-bundle-2017-02.zip]]
+      (200MB).
+   2. Double-click on the package and move the folder =krp=, which is
+      found inside the package to a destination on a root directory of
+      your computer, such as =C:=, =D:= and so on as a destination.
+   3. Within the folder =krp=, navigate to the =bin= folder found
+      there and then click on the file "*start-mandoku*", which is a
+      batchfile that sets up the environment and then starts
+      Emacs. This file can also be accessed through a shortcut placed
+      on the the Desktop, so you can easily find it next time. To make
+      such a shortcut, right-click on the file "start-mandoku" and
+      select "Send-to", then "Desktop (create shortcut)". You will
+      then be able to use that shortcut to start Emacs (and Mandoku)
+      next time.  Alternatively, you can also pin it to the taskbar
+      for convenient access.
+   4. When started for the first time, Emacs will install Sinomacs and
+      other packages that are required.  It will also try to install a
+      workspace from your GitHub user account.  For best results, you
+      should use this workspace and thus have your credentials for
+      GitHub ready.  Emacs will ask you for your account name and the
+      password. This will be used to ask the GitHub site to create a
+      "token" for you. This token is stored and used for subsequent
+      access from this machine; you will need the password only once
+      and it will not be stored.  The startup process might take a
+      while, but this is only necessary for the first time.
+
+
+*** (B) The mandoku bundle
+:PROPERTIES:
+:CUSTOM_ID: mandoku
+:END:
+
    The bundle for Windows has been tested on Windows 8 and 10.  It
    might work on earlier versions, but there might also be problems.
    Currently there is no 32 bit version of the package. The Emacs
    application included in the =Mandoku= package below is version 25.1
    from [[https://github.com/chuntaro/NTEmacs64][the NTemacs
    project]], this is known to work with the input methods for Chinese
-   and Japanese.
+   and Japanese. The installation procedure is similar to Sinomacs:
    
    1. The =Mandoku= bundle includes a version of the =git=
       program, which is used to download and update necessary
@@ -67,7 +117,6 @@
       and it will not be stored.  The startup process might take a
       while, but this is only necessary for the first time.
 
-      
 
 ** Installing Mandoku on a Macintosh computer
 
@@ -91,6 +140,7 @@
 (package-initialize)
 (package-refresh-contents)
 (package-install 'mandoku)
+(mandoku-show-catalog)
 )
 #+END_EXAMPLE
 

@@ -24,27 +24,12 @@
   - [[http:mandoku-format-en.html][The Mandoku text format]]
 
 * Status
-
-  [2011-06-17] The project has not yet been publically announced,
-  because at the moment, there is not much to be seen here.  Once that
-  changes, I will make an announcement and remove this silly notice.
-
-  [2013-07-09] A built of Emacs 24.3 that allows the display of
-  Unicode Ext. B characters can be found [[file:data/Emacs24.3+2013-07-03.dmg.zip][here]].
-
-  [2013-09-26] [[file:mandoku-install-en.html][Installation instructions]] for a preview version are now available.
-
-  [2014-01-13] [[file:mandoku-install-en.html][updated Installation instructions]] for a preview version.
-
-  [2014-09-27] a new preview version is available, see
-  [[file:mandoku-install-en.html][Installation instructions]]
-
-  [2015-11-27] updated installation instructions and a new preview
-  version available [[file:mandoku-install-en.html][Installation
-  instructions]]:
-
-  [2016-03-01] updated installation instructions and a new version available.
-  [[file:mandoku-install-en.html][Installation  instructions]]:
+  [2017-02-09] I now renamed the package to *Sinomacs*, the repository
+  is [[https://github.com/mandoku/sinomacs][on Github here]]. There is also a bundle for Windows users, it
+  contains the Emacs program and some other supporting programs in one
+  big archive.  The download of the latest version is here:
+  [[file:data/sinomacs-bundle-2017-02.zip][sinomacs-bundle-2017-02.zip]].  See the updated installation
+  instrucions under [[file:mandoku-install-en.html#sinomacs][=Sinomacs=]].
 
   [2017-01-09] New installation procedure: To make installation
   easier, I am trying a new procedure with a slightly modified version
@@ -53,7 +38,25 @@
   change some of the keybindings in the future.  The forked package is
   here: [[https://github.com/cwittern/easymacs][Easymacs-Mandoku]].
 
+  [2016-03-01] updated installation instructions and a new version is
+  available.  [[file:mandoku-install-en.html][Installation instructions]]:
 
+  [2015-11-27] updated installation instructions and a new preview
+  version available [[file:mandoku-install-en.html][Installation instructions]]:
+
+  [2014-09-27] a new preview version is available, see
+  [[file:mandoku-install-en.html][Installation instructions]]
+
+  [2014-01-13] [[file:mandoku-install-en.html][updated Installation instructions]] for a preview version.
+
+  [2013-09-26] [[file:mandoku-install-en.html][Installation instructions]] for a preview version are now available.
+
+  [2013-07-09] A built of Emacs 24.3 that allows the display of
+  Unicode Ext. B characters can be found [[file:data/Emacs24.3+2013-07-03.dmg.zip][here]].
+
+  [2011-06-17] The project has not yet been publically announced,
+  because at the moment, there is not much to be seen here.  Once that
+  changes, I will make an announcement and remove this silly notice.
 
 * Software
   The software for using Mandoku texts falls in two broad categories:
@@ -67,7 +70,7 @@
   as you like and drop me a line if you are stuck.
   
 ** Interface software
-*** Emacs
+*** Emacs (UPDATE: see Sinomacs and the instructions above)
     A set of Emacs lisp files, that together form a working
     environment for comfortable dealing with the texts.  The advantage
     of using Emacs lies in the fact, that it can make use of the large
@@ -109,4 +112,3 @@
    Language - Official Website]]), these are available in the python directories.
 
 
-   
