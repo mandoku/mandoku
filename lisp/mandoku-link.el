@@ -139,7 +139,7 @@ LINK will consist of a <textid> recognized by mandoku."
 		    (mandoku-remove-markup region )
 		    "〔" title  ", [[mandoku:" textid  ":" (substring start 0 -3)  "]["  start  "]]〕\n"
 		    )))
-      (message "Please select text and use C-l to store the citation first."))))
+      (message (substitute-command-keys "Please select text and use `\\[org-store-link]' to store the citation first.")))))
 
 
 (defun mandoku-link-insert-as-citation (&optional plink)
@@ -161,7 +161,7 @@ LINK will consist of a <textid> recognized by mandoku."
 		    "』" 
 		    "〔" title  ", [[cite:" textid  "]["  start  "]]〕\n"
 		    )))
-      (message "Please select text and use C-l to store the citation first.")))
+      (message (substitute-command-keys "Please select text and use `\\[org-store-link]' to store the citation first."))))
 
 
 (provide 'mandoku-link)
