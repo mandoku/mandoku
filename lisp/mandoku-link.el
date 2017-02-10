@@ -113,8 +113,9 @@ LINK will consist of a <textid> recognized by mandoku."
       (mandoku-link-insert-link)
 )  
 
-(defun mandoku-link-insert-link (&optional plink)
+(defun mandoku-link-insert-link (&optional plink head)
   "insert the most recent link"
+  (interactive)
   (let* ((link (or plink
 		   mandoku-store-link-plist
 		   org-store-link-plist))
@@ -125,14 +126,43 @@ LINK will consist of a <textid> recognized by mandoku."
 	 (start (plist-get link :start))
 	 (end (or (plist-get link :end) ""))
 	 )
-    (insert (concat "** " start " - " end  " " title "\n:PROPERTIES:\n:edition: " edition
+    (if link
+	(progn
+	  (when head
+	    (insert (concat "** " start " - " end  " " title "\n:PROPERTIES:\n:edition: " edition
 		    "\n:date: " (format-time-string "%Y-%m-%dT%T%z" (current-time))
-		    "\n:END:\n\n"
+		    "\n:END:\n\n")))
+	  (insert (concat
+		     "『"
+		    (mandoku-remove-markup region )
+		    "』"
 		    (mandoku-remove-markup region )
 		    "〔" title  ", [[mandoku:" textid  ":" (substring start 0 -3)  "]["  start  "]]〕\n"
 		    )))
-	 
-)
+      (message "Please select text and use C-l to store the citation first."))))
+
+
+(defun mandoku-link-insert-as-citation (&optional plink)
+  "insert the most recent link"
+  (interactive)
+  (let* ((link (or plink
+		   mandoku-store-link-plist
+		   org-store-link-plist))
+	 (region (plist-get link :region))
+	 (edition (plist-get link :edition))
+	 (textid (plist-get link :textid))
+	 (title (plist-get link :title))
+	 (start (plist-get link :start))
+	 (end (or (plist-get link :end) ""))
+	 )
+    (if link
+	(insert (concat "『"
+		    (mandoku-remove-markup region )
+		    "』" 
+		    "〔" title  ", [[cite:" textid  "]["  start  "]]〕\n"
+		    )))
+      (message "Please select text and use C-l to store the citation first.")))
+
 
 (provide 'mandoku-link)
 
