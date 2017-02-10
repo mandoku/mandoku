@@ -688,7 +688,9 @@ Do you want to download it now?"))
 ;;;###autoload
 (defun mandoku-search-text (search-for)
   (interactive 
-   (let ((search-for (mapconcat 'char-to-string (mandoku-next-three-chars) "")))
+   (let ((search-for
+	  (replace-regexp-in-string "\\([　-㏿！-￮]\\)" ""
+				    (mapconcat 'char-to-string (mandoku-next-three-chars) ""))))
      (list (read-string "Search for: " search-for))))
   (let ((index-buffer (get-buffer-create "*temp-mandoku*"))
 	(result-buffer (get-buffer-create "*Mandoku Index*"))
@@ -716,60 +718,60 @@ Do you want to download it now?"))
 	(push (char-after) chr)))
     (reverse chr)))
 
-(defun mandoku-forward-one-char ()
-  (save-match-data
-    (cond
-     ((looking-at "&[^;]*;")
-      (forward-char (- (match-end 0) (match-beginning 0))))
-     ((looking-at mandoku-annot-drawer)
-      (search-forward mandoku-annot-end)
-      (mandoku-forward-one-char))
-     ((looking-at "[:#	]")
-      (forward-line 1)
-      (mandoku-forward-one-char))
-     ((looking-at "*")
-      (forward-char 1)
-      (mandoku-forward-one-char))
-     ((looking-at "[ 　-㏿＀-￯\n¶]")
-      (forward-char 1)
-      (mandoku-forward-one-char))
-     ((looking-at mandoku-regex)
-      (forward-char (- (match-end 0) (match-beginning 0)))
-      (mandoku-forward-one-char))
-     ((looking-at mandoku-kanji-regex)
-      (forward-char 1)
-      )
-     ;; ( t
-     ;;   (mandoku-forward-one-char)
-     ;;   ))
-  )))
-
 ;; (defun mandoku-forward-one-char ()
-;; 	"this function moves forward one character, ignoring punctuation and markup
-;; One character is either a character or one entity expression"
-;; ;	(interactive)
-;; 	(ignore-errors
-;; 	(save-match-data
-;; 	  (if (looking-at "&[^;]*;")
-;; 	      (forward-char (- (match-end 0) (match-beginning 0)))
-;; 	    (if (looking-at mandoku-annot-drawer)
-;; 		(progn
-;; 		  (search-forward mandoku-annot-end)
-;; 		  (forward-char 1))
-;; 	      (forward-char 1)))
-;; 	;; this skips over newlines, punctuation and markup.
-;; 	;; Need to expand punctuation regex [2001-03-15T12:30:09+0800]
-;; 	;; this should now skip over most ideogrph punct
-;; 	  (while (looking-at mandoku-regex)
-;; 	    (forward-char (- (match-end 0) (match-beginning 0))))
-;; 	  )
-;;         (if (looking-at mandoku-annot-drawer)
-;;             (progn
-;;               (search-forward mandoku-annot-end)
-;;               (forward-char 1))
-;;           ;(forward-char 1)
-;;           )
-;; ))
+;;   (save-match-data
+;;     (cond
+;;      ((looking-at "&[^;]*;")
+;;       (forward-char (- (match-end 0) (match-beginning 0))))
+;;      ((looking-at mandoku-annot-drawer)
+;;       (search-forward mandoku-annot-end)
+;;       (mandoku-forward-one-char))
+;;      ((looking-at "[:#	]")
+;;       (forward-line 1)
+;;       (mandoku-forward-one-char))
+;;      ((looking-at "*")
+;;       (forward-char 1)
+;;       (mandoku-forward-one-char))
+;;      ((looking-at "[ 　-㏿＀-￯\n¶]")
+;;       (forward-char 1)
+;;       (mandoku-forward-one-char))
+;;      ((looking-at mandoku-regex)
+;;       (forward-char (- (match-end 0) (match-beginning 0)))
+;;       (mandoku-forward-one-char))
+;;      ((looking-at mandoku-kanji-regex)
+;;       (forward-char 1)
+;;       )
+;;      ;; ( t
+;;      ;;   (mandoku-forward-one-char)
+;;      ;;   ))
+;;   )))
+
+(defun mandoku-forward-one-char ()
+	"this function moves forward one character, ignoring punctuation and markup
+One character is either a character or one entity expression"
+;	(interactive)
+	(ignore-errors
+	(save-match-data
+	  (if (looking-at "&[^;]*;")
+	      (forward-char (- (match-end 0) (match-beginning 0)))
+	    (if (looking-at mandoku-annot-drawer)
+		(progn
+		  (search-forward mandoku-annot-end)
+		  (forward-char 1))
+	      (forward-char 1)))
+	;; this skips over newlines, punctuation and markup.
+	;; Need to expand punctuation regex [2001-03-15T12:30:09+0800]
+	;; this should now skip over most ideogrph punct
+	  (while (looking-at mandoku-regex)
+	    (forward-char (- (match-end 0) (match-beginning 0))))
+	  )
+        (if (looking-at mandoku-annot-drawer)
+            (progn
+              (search-forward mandoku-annot-end)
+              (forward-char 1))
+          ;(forward-char 1)
+          )
+))
 
 (defun mandoku-backward-one-char ()
 	"this function moves backward one character, ignoring punctuation and markup
