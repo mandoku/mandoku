@@ -258,7 +258,9 @@ This should only be changed in rare circumstances. Four strings will be provided
   (defvar mandoku-sys-dir (expand-file-name  (concat mandoku-base-dir "system/")))
   (defvar mandoku-user-dir (expand-file-name  (concat mandoku-base-dir "user/")))
   (defvar mandoku-work-dir (expand-file-name  (concat mandoku-base-dir "work/")))
-  (defvar mandoku-filters-dir (expand-file-name  (concat mandoku-work-dir "filters/")))
+  (defvar mandoku-filters-dir (if (file-exists-p (concat mandoku-base-dir "KR-Workspace/Texts/"))
+				  (expand-file-name (concat mandoku-base-dir "KR-Workspace/Texts/"))
+			       (expand-file-name  (concat mandoku-work-dir "filters/"))))
 ;;housekeeping files
   (defvar mandoku-log-file (concat mandoku-sys-dir "mandoku.log"))
   (defvar mandoku-local-catalog (concat mandoku-meta-dir "local-texts.txt"))
@@ -2005,6 +2007,22 @@ BEG and END default to the buffer boundaries."
   (mandoku-index-sort-func ?R "HITS")
   (message "Sorted the index with the number of hits as sort key."))
 
+(defun mandoku-index-toggle-variant-matches ()
+  "Redisplay the *Mandoku Index* with the inverse setting for
+variant matches."
+  (interactive)  
+  (let (
+	(index-buffer (get-buffer "*temp-mandoku*"))
+	(result-buffer (current-buffer))
+	(search-string mandoku-search-for))
+    (set-buffer result-buffer)
+    (setq buffer-read-only nil)
+    (erase-buffer)
+    (setq mandoku-index-all-editions (not mandoku-index-all-editions))
+    (mandoku-read-index-buffer index-buffer result-buffer search-string)
+  (message "Redisplayed the index with the variant count as sort key.")))
+
+
 (defun mandoku-index-sort-ncnt ()
   "sort the result index by the ngram count, this has been saved in the property NCNT"
   (interactive)
@@ -2139,6 +2157,7 @@ BEG and END default to the buffer boundaries."
     (define-key map "i" 'mandoku-index-sort-id)
     (define-key map "h" 'mandoku-index-sort-hits)
     (define-key map "n" 'mandoku-index-sort-ncnt)
+    (define-key map "v" 'mandoku-index-toggle-variant-matches)
          map)
   "Keymap for mandoku-index mode"
 )
