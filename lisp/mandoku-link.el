@@ -1,6 +1,6 @@
 ;; linking for mandoku files
 ;; cwittern@gmail.com [2014-05-20T19:57:42+0900]
-
+(require 'subr-x)
 (if (fboundp 'org-link-set-parameters)
     (org-link-set-parameters "mandoku"
                  :follow #'mandoku-link-open

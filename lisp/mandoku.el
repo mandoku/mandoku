@@ -72,11 +72,15 @@
   :type '(string)
   :group 'mandoku-user)
 
+(defcustom mandoku-index-all-editions nil "If not nil, then display all editions in the Mandoku Index display."
+  :type '(string)
+  :group 'mandoku-user)
+
 (defcustom mandoku-annot-drawer ":zhu:" "Start of a mandoku annotation. The end will always be :end: on a line by itself. Restart mandoku after changing this. Existing annotations will not be updated."
   :type '(string)
   :group 'mandoku)
 
-(defvar mandoku-annot-start (concat mandoku-annot-drawer "\n"))
+(defvar mandoku-annot-start (concat "\n\s*" mandoku-annot-drawer "\n"))
 (defconst mandoku-annot-end ":end:\n")
 
   
@@ -712,33 +716,60 @@ Do you want to download it now?"))
 	(push (char-after) chr)))
     (reverse chr)))
 
-
 (defun mandoku-forward-one-char ()
-	"this function moves forward one character, ignoring punctuation and markup
-One character is either a character or one entity expression"
-;	(interactive)
-	(ignore-errors
-	(save-match-data
-	  (if (looking-at "&[^;]*;")
-	      (forward-char (- (match-end 0) (match-beginning 0)))
-	    (if (looking-at mandoku-annot-drawer)
-		(progn
-		  (search-forward mandoku-annot-end)
-		  (forward-char 1))
-	      (forward-char 1)))
-	;; this skips over newlines, punctuation and markup.
-	;; Need to expand punctuation regex [2001-03-15T12:30:09+0800]
-	;; this should now skip over most ideogrph punct
-	  (while (looking-at mandoku-regex)
-	    (forward-char (- (match-end 0) (match-beginning 0))))
-	  )
-        (if (looking-at mandoku-annot-drawer)
-            (progn
-              (search-forward mandoku-annot-end)
-              (forward-char 1))
-          ;(forward-char 1)
-          )
-))
+  (save-match-data
+    (cond
+     ((looking-at "&[^;]*;")
+      (forward-char (- (match-end 0) (match-beginning 0))))
+     ((looking-at mandoku-annot-drawer)
+      (search-forward mandoku-annot-end)
+      (mandoku-forward-one-char))
+     ((looking-at "[:#	]")
+      (forward-line 1)
+      (mandoku-forward-one-char))
+     ((looking-at "*")
+      (forward-char 1)
+      (mandoku-forward-one-char))
+     ((looking-at "[ 　-㏿＀-￯\n¶]")
+      (forward-char 1)
+      (mandoku-forward-one-char))
+     ((looking-at mandoku-regex)
+      (forward-char (- (match-end 0) (match-beginning 0)))
+      (mandoku-forward-one-char))
+     ((looking-at mandoku-kanji-regex)
+      (forward-char 1)
+      )
+     ;; ( t
+     ;;   (mandoku-forward-one-char)
+     ;;   ))
+  )))
+
+;; (defun mandoku-forward-one-char ()
+;; 	"this function moves forward one character, ignoring punctuation and markup
+;; One character is either a character or one entity expression"
+;; ;	(interactive)
+;; 	(ignore-errors
+;; 	(save-match-data
+;; 	  (if (looking-at "&[^;]*;")
+;; 	      (forward-char (- (match-end 0) (match-beginning 0)))
+;; 	    (if (looking-at mandoku-annot-drawer)
+;; 		(progn
+;; 		  (search-forward mandoku-annot-end)
+;; 		  (forward-char 1))
+;; 	      (forward-char 1)))
+;; 	;; this skips over newlines, punctuation and markup.
+;; 	;; Need to expand punctuation regex [2001-03-15T12:30:09+0800]
+;; 	;; this should now skip over most ideogrph punct
+;; 	  (while (looking-at mandoku-regex)
+;; 	    (forward-char (- (match-end 0) (match-beginning 0))))
+;; 	  )
+;;         (if (looking-at mandoku-annot-drawer)
+;;             (progn
+;;               (search-forward mandoku-annot-end)
+;;               (forward-char 1))
+;;           ;(forward-char 1)
+;;           )
+;; ))
 
 (defun mandoku-backward-one-char ()
 	"this function moves backward one character, ignoring punctuation and markup
@@ -1050,7 +1081,9 @@ One character is either a character or one entity expression"
 	     (location (split-string (match-string 3) ":" ))
 	     (branches (remove "n" (split-string extra)))
 	     (txtf (concat filter  (car location)
-			   (when branches (concat "@" (mapconcat 'identity branches " ")))))
+			   (when
+			       branches
+			     (concat "@" (mapconcat 'identity branches " ")))))
 	     (txtid (concat filter (car (split-string (car location) "_"))))
 	     (line (car (cdr (cdr location))))
 	     (pag (car (cdr location)) ) 
@@ -1063,8 +1096,11 @@ One character is either a character or one entity expression"
 	     (vol (mandoku-textid-to-vol txtid))
 	     (tit (mandoku-textid-to-title txtid)))
 	(set-buffer result-buffer)
-	(unless (and (mandoku-apply-filter txtid)
-		     (mandoku-apply-datefilter txtid))
+	;; we ignore alternate versions at the moment
+	;; [2017-02-09T10:52:54+0900] TODO: expose user option in index display to override this
+	(unless (or (and branches (not mandoku-index-all-editions))
+		    (and (mandoku-apply-filter txtid)
+			 (mandoku-apply-datefilter txtid)))
 	  (setq mandoku-filtered-count (+ mandoku-filtered-count 1))
 	  (insert (format "** [[mandoku:%s:%s::%s][% 4s% 6s]]  % 10s%-30s  %s\n"
 		  txtf page search-string  
@@ -1078,7 +1114,9 @@ One character is either a character or one entity expression"
 		  (concat "  [[mandoku:meta:"
 			    txtid
 			    ":10][《" txtid
-			    (when branches (concat "@" (mapconcat 'identity branches " ")))
+			    (when
+				branches
+			      (concat "@" (mapconcat 'identity branches " ")))
 			    " "
 			    (mandoku-cut-string tit 15 t)
 			    "》]]")
@@ -1492,7 +1530,7 @@ first character and highlight '或'."
 		    (< (point) p )
 		    (re-search-forward "¶" (point-max) t))
 	      (setq line (+ line 1)))
-	    (list textid ed page line (mandoku-charcount-at-point-internal))))
+	    (list textid ed page line (mandoku-charcount-at-point-internal p))))
 	(list " -- " " -- " " -- " 0 0))
       )))
 
@@ -1502,8 +1540,9 @@ the character at point, ignoring non-Kanji characters"
   (save-excursion
     (let* ((p (or pnt (point)))
 	   (buffer-invisibility-spec nil)
-	  (begol (save-excursion (goto-char p) (search-backward "¶")))
-	  (charcount 0))
+	   (begol (save-excursion (goto-char p) (re-search-backward "¶" nil t )))
+	   (bs (buffer-substring-no-properties begol p))
+	   (charcount 0))
       (goto-char begol)
       (while (and (< charcount 50 )
 		  (< (point) p ))
@@ -2521,6 +2560,9 @@ Click on a link or move the cursor to the link and then press enter
   (nth (- (length fnlist ) 2 )  fnlist))
   )
 
+(defun mandoku-textid-to-filename (textid)
+  "Calculates the full path to a text from the text id."
+  (concat mandoku-text-dir (substring textid 0 4) "/" textid))
 
 (defun mandoku-start ()
   "return the start of region if a region is active, otherwise point"
