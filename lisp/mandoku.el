@@ -526,13 +526,14 @@ This should only be changed in rare circumstances. Four strings will be provided
 		  "~/krp"))
 	 (md 
 	  (if (not mandoku-base-dir)
-	      (read-string
-	       (format "Please input the full path to the base directory for Mandoku (default:%s): " defmd)
-	       nil nil  defmd)
+	      (if (file-exists-p (expand-file-name defmd))
+		  (expand-file-name defmd)
+		(read-string
+		 (format "Please input the full path to the base directory for Mandoku (default:%s): " defmd)
+		 nil nil  defmd))
 	    mandoku-base-dir))
 	 (mduser (concat md "/user"))
-	 (mandoku-ws-settings (expand-file-name (concat md "/KR-Workspace/Settings")))
-	 )
+	 (mandoku-ws-settings (expand-file-name (concat md "/KR-Workspace/Settings"))))
     (mkdir md t)
       ;; looks like we have to bootstrap the krp directory structure
       (progn
@@ -632,8 +633,7 @@ Do you want to download it now?"))
   ;; otherwise git will hang on windoof...
   (if (eq window-system 'w32)
       (setenv "GIT_ASKPASS" "git-gui--askpass"))
-  (setq mandoku-initialized-p t)
-)
+  (setq mandoku-initialized-p t))
 
 (defun mandoku-show-local-init ()
   (interactive)
