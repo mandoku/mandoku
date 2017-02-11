@@ -17,7 +17,7 @@
   "parse the string and repetitevely call the dictionary"
   (let ((result-buffer (get-buffer-create "*Dict Result*"))
 	(the-buf (current-buffer))
-	(pos    (mandoku-position-at-point)))
+	(pos    (mandoku-position-at-point-formatted)))
     (set-buffer result-buffer)
     (setq buffer-file-name nil)
     (read-only-mode 0)

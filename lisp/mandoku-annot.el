@@ -7,6 +7,34 @@
 
 (defvar mandoku-annot-regex "^\\([^:\n ]+\\) *\\([^:]+\\)::\\(.*?\\)$") 
 
+;;;###autoload
+(defun mandoku-annot-annotate (beg end &optional skip-pinyin)
+  "Annotate the selected term on the following line."
+  (interactive "r")
+  (let* ((term (mandoku-remove-markup (buffer-substring-no-properties beg end)))
+	 (pinyin (if (fboundp 'helm-charinfo-get-pinyin )
+		     (concat " [" (helm-charinfo-get-pinyin term) "] ")
+		   ""))
+	 (case-fold-search t))
+    (forward-line)
+    (beginning-of-line)
+    (if (looking-at ":zhu:")
+	(progn
+	  (re-search-forward ":end:")
+	  (beginning-of-line)
+	  (insert term 
+		  pinyin
+		  "\n" )
+	  (previous-line))
+      (progn
+	(insert ":zhu:\n \n:end:\n")
+	(previous-line 2)
+	(beginning-of-line)
+	(insert term pinyin)))
+    (beginning-of-line)
+    (deactivate-mark)))
+
+
 (defun mandoku-annot-write-to-file (filename &optional n)
   "Write to file, optional n indicates a 'notes first' format."
   (interactive)
@@ -158,6 +186,8 @@ of the annotation."
 	 (fn (plist-get mandoku-location-plist :filename))
 	 (lf (or key hd))
 	 )
+    (unless (file-exists-p mandoku-annot-dir)
+      (mkdir mandoku-annot-dir t))
     (with-current-buffer (find-file annot-file)
       (org-mode)
       (goto-char (point-min))

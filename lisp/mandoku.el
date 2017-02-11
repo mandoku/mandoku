@@ -87,7 +87,7 @@
 ;;;###autoload
 (defconst mandoku-lisp-dir (file-name-directory (or load-file-name (buffer-file-name)))
   "directory of mandoku lisp code")
-(defvar mandoku-subdirs (list "text" "images" "meta" "temp" "temp/imglist" "system" "work" "index" "user"))
+(defvar mandoku-subdirs (list "text" "images" "meta" "temp" "temp/imglist" "system" "work" "index" "user" "notes"))
 ;; it probably does not much sense to do this here, but anyway, this is the idea...
 (defcustom mandoku-grep-command "bzgrep" "The command used for mandoku's internal search function. On Windows, needs to be 'grep'."
     :type '(string)
@@ -1544,7 +1544,8 @@ the character at point, ignoring non-Kanji characters"
   (save-excursion
     (let* ((p (or pnt (point)))
 	   (buffer-invisibility-spec nil)
-	   (begol (save-excursion (goto-char p) (re-search-backward "¶" nil t )))
+	   (begol (or (save-excursion (goto-char p) (re-search-backward "¶" nil t ))
+		      p))
 	   (bs (buffer-substring-no-properties begol p))
 	   (charcount 0))
       (goto-char begol)
@@ -2210,9 +2211,10 @@ variant matches."
   (kill-append (concat "\n(巻" (mandoku-get-juan) ", " (mandoku-get-heading) ", p" (mandoku-page-at-point) ")") nil ) ) 
 
 (defun mandoku-get-line (&optional left)
-;  (interactive)
-;  (message 
-   (car (split-string (buffer-substring-no-properties (point-at-bol) (point-at-eol)) "	")))
+  (car (split-string
+	(buffer-substring-no-properties
+	 (point-at-bol)
+	 (point-at-eol)) "	")))
 
 ;; (easy-menu-define mandoku-md-menu org-mode-map "Mandoku menu"
 ;;   '("BK-MDA"
