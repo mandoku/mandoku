@@ -136,7 +136,6 @@ LINK will consist of a <textid> recognized by mandoku."
 		     "『"
 		    (mandoku-remove-markup region )
 		    "』"
-		    (mandoku-remove-markup region )
 		    "〔" title  ", [[mandoku:" textid  ":" (substring start 0 -3)  "]["  start  "]]〕\n"
 		    )))
       (message (substitute-command-keys "Please select text and use `\\[org-store-link]' to store the citation first.")))))
