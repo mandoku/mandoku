@@ -671,7 +671,7 @@ Do you want to download it now?"))
 
 
 ;;;###autoload
-(defun mandoku-search-user-text (search-for)
+(defun mandoku-search-user-text (search-for &optional search-dir)
   "This command searches through the texts located in `mandoku-work-dir'."
   (interactive 
    (let ((search-for (mapconcat 'char-to-string (mandoku-next-three-chars) "")))
@@ -680,12 +680,10 @@ Do you want to download it now?"))
 	(coding-system-for-write 'utf-8)
 	(grep-find-ignored-files nil)
 	(grep-find-ignored-directories nil)
-	)
+	(sd (or search-dir mandoku-work-dir)))
     (if (fboundp 'ripgrep-regexp-x)
-	(ripgrep-regexp search-for mandoku-work-dir '("-ttxt"))
-      (rgrep search-for "*.txt" mandoku-work-dir nil))))
-
-
+	(ripgrep-regexp search-for sd '("-ttxt"))
+      (rgrep search-for "*.txt" sd nil))))
 
 ;;;###autoload
 (defun mandoku-search-text (search-for)
@@ -2822,8 +2820,13 @@ the file."
     (kill-buffer)))
 
 
-
-
+(defun mandoku-open-file-narrow (filename loc)
+  "Open a file. Narrow to the area around the requested location.
+This location can be a line-number or a mandoku-location, like 580a06:1::晉侯"
+  (find-file-other-window filename)
+  (fundamental-mode)
+  (mandoku-execute-file-search loc)
+)
 
 ;; git config --global credential.helper wincred
 ;; one more
