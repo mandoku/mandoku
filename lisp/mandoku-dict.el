@@ -27,7 +27,8 @@
     (mandoku-dict-mode)
     (hide-sublevels 2)
     (goto-char (point-min))
-    (switch-to-buffer-other-window result-buffer t)))
+    (unless (get-buffer-window result-buffer)
+      (switch-to-buffer-other-window result-buffer t))))
 
 ;;;###autoload
 (defun mandoku-dict-mlookup (arg)
