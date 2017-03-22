@@ -3,7 +3,7 @@
 ;; created [2001-03-13T20:32:32+0800]  (as smart.el)
 ;; renamed and refactored [2010-01-08T17:01:43+0900]
 ;;
-;; Copyright (c) 2001-2016 Christian Wittern
+;; Copyright (c) 2001-2017 Christian Wittern
 ;;
 ;; Author: Christian Wittern <cwittern@gmail.com>
 ;; URL: http://www.mandoku.org

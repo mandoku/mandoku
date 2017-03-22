@@ -88,7 +88,7 @@ LINK will consist of a <textid> recognized by mandoku."
 			    (format "%2.2d" (mandoku-charcount-at-point-internal (region-end)))))))
 	     (region (if (org-region-active-p)
 		     (buffer-substring (region-beginning) (region-end))))
-	     (description  loc-format))
+	     (description  (concat "《" title "》" loc-format)))
 	(org-store-link-props
 	 :type "mandoku"
 	 :filename fn
@@ -100,7 +100,6 @@ LINK will consist of a <textid> recognized by mandoku."
 	 :region region
 	 :title title
 	 :description description)
-
 	))))
 
 (defun mandoku-insert-link (&optional notes plink )
