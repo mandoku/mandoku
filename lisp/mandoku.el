@@ -51,6 +51,7 @@
 (require 'url)
 (require 'url-handlers)
 (require 'cl)
+(require 'hi-lock)
 
 (defgroup mandoku nil
   "Main customization group for Mandoku.  The most frequently used settings are provided here.")
@@ -1968,6 +1969,63 @@ BEG and END default to the buffer boundaries."
 ;;   (replace-match "。
 ;; " (match-data))
 ;; ))
+
+(defun mandoku-helm-index-candidates ()
+  "Helm source for index"
+  (let (l
+	(filter "")
+	(search-string mandoku-search-for)
+	)
+    (with-current-buffer (get-buffer-create "*temp-mandoku*")
+      (goto-char (point-min))
+      ;(setq search-string (buffer-substring-no-properties 1 2))
+      (while (re-search-forward
+	      (concat "^\\([^,]*\\),\\([^\t]*\\)\t" filter  "\\([^\t \n]*\\)\t?\\([^\n]*\\)?$")
+	      nil t )
+	(let* ((pre (match-string 2))
+	       (post (match-string 1))
+	       (extra (match-string 4))
+	       (location (split-string (match-string 3) ":" ))
+	       (branches (remove "n" (split-string extra)))
+	       (txtf (concat filter  (car location)
+			     (when
+				 branches
+			       (concat "@" (mapconcat 'identity branches " ")))))
+	       (txtid (concat filter (car (split-string (car location) "_"))))
+	       (line (car (cdr (cdr location))))
+	       (pag (car (cdr location)) ) 
+	       (page (if (string-match "[-_]"  pag)
+			 (concat (substring pag 0 (- (length pag) 1))
+				 (mandoku-num-to-section (substring pag (- (length pag) 1))) line)
+		       (concat
+			pag
+			line)))
+	       (vol (mandoku-textid-to-vol txtid))
+	       (tit (mandoku-textid-to-title txtid)))
+	  (push (cons (format "%s %-10.10s %s%s " txtid
+			      (concat (if vol
+				  (concat vol ", ")
+				(or (ignore-errors (concat (number-to-string (string-to-number (cadr (split-string (car location) "_")))) ","))
+				    ""))
+			      (replace-regexp-in-string "^0+" "" page))
+			      
+			(replace-regexp-in-string "[\t\s\n+]" "" pre)
+			(mandoku-hi-in-string (replace-regexp-in-string "[\t\s\n+]" "" post) search-string)
+			)
+		      (format "%s:%s::%s"  txtf page search-string)) l))))
+    (nreverse l)
+  ))
+
+(defun mandoku-index-helm()
+  (interactive)
+  (let ((mandoku-index-helm-source
+	 '((name . "Mandoku Index")
+	   ;(fuzzy-match . t)
+	   (candidates . mandoku-helm-index-candidates)
+	   (action . (("Open" . (lambda (candidate)
+				  (mandoku-link-open candidate))))))))
+    (helm :sources '(mandoku-index-helm-source))))
+
 (defun mandoku-index-sort-func (type s)
   (when (derived-mode-p 'mandoku-index-mode)
     (goto-char (point-min))
@@ -2827,6 +2885,12 @@ This location can be a line-number or a mandoku-location, like 580a06:1::晉侯"
   (fundamental-mode)
   (mandoku-execute-file-search loc)
 )
+
+(defun mandoku-hi-in-string (str hi)
+  "Highlight 'hi' in str."
+  (let ((s (split-string str hi)))
+    (mapconcat 'identity s (propertize hi 'face 'hi-yellow))))
+
 
 ;; git config --global credential.helper wincred
 ;; one more
