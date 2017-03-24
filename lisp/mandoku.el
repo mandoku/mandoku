@@ -2001,17 +2001,18 @@ BEG and END default to the buffer boundaries."
 			pag
 			line)))
 	       (vol (mandoku-textid-to-vol txtid))
-	       (tit (mandoku-textid-to-title txtid)))
-	  (push (cons (format "%s %-10.10s %s%s " txtid
+	       (dummy "○")
+	       (tit (concat "《" (mandoku-textid-to-title txtid) "》")))
+	  (push (cons (format "%s %-10.10s %s%s %s" txtid
 			      (concat (if vol
 				  (concat vol ", ")
 				(or (ignore-errors (concat (number-to-string (string-to-number (cadr (split-string (car location) "_")))) ","))
 				    ""))
 			      (replace-regexp-in-string "^0+" "" page))
 			      
-			(replace-regexp-in-string "[\t\s\n+]" "" pre)
-			(mandoku-hi-in-string (replace-regexp-in-string "[\t\s\n+]" "" post) search-string)
-			)
+			(replace-regexp-in-string "[\t\s\n+]" "" pre)
+			(mandoku-hi-in-string (replace-regexp-in-string "[\t\s\n+]" "" post) search-string)
+			(propertize dummy 'display tit))
 		      (format "%s:%s::%s"  txtf page search-string)) l))))
     (nreverse l)
   ))
