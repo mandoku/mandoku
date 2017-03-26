@@ -398,7 +398,7 @@ This should only be changed in rare circumstances. Four strings will be provided
 (defun mandoku-read-txt-titles ()
   "This is the table which also includes references to other collections."
 ;  (interactive)
-  (setq mandoku-titles-by-taisho (make-hash-table :test 'equal))
+  (setq mandoku-txtid-by-other (make-hash-table :test 'equal))
   (when (file-exists-p mandoku-titles-file)
     (with-temp-buffer
       (let ((coding-system-for-read 'utf-8)
@@ -406,17 +406,15 @@ This should only be changed in rare circumstances. Four strings will be provided
 	(insert-file-contents mandoku-titles-file)
 	(goto-char (point-min))
 	(while (not (eobp))
-	  (if (looking-at "KR")
-	      (progn
-		(setq line (split-string (thing-at-point 'line t)))
-		(setq textid (car line))
-		(dolist (l (cdr line))
-
-		)
-	    (forward-line 1)
+	  (when (looking-at "KR")
+	    (setq line (split-string (thing-at-point 'line t)))
+	    (setq textid (car line))
+	    (dolist (l (cdr line))
+	      (when (string-match "@\\(.*\\)" l)
+		(puthash (match-string 1 l) textid mandoku-txtid-by-other))))
+	  (forward-line 1)
 	    ))
-  
-	  )))))
+	  )))
 	
 (defun mandoku-read-titletables () 
   "read the titles table"
@@ -2891,7 +2889,6 @@ This location can be a line-number or a mandoku-location, like 580a06:1::晉侯"
   "Highlight 'hi' in str."
   (let ((s (split-string str hi)))
     (mapconcat 'identity s (propertize hi 'face 'hi-yellow))))
-
 
 ;; git config --global credential.helper wincred
 ;; one more

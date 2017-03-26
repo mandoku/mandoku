@@ -63,8 +63,6 @@ LINK will consist of a <textid> recognized by mandoku."
 	  (outline-show-all)
 	  ))))
 
-
-
 (defun mandoku-link-store-link ()
   "if we are in mandoku-view-mode, or visiting a mandoku file, then store link"
   (when (eq major-mode 'mandoku-view-mode)
