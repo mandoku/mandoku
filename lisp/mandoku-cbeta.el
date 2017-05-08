@@ -1,4 +1,5 @@
 ;;support file for the CBETA texts.
+;; -*-no-byte-compile: t; -*-
 ;; currently there are five subsections H J W T X, they are accessed through different functions
 ;; [2017-03-26T11:08:00+0900]
 ;; updated the file from 2010 to work with the KR files
