@@ -1,12 +1,12 @@
-;;support file for the CBETA texts.
 ;; -*-no-byte-compile: t; -*-
+;; support file for the CBETA texts.
 ;; currently there are five subsections H J W T X, they are accessed through different functions
 ;; [2017-03-26T11:08:00+0900]
 ;; updated the file from 2010 to work with the KR files
 ;;;###autoload
 (defun mandoku-cbeta-open-by-vol-page (str)
   "Opens a text given a string like T51, p439a03. For texts from
-the 续藏经 use volumes and page numbers from the new edition,
+the 續藏經 use volumes and page numbers from the new edition,
 e.g. X78 771c12."
   (interactive "sMandoku | Open text by volume & page, e.g T9, 5b: ")
   (let* ((str (string-trim (replace-in-string str "[,p]" "")))
@@ -18,7 +18,8 @@ e.g. X78 771c12."
       (mandoku-cbeta-vol-page-to-file subcoll vol p) ":" (cadr (split-string str)) ) )))
 
 (defun mandoku-cbeta-vol-page-to-file (subcoll vol page)
-"converts the text id and page to a file name.  Page is numeric with the ending abc as 123"
+"converts the text id and page to a file name.  Page is numeric
+with the ending abc as 123"
 (cond
  ((equal subcoll "T")
   (cond 
