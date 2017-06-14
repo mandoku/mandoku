@@ -10,7 +10,9 @@ from difflib import *
 from collections import defaultdict
 ch_re = re.compile(ur'(\[[^\]]*\]|&[^;]*;|&amp;[CZ][X3-7]-[A-F0-9]+|.)')
 img_re = re.compile(ur'<i[^>]*>')
+sys.path.insert(0, '/Users/chris/krp/mandoku/python/citfind')
 
+import ftlib
 
 url = u"http://dao3.zinbun.kyoto-u.ac.jp:5000/api/v1.0/search?query=%s"
 
