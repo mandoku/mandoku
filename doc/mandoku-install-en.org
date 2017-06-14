@@ -15,6 +15,12 @@
   needed for the operation, including Mandoku, need to be installed as
   described below.
 
+  [Update: 2017-05-01] A bundle is now also available for computers
+  running macOS: Download the installation bundle
+  [[file:data/Sinomacs-mac-bundle.zip][Sinomacs-mac-bundle.zip]] (160MB). Unpack somewhere and click on the
+  file StartSinomacs within the bundle.  This file is experimental and
+  feedback is much appreciated.
+
 
   Requirements:
   - On all platforms, =git= and =python= are required for the

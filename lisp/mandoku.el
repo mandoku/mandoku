@@ -1949,8 +1949,8 @@ BEG and END default to the buffer boundaries."
 
 
 
-(define-key mandoku-view-mode-map
-  "C-ce" 'view-mode)
+;; (define-key mandoku-view-mode-map
+;;   "C-ce" 'view-mode)
 
 
 
@@ -1972,8 +1972,7 @@ BEG and END default to the buffer boundaries."
   "Helm source for index"
   (let (l
 	(filter "")
-	(search-string mandoku-search-for)
-	)
+	(search-string mandoku-search-for))
     (with-current-buffer (get-buffer-create "*temp-mandoku*")
       (goto-char (point-min))
       ;(setq search-string (buffer-substring-no-properties 1 2))
@@ -2008,22 +2007,24 @@ BEG and END default to the buffer boundaries."
 				    ""))
 			      (replace-regexp-in-string "^0+" "" page))
 			      
-			(replace-regexp-in-string "[\t\s\n+]" "" pre)
-			(mandoku-hi-in-string (replace-regexp-in-string "[\t\s\n+]" "" post) search-string)
+			      (replace-regexp-in-string "[\t\s\n+]" "" pre)
+			      (replace-regexp-in-string "\\\[\\\[file:\\([^]]*\\)\\\]\\\]" 'mandoku-rep-img-in-string 
+		 	(mandoku-hi-in-string (replace-regexp-in-string "[\t\s\n+]" "" post) search-string))
 			(propertize dummy 'display tit))
 		      (format "%s:%s::%s"  txtf page search-string)) l))))
     (nreverse l)
-  ))
+    ))
 
-(defun mandoku-index-helm()
-  (interactive)
-  (let ((mandoku-index-helm-source
+(defvar mandoku-index-helm-source
 	 '((name . "Mandoku Index")
 	   ;(fuzzy-match . t)
 	   (candidates . mandoku-helm-index-candidates)
 	   (action . (("Open" . (lambda (candidate)
-				  (mandoku-link-open candidate))))))))
-    (helm :sources '(mandoku-index-helm-source))))
+				  (mandoku-link-open candidate)))))))
+  
+(defun mandoku-index-helm()
+  (interactive)
+  (helm :sources '(mandoku-index-helm-source)))
 
 (defun mandoku-index-sort-func (type s)
   (when (derived-mode-p 'mandoku-index-mode)
@@ -2885,6 +2886,16 @@ This location can be a line-number or a mandoku-location, like 580a06:1::晉侯"
   (mandoku-execute-file-search loc)
 )
 
+(defun mandoku-rep-img-in-string (imgfile)
+  "Replace the org-type image link with the image as property. To be used in `replace-regexp-in-string'"
+  (let (img
+	(file (match-string 1 imgfile))
+	(dummy "○"))
+    (when (file-exists-p file)
+      (setq img (create-image file))
+      (when img
+	(propertize dummy 'display (cons 'image  img))))))
+      
 (defun mandoku-hi-in-string (str hi)
   "Highlight 'hi' in str."
   (let ((s (split-string str hi)))

@@ -13,7 +13,7 @@
 (defvar mandoku-dict-img-dir nil) 
 
 
-(defun mandoku-dict-procline (inp)
+(defun mandoku-dict-procline (inp &optional japanese)
   "parse the string and repetitevely call the dictionary"
   (let ((result-buffer (get-buffer-create "*Dict Result*"))
 	(the-buf (current-buffer))
@@ -23,7 +23,9 @@
     (read-only-mode 0)
     (erase-buffer)
     (insert "* " (if pos pos "")  "\n")
-    (url-insert-file-contents (concat mandoku-dict-url "/procline?query=" (replace-regexp-in-string "&" "$" inp)))
+    (if japanese
+	(url-insert-file-contents (concat mandoku-dict-url "/procline?&japanese=1&query=" (replace-regexp-in-string "&" "$" inp)))
+      (url-insert-file-contents (concat mandoku-dict-url "/procline?query=" (replace-regexp-in-string "&" "$" inp))))
     (mandoku-dict-mode)
     (hide-sublevels 2)
     (goto-char (point-min))
