@@ -14,7 +14,8 @@ zbmeta = "kr:meta:"
 kr_user = "kr_user:"
 tpref="taisho:"
 ## dictionary stuff.  really should wrap this in an object?!
-md_re = re.compile(ur"<[^>]*>|[　-㄀＀-￯\n¶]+|\t[^\n]+\n|\$[^;]+;")
+img_re = re.compile(ur'<i[^>]*>')
+md_re = re.compile(ur"<[^>]*>|[0-9　-㄀＀-￯\n¶\.]+|\t[^\n]+\n|\$[^;]+;")
 gaiji = re.compile(r"&([^;]+);")
 imgbase = "<img height='20' width='20' alt='{gaiji}' title='{gaiji}' src='https://raw.githubusercontent.com/kanripo/KR-Gaiji/master/images/{gaiji}.png'/>"
 
@@ -650,3 +651,42 @@ def consorted(defdic):
         out.append((s, t, defdic[d][0][2]))
     out = sorted(out, key=lambda x : x[0], reverse=True)
     return out
+
+def keycmp(kstr, idxdir=None, klen=3, exp=None):
+    if not idxdir:
+        idxdir="/Users/Shared/krp/index"
+    cutoff = float(len(kstr) - 1) / len(kstr)
+    key = kstr[0:klen]
+    if not redis_store.exists(key): 
+        doftsearch(key, idxdir=idxdir, exp=exp)
+    res = [key[0:1]+a for a in redis_store.lrange(key, 0, -1)]
+    res = [img_re.sub(u"〓",a) for a in res]
+    res = [(a, cscore(a[:len(kstr)], kstr)) for a in res]
+    # get rid of non-matches
+    res = [a[0] for a in res if a[1] > cutoff]
+    # filter out the matches on other branches:
+    res = [a for a in res if a.split("\t")[-1][0] in ["K", "n"]]
+    res = sorted(res, key = lambda k : kformat(k.split("\t")[1]))
+    return res
+
+def keyngram(kstr, idxdir=None, klen=3, exp=None):
+    """This function moves an ngram windown over the string and collects
+the output"""
+    idxdir="/Users/Shared/krp/index"
+    for i in xrange(len(kstr)-klen+1):
+        key = kstr[i:i+klen]
+        if not redis_store.exists(key, idxdir=idxdir): 
+            doftsearch(key, exp=exp)
+        res = [key[0:1]+a for a in redis_store.lrange(key, 0, -1)]
+        res = [img_re.sub(u"〓",a) for a in res]
+        ##what now?
+        res = [(a, cscore(a[:len(kstr)], kstr)) for a in res]
+    return res
+
+
+def kformat(a):
+    "make an indexloc sortable KR4d0427_006:6b:5:4:8, or KR5i0038_002:02p049b:10:21:20" 
+    t1 = a.split(":")
+    a = "%s:%4.4d%s%3.3d%3.3d%6.6d" % (t1[0], int(t1[1][:-1].replace("p", "0")), t1[1][-1], int(t1[2]), int(t1[3]), int(t1[4]))
+    return a
+
