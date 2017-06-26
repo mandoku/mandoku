@@ -687,7 +687,10 @@ the output"""
 def kformat(a):
     "make an indexloc sortable KR4d0427_006:6b:5:4:8, or KR5i0038_002:02p049b:10:21:20" 
     t1 = a.split(":")
-    a = "%s:%4.4d%s%3.3d%3.3d%6.6d" % (t1[0], int(t1[1][:-1].replace("p", "0")), t1[1][-1], int(t1[2]), int(t1[3]), int(t1[4]))
+    try:
+        a = "%s:%4.4d%s%3.3d%3.3d%6.6d" % (t1[0], int(t1[1][:-1].replace("p", "0")), t1[1][-1], int(t1[2]), int(t1[3]), int(t1[4]))
+    except:
+        a = "%s:0000%s%s%3.3d%3.3d%6.6d" % (t1[0], t1[1][:-1].replace("p", "0"), t1[1][-1], int(t1[2]), int(t1[3]), int(t1[4]))
     return a
 
 def kclose(a, b):
