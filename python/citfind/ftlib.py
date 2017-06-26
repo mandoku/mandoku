@@ -690,3 +690,57 @@ def kformat(a):
     a = "%s:%4.4d%s%3.3d%3.3d%6.6d" % (t1[0], int(t1[1][:-1].replace("p", "0")), t1[1][-1], int(t1[2]), int(t1[3]), int(t1[4]))
     return a
 
+def kclose(a, b):
+    """determine if the index location a is close to the index location
+b. Close means in the same juan on neighbouring lines."""
+    resp=False
+    tx =[a.split(":"), b.split(":")]
+    # different text/juan
+    if tx[0][0] == tx[1][0]:
+        if tx[0][1] == tx[1][1]:
+            if abs(int(tx[0][2]) - int(tx[1][2])) < 2:
+                resp = True
+        else:
+            #different pages: are we on neighbouring pages?
+            try:
+                if abs(int(tx[0][1][:-1]) - int(tx[1][1][:-1])) < 2:
+                    #one has to be line 1, the other? fairly large?, not one
+                    if int(tx[1][2]) == 1 and max(int(tx[0][2]), int(tx[1][2])) > 1:
+                        resp = True
+            except:
+                pass
+    return resp
+
+def kcondense (res, kf = lambda x : x.split("\t")[1]):
+    """This will return a list with locations that occur in proximity,
+grouped in lists of adjoining results. The list has to be sorted by
+location."""
+    out = []    
+    for i, rx in enumerate(res):
+        if len(out) > 0:
+            if kclose(kf(out[-1][-1]), kf(res[i])):
+                if res[i] in out[-1]:
+                    pass
+                else:
+                    out[-1].append(res[i])
+                continue
+        if i < len(res) - 1:
+            if kclose(kf(res[i]), kf(res[i+1])):
+                out.append([res[i], res[i+1]])
+    return out
+
+def krestore(l):
+    """Restores an index line to the original string, removes the location"""
+    fx = l.split("\t")[0].split(",")
+    return "%s%s" % (fx[1], fx[0])
+
+def kcombine(lx):
+    """Combines the index items in the list to one string where possible."""
+    res = lx[0]
+    for s in lx[1:]:
+        tmp = res[-4:]
+        if s.find(tmp) > 0:
+            res = res + s[s.index(tmp):]
+        else:
+            res = res + " / " + s
+    return res
