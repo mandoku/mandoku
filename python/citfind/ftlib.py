@@ -652,10 +652,11 @@ def consorted(defdic):
     out = sorted(out, key=lambda x : x[0], reverse=True)
     return out
 
-def keycmp(kstr, idxdir=None, klen=3, exp=None):
+def keycmp(kstr, idxdir=None, klen=3, exp=None, cutoff=None):
     if not idxdir:
         idxdir="/Users/Shared/krp/index"
-    cutoff = float(len(kstr) - 1) / len(kstr)
+    if not cutoff:
+        cutoff = float(len(kstr) - 1.1) / len(kstr)
     key = kstr[0:klen]
     if not redis_store.exists(key): 
         doftsearch(key, idxdir=idxdir, exp=exp)
