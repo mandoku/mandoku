@@ -32,7 +32,7 @@ astkanji = Ur'\U00020000-\U0002A6DF\U0002A700-\U0002B73F\U0002B740-\U0002B81F\U0
 pua=Ur'\uE000-\uF8FF'
 astpua = Ur'\U000F0000-\U000FFFFD\U00100000-\U0010FFFD'
 # the length of the ngram
-n=4
+n=7
 
 cnt = 0
 phrases=[]
@@ -58,9 +58,10 @@ for fx in files:
 def procng(ng, nl, cutoff=None):
 #    res = ",".join([a.split("\t")[1] for a in ftlib.keycmp(ng[0:nl],cutoff=cutoff)])
     # now we go for the whole keys, this will take some time...
-    res = ",".join([a.split("\t")[1] for a in ftlib.keycmp(ng[0:nl], klen=1)])
+    res = ",".join([a.split("\t")[1] for a in ftlib.keycmp(ng[0:nl], klen=3)])
     return res
 ng=""
+cf=0.6
 nextp=0
 ngcnt = 0
 pidx = 1
@@ -72,13 +73,13 @@ for i, c in enumerate (phrases):
     ng += p
     while len(ng) > n:
         ngcnt += 1
-        r=procng(ng, n, cutoff=0.99)
-        ng=ng[1:]
+        r=procng(ng, n, cutoff=cf)
         ox.write("%d\t%d\t%s\t%s\n" % (pdict[ngcnt], ngcnt, ng[0:n], r))
         print pdict[ngcnt], ngcnt, ng[0:n]
+        ng=ng[1:]
 
 ngcnt += 1
-r=procng(ng, n, cutoff=0.99)
+r=procng(ng, n, cutoff=cf)
 ox.write("%d\t%d\t%s\t%s\n" % (pdict[ngcnt], ngcnt, ng[0:n], r))
 print pdict[ngcnt], ngcnt, ng
 ox.close()
