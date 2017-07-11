@@ -32,7 +32,7 @@ astkanji = Ur'\U00020000-\U0002A6DF\U0002A700-\U0002B73F\U0002B740-\U0002B81F\U0
 pua=Ur'\uE000-\uF8FF'
 astpua = Ur'\U000F0000-\U000FFFFD\U00100000-\U0010FFFD'
 # the length of the ngram
-n=7
+n=4
 
 cnt = 0
 phrases=[]
@@ -58,13 +58,14 @@ for fx in files:
 def procng(ng, nl, cutoff=None):
 #    res = ",".join([a.split("\t")[1] for a in ftlib.keycmp(ng[0:nl],cutoff=cutoff)])
     # now we go for the whole keys, this will take some time...
-    res = ",".join([a.split("\t")[1] for a in ftlib.keycmp(ng[0:nl], klen=3)])
+    res = ",".join([a.split("\t")[1] for a in ftlib.keycmp(ng[0:nl], klen=3, cutoff=cutoff)])
     return res
 ng=""
-cf=0.6
+cf=0.99
 nextp=0
 ngcnt = 0
 pidx = 1
+ox.write("#Config values: n=%d, cutoff=%d, klen=3 \n" % (n, cf))
 for i, c in enumerate (phrases):
     p = c[1]
     pn= c[0]
