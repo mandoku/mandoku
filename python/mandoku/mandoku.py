@@ -502,7 +502,10 @@ function with access to a database."""
                         flag = rp[0].split('_')[1].lower()
                         flag = flag.replace(u'\xb6', u'')
                         #and the end
-                        self.markup[flag][self.flags[flag]] = len(self.seq)
+                        try:
+                            self.markup[flag][self.flags[flag]] = len(self.seq)
+                        except:
+                            pass
                     else:
                         try:
                             self.defs[rp[0].lower()]=" ".join(rp[1:]).strip()
