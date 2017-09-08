@@ -869,7 +869,7 @@ One character is either a character or one entity expression"
 	  (insert "\n** "
 		txtid " "
 		(mandoku-textid-to-title (car (split-string key "_")))
-		" 第" (format "%d" (string-to-int juan))
+		" 第" (format "%d" (string-to-number juan))
 		(format "巻 (%d)" hits)
 		": \n"
 		(format ":PROPERTIES:\n:ID: %s\n:TXTDATE: %s_%s\n:HITS: %3.3d\n:END:\n"
@@ -909,13 +909,13 @@ One character is either a character or one entity expression"
 (defun mandoku-transform-location (loc)
   "Convert the location in the index to a sortable numeric representation"
   (let ((l (split-string (cadr (split-string (cdr loc) "\t")) ":")))
-     (string-to-int
+     (string-to-number
       (format "%s%3.3d%3.3d"
        (replace-regexp-in-string "\\([a-d]\\)" 
 				 (lambda (rep)
 				   (format "%s" (- (string-to-char rep) 96))) (cadr l))
-       (string-to-int (caddr l))
-       (string-to-int (cadddr l))))))
+       (string-to-number (caddr l))
+       (string-to-number (cadddr l))))))
 
 
 (defun mandoku-hash-keys-mhash (hash-table search-strings)
@@ -1148,7 +1148,7 @@ One character is either a character or one entity expression"
     (setq j 0)
     (while (< j  (- (length s) (- n 1)))
       (setq m (substring s j (+ j n)))
-      (setq cnt (+ cnt (string-to-int (or (plist-get (gethash m ngramhash) :right) "0"))))
+      (setq cnt (+ cnt (string-to-number (or (plist-get (gethash m ngramhash) :right) "0"))))
       (setq j (+ j 1)))
     cnt))
 ;; ngram-n
@@ -1337,7 +1337,7 @@ One character is either a character or one entity expression"
 
 (defun mandoku-apply-datefilter (textid)
   ;(if mandoku-datefilter
-   (< mandoku-datefilter (string-to-int (gethash textid mandoku-textdates)))
+   (< mandoku-datefilter (string-to-number (gethash textid mandoku-textdates)))
    );)
 
 (defun mandoku-apply-filter (textid)
@@ -1455,7 +1455,7 @@ first character and highlight '或'."
 	   (line (if (posix-string-match "[a-o]." s)
 		     (string-to-number (car (cdr  (split-string (car (split-string s "::")) "[a-o]"))))
 		   0))
-	   (char (string-to-int  (or (cadr (split-string s ":")) "")))
+	   (char (string-to-number  (or (cadr (split-string s ":")) "")))
 	   (search (if (posix-string-match "::" s)
 		       (car (cdr (split-string s "::")))
 		     nil)))
