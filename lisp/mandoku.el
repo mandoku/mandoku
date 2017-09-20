@@ -1835,8 +1835,10 @@ eds
   
       
 (defun mandoku-header-line ()
-  (let* ((fn (file-name-sans-extension (file-name-nondirectory (buffer-file-name ))))
-	 (textid (car (split-string fn "_"))))
+  (let* ((fn (ignore-errors (file-name-sans-extension (file-name-nondirectory (buffer-file-name )))))
+	 (textid (if fn
+		     (car (split-string fn "_"))
+		   "No Name")))
     (list 
      (concat " " textid " " (mandoku-get-title)  ", " (mandoku-get-juan) " -  ")
      '(:eval  (mapconcat 'identity (mandoku-get-outline-path) " / "))
