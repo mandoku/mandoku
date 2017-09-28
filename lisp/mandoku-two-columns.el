@@ -11,7 +11,9 @@
 (defvar mandoku-two-columns-overlay nil)
 (defvar mandoku-two-columns-ask-before-returning-to-edit-buffer t)
 (defvar mandoku-two-columns-separator "	")
- 
+(defvar mandoku-two-columns-translation-pos nil)
+
+
 (defcustom mandoku-two-columns-window-setup 'reorganize-frame
   "How the source code edit buffer should be displayed.
 Possible values for this option are:
@@ -30,6 +32,31 @@ other-frame       Use `switch-to-buffer-other-frame' to display edit buffer.
 	  (const other-frame)
 	  (const other-window)
 	  (const reorganize-frame)))
+
+(defun mandoku-two-columns-set-translation ()
+  "Sets current buffer at current position as translation source."
+  (interactive)
+  (setq mandoku-two-columns-translation-pos (make-marker))
+  (set-marker mandoku-two-columns-translation-pos (point))
+  (message "Translation source set."))
+
+(defun mandoku-two-columns-get-next-translation ()
+  "Gets the next chunk of the associated translation."
+					; 1. go to the position 2. get the text 3. move to next position and save it.
+  (interactive)
+  (let (string bpos)
+    (unless mandoku-two-columns-translation-pos
+      (user-error "Please set the translation buffer before invoking this command."))
+    (with-current-buffer (marker-buffer mandoku-two-columns-translation-pos)
+      (goto-char mandoku-two-columns-translation-pos)
+      (search-forward "\n\n")
+      (setq string (string-trim-right (buffer-substring mandoku-two-columns-translation-pos (point))))
+      (skip-chars-forward " \n")
+      (set-marker mandoku-two-columns-translation-pos (point))
+      (bookmark-set (bookmark-buffer-name) nil nil nil)
+      )
+    (insert (replace-regexp-in-string "\n" " " string))
+  ))
 
 (defun mandoku-two-columns-edit-buffer-p (&optional buffer)
   "Non-nil when current buffer is a source editing buffer.
@@ -251,31 +278,35 @@ Leave point in edit buffer."
   ;; this is called immediately after 2C-two-columns
   (let ((b1 (current-buffer))
 	(b2 (2C-other t))
-	string)
+	left-string
+	stringl)
     (goto-char (point-min))
     ;; buffer b2 is still empty
     (while (not (eobp))
-      (setq string (split-string (buffer-substring (point)
-						   (progn (end-of-line) (point))) mandoku-two-columns-separator ))
-      (if (string= string "")
+      (setq stringl (split-string
+		    (buffer-substring
+		     (point)
+		     (progn (end-of-line) (point))) mandoku-two-columns-separator ))
+      (setq left-string (concat left-string (cadr stringl) "\n"))
+      (if (string= (car stringl) "")
 	  ()
-	(kill-line))
+	(delete-backward-char (- (point) (point-at-bol)))
+	(insert (car stringl))
+	)
       (or (eobp)
 	  (forward-char))		; next line
-      (set-buffer b2)
-      (if (string= string "")
-	  ()
-	(insert (cadr string)))
-      (next-line 1)
-      (beginning-of-line)
-      (set-buffer b1))
-  (let 
-  (goto-char (point-min)
-
+      )
+    (set-buffer b2)
+    (erase-buffer)
+    (insert (string-trim-right left-string) "\n")
+    (set-buffer b1)
+    ;;
+))
 
 (defun mandoku-two-columns-edit-setup (beg end)
   "Prepare for two column editing of the src buffer"
   (let ((2C-window-width 20))
+    (2C-two-columns)
     (mandoku-2C-split)
     (with-current-buffer (2C-other)
       (setq-local mandoku-two-columns-beg-marker beg)
@@ -294,6 +325,7 @@ Leave point in edit buffer."
     (define-key map "\C-c'" 'mandoku-two-columns-exit)
     (define-key map "\C-c\C-k" 'mandoku-two-columns-abort)
     (define-key map "\C-x\C-s" 'mandoku-two-columns-save)
+    (define-key map "\C-c\C-n" 'mandoku-two-columns-get-next-translation)
     map))
 
 (define-minor-mode mandoku-2C-right-mode
@@ -353,15 +385,17 @@ this one becomes the left column. The merging will be done based
 on visibility, lines with a :zhu: drawer containing annotations
 will be skipped over."
   (interactive)
-  (and (> (car (window-edges)) 0)	; not touching left edge of screen
-       (eq (window-buffer (previous-window))
-	   (2C-other t))
-       (other-window -1))
-  (save-excursion
-    (let ((b1 (current-buffer))
-	  (b2 (2C-other t))
+;  (and (> (car (window-edges)) 0)	; not touching left edge of screen
+;       (eq (window-buffer (previous-window))
+;	   (2C-other t))
+;       (other-window -1))
+;  (save-excursion
+    (let ((b2 (current-buffer))
+	  (b1 (2C-other t))
 	  string)
-      (goto-char (point-min))
+      (with-current-buffer b1
+;	(2C-toggle-autoscroll 0)
+	(goto-char (point-min)))
       (set-buffer b2)
       (goto-char (point-min))
       (while (not (eobp))
@@ -381,9 +415,10 @@ will be skipped over."
       (set-buffer b1)
       (kill-buffer b2)
       ))
-  )
+  
 
 ;; this is the entry point
+;;;###autoload
 (defun mandoku-two-columns-edit (&optional code edit-buffer-name)
   "Edit the text/translation at point.  A chunk of text of the
 next `mandoku-two-columns-limit' lines is copied to a separate
@@ -452,6 +487,8 @@ This can be called from either of the two buffers."
     ;; Clean up left-over markers and restore window configuration.
     (set-marker beg nil)
     (set-marker end nil)
+    (bookmark-set (bookmark-buffer-name) nil nil nil)
+    (save-buffer)
     (when mandoku-two-columns-saved-temp-window-config
       (set-window-configuration mandoku-two-columns-saved-temp-window-config)
       (setq mandoku-two-columns-saved-temp-window-config nil))))

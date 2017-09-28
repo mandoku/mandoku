@@ -1521,11 +1521,10 @@ first character and highlight '或'."
 	  )
       (goto-char p)
       (if (re-search-backward pb nil t)
-	  (progn
-	    (re-search-forward ":\\([^_]*\\)_\\([^_]*\\)_\\([^_>]*\\)>" nil t)
-	    (let ((textid (match-string 1))
-	    	    (ed (match-string 2))	
-   		    	    (page (match-string	3))
+	  (if (re-search-forward ":\\([^_]*\\)_\\([^_]*\\)_\\([^_>]*\\)>" nil t)
+	      (let ((textid (match-string 1))
+		    (ed (match-string 2))	
+		    (page (match-string	3))
 	    (line -1))
 	    (while (and
 		    (< (point) p )
