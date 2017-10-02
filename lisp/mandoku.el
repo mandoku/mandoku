@@ -1840,7 +1840,7 @@ eds
 		   "No Name")))
     (list 
      (concat " " textid " " (mandoku-get-title)  ", " (mandoku-get-juan) " -  ")
-     '(:eval  (mapconcat 'identity (mandoku-get-outline-path) " / "))
+     '(:eval  (mandoku-cut-string (mapconcat 'identity (mandoku-get-outline-path) " / ") 20))
      " "
      '(:eval (mandoku-position-at-point-formatted))
      " BR: "
