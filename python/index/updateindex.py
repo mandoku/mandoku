@@ -48,6 +48,7 @@ def textwalk(arg, dirname, names):
 # check for index-queue
 
 # just update
+# md.debug = True
 os.path.walk(mdtext, textwalk, '')
 idxtxt.close()
 #for path, dirlist, filelist in os.walk(mdtext):
