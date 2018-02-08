@@ -14,8 +14,9 @@ ccidx= "%s%s" % (krpbase, "index")
 try:
     os.makedirs(ccidx)
 except:
-    shutil.rmtree(ccidx)
-    os.makedirs(ccidx)
+    pass
+#    shutil.rmtree(ccidx)
+#    os.makedirs(ccidx)
 
 for d1 in os.listdir(kridx):
     sa = "%s/%s" % ( kridx, d1)

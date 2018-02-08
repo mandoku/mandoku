@@ -25,6 +25,7 @@ def PrintToIdxfile(outdir, string, collection ):
         code = u"gj"
     if (not code.startswith('30') and  u"()/¶*".find(string[0]) == -1 ):
         #to speed things up, we separate by bu: KR1, KR2, etc.
+        #ndir = "%s/%s/%s/%s"%(outdir, collection[0:3], code[0:2], code[0:4])
         ndir = "%s/%s/%s/%s"%(outdir, collection[0:3], code[0:2], code[0:4])
         try:
             os.makedirs(ndir)

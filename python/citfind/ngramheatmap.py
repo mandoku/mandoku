@@ -32,7 +32,7 @@ astkanji = Ur'\U00020000-\U0002A6DF\U0002A700-\U0002B73F\U0002B740-\U0002B81F\U0
 pua=Ur'\uE000-\uF8FF'
 astpua = Ur'\U000F0000-\U000FFFFD\U00100000-\U0010FFFD'
 # the length of the ngram
-n=4
+n=3
 
 cnt = 0
 phrases=[]

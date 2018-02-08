@@ -652,6 +652,29 @@ def consorted(defdic):
     out = sorted(out, key=lambda x : x[0], reverse=True)
     return out
 
+def key_yue(kstr, idxdir=None, klen=3, exp=None, cutoff=None, prec=u"曰"):
+    "return match if preceded by yue"
+    if not idxdir:
+        idxdir="/Users/Shared/krp/index"
+    if not cutoff:
+        cutoff = float(len(kstr) - 1.1) / len(kstr)
+    key = kstr[0:klen]
+    if not redis_store.exists(key): 
+        doftsearch(key, idxdir=idxdir, exp=exp)
+    res = [key[0:1]+a for a in redis_store.lrange(key, 0, -1)]
+    res = [img_re.sub(u"〓",a) for a in res]
+    res = [(a, cscore(a[:len(kstr)], kstr)) for a in res]
+    # get rid of non-matches
+    res = [a[0] for a in res if a[1] > cutoff]
+    # filter out the matches on other branches:
+    res = [a for a in res if a.split("\t")[-1][0] in ["K", "n"]]
+    res = [a for a in res if prec+"\t" in a]
+    # now lets rearrange the stuff as we like it
+    res = [re.sub("([^,]+),([^	]+)", "\\2\\1", a) for a in res]
+    res = sorted(res, key = lambda k : kformat(k.split("\t")[1]))
+    return res
+
+
 def keycmp(kstr, idxdir=None, klen=3, exp=None, cutoff=None):
     if not idxdir:
         idxdir="/Users/Shared/krp/index"

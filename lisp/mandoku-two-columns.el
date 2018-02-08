@@ -53,7 +53,7 @@ other-frame       Use `switch-to-buffer-other-frame' to display edit buffer.
       (setq string (string-trim-right (buffer-substring mandoku-two-columns-translation-pos (point))))
       (skip-chars-forward " \n")
       (set-marker mandoku-two-columns-translation-pos (point))
-      (bookmark-set (bookmark-buffer-name) nil nil nil)
+      (bookmark-set (bookmark-buffer-name) nil)
       )
     (insert (replace-regexp-in-string "\n" " " string))
   ))
@@ -257,14 +257,13 @@ Leave point in edit buffer."
 	;; Move mark and point in edit buffer to the corresponding
 	;; location.
 	(if remote
-	    (progn
-	      ;; Put point at first non read-only character after
-	      ;; leading blank.
-	      (goto-char
-	       (or (text-property-any (point-min) (point-max) 'read-only nil)
-		   (point-max)))
-	      (skip-chars-forward " \r\t\n"))
-	  )))))
+	    (goto-char (point-min)))
+	  (other-window 1)
+	  ;(setq-local line-spacing 0.6)
+	  
+	  ))))
+
+
 	  ;; Set mark and point.
 	  ;; (when mark-coordinates
 	  ;;   (mandoku-two-columns-goto-coordinates mark-coordinates (point-min) (point-max))
@@ -409,7 +408,7 @@ will be skipped over."
 	  (end-of-line)
 	  ;(indent-to-column 2C-window-width)
 	  (insert mandoku-two-columns-separator string))
-	(next-line 1)
+	(forward-line 1)
 	(beginning-of-line)
 	(set-buffer b2))
       (set-buffer b1)
@@ -487,7 +486,7 @@ This can be called from either of the two buffers."
     ;; Clean up left-over markers and restore window configuration.
     (set-marker beg nil)
     (set-marker end nil)
-    (bookmark-set (bookmark-buffer-name) nil nil nil)
+    (bookmark-set (bookmark-buffer-name) nil)
     (save-buffer)
     (when mandoku-two-columns-saved-temp-window-config
       (set-window-configuration mandoku-two-columns-saved-temp-window-config)
