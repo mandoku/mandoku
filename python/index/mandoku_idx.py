@@ -337,9 +337,9 @@ def mdIndexGit(txtdir, repo, branches, left, right, length):
     return alls
     
 
-def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7, es=False):
+def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7, backend="files"):
     global idx
-    if es:
+    if backend == "elastic":
         from elasticsearch import Elasticsearch
         es = Elasticsearch(hosts = ["http://elastic:NewTLS55@localhost:9200/"])
         INDEX_NAME = 'krp'
@@ -356,9 +356,13 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7, es=False)
     #check if a previous run exists:
     for b in [a for a in repo.branches if a.name == a.name.upper() or a.name == "master"]:
         now[b.name] = b.commit.hexsha
-    lg = '%s/meta/%s/%s.log' % (idxdir, coll, txtid)
-    # if we have a log file, this is an update
-    update = os.path.isfile(lg)
+    if backend == "files":
+        lg = '%s/meta/%s/%s.log' % (idxdir, coll, txtid)
+        # if we have a log file, this is an update
+        update = os.path.isfile(lg)
+    else:
+        lg = ""
+        update = False
     if debug:
         print lg, update
     changed = True
@@ -397,16 +401,17 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7, es=False)
         except:
             pass
     # now we write the new logfile
-    rec = codecs.open(lg, 'w', 'utf-8')
-    if changed:
-        rec.write(u"# updating index at: %s\n" % (datetime.datetime.now()))
-    else:
-        rec.write(u"# creating index at %s\n" % (datetime.datetime.now()))
-    rec.write(u"para: '%s', %d, %d, %d\n" % (idxdir, left, right, length))
-    for b in [a for a in repo.branches if a.name == a.name.upper() or a.name=="master"]:
-        rec.write(u"%s\t%s\n" % (b.name.decode('utf-8'), b.commit.hexsha))
-    # check for identical hashes:
-    rec.close()
+    if backend == "files":
+        rec = codecs.open(lg, 'w', 'utf-8')
+        if changed:
+            rec.write(u"# updating index at: %s\n" % (datetime.datetime.now()))
+        else:
+            rec.write(u"# creating index at %s\n" % (datetime.datetime.now()))
+        rec.write(u"para: '%s', %d, %d, %d\n" % (idxdir, left, right, length))
+        for b in [a for a in repo.branches if a.name == a.name.upper() or a.name=="master"]:
+            rec.write(u"%s\t%s\n" % (b.name.decode('utf-8'), b.commit.hexsha))
+            # check for identical hashes:
+        rec.close()
     if  len(now) > 0 and changed:
         index = mdIndexGit(txtdir, repo, now, left, right, length)
         if not update:
@@ -425,11 +430,11 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7, es=False)
             if debug:
                 print "writing index %d keys." % (len(idx))
             for of in idx.keys():                
-                if not es:
+                if backend == "files":
                     outfile=codecs.open(of, 'a+', 'utf-8')
                     outfile.write("".join(idx[of]))
                     outfile.close()
-                else:
+                elif backend == "elastic":
                     ch=unichr(int(os.path.split(of)[-1].split(".")[0], 16))
                     es_out = [u"%s%s" % (ch, a.strip("\n")) for a in idx[of].split("\n")]
                     for e in es_out:
