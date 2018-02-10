@@ -16,6 +16,8 @@ idx={}
 pcnt = 0
 notes = []
 defs = {}
+pw = os.environ["ELASTICPW"]
+
 
 def PrintToIdxfile(outdir, string, collection ):
     global idx
@@ -27,10 +29,12 @@ def PrintToIdxfile(outdir, string, collection ):
         #to speed things up, we separate by bu: KR1, KR2, etc.
         #ndir = "%s/%s/%s/%s"%(outdir, collection[0:3], code[0:2], code[0:4])
         ndir = "%s/%s/%s/%s"%(outdir, collection[0:3], code[0:2], code[0:4])
-        try:
-            os.makedirs(ndir)
-        except:
-            pass
+        if outdir:
+            #for none file based backends, dont produce this
+            try:
+                os.makedirs(ndir)
+            except:
+                pass
         # this is the old style
         ofile="%s/%s.%s.idx"%(ndir, code, collection)
         try:
@@ -341,7 +345,7 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7, backend="
     global idx
     if backend == "elastic":
         from elasticsearch import Elasticsearch
-        es = Elasticsearch(hosts = ["http://elastic:NewTLS55@localhost:9200/"])
+        es = Elasticsearch(hosts = ["http://elastic:%s@localhost:9200/" % (pw)])
         INDEX_NAME = 'krp'
         metadata = {'index' : { '_index' : INDEX_NAME, '_type' : 'idx' }}
         bulk = []
@@ -396,10 +400,11 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7, backend="
                 print "INFO: Something changed, re-indexing."
             oldindex = mdIndexGit(txtdir, repo, old, left, right, length)
     else:
-        try:
-            os.makedirs("%s/meta/%s" % (idxdir, coll))
-        except:
-            pass
+        if idxdir:
+            try:
+                os.makedirs("%s/meta/%s" % (idxdir, coll))
+            except:
+                pass
     # now we write the new logfile
     if backend == "files":
         rec = codecs.open(lg, 'w', 'utf-8')
