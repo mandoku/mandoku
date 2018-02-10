@@ -337,8 +337,16 @@ def mdIndexGit(txtdir, repo, branches, left, right, length):
     return alls
     
 
-def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7):
+def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7, es=False):
     global idx
+    if es:
+        from elasticsearch import Elasticsearch
+        es = Elasticsearch(hosts = ["http://elastic:NewTLS55@localhost:9200/"])
+        INDEX_NAME = 'krp'
+        metadata = {'index' : { '_index' : INDEX_NAME, '_type' : 'idx' }}
+        bulk = []
+        bulkcnt = 0
+        bulk_size = 5000
     old = {}
     now = {}
     oldindex = []
@@ -416,10 +424,35 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7):
                     PrintToIdxfile(idxdir, i, txtid[0:8])
             if debug:
                 print "writing index %d keys." % (len(idx))
-            for of in idx.keys():
-                outfile=codecs.open(of, 'a+', 'utf-8')
-                outfile.write("".join(idx[of]))
-                outfile.close()
+            for of in idx.keys():                
+                if not es:
+                    outfile=codecs.open(of, 'a+', 'utf-8')
+                    outfile.write("".join(idx[of]))
+                    outfile.close()
+                else:
+                    ch=unichr(int(os.path.split(of)[-1].split(".")[0], 16))
+                    es_out = [u"%s%s" % (ch, a.strip("\n")) for a in idx[of].split("\n")]
+                    for e in es_out:
+                        if "\t" in e:
+                            m1=e.split("\t")
+                            try:
+                                text, prev = m1[0].split(",")
+                                filen, loc = m1[1].split(":", 1)
+                            except:
+                                print m1
+                                continue
+                            mx={'text' : text, 'prev' : prev, 'file' : filen, 'loc' : loc}
+                            if len(m1) > 2:
+                                mx.update({"extra" : m1[2]})
+                            bulk.append(metadata)
+                            bulk.append(mx)
+                            bulkcnt +=1
+                    if bulkcnt > bulk_size:
+                        resb = es.bulk(index = INDEX_NAME,body = bulk, refresh = True)                        
+                        print resb
+                        bulk = []
+                        bulkcnt = 0
+                        
             idx={}
         else:
             if len(oldindex) > 0:
