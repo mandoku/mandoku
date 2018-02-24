@@ -37,3 +37,21 @@ def cscore(s, ref, cutoff=0.5):
     r = m.quick_ratio()
     if r > cutoff:
         return (r, s)
+
+
+def fx():
+    for k in keys:
+        [rx.append(k[0:1]+a) for a in redis_store.lrange(k, 0, -1)]
+    out = sorted(rx, key = lambda k : ftlib.kformat(k.split("\t")[1]))
+    out = ftlib.kcondense(out)
+
+
+for a in out:
+  m = [0, 0]
+  for b in a:
+    for j, k in enumerate(keys):
+      if b.find(k):
+        m[j] += 1
+  if min(m) > 0:
+      print m, "\n".join(a)
+    
