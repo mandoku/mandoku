@@ -3,7 +3,7 @@
 from __future__ import division
 from __future__ import absolute_import
 
-import os, sys, codecs, re, datetime, os.path, git
+import os, sys, codecs, re, datetime, os.path, git, logging
 from difflib import *
 
 debug = False
@@ -16,33 +16,66 @@ idx={}
 pcnt = 0
 notes = []
 defs = {}
-pw = os.environ["ELASTICPW"]
+teardown=True
+# spaeter auf max setzen
+gcharcnt = 0
+gbackend = "files"
+# file:page:line:char:para$gchar
+templ = "%s:%s:%2.2d:%2.2d:%d$%d"  
 
 
 def PrintToIdxfile(outdir, string, collection ):
     global idx
+    global gcharcnt
     try:
         code = (u"%4.4x"%(ord(string[0])))
     except:
         code = u"gj"
     if (not code.startswith('30') and  u"()/¶*".find(string[0]) == -1 ):
         #to speed things up, we separate by bu: KR1, KR2, etc.
-        #ndir = "%s/%s/%s/%s"%(outdir, collection[0:3], code[0:2], code[0:4])
-        ndir = "%s/%s/%s/%s"%(outdir, collection[0:3], code[0:2], code[0:4])
-        if outdir:
-            #for none file based backends, dont produce this
+        if gbackend == "files":
+            #ndir = "%s/%s/%s/%s"%(outdir, collection[0:3], code[0:2], code[0:4])
+            ndir = "%s/%s/%s/%s"%(outdir, collection[0:3], code[0:2], code[0:4])
+            if outdir:
+                #for none file based backends, dont produce this
+                try:
+                    os.makedirs(ndir)
+                except:
+                    pass
+            # this is the old style
+            ofile="%s/%s.%s.idx"%(ndir, code, collection)
             try:
-                os.makedirs(ndir)
+                idx[ofile] += "%s\n" % (string[1:])
             except:
-                pass
-        # this is the old style
-        ofile="%s/%s.%s.idx"%(ndir, code, collection)
-        try:
-            idx[ofile] += "%s\n" % (string[1:])
-        except:
-            idx[ofile] = "%s\n" % (string[1:])
-        
-
+                idx[ofile] = "%s\n" % (string[1:])
+        else:
+            m1 = string.split("\t")
+            try:
+                text, prev = m1[0].split(",")
+                filen, tmp = m1[1].split(":", 1)
+                loc, no = tmp.split("$")
+                no = int(no)
+            except:
+                print m1
+                return
+            mx={'text' : text, 'prev' : prev, 'file' : filen, 'loc' : loc}
+            if len(m1) > 2:
+                extra = "\t".join(m1[2:])
+                mx.update({'extra' : extra})
+                if extra.startswith("n"):
+                    gcharcnt += 1
+                    mx.update({'id' : no})
+                else:
+                    #print string
+                    mx.update({'var' : no})
+            else:
+                gcharcnt += 1
+                mx.update({'id' : no})
+            try:
+                idx[no].append(mx)
+            except:
+                idx[no] = [mx]
+                
     
             
 def MandokuIndex(file, idlogfile='logfile.log', left=2, right=2, length=3, collection='test', use_vol=0):
@@ -54,7 +87,10 @@ def MandokuIndex(file, idlogfile='logfile.log', left=2, right=2, length=3, colle
     defs['noteflag'] = 0
     defs['versflag'] = 0
     defs['file'] = file
+    #this is the char on the line
     defs['char'] = 0
+    #here we count the total chars for the whole file
+    defs['charcnt'] = 0
     defs['para'] = 0
     s=[]
     #prefill the pre array    
@@ -92,6 +128,7 @@ def MandokuIndex(file, idlogfile='logfile.log', left=2, right=2, length=3, colle
                         defs['noteflag'] = 0
                     else:
                         defs['char'] += 1
+                        defs['charcnt'] += 1
                         pcnt += 1
                         if defs['noteflag'] == 1:
                             #if the previous character is a note, add to stack, otherwise print out, empty stack and start afres
@@ -106,12 +143,14 @@ def MandokuIndex(file, idlogfile='logfile.log', left=2, right=2, length=3, colle
                                     npre.append(notes.pop(0)[0])
                                     npre.pop(0)
                                 #procnotes
-                                notes = [(a, "%s:%s:%d:%d:%d"%(defs['txtfile'], defs['page'], defs['line'], defs['char'], defs['para']), pcnt)]
+                                notes = [(a, templ % (defs['txtfile'], defs['page'],
+                                                      defs['line'], defs['char'], defs['para'], defs['charcnt']), pcnt)]
                             else:
-                                notes.append((a, "%s:%s:%d:%d:%d"%(defs['txtfile'], defs['page'], defs['line'], defs['char'], defs['para']), pcnt))
+                                notes.append((a, templ % (defs['txtfile'], defs['page'],
+                                            defs['line'], defs['char'], defs['para'], defs['charcnt']), pcnt))
                         else:
                             try:
-                                chars.append((a, "%s:%s:%d:%d:%d"%(defs['txtfile'], defs['page'], defs['line'], defs['char'], defs['para']), pcnt))
+                                chars.append((a, templ % (defs['txtfile'], defs['page'], defs['line'], defs['char'], defs['para'], defs['charcnt']), pcnt))
                             except:
                                 print "error:", defs
                                 sys.exit()
@@ -166,7 +205,12 @@ def MandokuIndex(file, idlogfile='logfile.log', left=2, right=2, length=3, colle
     for line in f:
         if line.startswith(u'校勘記¶'):
             break
+        if line.startswith('No'):
+            continue
         line = img_re.sub('', line)
+        ##[2018-02-26T20:41:10+0900]
+        ## need to get rid of commas!
+        line = line.replace(",", "")
         line = re.sub(r'/', '', line)
         if "\t" in line:
             line=line.split('\t')[0] + "\n"
@@ -343,14 +387,35 @@ def mdIndexGit(txtdir, repo, branches, left, right, length):
 
 def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7, backend="files"):
     global idx
+    global gbackend
+    gbackend = backend
+    bulkcnt = 0
+    bulk = []
+    bulk_size = 5000
     if backend == "elastic":
+        pw = os.environ["ELASTICPW"]
         from elasticsearch import Elasticsearch
         es = Elasticsearch(hosts = ["http://elastic:%s@localhost:9200/" % (pw)])
         INDEX_NAME = 'krp'
         metadata = {'index' : { '_index' : INDEX_NAME, '_type' : 'idx' }}
-        bulk = []
-        bulkcnt = 0
-        bulk_size = 5000
+    elif backend == "rethink":
+        pw = os.environ["RETHINKPW"]
+        indexdb="krpindex"
+        indextb="idx"
+        import rethinkdb as r
+        #conn=r.connect("localhost", password=pw)
+        conn=r.connect("localhost", port=28020)
+        if not indexdb in r.db_list().run(conn):
+            r.db_create(indexdb).run(conn)
+            r.db(indexdb).table_create(indextb).run(conn)
+            #ngram index for n=1, n=2 and n=3
+            r.db(indexdb).table(indextb).index_create("ngram", [r.row["text"].slice(0,1),r.row["text"].slice(0,2),r.row["text"].slice(0,3)], multi=True).run(conn) 
+
+        elif teardown:
+            r.db(indexdb).table_drop(indextb).run(conn)
+            r.db(indexdb).table_create(indextb).run(conn)
+            #r.db(indexdb).table(indextb).index_create("ngram", [r.row["text"].slice(0,1),r.row["text"].slice(0,2),r.row["text"].slice(0,3)], multi=True).run(conn) 
+        rx=r.db(indexdb).table(indextb)
     old = {}
     now = {}
     oldindex = []
@@ -439,30 +504,28 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7, backend="
                     outfile=codecs.open(of, 'a+', 'utf-8')
                     outfile.write("".join(idx[of]))
                     outfile.close()
-                elif backend == "elastic":
-                    ch=unichr(int(os.path.split(of)[-1].split(".")[0], 16))
-                    es_out = [u"%s%s" % (ch, a.strip("\n")) for a in idx[of].split("\n")]
-                    for e in es_out:
-                        if "\t" in e:
-                            m1=e.split("\t")
-                            try:
-                                text, prev = m1[0].split(",")
-                                filen, loc = m1[1].split(":", 1)
-                            except:
-                                print m1
-                                continue
-                            mx={'text' : text, 'prev' : prev, 'file' : filen, 'loc' : loc}
-                            if len(m1) > 2:
-                                mx.update({"extra" : m1[2]})
+                elif backend == "elastic" or backend == "rethink":
+                    #ch=unichr(int(os.path.split(of)[-1].split(".")[0], 16))
+                    #es_out = [u"%s%s" % (ch, a.strip("\n")) for a in idx[of].split("\n")]
+                    for mx in idx[of]:
+                        if backend == "elastic":
                             bulk.append(metadata)
-                            bulk.append(mx)
-                            bulkcnt +=1
+                        bulk.append(mx)
+                        bulkcnt +=1
                     if bulkcnt > bulk_size:
-                        resb = es.bulk(index = INDEX_NAME,body = bulk, refresh = True)                        
-                        print resb
+                        if backend == "elastic":
+                            resb = es.bulk(index = INDEX_NAME,body = bulk, refresh = True)
+                        else:
+                            resb = dict(rx.insert(bulk).run(conn))
+                            try:
+                                print resb['inserted']
+                            except:
+                                print resb
                         bulk = []
                         bulkcnt = 0
-                        
+                else:
+                    print "No valid backend found, exiting.  Valid backends are:\nfiles\tfile based index_stage\nelastic\telasticsearch index\nrethink\trethinkdb index\n"
+                    sys.exit()
             idx={}
         else:
             if len(oldindex) > 0:
