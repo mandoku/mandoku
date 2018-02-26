@@ -16,7 +16,7 @@ idx={}
 pcnt = 0
 notes = []
 defs = {}
-teardown=True
+teardown=False
 # spaeter auf max setzen
 gcharcnt = 0
 gbackend = "files"
@@ -409,12 +409,12 @@ def StartIndex(txtdir, idxdir="/tmp/index", left=3, right=3, length=7, backend="
             r.db_create(indexdb).run(conn)
             r.db(indexdb).table_create(indextb).run(conn)
             #ngram index for n=1, n=2 and n=3
-            r.db(indexdb).table(indextb).index_create("ngram", [r.row["text"].slice(0,1),r.row["text"].slice(0,2),r.row["text"].slice(0,3)], multi=True).run(conn) 
+            #r.db(indexdb).table(indextb).index_create("ngram", [r.row["text"].slice(0,1),r.row["text"].slice(0,2),r.row["text"].slice(0,3)], multi=True).run(conn) 
 
         elif teardown:
             r.db(indexdb).table_drop(indextb).run(conn)
             r.db(indexdb).table_create(indextb).run(conn)
-            #r.db(indexdb).table(indextb).index_create("ngram", [r.row["text"].slice(0,1),r.row["text"].slice(0,2),r.row["text"].slice(0,3)], multi=True).run(conn) 
+            r.db(indexdb).table(indextb).index_create("ngram", [r.row["text"].slice(0,1),r.row["text"].slice(0,2),r.row["text"].slice(0,3)], multi=True).run(conn) 
         rx=r.db(indexdb).table(indextb)
     old = {}
     now = {}
