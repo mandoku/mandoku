@@ -219,6 +219,8 @@ def MandokuIndex(file, idlogfile='logfile.log', left=2, right=2, length=3, colle
                 r=line[2:-1].split()
             else:
                 r=line[1:-1].split()
+            if len(r) < 1:
+                continue
             if r[0].startswith('PROPERTY'):
                 try:
                     defs[r[1].lower()] = r[2]
