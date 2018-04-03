@@ -565,7 +565,9 @@ This should only be changed in rare circumstances. Four strings will be provided
             (insert "(setq mandoku-base-dir \"" mandoku-base-dir "\")\n")
             (insert ";; additional settings for mandoku: \n")
             (insert "(load (concat user-emacs-directory \"mandoku-init\"))\n")
-            (insert "(mandoku-show-catalog)\n")
+	    (insert "(if (boundp 'sinomacs-dir)    (ignore-errors 
+      (mapc 'load (directory-files (concat sinomacs-dir \"lisp\") 't \"^[^#].*el$\")))
+  (mandoku-show-catalog))" )
             (insert ";; --end-- added by mandoku installer\n")
             (save-buffer))
 	  (kill-buffer)))
