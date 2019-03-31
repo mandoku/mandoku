@@ -36,6 +36,7 @@ idxtxt = open("%s/indexed-texts.txt" % (mdsys), "w")
 
 def textwalk(arg, dirname, names):
     """Processing a dir in the mandoku text hierarchy, looking for files to index.:"""
+    names.sort()
     for f in names:
         if txtid_re.match(f):
             p = "%s/%s" % (dirname, f)
