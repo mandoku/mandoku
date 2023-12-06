@@ -1,5 +1,6 @@
 #+TITLE: Mandoku project
 
+2023-12-06 This project is broken and not maintained, so I am archiving it now.
 
 * About mandoku
 
